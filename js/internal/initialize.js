@@ -1,4 +1,5 @@
 require([
+            'utility/log',
             'utility/renderer',
             'utility/helper',
             'baseball/game',
@@ -8,16 +9,18 @@ require([
             'baseball/manager',
             'baseball/umpire'
         ], function(
+            Log,
             Renderer,
             Helper,
             Game, Field, Team, Player, Manager, Umpire
         ) {
-    var yakyuu = {
+    var baseball = {
         utility : {
+            Log : Log,
             Renderer : Renderer,
             Helper : Helper
         },
-        static : {
+        instance : {
 
         },
         Game : Game,
@@ -27,8 +30,10 @@ require([
         Manager : Manager,
         Umpire : Umpire
     };
+    var match;
     jQ(function() {
-        yakyuu.static.game = new Game(yakyuu);
+        //domready
     });
-    window.yakyuu = yakyuu;
+    match = new Game(baseball);
+    window.y = match;
 });

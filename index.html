@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<script>
+    window.log = function() {
+        console.log.apply(console, arguments);
+    };
+</script>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Baseball Hobby Club</title>
+        <script src="js/external/angular/angular.js"></script>
+        <script src="js/external/jquery/jquery-1.10.2.min.js"></script>
+        <script src="js/internal/utility/data.js"></script>
+        <script src="js/internal/angular/application/application.js"></script>
+        <script src="js/internal/angular/controllers/IndexController.js"></script>
+        <script data-main="js/internal/initialize" src="js/external/requirejs/2.1.10-require.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <link rel="shortcut icon"
+              href="">
+    </head>
+    <body>
+        <div ng-click="refresh()" class="main-content" ng-app='YakyuuAikoukai' ng-controller='IndexController'>
+            <div class="scoreboard">
+                <div class='team-names left'>
+                    <table>
+                        <tr>
+                            <td>Team</td>
+                        </tr>
+                        <tr ng-repeat="team in y.teams">
+                            <td>{{team.name}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="scores left">
+                    <table>
+                        <tr>
+                            <td ng-repeat="(block, value) in y.scoreboard.home">{{block}}</td>
+                        </tr>
+                        <tr class="team-line" ng-repeat="side in y.scoreboard">
+                            <td class='' ng-repeat="score in side">
+                                {{score}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="tallies left">
+                    <table>
+                        <tr>
+                            <td>H</td><td>R</td><td>E</td>
+                        </tr>
+                        <tr ng-repeat="side in y.tally">
+                            <td>{{side.H}}</td><td>{{side.R}}</td><td>{{side.E}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="clear"></div>
+            <div class="strikezone" ng-click="swing($event)">
+
+            </div>
+            <ul class="left">
+                <li ng-repeat="event in y.log.record">
+                    {{event}}
+                </li>
+            </ul>
+            <div class="left umpire">
+                {{y.umpire.says}}
+            </div>
+            <ul class="left pitch-record">
+                <li ng-repeat="event in y.log.pitchRecord track by $index">
+                    {{event}}
+                </li>
+            </ul>
+        </div>
+    </body>
+</html>
