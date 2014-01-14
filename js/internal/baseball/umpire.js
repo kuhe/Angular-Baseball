@@ -8,6 +8,11 @@ define(function(){
             this.game = game;
             this.playBall();
         },
+        count : {
+            strikes : 0,
+            balls : 0,
+            outs : 0
+        },
         playBall : function() {
             this.game.half = 'top';
             this.game.inning = 1;
@@ -26,6 +31,37 @@ define(function(){
         makeCall : function() {
             if (this.game.log.pitchRecord.length > 12) {
                 this.game.log.pitchRecord = [];
+            }
+
+            var result = this.game.swingResult;
+
+            if (result.contact) {
+                if (result.caught) {
+                    this.says = 'Batter out.'
+                } else {
+
+                }
+            } else {
+                if (!result.looking) { //swung no contact
+                    this.strikes++;
+                } else { // looking
+                    if (result.strike) {
+                        this.strikes++;
+                    } else {
+                        this.balls++;
+                    }
+                }
+            }
+
+            if (this.count.strikes > 2) {
+                this.outs++;
+                this.says = 'Strike. Batter out.';
+            }
+            if (this.count.balls > 3) {
+                this.says = 'Ball four.';
+            }
+            if (this.outs > 2) {
+                this.says = 'Three outs, change.';
             }
         },
         says : 'Play ball!',

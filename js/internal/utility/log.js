@@ -40,11 +40,9 @@ define(function(){
             };
             this.note('Now batting'+order+', '+positions[batter.position]+', '+batter.name);
         },
-        notePitch : function(pitchInFlight) {
+        noteSwing : function(pitchInFlight, swingResult) {
             var pitch = pitchInFlight;
-            this.pitchRecord.unshift(pitch.pitch.name + ' ('+pitch.x+', '+pitch.y+')');
-        },
-        noteSwing : function(swingResult) {
+            this.pitchRecord.unshift(pitch.name + ' ('+pitch.x+', '+pitch.y+')');
             var swing = swingResult;
             this.pitchRecord.unshift('Swung at, ' + ' ('+swing.x+', '+swing.y+')' + (swing.contact ? ' and hit.' : ' and missed.'));
         },

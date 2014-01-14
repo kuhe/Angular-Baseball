@@ -1,5 +1,7 @@
 * {
     font-family : arial, helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .left {
@@ -29,18 +31,53 @@
     padding: 0;
     width: 100%;
     height: 100%;
+    min-height: 700px;
+    min-width: 1000px;
 }
 
-.main-content div {
+div {
     margin: 2px 10px;
     padding: 1px 10px;
 }
 
-.strikezone {
-    margin: 10px 30px !important;
-    padding: 0 !important;
+.nonii {
+    height: 33.33%;
+    width: 33.33%;
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.nonii.n-1 { left: 0; bottom: 0; text-align: left;}
+.nonii.n-2 { left: 33%; bottom: 0; }
+.nonii.n-3 { right: 0; bottom: 0;text-align: left; }
+.nonii.n-4 { left: 0; top: 33%; }
+.nonii.n-5 { left: 33%; top: 33%; }
+.nonii.n-6 { right: 0; top: 33%; }
+.nonii.n-7 { left: 0; top: 0; }
+.nonii.n-8 { left: 33%; top: 0; }
+.nonii.n-9 { right: 0; top: 0; }
+
+
+.target {
+    margin: 0 auto;
+    padding: 0;
     position: relative;
     width: 200px;
     height: 200px;
-    background: grey;
+    background: #f7ffd6;
+    border: 2px dashed red;
+}
+.strikezone {
+    margin: 50px 50px;
+    padding: 0;
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background: #ffe3e3;
+    border: 1px dashed #3ab9ff;
+}
+
+.batters-eye {
 }

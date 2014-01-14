@@ -20,7 +20,8 @@
     </head>
     <body>
         <div ng-click="refresh()" class="main-content" ng-app='YakyuuAikoukai' ng-controller='IndexController'>
-            <div class="scoreboard">
+            <div class='nonii n-7'></div>
+            <div class="scoreboard nonii n-8">
                 <div class='team-names left'>
                     <table>
                         <tr>
@@ -53,24 +54,39 @@
                         </tr>
                     </table>
                 </div>
-            </div>
-            <div class="clear"></div>
-            <div class="strikezone" ng-click="swing($event)">
+                <div class='clear'></div>
 
             </div>
-            <ul class="left">
-                <li ng-repeat="event in y.log.record">
-                    {{event}}
-                </li>
-            </ul>
-            <div class="left umpire">
-                {{y.umpire.says}}
+            <div class='nonii n-9'></div>
+            <div class='nonii n-4'></div>
+            <div class='nonii n-5'>
+                <div class='batters-eye'>
+                    {{y.battersEye}}
+                </div>
+                <div class="target" ng-click="swing($event)">
+                    <div class='strikezone'></div>
+                </div>
             </div>
-            <ul class="left pitch-record">
-                <li ng-repeat="event in y.log.pitchRecord track by $index">
-                    {{event}}
-                </li>
-            </ul>
+            <div class='nonii n-6'></div>
+            <div class='nonii n-1'>
+                <ul>
+                    <li ng-repeat="event in y.log.record">
+                        {{event}}
+                    </li>
+                </ul>
+            </div>
+            <div class='nonii n-2'>
+                <div class="umpire">
+                    {{y.umpire.says}}
+                </div>
+            </div>
+            <div class='nonii n-3'>
+                <ul class="pitch-record">
+                    <li ng-repeat="event in y.log.pitchRecord track by $index">
+                        {{event}}
+                    </li>
+                </ul>
+            </div>
         </div>
     </body>
 </html>

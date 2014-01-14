@@ -17,7 +17,7 @@ define(function(){
             if (this.humanControl == 'away' && this.half == 'bottom' || this.half == 'top' && this.humanControl == 'home' || this.humanControl == 'both') {
                 this.stage = 'pitch';
             } else {
-                this.AIPitch();
+                this.autoPitch();
             }
         },
         stage : 'pitch', //pitch, swing
@@ -30,53 +30,55 @@ define(function(){
                 this.theSwing(x, y);
             }
         },
-        AIPitchSelect : function() {
-            pitchName = '4-seam';
-            var pitch = this.pitcher.pitching.straight[pitchName];
+        autoPitchSelect : function() {
+            var pitchName = '4-seam';
+            var pitch = this.pitcher.pitching.strautoght[pitchName];
             pitch.name = pitchName;
-            this.pitchInFlight.pitch = this.pitcher.pitching.straight;
+            this.pitchInFlight = pitch;
         },
-        AIPitch : function() {
-            this.AIPitchSelect();
+        autoPitch : function() {
+            this.autoPitchSelect();
             var x = Math.floor(Math.random()*200);
             var y = Math.floor(Math.random()*200);
             this.thePitch(x, y);
         },
-        AISwing : function() {
+        autoSwing : function() {
             this.theSwing(Math.floor(Math.random()*200), Math.floor(Math.random()*200));
         },
         pitchInFlight : {
             x : 100,
             y : 100,
             breakDirection : [0, 0],
-            pitch : {
-                name : '4-seam',
-                velocity : 50,
-                break : 50,
-                control : 50
-            }
+            name : '4-seam',
+            velocity : 50,
+            break : 50,
+            control : 50
         },
         swingResult : {
             x : 100, //difference to pitch location
             y : 100, //difference to pitch location
             strike : true,
             foul : true,
-            ball : false,
             caught : false,
-            contact : true
+            contact : true,
+            looking : false
+        },
+        pitchSelect : function() {
+
         },
         thePitch : function(x, y) {
+            this.battersEye = 'Looks like: '+(this.pitchInFlight.breakDirection[0]+this.pitchInFlight.breakDirection[1] > 100 ? 'breaking ball' : 'fastball');
             this.pitchInFlight.breakDirection = [0, 0];
             this.pitchInFlight.x = x + this.pitchInFlight.breakDirection[0];
             this.pitchInFlight.y = y + this.pitchInFlight.breakDirection[1];
 
-            this.log.notePitch(this.pitchInFlight);
             if (this.humanControl == 'home' && this.half == 'bottom' || this.half == 'top' && this.humanControl == 'away' || this.humanControl == 'both') {
                 this.stage = 'swing';
             } else {
-                this.AISwing();
+                this.autoSwing();
             }
         },
+        battersEye : '',
         theSwing : function(x, y) {
             this.swingResult.x = this.pitchInFlight.x - x;
             this.swingResult.y = this.pitchInFlight.y - y;
@@ -87,12 +89,12 @@ define(function(){
                 this.swingResult.contact = false;
             }
 
-            this.log.noteSwing(this.swingResult);
+            this.log.noteSwing(this.pitchInFlight, this.swingResult);
             this.umpire.makeCall();
             if (this.humanControl == 'away' && this.half == 'bottom' || this.half == 'top' && this.humanControl == 'home' || this.humanControl == 'both') {
                 this.stage = 'pitch';
             } else {
-                this.AIPitch();
+                this.autoPitch();
             }
         },
         field : null,
