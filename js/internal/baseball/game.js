@@ -68,7 +68,9 @@ define(function(){
             foul : true,
             caught : false,
             contact : true,
-            looking : false
+            looking : false,
+            bases : 0,
+            fielder : 'short'
         },
         pitchSelect : function() {
 
@@ -100,11 +102,19 @@ define(function(){
                 log('swing!');
                 this.swingResult.x = x - this.pitchInFlight.x;
                 this.swingResult.y = y - this.pitchInFlight.y;
-                if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 25) {
-                    this.swingResult.contact = true;
+                if (true || swung) {
+                    this.swingResult.looking = true;
+                    if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {
+                        this.swingResult.contact = true;
+                        this.swingResult = this.field.determineSwingContactResult(this.swingResult)();
+                    } else {
+                        this.swingResult.contact = false;
+                    }
                 } else {
                     this.swingResult.contact = false;
+                    this.swingResult.looking = true;
                 }
+
                 this.log.noteSwing(this.pitchInFlight, this.swingResult);
                 this.umpire.makeCall();
 
