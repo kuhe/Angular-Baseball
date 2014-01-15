@@ -22,6 +22,9 @@
 .inline {
     display: inline;
 }
+table, td {
+    text-align: left;
+}
 
 .main-content {
     position: absolute;
@@ -47,16 +50,17 @@ div {
     margin: 0;
     padding: 0;
     text-align: center;
+    border: 1px solid black;
 }
 
 .nonii.n-1 { left: 0; bottom: 0; text-align: left;}
-.nonii.n-2 { left: 33%; bottom: 0; }
+.nonii.n-2 { left: 33.33%; bottom: 0; }
 .nonii.n-3 { right: 0; bottom: 0;text-align: left; }
-.nonii.n-4 { left: 0; top: 33%; }
-.nonii.n-5 { left: 33%; top: 33%; }
-.nonii.n-6 { right: 0; top: 33%; }
+.nonii.n-4 { left: 0; top: 33.33%; }
+.nonii.n-5 { left: 33.33%; top: 33.33%; }
+.nonii.n-6 { right: 0; top: 33.33%; }
 .nonii.n-7 { left: 0; top: 0; }
-.nonii.n-8 { left: 33%; top: 0; }
+.nonii.n-8 { left: 33.33%; top: 0; }
 .nonii.n-9 { right: 0; top: 0; }
 
 
@@ -66,18 +70,48 @@ div {
     position: relative;
     width: 200px;
     height: 200px;
-    background: #f7ffd6;
-    border: 2px dashed red;
+    background: #dbe2be;
+    border: 2px dashed #a7a4a4;
 }
 .strikezone {
-    margin: 50px 50px;
+    margin: 35px 50px;
     padding: 0;
-    position: relative;
     width: 100px;
-    height: 100px;
-    background: #ffe3e3;
+    height: 130px;
+    background: #ebf4ed;
     border: 1px dashed #3ab9ff;
 }
 
 .batters-eye {
+
+}
+
+.indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 13px;
+    padding: 13px;
+    border: 1px dashed #ff6261;
+    background: white;
+    margin: -13px;
+}
+
+.target.swing .indicator.swing {
+    display: none;
+}
+
+.indicator.pitch {
+    background-color : rgba(255,255,255, 0.4);
+}
+
+.indicator.swing {
+    border-radius: 4px;
+    padding: 10px 35px;
+    margin: -10px -35px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    border-left: none;
+    border-right: none;
+    background: #e8dd49;
 }

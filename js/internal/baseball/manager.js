@@ -65,7 +65,7 @@ define(function(){
                     while (property = skills.shift()) {
                         cursor = cursor[property];
                     }
-                    if (cursor >= rating && (!mustBeRightHanded || player.throws == 'right')) {
+                    if (!(player.order+1) && cursor >= rating && (!mustBeRightHanded || player.throws == 'right')) {
                         rating = cursor;
                         selection = player;
                         index = key;

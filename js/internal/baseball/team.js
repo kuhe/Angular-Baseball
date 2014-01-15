@@ -33,7 +33,8 @@ define(function(){
         positions : {},
         manager : null,
         bench : [],
-        bullpen : []
+        bullpen : [],
+        nowBatting : 0
     };
     return Team;
 });

@@ -16,7 +16,6 @@ define(function(){
         playBall : function() {
             this.game.half = 'top';
             this.game.inning = 1;
-            this.game.battingOrder = 0;
             this.game.batter = this.game.teams.away.lineup[0];
             this.game.deck = this.game.teams.away.lineup[1];
             this.game.hole = this.game.teams.away.lineup[2];
@@ -25,7 +24,7 @@ define(function(){
                 'Top 1, '+this.game.teams.away.name+' offense vs. '+this.game.teams.home.positions.pitcher.name+' starting for '+this.game.teams.home.name
             );
             this.game.log.noteBatter(
-                this.game.batter, this.game.battingOrder
+                this.game.batter
             );
         },
         makeCall : function() {
@@ -43,19 +42,19 @@ define(function(){
                 }
             } else {
                 if (!result.looking) { //swung no contact
-                    this.strikes++;
+                    this.count.strikes++;
                 } else { // looking
                     if (result.strike) {
-                        this.strikes++;
+                        this.count.strikes++;
                     } else {
-                        this.balls++;
+                        this.count.balls++;
                     }
                 }
             }
 
             if (this.count.strikes > 2) {
                 this.outs++;
-                this.says = 'Strike. Batter out.';
+                this.says = 'Strike three. Batter out.';
             }
             if (this.count.balls > 3) {
                 this.says = 'Ball four.';

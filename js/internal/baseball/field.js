@@ -6,6 +6,9 @@ define(function(){
     Field.prototype = {
         init : function(game) {
             this.game = game;
+            this.first = null;
+            this.second = null;
+            this.third = null;
         }
     };
     return Field;
