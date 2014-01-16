@@ -21,8 +21,11 @@ define(function(){
                 this.autoPitch();
             }
         },
+        end : function() {
+            this.stage = 'end';
+        },
         stage : 'pitch', //pitch, swing
-        humanControl : 'away', //home, away, both
+        humanControl : 'home', //home, away, both
         receiveInput : function(x, y) {
             if (this.stage == 'pitch') {
                 this.thePitch(x, y);
@@ -31,7 +34,6 @@ define(function(){
             }
         },
         autoPitchSelect : function() {
-            log('auto pitch select');
             var pitchName = this.helper.selectRandomPitch();
             while (!this.pitcher.pitching.hasOwnProperty(pitchName)) {
                 pitchName = this.helper.selectRandomPitch();
@@ -41,14 +43,12 @@ define(function(){
             this.pitchInFlight = pitch;
         },
         autoPitch : function() {
-            log('auto pitch');
             this.autoPitchSelect();
             var x = Math.floor(Math.random()*200);
             var y = Math.floor(Math.random()*200);
             this.thePitch(x, y);
         },
         autoSwing : function() {
-            log('auto swing');
             this.theSwing(Math.floor(Math.random()*200), Math.floor(Math.random()*200));
         },
         pitchTarget : {x : 100, y : 100},
@@ -70,14 +70,14 @@ define(function(){
             contact : true,
             looking : false,
             bases : 0,
-            fielder : 'short'
+            fielder : 'short',
+            outs : 0
         },
         pitchSelect : function() {
 
         },
         thePitch : function(x, y) {
             if (this.stage == 'pitch') {
-                log('pitch!');
                 this.pitchTarget.x = x;
                 this.pitchTarget.y = y;
 
@@ -89,6 +89,7 @@ define(function(){
                 this.pitchInFlight.y = Math.floor(y + (this.pitchInFlight.breakDirection[1]*this.pitchInFlight.break/100));
 
                 this.stage = 'swing';
+                this.log.notePitch(this.pitchInFlight);
                 if (this.humanControl == 'both' || this.teams[this.humanControl].lineup[this.batter.team.nowBatting] == this.batter) {
 
                 } else {
@@ -99,14 +100,14 @@ define(function(){
         battersEye : '',
         theSwing : function(x, y) {
             if (this.stage == 'swing') {
-                log('swing!');
+                this.swingResult = {};
                 this.swingResult.x = x - this.pitchInFlight.x;
                 this.swingResult.y = y - this.pitchInFlight.y;
                 if (true || swung) {
-                    this.swingResult.looking = true;
+                    this.swingResult.looking = false;
                     if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {
                         this.swingResult.contact = true;
-                        this.swingResult = this.field.determineSwingContactResult(this.swingResult)();
+                        this.swingResult = this.field.determineSwingContactResult(this.swingResult);
                     } else {
                         this.swingResult.contact = false;
                     }
@@ -115,7 +116,7 @@ define(function(){
                     this.swingResult.looking = true;
                 }
 
-                this.log.noteSwing(this.pitchInFlight, this.swingResult);
+                this.log.noteSwing(this.swingResult);
                 this.umpire.makeCall();
 
                 this.stage = 'pitch';

@@ -76,13 +76,13 @@
                 </div>
                 <div class='clear'></div>
                 <div>
-                    First : {{y.field.first || 'Empty'}}
+                    First : {{y.field.first.name || 'Empty'}}
                 </div>
                 <div>
-                    Second : {{y.field.second || 'Empty'}}
+                    Second : {{y.field.second.name || 'Empty'}}
                 </div>
                 <div>
-                    Third : {{y.field.third || 'Empty'}}
+                    Third : {{y.field.third.name || 'Empty'}}
                 </div>
             </div>
             <div class='nonii n-9'>
@@ -125,10 +125,14 @@
                     <div class='strikezone'></div>
                 </div>
             </div>
-            <div class='nonii n-6'></div>
+            <div class='nonii n-6'>
+                <div ng-repeat='(key, val) in y.swingResult'>
+                    {{key}} : {{val}}
+                </div>
+            </div>
             <div class='nonii n-1'>
                 <ul>
-                    <li ng-repeat="event in y.log.record">
+                    <li ng-repeat="event in y.log.shortRecord track by $index">
                         {{event}}
                     </li>
                 </ul>
@@ -136,6 +140,9 @@
             <div class='nonii n-2'>
                 <div class="umpire">
                     {{y.umpire.says}}
+                </div>
+                <div class="umpire" ng-repeat='(key, val) in y.umpire.count'>
+                    {{key}} : {{val}}
                 </div>
             </div>
             <div class='nonii n-3'>
