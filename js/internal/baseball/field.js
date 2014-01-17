@@ -16,7 +16,7 @@ define(function(){
             var splayAngle = 90 - 1.5*x;
             var flyAngle = -3*y;
             var power = this.game.batter.skill.offense.power;
-            var landingDistance = (200 + Math.random()*100 + (power/100)*75) * (1 - Math.abs(flyAngle - 30)/60);
+            var landingDistance = (50 + Math.random()*300 + (power/100)*75) * (1 - Math.abs(flyAngle - 30)/60);
 
             if (Math.abs(90 - splayAngle) > 50) swing.foul = true;
 

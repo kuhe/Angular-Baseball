@@ -61,13 +61,19 @@ define(function(){
                                         this.record.unshift(batter+' reached on single to '+ r.fielder + '.');
                                         break;
                                     case 2:
-                                        this.record.unshift(batter+' doubled to '+ r.fielder + '.');
+                                        this.record.unshift(batter+' doubled past '+ r.fielder + '.');
                                         break;
                                     case 3:
-                                        this.record.unshift(batter+' reached third on triple to '+ r.fielder + '.');
+                                        this.record.unshift(batter+' reached third on triple past '+ r.fielder + '.');
                                         break;
                                     case 4:
-                                        this.record.unshift(batter+' homered.');
+                                        if (r.splay < -15) {
+                                            this.record.unshift(batter+' homered to left.');
+                                        } else if (r.splay < 15) {
+                                            this.record.unshift(batter+' homered to center.');
+                                        } else {
+                                            this.record.unshift(batter+' homered to right.');
+                                        }
                                         break;
                                 }
                             }

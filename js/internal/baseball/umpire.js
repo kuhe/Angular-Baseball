@@ -32,6 +32,8 @@ define(function(){
                 this.game.log.pitchRecord = [];
             }
 
+            this.says = '';
+
             var result = this.game.swingResult;
 
             if (result.looking) {
@@ -74,6 +76,8 @@ define(function(){
                     this.count.strikes++;
                 }
             }
+
+            this.says = (this.count.balls + ' and ' + this.count.strikes);
 
             if (this.count.strikes > 2) {
                 this.count.outs++;

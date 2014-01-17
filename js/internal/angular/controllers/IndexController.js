@@ -22,5 +22,37 @@ app.controller('IndexController', function($scope) {
             top: 200 - (y.pitchInFlight.y) + y.swingResult.y,
             left: y.pitchInFlight.x + y.swingResult.x
         }).show();
+    };
+    $scope.rate = function(rating) {
+        if (rating > 95) {
+            return 'A+';
+        } else if (rating > 90) {
+            return 'A';
+        } else if (rating > 85) {
+            return 'A-';
+        } else if (rating > 80) {
+            return 'B+';
+        } else if (rating > 70) {
+            return 'B';
+        } else if (rating > 60) {
+            return 'C';
+        } else if (rating > 50) {
+            return 'C-';
+        } else {
+            return 'D';
+        }
+    };
+    $scope.abbreviatePosition = function(position) {
+        return {
+            pitcher : 'P',
+            catcher : 'C',
+            first : '1B',
+            second : '2B',
+            short : 'SS',
+            third : '3B',
+            left : 'LF',
+            center : 'CF',
+            right : 'RF'
+        }[position];
     }
 });

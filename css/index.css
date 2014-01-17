@@ -1,7 +1,8 @@
 * {
     font-family : arial, helvetica, sans-serif;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 16px;
 }
 
 .left {
@@ -22,47 +23,20 @@
 .inline {
     display: inline;
 }
-table, td {
-    text-align: left;
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
-.main-content {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    min-height: 700px;
-    min-width: 1000px;
+.background-color {
+    background: white;
+    border-radius: 5px;
 }
-
-div {
-    margin: 2px 10px;
-    padding: 1px 10px;
-}
-
-.nonii {
-    height: 33.33%;
-    width: 33.33%;
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    border: 1px solid black;
-}
-
-.nonii.n-1 { left: 0; bottom: 0; text-align: left;}
-.nonii.n-2 { left: 33.33%; bottom: 0; }
-.nonii.n-3 { right: 0; bottom: 0;text-align: left; }
-.nonii.n-4 { left: 0; top: 33.33%; }
-.nonii.n-5 { left: 33.33%; top: 33.33%; }
-.nonii.n-6 { right: 0; top: 33.33%; }
-.nonii.n-7 { left: 0; top: 0; }
-.nonii.n-8 { left: 33.33%; top: 0; }
-.nonii.n-9 { right: 0; top: 0; }
-
 
 .target {
     margin: 0 auto;
@@ -70,7 +44,7 @@ div {
     position: relative;
     width: 200px;
     height: 200px;
-    background: #dbe2be;
+    background: rgba(0, 0, 0, 0.28);
     border: 2px dashed #a7a4a4;
 }
 .strikezone {
@@ -78,8 +52,8 @@ div {
     padding: 0;
     width: 100px;
     height: 130px;
-    background: #ebf4ed;
-    border: 1px dashed #3ab9ff;
+    background: rgba(85, 79, 71, 0.64);
+    border: 3px dashed #8bb5ff;
 }
 
 .batters-eye {
@@ -92,7 +66,7 @@ div {
     left: 0;
     border-radius: 13px;
     padding: 13px;
-    border: 1px dashed #ff6261;
+    border: 3px dashed #ff6261;
     background: white;
     margin: -13px;
 }
@@ -109,9 +83,9 @@ div {
     border-radius: 4px;
     padding: 10px 35px;
     margin: -10px -35px;
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
+    border-top: 3px solid #645f40;
+    border-bottom: 3px solid #645f40;
     border-left: none;
     border-right: none;
-    background: #e8dd49;
+    background: #f0e69b;
 }
