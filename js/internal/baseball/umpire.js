@@ -105,7 +105,7 @@ define(function(){
                 this.says = 'Ball four.';
                 this.count.balls = this.count.strikes = 0;
                 this.game.batter.atBats.push('BB');
-                this.advanceRunners().reachBase().newBatter();
+                this.advanceRunners(true).reachBase().newBatter();
             }
             if (this.count.outs > 2) {
                 this.says = 'Three outs, change.';
@@ -117,8 +117,9 @@ define(function(){
             this.game.field.first = this.game.batter;
             return this;
         },
-        advanceRunners : function() {
-            if (this.game.field.third instanceof this.game.batter.constructor) {
+        advanceRunners : function(isWalk) {
+            isWalk = !!isWalk;
+            if (this.game.field.third instanceof this.game.batter.constructor && (!isWalk || (this.game.field.second != null && this.game.field.first != null))) {
                 // run scored
                 this.game.scoreboard[this.game.half == 'top' ? 'away' : 'home'][this.game.inning]++;
                 this.game.tally[this.game.half == 'top' ? 'away' : 'home']['R']++;
@@ -127,7 +128,7 @@ define(function(){
                     this.game.field.third.atBats.push('R');
                 }
             }
-            this.game.field.third = this.game.field.second;
+            if (!isWalk || this.game.field.first != null) this.game.field.third = this.game.field.second;
             this.game.field.second = this.game.field.first;
             this.game.field.first = null;
             return this;

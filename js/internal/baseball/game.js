@@ -48,8 +48,27 @@ define(function(){
             var y = Math.floor(Math.random()*200);
             this.thePitch(x, y);
         },
-        autoSwing : function() {
-            this.theSwing(Math.floor(Math.random()*200), Math.floor(Math.random()*200));
+        autoSwing : function(deceptiveX, deceptiveY) {
+            var x = Math.floor(Math.random()*200), y = Math.floor(Math.random()*200);
+            if (100*Math.random() < this.batter.skill.offense.eye) {
+                x = (this.pitchInFlight.x*(1 + 3*this.batter.skill.offense.eye/100) + x)/4;
+                y = (this.pitchInFlight.y*(1 + 3*this.batter.skill.offense.eye/100) + y)/4;
+            } else {
+                x = (deceptiveX*(1 + 3*this.batter.skill.offense.eye/100) + x)/4;
+                y = (deceptiveY*(1 + 3*this.batter.skill.offense.eye/100) + y)/4;
+            }
+            var swingLikelihood = 50;
+            if (x < 50 || x > 150 || y < 35 || y > 165) {
+                swingLikelihood = Math.min(50, (100 - (this.batter.skill.offense.eye)));
+            } else {
+                swingLikelihood = Math.min(50, this.batter.skill.offense.eye);
+            }
+            if (swingLikelihood - 10*(this.umpire.count.balls - this.umpire.count.strikes) > Math.random()*100) {
+                // no swing;
+                this.theSwing(-20, y);
+            } else {
+                this.theSwing(x, y);
+            }
         },
         pitchTarget : {x : 100, y : 100},
         pitchInFlight : {
@@ -85,6 +104,10 @@ define(function(){
                 this.battersEye = 'Looks like: '+(Math.abs(this.pitchInFlight.breakDirection[0])+Math.abs(this.pitchInFlight.breakDirection[1]) > 40 ?
                     'breaking ball' : 'fastball');
 
+                var control = this.pitchInFlight.control;
+                this.pitchTarget.x += (75 - Math.random()*150)/(1+control/100);
+                this.pitchTarget.y += (75 - Math.random()*150)/(1+control/100);
+
                 if (this.pitcher.throws == 'right') this.pitchInFlight.breakDirection[0] *= -1;
 
                 this.pitchInFlight.x = Math.floor(x + (this.pitchInFlight.breakDirection[0]*this.pitchInFlight.break/100));
@@ -95,7 +118,7 @@ define(function(){
                 if (this.humanControl == 'both' || this.teams[this.humanControl].lineup[this.batter.team.nowBatting] == this.batter) {
 
                 } else {
-                    this.autoSwing();
+                    this.autoSwing(x, y);
                 }
             }
         },
@@ -103,8 +126,9 @@ define(function(){
         theSwing : function(x, y) {
             if (this.stage == 'swing') {
                 this.swingResult = {};
-                this.swingResult.x = x - this.pitchInFlight.x;
-                this.swingResult.y = y - this.pitchInFlight.y;
+                this.swingResult.x = (x - this.pitchInFlight.x)/(1+this.batter.skill.offense.eye/100);
+                this.swingResult.y = (y - this.pitchInFlight.y)/(1+this.batter.skill.offense.eye/100);
+
                 if (!(x < 0 || x > 200)) {
                     this.swingResult.looking = false;
                     if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {

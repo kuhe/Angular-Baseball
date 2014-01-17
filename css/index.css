@@ -44,8 +44,8 @@
 
 .no-swing {
     padding: 0;
-    border-left: 50px solid rgba(150, 238, 140, 0.49);
-    border-right: 50px solid rgba(150, 238, 140, 0.49);
+    border-left: 50px solid rgba(143, 151, 144, 0.49);
+    border-right: 50px solid rgba(143, 151, 144, 0.49);
     background: white;
     width: 300px;
     margin: auto;
@@ -58,7 +58,7 @@
     width: 200px;
     height: 200px;
     background: rgba(0, 0, 0, 0.28);
-    border: 2px dashed #a7a4a4;
+    border: 3px dashed #f5eda8;
 }
 .strikezone {
     margin: 35px 50px;
