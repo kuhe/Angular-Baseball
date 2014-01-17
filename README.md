@@ -9,10 +9,17 @@ A game of baseball, in web page form.
 
 todo :
     見送り
+
     フォアボール
+
     ピッチ選択
+
     試合終了
+
     送りバント・打席
+
     AI団レベルあげる
+
     日本語版
+
     選手名前なんか足りないじゃん
