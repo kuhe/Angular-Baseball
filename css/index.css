@@ -5,6 +5,10 @@
     line-height: 16px;
 }
 
+.capitalize {
+    text-transform : capitalize;
+}
+
 .left {
     float: left;
 }

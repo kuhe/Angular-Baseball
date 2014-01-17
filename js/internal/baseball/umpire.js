@@ -28,10 +28,6 @@ define(function(){
             );
         },
         makeCall : function() {
-            if (this.game.log.pitchRecord.length > 12) {
-                this.game.log.pitchRecord = [];
-            }
-
             this.says = '';
 
             var result = this.game.swingResult;
@@ -46,6 +42,7 @@ define(function(){
                 if (result.contact) {
                     if (result.caught) {
                         this.count.outs++;
+                        this.game.batter.atBats.push('FO');
                         this.newBatter(); //todo: sac fly
                     } else {
                         if (result.foul) {
@@ -54,11 +51,29 @@ define(function(){
                         } else {
                             if (result.thrownOut) {
                                 this.count.outs++;
+                                this.game.batter.atBats.push('GO');
                                 this.newBatter(); //todo: sac
                             }
                             if (result.bases) {
                                 this.game.tally[this.game.half == 'top' ? 'away' : 'home']['H']++;
                                 var bases = result.bases;
+                                switch (bases) {
+                                    case 0 :
+                                        this.game.batter.atBats.push('SO');
+                                        break;
+                                    case 1 :
+                                        this.game.batter.atBats.push('H');
+                                        break;
+                                    case 2 :
+                                        this.game.batter.atBats.push('2B');
+                                        break;
+                                    case 3 :
+                                        this.game.batter.atBats.push('3B');
+                                        break;
+                                    case 4 :
+                                        this.game.batter.atBats.push('HR');
+                                        break;
+                                }
                                 var onBase = false;
                                 while (bases > 0) {
                                     bases -= 1;
@@ -83,12 +98,14 @@ define(function(){
                 this.count.outs++;
                 this.count.balls = this.count.strikes = 0;
                 this.says = 'Strike three. Batter out.';
+                this.game.batter.atBats.push('SO');
                 this.newBatter();
             }
             if (this.count.balls > 3) {
                 this.says = 'Ball four.';
                 this.count.balls = this.count.strikes = 0;
                 this.game.field.first = this.game.batter;
+                this.game.batter.atBats.push('BB');
                 this.advanceRunners().reachBase().newBatter();
             }
             if (this.count.outs > 2) {
@@ -106,6 +123,10 @@ define(function(){
                 // run scored
                 this.game.scoreboard[this.game.half == 'top' ? 'away' : 'home'][this.game.inning]++;
                 this.game.tally[this.game.half == 'top' ? 'away' : 'home']['R']++;
+                if (this.game.batter != this.game.field.third) {
+                    this.game.batter.atBats.push('RBI');
+                    this.game.field.third.atBats.push('R');
+                }
             }
             this.game.field.third = this.game.field.second;
             this.game.field.second = this.game.field.first;
@@ -113,6 +134,7 @@ define(function(){
             return this;
         },
         newBatter : function() {
+            this.game.log.pitchRecord = [];
             this.game.log.notePlateAppearanceResult(this.game);
             var team = this.game.half == 'bottom' ? this.game.teams.home : this.game.teams.away;
             this.game.batter = team.lineup[(team.nowBatting + 1)%9];
@@ -124,6 +146,7 @@ define(function(){
             }
         },
         changeSides : function() {
+            this.game.log.pitchRecord = [];
             var offense, defense;
             this.game.field.first = null;
             this.game.field.second = null;

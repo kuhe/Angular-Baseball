@@ -54,5 +54,8 @@ app.controller('IndexController', function($scope) {
             center : 'CF',
             right : 'RF'
         }[position];
-    }
+    };
+    angular.element(document).ready(function() {
+        $scope.refresh();
+    });
 });

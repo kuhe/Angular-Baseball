@@ -85,11 +85,13 @@ define(function(){
                 this.battersEye = 'Looks like: '+(Math.abs(this.pitchInFlight.breakDirection[0])+Math.abs(this.pitchInFlight.breakDirection[1]) > 40 ?
                     'breaking ball' : 'fastball');
 
+                if (this.pitcher.throws == 'right') this.pitchInFlight.breakDirection[0] *= -1;
+
                 this.pitchInFlight.x = Math.floor(x + (this.pitchInFlight.breakDirection[0]*this.pitchInFlight.break/100));
                 this.pitchInFlight.y = Math.floor(y + (this.pitchInFlight.breakDirection[1]*this.pitchInFlight.break/100));
 
                 this.stage = 'swing';
-                this.log.notePitch(this.pitchInFlight);
+                this.log.notePitch(this.pitchInFlight, this.batter);
                 if (this.humanControl == 'both' || this.teams[this.humanControl].lineup[this.batter.team.nowBatting] == this.batter) {
 
                 } else {

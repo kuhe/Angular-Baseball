@@ -27,14 +27,84 @@ define(function(){
             var positions = this.longFormFielder;
             this.note('Now batting'+order+', '+positions[batter.position]+', '+batter.name);
         },
-        notePitch : function(pitchInFlight) {
-            this.pitchRecord.unshift(pitchInFlight.name + ' ('+Math.floor(pitchInFlight.x)+', '+Math.floor(pitchInFlight.y)+')');
+        getPitchLocationDescription : function(pitchInFlight, batterIsLefty) {
+            var x = pitchInFlight.x, y = pitchInFlight.y, say = '';
+            var noComma = false, noComma2 = false;
+            var ball = false;
+            if (!batterIsLefty) x = 200 - x;
+            if (x < 50) {
+                say += 'way outside';
+                ball = true;
+            } else if (x < 70) {
+                say += 'outside';
+            } else if (x < 100) {
+                say += '';
+                noComma = true;
+            } else if (x < 130) {
+                say += '';
+                noComma = true;
+            } else if (x < 150) {
+                say += 'inside';
+            } else {
+                say += 'way inside';
+                ball = true;
+            }
+            if (say != '') say += ', ';
+            if (y < 35) {
+                say += 'way low';
+                ball = true;
+            } else if (y < 65) {
+                say += 'low';
+            } else if (y < 135) {
+                say += '';
+                noComma2 = true;
+            } else if (y < 165) {
+                say += 'high';
+            } else {
+                say += 'way high';
+                ball = true;
+            }
+            if (noComma || noComma2) {
+                say = say.split(', ').join('');
+                if (noComma && noComma2) {
+                    say = 'down the middle';
+                }
+            }
+            // say = (ball ? 'Ball, ' : 'Strike, ') + say;
+            say = pitchInFlight.name.charAt(0).toUpperCase() + pitchInFlight.name.slice(1) + ' ' + say + '. ';
+            return say;
+        },
+        notePitch : function(pitchInFlight, batter) {
+            this.pitchRecord.unshift(
+                this.getPitchLocationDescription(pitchInFlight, batter.bats == 'left')
+            );
         },
         noteSwing : function(swingResult) {
-            this.pitchRecord.unshift(
-                'Swung at, ' + ' ('+Math.floor(swingResult.x)+', '
-                    +Math.floor(swingResult.y)+')' + (swingResult.contact ? ' and hit.' : ' and missed.')
-            );
+            if (swingResult.looking) {
+                if (swingResult.strike) {
+                    this.pitchRecord[0] += 'Strike.'
+                } else {
+                    this.pitchRecord[0] += 'Ball.'
+                }
+            } else {
+                if (swingResult.contact) {
+                    if (swingResult.foul) {
+                        this.pitchRecord[0] += 'Fouled off.'
+                    } else {
+                        if (swingResult.caught) {
+                            this.pitchRecord[0] += 'In play.'
+                        } else {
+                            if (swingResult.thrownOut) {
+                                this.pitchRecord[0] += 'In play.'
+                            } else {
+                                this.pitchRecord[0] += 'In play.'
+                            }
+                        }
+                    }
+                } else {
+                    this.pitchRecord[0] += 'Swinging strike.'
+                }
+            }
         },
         notePlateAppearanceResult : function(game) {
             var r = game.swingResult;

@@ -15,6 +15,7 @@ define(function(){
             this.randomizeSkills();
             this.name = data.surnames[Math.floor(Math.random()*data.surnames.length)] + ' ' +
                 data.names[Math.floor(Math.random()*data.names.length)];
+            this.atBats = [];
         },
         randomizeSkills : function() {
             var giraffe = this;
@@ -99,7 +100,8 @@ define(function(){
         },
         name : '',
         number : 0,
-        position : ''
+        position : '',
+        atBats : []
     };
     return Player;
 });

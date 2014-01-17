@@ -72,7 +72,15 @@
                 </div>
                 <div class='col-md-3'>
                     <ul class="umpire list-group">
-                        <li class='list-group-item' ng-repeat='(key, val) in y.umpire.count'>{{key}} : {{val}}</li>
+                        <li class='list-group-item'>
+                            Balls : {{y.umpire.count.balls}}
+                        </li>
+                        <li class='list-group-item'>
+                            Strikes : {{y.umpire.count.strikes}}
+                        </li>
+                        <li class='list-group-item'>
+                            Outs : {{y.umpire.count.outs}}
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -95,8 +103,15 @@
                         </div>
                     </div>
                     <div class='col-md-3 background-color'>
-                        <div class="umpire">
+                        <div class="list-group-item umpire">
                             {{y.umpire.says}}
+                        </div>
+                        <div class='list-group-item'>
+                            {{y.stage == 'swing' ? '(Batting)' : ''}}
+                            {{y.stage == 'pitch' ? '(Pitching)' : ''}}
+                        </div>
+                        <div class='list-group-item'>
+                            {{y.battersEye}}
                         </div>
                     </div>
                 </div>
@@ -150,6 +165,9 @@
                             <div>
                                 Speed : {{rate(y.batter.skill.offense.speed)}}
                             </div>
+                            <div>
+                                - {{y.batter.atBats.join(', ')}} -
+                            </div>
                         </div>
                         <div class='col-lg-6'>
                             <div>
@@ -164,6 +182,9 @@
                             <div>
                                 Speed : {{rate(y.deck.skill.offense.speed)}}
                             </div>
+                            <div>
+                                - {{y.deck.atBats.join(', ')}} -
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -177,6 +198,32 @@
                 <ul class="list-group pitch-record col-lg-6">
                     <li class='list-group-item' ng-repeat="event in y.log.shortRecord track by $index">
                         {{event}}
+                    </li>
+                </ul>
+            </div>
+            <div class='row'>
+                <ul class='list-group col-lg-6'>
+                    <li class='list-group-item'>
+                        {{y.teams.away.name}}
+                    </li>
+                    <li class='list-group-item' ng-repeat="(order, player) in y.teams.away.lineup track by $index">
+                        {{abbreviatePosition(player.position)}} <strong>{{player.name}}</strong> (#{{player.number}})
+                        B/T: {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
+                        <span class='pull-right'>
+                            {{player.atBats.length ? ' - ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - Up to Bat' : ''}}</em>
+                        </span>
+                    </li>
+                </ul>
+                <ul class='list-group col-lg-6'>
+                    <li class='list-group-item'>
+                        {{y.teams.home.name}}
+                    </li>
+                    <li class='list-group-item' ng-repeat="(order, player) in y.teams.home.lineup track by $index">
+                        {{abbreviatePosition(player.position)}} <strong>{{player.name}}</strong> (#{{player.number}})
+                        B/T: {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
+                        <span class='pull-right'>
+                            {{player.atBats.length ? ' - ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - Up to Bat' : ''}}</em>
+                        </span>
                     </li>
                 </ul>
             </div>
