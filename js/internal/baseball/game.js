@@ -105,7 +105,7 @@ define(function(){
                 this.swingResult = {};
                 this.swingResult.x = x - this.pitchInFlight.x;
                 this.swingResult.y = y - this.pitchInFlight.y;
-                if (true || swung) {
+                if (!(x < 0 || x > 200)) {
                     this.swingResult.looking = false;
                     if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {
                         this.swingResult.contact = true;
@@ -114,6 +114,8 @@ define(function(){
                         this.swingResult.contact = false;
                     }
                 } else {
+                    this.swingResult.strike = this.pitchInFlight.x > 50 && this.pitchInFlight.x < 150
+                        && this.pitchInFlight.y > 35 && this.pitchInFlight.y < 165;
                     this.swingResult.contact = false;
                     this.swingResult.looking = true;
                 }

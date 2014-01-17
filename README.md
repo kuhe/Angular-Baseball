@@ -8,17 +8,20 @@ A game of baseball, in web page form.
 -George Fu
 
 todo :
+
     見送り
 
     フォアボール
+
+    ピッチコントロール・速度影響とバットコントロール影響
+
+    AI団レベルあげる
 
     ピッチ選択
 
     試合終了
 
     送りバント・打席
-
-    AI団レベルあげる
 
     日本語版
 

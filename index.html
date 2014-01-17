@@ -95,11 +95,13 @@
                         <div class='list-group-item bottom'>{{y.log.shortRecord[2]}}</div>
                     </div>
                     <div class='col-md-6'>
-                        <div class="target {{y.stage}}" ng-click="indicate($event)">
-                            <div class='indicator pitch' style='top:{{200-y.pitchTarget.y}}px;left:{{y.pitchTarget.x}}px;'></div>
-                            <div class='indicator break' style='top:{{200-y.pitchInFlight.y}}px;left:{{y.pitchInFlight.x}}px;'></div>
-                            <div class='indicator swing' style='top:{{200-y.pitchInFlight.y + y.swingResult.y}}px;left:{{y.pitchInFlight.x + y.swingResult.x}}px;'></div>
-                            <div class='strikezone'></div>
+                        <div class="no-swing" ng-click="indicate($event)">
+                            <div class="target {{y.stage}}">
+                                <div class='indicator pitch' style='top:{{200-y.pitchTarget.y}}px;left:{{y.pitchTarget.x}}px;'></div>
+                                <div class='indicator break' style='top:{{200-y.pitchInFlight.y}}px;left:{{y.pitchInFlight.x}}px;'></div>
+                                <div class='indicator swing' style='top:{{200-y.pitchInFlight.y + y.swingResult.y}}px;left:{{y.pitchInFlight.x + y.swingResult.x}}px;'></div>
+                                <div class='strikezone'></div>
+                            </div>
                         </div>
                     </div>
                     <div class='col-md-3 background-color'>

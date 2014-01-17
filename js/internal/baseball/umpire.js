@@ -104,7 +104,6 @@ define(function(){
             if (this.count.balls > 3) {
                 this.says = 'Ball four.';
                 this.count.balls = this.count.strikes = 0;
-                this.game.field.first = this.game.batter;
                 this.game.batter.atBats.push('BB');
                 this.advanceRunners().reachBase().newBatter();
             }
@@ -135,6 +134,7 @@ define(function(){
         },
         newBatter : function() {
             this.game.log.pitchRecord = [];
+            this.count.balls = this.count.strikes = 0;
             this.game.log.notePlateAppearanceResult(this.game);
             var team = this.game.half == 'bottom' ? this.game.teams.home : this.game.teams.away;
             this.game.batter = team.lineup[(team.nowBatting + 1)%9];
