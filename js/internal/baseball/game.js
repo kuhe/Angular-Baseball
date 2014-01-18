@@ -105,13 +105,13 @@ define(function(){
                     'breaking ball' : 'fastball');
 
                 var control = this.pitchInFlight.control;
-                this.pitchTarget.x += (75 - Math.random()*150)/(1+control/100);
-                this.pitchTarget.y += (75 - Math.random()*150)/(1+control/100);
+                this.pitchTarget.x += (50 - Math.random()*100)/(1+control/100);
+                this.pitchTarget.y += (50 - Math.random()*100)/(1+control/100);
 
                 if (this.pitcher.throws == 'right') this.pitchInFlight.breakDirection[0] *= -1;
 
-                this.pitchInFlight.x = Math.floor(x + (this.pitchInFlight.breakDirection[0]*this.pitchInFlight.break/100));
-                this.pitchInFlight.y = Math.floor(y + (this.pitchInFlight.breakDirection[1]*this.pitchInFlight.break/100));
+                this.pitchInFlight.x = Math.floor(this.pitchTarget.x + (this.pitchInFlight.breakDirection[0]*this.pitchInFlight.break/100));
+                this.pitchInFlight.y = Math.floor(this.pitchTarget.y + (this.pitchInFlight.breakDirection[1]*this.pitchInFlight.break/100));
 
                 this.stage = 'swing';
                 this.log.notePitch(this.pitchInFlight, this.batter);
