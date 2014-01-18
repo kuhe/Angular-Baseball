@@ -98,6 +98,9 @@ define(function(){
             }))/this.pitching.averaging.length+this.pitching.averaging.length*3);
             delete this.pitching.averaging;
         },
+        getSurname : function() {
+            return this.name.split(' ')[0];
+        },
         name : '',
         number : 0,
         position : '',

@@ -9,7 +9,7 @@ define(function(){
         },
         note : function(note) {
             this.record.unshift(note);
-            this.shortRecord = this.record.slice(0, 8);
+            this.shortRecord = this.record.slice(0, 6);
         },
         noteBatter : function(batter) {
             var order = batter.team.nowBatting;

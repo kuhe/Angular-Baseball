@@ -14,24 +14,38 @@
         <script src="js/internal/angular/application/application.js"></script>
         <script src="js/internal/angular/controllers/IndexController.js"></script>
         <script data-main="js/internal/initialize" src="js/external/requirejs/2.1.10-require.js"></script>
-        <link rel="shortcut icon"
-              href="yakk.ico">
+        <link rel="shortcut icon" href="yakk.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="css/index.css">
         <link href="css/external/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     </head>
-    <body>
+    <body class='blue'>
         <div class='container' ng-click="refresh()" ng-app='YakyuuAikoukai' ng-controller='IndexController'>
-            <div class='header row'>
+            <div class='header scoreboard row'>
                 <div class='col-md-3'>
-                    <div class='list-group-item'>
-                        First : {{y.field.first.name || 'Empty'}}
+                    <div class='text-center on-base padded'>
+                        <span class='grey'>{{y.field.second.getSurname() || 'Empty'}}</span>
                     </div>
-                    <div class='list-group-item'>
-                        Second : {{y.field.second.name || 'Empty'}}
-                    </div>
-                    <div class='list-group-item'>
-                        Third : {{y.field.third.name || 'Empty'}}
+                    <div class=''>
+                        <div class='padded col-xs-5 on-base side-base-indicator'>
+                            <span class='grey'>{{y.field.third.getSurname() || 'Empty'}}</span>
+                        </div>
+                        <div class='text-center col-xs-2'>
+                            <div class='bases'>
+                                <div class='diamond-bg'>
+                                    <div class='diamond {{y.field.second != null ? "filled" : ""}}'></div>
+                                </div>
+                                <div class='diamond-bg first'>
+                                    <div class='diamond {{y.field.first != null ? "filled" : ""}}'></div>
+                                </div>
+                                <div class='diamond-bg third'>
+                                    <div class='diamond {{y.field.third != null ? "filled" : ""}}'></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class='padded col-xs-5 on-base side-base-indicator'>
+                            <span class='grey'>{{y.field.first.getSurname() || 'Empty'}}</span>
+                        </div>
                     </div>
                 </div>
                 <div class='col-md-6'>
@@ -42,18 +56,20 @@
                                     <td>&nbsp;</td>
                                 </tr>
                                 <tr ng-repeat="team in y.teams">
-                                    <td>{{team.name}}</td>
+                                    <td><span class='grey'>{{team.name}}</span></td>
                                 </tr>
                             </table>
                         </div>
                         <div class="scores col-md-6">
                             <table class='table'>
                                 <tr>
-                                    <td ng-repeat="(block, value) in y.scoreboard.home">{{block}}</td>
+                                    <td class='font-yellow' ng-repeat="(block, value) in y.scoreboard.home">
+                                        <span class='grey'>{{block}}</span>
+                                    </td>
                                 </tr>
                                 <tr class="team-line" ng-repeat="(side, scores) in y.scoreboard">
                                     <td class='' ng-repeat="(inning, score) in scores">
-                                        {{y.inning < inning || y.inning == inning && side == 'home' && y.half == 'top' ? '-' : score}}
+                                        <span class='grey'>{{y.inning < inning || y.inning == inning && side == 'home' && y.half == 'top' ? '-' : score}}</span>
                                     </td>
                                 </tr>
                             </table>
@@ -61,40 +77,83 @@
                         <div class="tallies col-md-3">
                             <table class='table'>
                                 <tr>
-                                    <td>H</td><td>R</td><td>E</td>
+                                    <td>
+                                        <span class='grey font-yellow'>H</span>
+                                    </td>
+                                    <td>
+                                        <span class='grey font-yellow'>R</span>
+                                    </td>
+                                    <td>
+                                        <span class='grey font-yellow'>E</span>
+                                    </td>
                                 </tr>
                                 <tr ng-repeat="side in y.tally">
-                                    <td>{{side.H}}</td><td>{{side.R}}</td><td>{{side.E}}</td>
+                                    <td>
+                                        <span class='grey'>{{side.H}}</span>
+                                    </td>
+                                    <td>
+                                        <span class='grey'>{{side.R}}</span>
+                                    </td>
+                                    <td>
+                                        <span class='grey'>{{side.E}}</span>
+                                    </td>
                                 </tr>
                             </table>
                         </div>
                     </div>
                 </div>
                 <div class='col-md-3'>
-                    <ul class="umpire list-group">
-                        <li class='list-group-item'>
-                            Balls : {{y.umpire.count.balls}}
-                        </li>
-                        <li class='list-group-item'>
-                            Strikes : {{y.umpire.count.strikes}}
-                        </li>
-                        <li class='list-group-item'>
-                            Outs : {{y.umpire.count.outs}}
-                        </li>
-                    </ul>
+                    <div class="umpire padded">
+                        <div class='row'>
+                            <div class='col-xs-3 grey'>S</div>
+                            <div class='col-xs-3 grey'>
+                                <div class='circle {{y.umpire.count.strikes >= 1 ? "orange" : "unlit"}}'></div>
+                            </div>
+                            <div class='col-xs-3 grey'>
+                                <div class='circle {{y.umpire.count.strikes >= 2 ? "orange" : "unlit"}}'></div>
+                            </div>
+                            <div class='col-xs-3'>
+                            </div>
+                        </div>
+                        <div class='row'>
+                            <div class='col-xs-3 grey'>B</div>
+                            <div class='col-xs-3 grey'>
+                                <div class='circle {{y.umpire.count.balls >= 1 ? "green" : "unlit"}}'></div>
+                            </div>
+                            <div class='col-xs-3 grey'>
+                                <div class='circle {{y.umpire.count.balls >= 2 ? "green" : "unlit"}}'></div>
+                            </div>
+                            <div class='col-xs-3 grey'>
+                                <div class='circle {{y.umpire.count.balls >= 3 ? "green" : "unlit"}}'></div>
+                            </div>
+                        </div>
+                        <div class='row'>
+                            <div class='col-xs-3 grey'>O</div>
+                            <div class='col-xs-3 grey'>
+                                <div class='circle {{y.umpire.count.outs >= 1 ? "red" : "unlit"}}'></div>
+                            </div>
+                            <div class='col-xs-3 grey'>
+                                <div class='circle {{y.umpire.count.outs >= 2 ? "red" : "unlit"}}'></div>
+                            </div>
+                            <div class='col-xs-3'>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class='jumbotron noselect'>
+            <div class='jumbotron noselect row'>
                 <div class='row'>
-                    <div class='col-md-3 background-color'>
+                    <div class='col-md-4 background-color visible-lg visible-md'>
                         <!--<div ng-repeat='(key, val) in y.swingResult'>-->
                             <!--{{key}} : {{val}}-->
                         <!--</div>-->
-                        <div class='list-group-item'>{{y.log.shortRecord[0]}}</div>
-                        <div class='list-group-item bottom'>{{y.log.shortRecord[1]}}</div>
-                        <div class='list-group-item bottom'>{{y.log.shortRecord[2]}}</div>
+                        <ul class="list-group pitch-record">
+                            <li class='list-group-item' ng-repeat="event in y.log.pitchRecord track by $index">
+                                {{event}}
+                            </li>
+                        </ul>
                     </div>
-                    <div class='col-md-6'>
+                    <div class='col-md-4'>
                         <div class="no-swing" ng-click="indicate($event)">
                             <div class="target {{y.stage}}">
                                 <div class='indicator pitch' style='top:{{200-y.pitchTarget.y}}px;left:{{y.pitchTarget.x}}px;'></div>
@@ -103,35 +162,42 @@
                                 <div class='strikezone'></div>
                             </div>
                         </div>
+                        <div>
+                            <div class="list-group-item umpire">
+                                {{y.umpire.says}}
+                            </div>
+                            <div class='list-group-item'>
+                                {{y.stage == 'swing' ? '(Batting)' : ''}}
+                                {{y.stage == 'pitch' ? '(Pitching)' : ''}}
+                            </div>
+                            <div class='list-group-item'>
+                                {{y.battersEye}}
+                            </div>
+                        </div>
                     </div>
-                    <div class='col-md-3 background-color'>
-                        <div class="list-group-item umpire">
-                            {{y.umpire.says}}
-                        </div>
-                        <div class='list-group-item'>
-                            {{y.stage == 'swing' ? '(Batting)' : ''}}
-                            {{y.stage == 'pitch' ? '(Pitching)' : ''}}
-                        </div>
-                        <div class='list-group-item'>
-                            {{y.battersEye}}
-                        </div>
+                    <div class='col-md-4 background-color visible-lg visible-md'>
+                        <ul class="list-group pitch-record">
+                            <li class='list-group-item' ng-repeat="event in y.log.shortRecord track by $index">
+                                {{event}}
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
-            <div class='row'>
+            <div class='row list-group-item'>
                 <div class='col-lg-6'>
                     <div>
-                        <div class='row'>
+                        <div class='row list-group-item'>
                             <div class='col-lg-6'>
-                                <em>{{y.batter.throws == 'right' ? 'RHP' : 'LHP'}}</em> {{y.pitcher.name}} ({{y.pitcher.number}}) - Rating: {{rate(y.batter.skill.pitching)}}
+                                <em>{{y.batter.throws == 'right' ? 'RHP' : 'LHP'}}</em> <strong>{{y.pitcher.name}}</strong> ({{y.pitcher.number}}) &raquo; {{rate(y.batter.skill.pitching)}}
                             </div>
                             <div class='col-lg-6'>
-                                <em>C</em> {{y.pitcher.team.positions.catcher.name}} ({{y.pitcher.team.positions.catcher.number}}) - Rating: {{rate(y.pitcher.team.positions.catcher.skill.defense.catching)}}
+                                <em>C</em> <strong>{{y.pitcher.team.positions.catcher.name}}</strong> ({{y.pitcher.team.positions.catcher.number}}) &raquo; {{rate(y.pitcher.team.positions.catcher.skill.defense.catching)}}
                             </div>
                         </div>
                         <div class='row'></div>
                         <div>
-                            <table class='table table-condensed'>
+                            <table class='list-group-item table table-condensed'>
                                 <thead>
                                     <tr>
                                         <th>Pitch</th><th ng-repeat='(name, pitch) in y.pitcher.pitching'>{{name}}</th>
@@ -152,11 +218,11 @@
                         </div>
                     </div>
                 </div>
-                <div class='col-lg-6'>
+                <div class='col-lg-6 list-group-item'>
                     <div class='row'>
                         <div class='col-lg-6'>
                             <div>
-                                {{y.batter.name}} ({{y.batter.number}}) - <em>{{abbreviatePosition(y.batter.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}</em>
+                                <strong>{{y.batter.name}}</strong> ({{y.batter.number}}) - <em>{{abbreviatePosition(y.batter.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}</em>
                             </div>
                             <div>
                                 Eye : {{rate(y.batter.skill.offense.eye)}}
@@ -173,7 +239,7 @@
                         </div>
                         <div class='col-lg-6'>
                             <div>
-                                On Deck : {{y.deck.name}} ({{y.deck.number}}) - {{abbreviatePosition(y.deck.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}
+                                On Deck : <strong>{{y.deck.name}}</strong> ({{y.deck.number}}) - {{abbreviatePosition(y.deck.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}
                             </div>
                             <div>
                                 Eye : {{rate(y.deck.skill.offense.eye)}}
@@ -191,7 +257,7 @@
                     </div>
                 </div>
             </div>
-            <div class='row'>
+            <div class='block col-lg-12 hidden-lg hidden-md'>
                 <ul class="list-group pitch-record col-lg-6">
                     <li class='list-group-item' ng-repeat="event in y.log.pitchRecord track by $index">
                         {{event}}
@@ -203,7 +269,8 @@
                     </li>
                 </ul>
             </div>
-            <div class='row'>
+            <div class='clear'></div>
+            <div class='col-lg-12'>
                 <ul class='list-group col-lg-6'>
                     <li class='list-group-item'>
                         {{y.teams.away.name}}
