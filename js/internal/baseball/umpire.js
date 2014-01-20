@@ -4,6 +4,7 @@ define(function(){
     };
 
     Umpire.prototype = {
+        constructor : Umpire,
         init : function(game) {
             this.game = game;
             this.playBall();

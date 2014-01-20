@@ -4,6 +4,7 @@ define(function(){
     };
 
     Field.prototype = {
+        constructor : Field,
         init : function(game) {
             this.game = game;
             this.first = null;

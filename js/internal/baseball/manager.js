@@ -4,6 +4,7 @@ define(function(){
     };
 
     Manager.prototype = {
+        constructor : Manager,
         init : function(team) {
             this.team = team;
         },

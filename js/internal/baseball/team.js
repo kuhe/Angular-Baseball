@@ -4,6 +4,7 @@ define(function(){
     };
 
     Team.prototype = {
+        constructor : Team,
         init : function(baseball) {
             this.lineup = [];
             this.bench = [];
