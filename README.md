@@ -1,11 +1,9 @@
 Yakyuu-Aikoukai（Baseball Club）
 ===============
 
-A game of one of the top five bat-based sports! BASEBALL!
+A game of one of the top five bat-based sports! Namely, baseball! Now in JavaScript form.
 
-Now in web page form!
-
-Click on and around the strike zone to pitch/bat. Locate your pitches well to draw groundouts, easy pop flies,
+Click on and around the strike zone to pitch/bat (click on the outer edge to not swing). Locate your pitches well to draw groundouts, easy pop flies,
 and strikeouts from opposing batters, and use your batter's eye to hit the ball squarely in order to avoid the same.
 
 -George Fu
@@ -13,15 +11,15 @@ and strikeouts from opposing batters, and use your batter's eye to hit the ball 
 
 todo :
 
-    ピッチコントロール・速度影響とバットコントロール影響
+    ゲーム説明紹介
 
-    AI団レベルあげる
+    AIバッター騙される方法
 
     ピッチ選択
 
-    試合終了
+    試合終了メセージ
 
-    送りバント・打席
+    送りバント
 
     日本語版
 
