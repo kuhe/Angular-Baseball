@@ -171,7 +171,11 @@ define(function(){
             offense = this.game.half == 'top' ? 'away' : 'home';
             defense = this.game.half == 'top' ? 'home' : 'away';
             this.game.log.note((this.game.half == 'top' ? 'Top' : 'Bottom')+' '+this.game.inning);
-            this.game.batter = this.game.teams[offense].lineup[this.game.teams[offense].nowBatting];
+            var team = this.game.teams[offense];
+            this.game.batter = team.lineup[team.nowBatting];
+            this.game.deck = team.lineup[(team.nowBatting + 1)%9];
+            this.game.hole = team.lineup[(team.nowBatting + 2)%9];
+
             this.game.pitcher = this.game.teams[defense].positions.pitcher;
             this.game.log.noteBatter(this.game.batter);
         },
