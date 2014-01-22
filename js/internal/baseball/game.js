@@ -50,8 +50,8 @@ define(function(){
         autoPitch : function() {
             if (this.stage == 'pitch') {
                 this.autoPitchSelect();
-                var x = Math.floor(Math.random()*200);
-                var y = Math.floor(Math.random()*200);
+                var x = 100 + Math.floor(Math.random()*100) - Math.floor(Math.random()*100);
+                var y = Math.floor(Math.sqrt(Math.random()));
                 this.thePitch(x, y);
             }
         },
@@ -112,16 +112,16 @@ define(function(){
                     'breaking ball' : 'fastball');
 
                 var control = this.pitchInFlight.control;
-                this.pitchTarget.x += (50 - Math.random()*100)/(1+control/100);
-                this.pitchTarget.y += (50 - Math.random()*100)/(1+control/100);
+                this.pitchTarget.x = Math.min(199.9, Math.max(0.1, this.pitchTarget.x + (50 - Math.random()*100)/(1+control/100)));
+                this.pitchTarget.y = Math.min(199.9, Math.max(0.1, this.pitchTarget.y + (50 - Math.random()*100)/(1+control/100)));
 
                 if (this.pitcher.throws == 'right') this.pitchInFlight.breakDirection[0] *= -1;
 
                 this.pitchInFlight.x = Math.floor(this.pitchTarget.x + (this.pitchInFlight.breakDirection[0]*this.pitchInFlight.break/100));
                 this.pitchInFlight.y = Math.floor(this.pitchTarget.y + (this.pitchInFlight.breakDirection[1]*this.pitchInFlight.break/100));
+                this.log.notePitch(this.pitchInFlight, this.batter);
 
                 this.stage = 'swing';
-                this.log.notePitch(this.pitchInFlight, this.batter);
                 if (this.humanControl == 'both' || this.teams[this.humanControl].lineup[this.batter.team.nowBatting] == this.batter) {
 
                 } else {
