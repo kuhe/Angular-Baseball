@@ -24,10 +24,14 @@ define(function(){
         },
         end : function() {
             this.stage = 'end';
+            this.log.note(this.tally.home.R > this.tally.away.R ? 'Home team wins!' : (this.tally.home.R == this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!'));
         },
         stage : 'pitch', //pitch, swing
         humanControl : 'home', //home, away, both
         receiveInput : function(x, y) {
+            if (this.stage == 'end') {
+                return;
+            }
             if (this.stage == 'pitch') {
                 this.thePitch(x, y);
             } else if (this.stage == 'swing') {
@@ -44,10 +48,12 @@ define(function(){
             this.pitchInFlight = pitch;
         },
         autoPitch : function() {
-            this.autoPitchSelect();
-            var x = Math.floor(Math.random()*200);
-            var y = Math.floor(Math.random()*200);
-            this.thePitch(x, y);
+            if (this.stage == 'pitch') {
+                this.autoPitchSelect();
+                var x = Math.floor(Math.random()*200);
+                var y = Math.floor(Math.random()*200);
+                this.thePitch(x, y);
+            }
         },
         autoSwing : function(deceptiveX, deceptiveY) {
             var x = Math.floor(Math.random()*200), y = Math.floor(Math.random()*200);
@@ -84,11 +90,11 @@ define(function(){
         swingResult : {
             x : 100, //difference to pitch location
             y : 100, //difference to pitch location
-            strike : true,
-            foul : true,
+            strike : false,
+            foul : false,
             caught : false,
-            contact : true,
-            looking : false,
+            contact : false,
+            looking : true,
             bases : 0,
             fielder : 'short',
             outs : 0
@@ -102,7 +108,7 @@ define(function(){
                 this.pitchTarget.y = y;
 
                 this.pitchInFlight.breakDirection = this.helper.pitchDefinitions[this.pitchInFlight.name].slice(0, 2);
-                this.battersEye = 'Looks like: '+(Math.abs(this.pitchInFlight.breakDirection[0])+Math.abs(this.pitchInFlight.breakDirection[1]) > 40 ?
+                this.battersEye = 'looks like: '+(Math.abs(this.pitchInFlight.breakDirection[0])+Math.abs(this.pitchInFlight.breakDirection[1]) > 40 ?
                     'breaking ball' : 'fastball');
 
                 var control = this.pitchInFlight.control;
@@ -146,9 +152,10 @@ define(function(){
                 }
 
                 this.log.noteSwing(this.swingResult);
+                this.stage = 'pitch';
+
                 this.umpire.makeCall();
 
-                this.stage = 'pitch';
                 if (this.humanControl == 'both' || this.teams[this.humanControl].positions.pitcher == this.pitcher) {
 
                 } else {

@@ -3,6 +3,18 @@ app.controller('IndexController', function($scope) {
     $scope.refresh = function() {
         $scope.y = window.y;
     };
+    $scope.proceedToGame = function() {
+        $scope.refresh();
+        jQ('.blocking').remove();
+    };
+    $scope.selectPitch = function($event) {
+        if (y.stage == 'pitch') {
+            var pitchName = $event.srcElement.attributes.name.nodeValue;
+            y.pitchInFlight = jQ.extend({}, y.pitcher.pitching[pitchName]);
+            y.pitchInFlight.name = pitchName;
+            y.swingResult.looking = true;
+        }
+    };
     $scope.indicate = function($event) {
         var offset = jQ('.target').offset();
         var relativeOffset = {
@@ -10,18 +22,6 @@ app.controller('IndexController', function($scope) {
             y : 200 - ($event.pageY - offset.top)
         };
         y.receiveInput(relativeOffset.x, relativeOffset.y);
-        jQ('.indicator.pitch').css({
-            top: 200 - relativeOffset.y,
-            left: relativeOffset.x
-        }).show();
-        jQ('.indicator.break').css({
-            top: 200 - y.pitchInFlight.y,
-            left: y.pitchInFlight.x
-        }).show();
-        jQ('.indicator.swing').css({
-            top: 200 - (y.pitchInFlight.y) + y.swingResult.y,
-            left: y.pitchInFlight.x + y.swingResult.x
-        }).show();
     };
     $scope.rate = function(rating) {
         if (rating > 95) {

@@ -108,41 +108,42 @@ define(function(){
         },
         notePlateAppearanceResult : function(game) {
             var r = game.swingResult;
+            var record = '';
             var batter = game.batter.name;
             if (r.looking) {
                 if (r.strike) {
-                    this.record.unshift(batter+' struck out looking.');
+                    record = (batter+' struck out looking.');
                 } else {
-                    this.record.unshift(batter+' walked.');
+                    record = (batter+' walked.');
                 }
             } else {
                 if (r.contact) {
                     if (r.caught) {
-                        this.record.unshift(batter+' flew out to '+ r.fielder + '.');
+                        record = (batter+' flew out to '+ r.fielder + '.');
                     } else {
                         if (r.foul) {
                             // not possible to end PA on foul?
                         } else {
                             if (r.thrownOut) {
-                                this.record.unshift(batter+' grounded out to '+ r.fielder + '.');
+                                record = (batter+' grounded out to '+ r.fielder + '.');
                             } else {
                                 switch (r.bases) {
                                     case 1:
-                                        this.record.unshift(batter+' reached on single to '+ r.fielder + '.');
+                                        record = (batter+' reached on single to '+ r.fielder + '.');
                                         break;
                                     case 2:
-                                        this.record.unshift(batter+' doubled past '+ r.fielder + '.');
+                                        record = (batter+' doubled past '+ r.fielder + '.');
                                         break;
                                     case 3:
-                                        this.record.unshift(batter+' reached third on triple past '+ r.fielder + '.');
+                                        record = (batter+' reached third on triple past '+ r.fielder + '.');
                                         break;
                                     case 4:
                                         if (r.splay < -15) {
-                                            this.record.unshift(batter+' homered to left.');
+                                            record = (batter+' homered to left.');
                                         } else if (r.splay < 15) {
-                                            this.record.unshift(batter+' homered to center.');
+                                            record = (batter+' homered to center.');
                                         } else {
-                                            this.record.unshift(batter+' homered to right.');
+                                            record = (batter+' homered to right.');
                                         }
                                         break;
                                 }
@@ -150,9 +151,11 @@ define(function(){
                         }
                     }
                 } else {
-                    this.record.unshift(batter+' struck out swinging.');
+                    record = (batter+' struck out swinging.');
                 }
             }
+            this.record.unshift(record);
+            this.pitchRecord = ['Previous: '+record];
         },
         pointer : 0,
         pitchRecord : [],

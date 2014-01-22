@@ -148,6 +148,9 @@ define(function(){
             }
         },
         changeSides : function() {
+            this.game.swingResult.looking = true; // hide bat
+            this.game.pitchInFlight.x = null; // hide ball
+            this.game.pitchInFlight.y = null; // hide ball
             this.game.log.pitchRecord = [];
             var offense, defense;
             this.game.field.first = null;
@@ -155,11 +158,14 @@ define(function(){
             this.game.field.third = null;
             if (this.game.half == 'top') {
                 this.game.half = 'bottom';
+                if (this.game.inning == 9 && this.game.tally.home.R > this.game.tally.away.R) {
+                    return this.game.end();
+                }
             } else {
                 this.game.half = 'top';
                 this.game.inning++;
                 if (this.game.inning > 9) {
-                    this.game.end();
+                    return this.game.end();
                 }
             }
             offense = this.game.half == 'top' ? 'away' : 'home';
