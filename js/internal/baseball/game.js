@@ -4,7 +4,7 @@ define(function(){
     };
 
     Game.prototype = {
-        constructor : game,
+        constructor : Game,
         init : function(baseball) {
             this.field = new baseball.Field(this);
             this.teams.away = new baseball.Team(baseball);
