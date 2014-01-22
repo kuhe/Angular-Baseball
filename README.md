@@ -8,16 +8,11 @@ and strikeouts from opposing batters, and use your batter's eye to hit the ball 
 
 -George Fu
 
+currently hosted at georgefu.info/y/
 
 todo :
 
-    ゲーム説明紹介
-
     AIバッター騙される方法
-
-    ピッチ選択
-
-    試合終了メセージ
 
     送りバント
 
