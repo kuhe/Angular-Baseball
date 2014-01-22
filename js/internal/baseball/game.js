@@ -51,7 +51,7 @@ define(function(){
             if (this.stage == 'pitch') {
                 this.autoPitchSelect();
                 var x = 100 + Math.floor(Math.random()*100) - Math.floor(Math.random()*100);
-                var y = Math.floor(Math.sqrt(Math.random()));
+                var y = Math.floor(Math.sqrt(Math.random()*40000));
                 this.thePitch(x, y);
             }
         },
