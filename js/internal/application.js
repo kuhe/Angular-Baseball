@@ -1162,20 +1162,16 @@ Renderer.prototype = {
     }
 };
 app.controller('IndexController', function($scope) {
-    $scope.y = window.y = new Game();
-    $scope.refresh = function() {
-        $scope.y = window.y;
-    };
+    $scope.y = new Game();
     $scope.proceedToGame = function() {
-        $scope.refresh();
         jQ('.blocking').remove();
     };
     $scope.selectPitch = function($event) {
-        if (y.stage == 'pitch') {
+        if ($scope.y.stage == 'pitch') {
             var pitchName = $event.srcElement.attributes.name.nodeValue;
-            y.pitchInFlight = jQ.extend({}, y.pitcher.pitching[pitchName]);
-            y.pitchInFlight.name = pitchName;
-            y.swingResult.looking = true;
+            $scope.y.pitchInFlight = jQ.extend({}, y.pitcher.pitching[pitchName]);
+            $scope.y.pitchInFlight.name = pitchName;
+            $scope.y.swingResult.looking = true;
         }
     };
     $scope.indicate = function($event) {
@@ -1184,7 +1180,7 @@ app.controller('IndexController', function($scope) {
             x : $event.pageX - offset.left,
             y : 200 - ($event.pageY - offset.top)
         };
-        y.receiveInput(relativeOffset.x, relativeOffset.y);
+        $scope.y.receiveInput(relativeOffset.x, relativeOffset.y);
     };
     $scope.rate = function(rating) {
         if (rating > 95) {
@@ -1218,9 +1214,6 @@ app.controller('IndexController', function($scope) {
             right : 'RF'
         }[position];
     };
-    angular.element(document).ready(function() {
-        $scope.refresh();
-    });
 });
 var Catcher = function() {
     this.init();
