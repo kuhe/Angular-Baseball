@@ -1,12 +1,9 @@
-define(function(){
-    var Runner = function() {
-        this.init();
-    };
+var Runner = function() {
+    this.init();
+};
 
-    Runner.prototype = {
-        init : function() {
+Runner.prototype = {
+    init : function() {
 
-        }
-    };
-    return Runner;
-});
+    }
+};

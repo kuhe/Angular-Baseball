@@ -1,15 +1,12 @@
-define(function(){
-    var Renderer = function(game) {
-        this.init(game);
-    };
+var Renderer = function(game) {
+    this.init(game);
+};
 
-    Renderer.prototype = {
-        init : function(game) {
-            this.game = game;
-        },
-        render : function() {
+Renderer.prototype = {
+    init : function(game) {
+        this.game = game;
+    },
+    render : function() {
 
-        }
-    };
-    return Renderer;
-});
+    }
+};

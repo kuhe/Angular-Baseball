@@ -1,12 +1,9 @@
-define(function(){
-    var Pitcher = function() {
-        this.init();
-    };
+var Pitcher = function() {
+    this.init();
+};
 
-    Pitcher.prototype = {
-        init : function() {
+Pitcher.prototype = {
+    init : function() {
 
-        }
-    };
-    return Pitcher;
-});
+    }
+};

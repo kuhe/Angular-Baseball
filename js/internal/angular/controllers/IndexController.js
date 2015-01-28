@@ -1,5 +1,5 @@
 app.controller('IndexController', function($scope) {
-    $scope.y = null;
+    $scope.y = window.y = new Game();
     $scope.refresh = function() {
         $scope.y = window.y;
     };

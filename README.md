@@ -19,7 +19,3 @@ todo :
     日本語版
 
     選手名前なんか足りないじゃん
-
-notes:
-
-    Using Bootstrap, AngularJS, RequireJS, and jQuery

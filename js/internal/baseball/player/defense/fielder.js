@@ -1,12 +1,9 @@
-define(function(){
-    var Fielder = function() {
-        this.init();
-    };
+var Fielder = function() {
+    this.init();
+};
 
-    Fielder.prototype = {
-        init : function() {
+Fielder.prototype = {
+    init : function() {
 
-        }
-    };
-    return Fielder;
-});
+    }
+};
