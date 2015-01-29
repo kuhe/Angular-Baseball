@@ -119,18 +119,51 @@ Umpire.prototype = {
     },
     advanceRunners : function(isWalk) {
         isWalk = !!isWalk;
-        if (this.game.field.third instanceof this.game.batter.constructor && (!isWalk || (this.game.field.second != null && this.game.field.first != null))) {
-            // run scored
-            this.game.scoreboard[this.game.half == 'top' ? 'away' : 'home'][this.game.inning]++;
-            this.game.tally[this.game.half == 'top' ? 'away' : 'home']['R']++;
-            if (this.game.batter != this.game.field.third) {
-                this.game.batter.atBats.push('RBI');
-                this.game.field.third.atBats.push('R');
+
+        if (isWalk) {
+            if (this.game.field.first) {
+                if (this.game.field.second) {
+                    if (this.game.field.third) {
+                        //bases loaded
+                        this.game.batter.atBats.push('RBI');
+                        this.game.field.third.atBats.push('R');
+                        this.game.field.third = this.game.field.second;
+                        this.game.field.second = this.game.field.first;
+                        this.game.field.first = null;
+                    } else {
+                        // 1st and second
+                        this.game.field.third = this.game.field.second;
+                        this.game.field.second = this.game.field.first;
+                        this.game.field.first = null;
+                    }
+                } else {
+                    if (this.game.field.third) {
+                        // first and third
+                        this.game.field.second = this.game.field.first;
+                        this.game.field.first = null;
+                    } else {
+                        // first only
+                        this.game.field.second = this.game.field.first;
+                        this.game.field.first = null;
+                    }
+                }
+            } else {
+                // no one on first
             }
+        } else {
+            if (this.game.field.third instanceof this.game.batter.constructor) {
+                // run scored
+                this.game.scoreboard[this.game.half == 'top' ? 'away' : 'home'][this.game.inning]++;
+                this.game.tally[this.game.half == 'top' ? 'away' : 'home']['R']++;
+                if (this.game.batter != this.game.field.third) {
+                    this.game.batter.atBats.push('RBI');
+                    this.game.field.third.atBats.push('R');
+                }
+            }
+            this.game.field.third = this.game.field.second;
+            this.game.field.second = this.game.field.first;
+            this.game.field.first = null;
         }
-        if (!isWalk || this.game.field.first != null) this.game.field.third = this.game.field.second;
-        this.game.field.second = this.game.field.first;
-        this.game.field.first = null;
         return this;
     },
     newBatter : function() {
