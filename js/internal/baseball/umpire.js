@@ -127,6 +127,8 @@ Umpire.prototype = {
                         //bases loaded
                         this.game.batter.atBats.push('RBI');
                         this.game.field.third.atBats.push('R');
+                        this.game.scoreboard[this.game.half == 'top' ? 'away' : 'home'][this.game.inning]++;
+                        this.game.tally[this.game.half == 'top' ? 'away' : 'home']['R']++;
                         this.game.field.third = this.game.field.second;
                         this.game.field.second = this.game.field.first;
                         this.game.field.first = null;
