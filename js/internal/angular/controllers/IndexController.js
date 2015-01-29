@@ -1,12 +1,12 @@
 app.controller('IndexController', function($scope) {
+    window.s = $scope;
     $scope.y = new Game();
     $scope.proceedToGame = function() {
         jQ('.blocking').remove();
     };
-    $scope.selectPitch = function($event) {
+    $scope.selectPitch = function(pitchName) {
         if ($scope.y.stage == 'pitch') {
-            var pitchName = $event.srcElement.attributes.name.nodeValue;
-            $scope.y.pitchInFlight = jQ.extend({}, y.pitcher.pitching[pitchName]);
+            $scope.y.pitchInFlight = jQ.extend({}, $scope.y.pitcher.pitching[pitchName]);
             $scope.y.pitchInFlight.name = pitchName;
             $scope.y.swingResult.looking = true;
         }

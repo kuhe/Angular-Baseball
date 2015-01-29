@@ -118,13 +118,21 @@ Log.prototype = {
         } else {
             if (r.contact) {
                 if (r.caught) {
-                    record = (batter+' flew out to '+ r.fielder + '.');
+                    if (['left', 'center', 'right'].indexOf(r.fielder) < 0) {
+                        record = (batter+' popped out to '+ r.fielder + '.');
+                    } else {
+                        record = (batter+' flew out to '+ r.fielder + '.');
+                    }
                 } else {
                     if (r.foul) {
                         // not possible to end PA on foul?
                     } else {
                         if (r.thrownOut) {
-                            record = (batter+' grounded out to '+ r.fielder + '.');
+                            if (Math.random() > 0.5) {
+                                record = (batter+' grounded out to '+ r.fielder + '.');
+                            } else {
+                                record = (batter+' thrown out by '+ r.fielder + '.');
+                            }
                         } else {
                             switch (r.bases) {
                                 case 1:

@@ -188,7 +188,12 @@
                         <!--</div>-->
                         <ul class="list-group pitch-record">
                             <li class='list-group-item' ng-repeat="event in y.log.pitchRecord track by $index">
-                                {{event}}
+                                <strong ng-if="$index == 0">
+                                    {{event}}
+                                </strong>
+                                <span ng-if="$index">
+                                    {{event}}
+                                </span>
                             </li>
                         </ul>
                     </div>
@@ -196,7 +201,7 @@
                         <div class="no-swing" ng-click="indicate($event)">
                             <div class="target {{y.stage}}">
                                 <div class='indicator pitch {{!y.pitchInFlight.x ? "hide" : ""}}' style='top:{{200-y.pitchTarget.y}}px;left:{{y.pitchTarget.x}}px;'></div>
-                                <div class='indicator break {{!y.pitchInFlight.x ? "hide" : ""}}' style='top:{{200-y.pitchInFlight.y}}px;left:{{y.pitchInFlight.x}}px;'></div>
+                                <div ng-class='{"hide" : y.humanBatting()}' class='indicator break {{!y.pitchInFlight.x ? "hide" : ""}}' style='top:{{200-y.pitchInFlight.y}}px;left:{{y.pitchInFlight.x}}px;'></div>
                                 <div class='indicator swing {{y.swingResult.looking ? "hide" : ""}}' style='top:{{200-y.pitchInFlight.y + y.swingResult.y}}px;left:{{y.pitchInFlight.x + y.swingResult.x}}px;'></div>
                                 <div class='strikezone'></div>
                             </div>
@@ -214,7 +219,12 @@
                     <div class='col-md-4 background-color visible-lg visible-md'>
                         <ul class="list-group pitch-record">
                             <li class='list-group-item' ng-repeat="event in y.log.shortRecord track by $index">
-                                {{event}}
+                                <strong ng-if="$index == 0">
+                                    {{event}}
+                                </strong>
+                                <span ng-if="$index">
+                                    {{event}}
+                                </span>
                             </li>
                         </ul>
                     </div>
@@ -238,7 +248,7 @@
                                     <tr>
                                         <th>Pitch</th>
                                         <th class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
-                                            <span ng-click="selectPitch($event)" name="{{name}}">{{name}}</span>
+                                            <span ng-click="selectPitch(name)">{{name}}</span>
                                         </th>
                                     </tr>
                                 </thead>

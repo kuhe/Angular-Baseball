@@ -202,10 +202,30 @@ Game.prototype = {
         }
         this.renderer = new Renderer(this);
         this.umpire = new Umpire(this);
-        if (this.humanControl == 'away' && this.half == 'bottom' || this.half == 'top' && this.humanControl == 'home' || this.humanControl == 'both') {
+        if (this.humanPitching()) {
             this.stage = 'pitch';
         } else {
             this.autoPitch();
+        }
+    },
+    humanBatting : function() {
+        switch (this.half) {
+            case 'top':
+                return this.humanControl == 'both' || this.humanControl == 'away';
+                break;
+            case 'bottom':
+                return this.humanControl == 'both' || this.humanControl == 'home';
+                break;
+        }
+    },
+    humanPitching : function() {
+        switch (this.half) {
+            case 'top':
+                return this.humanControl == 'both' || this.humanControl == 'home';
+                break;
+            case 'bottom':
+                return this.humanControl == 'both' || this.humanControl == 'away';
+                break;
         }
     },
     end : function() {
@@ -303,8 +323,10 @@ Game.prototype = {
 
             if (this.pitcher.throws == 'right') this.pitchInFlight.breakDirection[0] *= -1;
 
-            this.pitchInFlight.x = Math.floor(this.pitchTarget.x + (this.pitchInFlight.breakDirection[0]*this.pitchInFlight.break/100));
-            this.pitchInFlight.y = Math.floor(this.pitchTarget.y + (this.pitchInFlight.breakDirection[1]*this.pitchInFlight.break/100));
+            this.pitchInFlight.x = Math.floor(this.pitchTarget.x + (this.pitchInFlight.breakDirection[0]
+                *((0.5+Math.random()*this.pitchInFlight.break)/100)));
+            this.pitchInFlight.y = Math.floor(this.pitchTarget.y + (this.pitchInFlight.breakDirection[1]
+                *((0.5+Math.random()*this.pitchInFlight.break)/100))/(0.5 + this.pitchTarget.y/200));
             this.log.notePitch(this.pitchInFlight, this.batter);
 
             this.stage = 'swing';
@@ -319,8 +341,8 @@ Game.prototype = {
     theSwing : function(x, y) {
         if (this.stage == 'swing') {
             this.swingResult = {};
-            this.swingResult.x = (x - this.pitchInFlight.x)/(1+this.batter.skill.offense.eye/100);
-            this.swingResult.y = (y - this.pitchInFlight.y)/(1+this.batter.skill.offense.eye/100);
+            this.swingResult.x = (x - this.pitchInFlight.x)/(0.5+Math.random()*this.batter.skill.offense.eye/50);
+            this.swingResult.y = (y - this.pitchInFlight.y)/(0.5+Math.random()*this.batter.skill.offense.eye/50);
 
             if (!(x < 0 || x > 200)) {
                 this.swingResult.looking = false;
@@ -956,15 +978,15 @@ data = {
 helper = {
     pitchDefinitions : {
         '4-seam' :      [0, 0, 1], //x movement, y movement, speed ratio
-        '2-seam' :      [20, -20, 0.96],
-        'cutter' :      [-25, -12, 0.95],
-        'sinker' :      [0, -15, 0.95],
+        '2-seam' :      [20, -20, 0.90],
+        'cutter' :      [-25, -20, 0.95],
+        'sinker' :      [-15, -30, 0.95],
 
-        'slider' :      [-50, -25, 0.9],
+        'slider' :      [-50, -35, 0.9],
         'fork'   :      [0, -70, 0.87],
         'curve'  :      [0, -90, 0.82],
 
-        'change' :    [0, 0, 0.88]
+        'change' :    [0, -10, 0.88]
     },
     selectRandomPitch : function() {
         return [
@@ -1095,13 +1117,21 @@ Log.prototype = {
         } else {
             if (r.contact) {
                 if (r.caught) {
-                    record = (batter+' flew out to '+ r.fielder + '.');
+                    if (['left', 'center', 'right'].indexOf(r.fielder) < 0) {
+                        record = (batter+' popped out to '+ r.fielder + '.');
+                    } else {
+                        record = (batter+' flew out to '+ r.fielder + '.');
+                    }
                 } else {
                     if (r.foul) {
                         // not possible to end PA on foul?
                     } else {
                         if (r.thrownOut) {
-                            record = (batter+' grounded out to '+ r.fielder + '.');
+                            if (Math.random() > 0.5) {
+                                record = (batter+' grounded out to '+ r.fielder + '.');
+                            } else {
+                                record = (batter+' thrown out by '+ r.fielder + '.');
+                            }
                         } else {
                             switch (r.bases) {
                                 case 1:
@@ -1162,14 +1192,14 @@ Renderer.prototype = {
     }
 };
 app.controller('IndexController', function($scope) {
+    window.s = $scope;
     $scope.y = new Game();
     $scope.proceedToGame = function() {
         jQ('.blocking').remove();
     };
-    $scope.selectPitch = function($event) {
+    $scope.selectPitch = function(pitchName) {
         if ($scope.y.stage == 'pitch') {
-            var pitchName = $event.srcElement.attributes.name.nodeValue;
-            $scope.y.pitchInFlight = jQ.extend({}, y.pitcher.pitching[pitchName]);
+            $scope.y.pitchInFlight = jQ.extend({}, $scope.y.pitcher.pitching[pitchName]);
             $scope.y.pitchInFlight.name = pitchName;
             $scope.y.swingResult.looking = true;
         }

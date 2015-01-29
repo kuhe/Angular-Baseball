@@ -15,10 +15,30 @@ Game.prototype = {
         }
         this.renderer = new Renderer(this);
         this.umpire = new Umpire(this);
-        if (this.humanControl == 'away' && this.half == 'bottom' || this.half == 'top' && this.humanControl == 'home' || this.humanControl == 'both') {
+        if (this.humanPitching()) {
             this.stage = 'pitch';
         } else {
             this.autoPitch();
+        }
+    },
+    humanBatting : function() {
+        switch (this.half) {
+            case 'top':
+                return this.humanControl == 'both' || this.humanControl == 'away';
+                break;
+            case 'bottom':
+                return this.humanControl == 'both' || this.humanControl == 'home';
+                break;
+        }
+    },
+    humanPitching : function() {
+        switch (this.half) {
+            case 'top':
+                return this.humanControl == 'both' || this.humanControl == 'home';
+                break;
+            case 'bottom':
+                return this.humanControl == 'both' || this.humanControl == 'away';
+                break;
         }
     },
     end : function() {
@@ -116,8 +136,10 @@ Game.prototype = {
 
             if (this.pitcher.throws == 'right') this.pitchInFlight.breakDirection[0] *= -1;
 
-            this.pitchInFlight.x = Math.floor(this.pitchTarget.x + (this.pitchInFlight.breakDirection[0]*this.pitchInFlight.break/100));
-            this.pitchInFlight.y = Math.floor(this.pitchTarget.y + (this.pitchInFlight.breakDirection[1]*this.pitchInFlight.break/100));
+            this.pitchInFlight.x = Math.floor(this.pitchTarget.x + (this.pitchInFlight.breakDirection[0]
+                *((0.5+Math.random()*this.pitchInFlight.break)/100)));
+            this.pitchInFlight.y = Math.floor(this.pitchTarget.y + (this.pitchInFlight.breakDirection[1]
+                *((0.5+Math.random()*this.pitchInFlight.break)/100))/(0.5 + this.pitchTarget.y/200));
             this.log.notePitch(this.pitchInFlight, this.batter);
 
             this.stage = 'swing';
@@ -132,8 +154,8 @@ Game.prototype = {
     theSwing : function(x, y) {
         if (this.stage == 'swing') {
             this.swingResult = {};
-            this.swingResult.x = (x - this.pitchInFlight.x)/(1+this.batter.skill.offense.eye/100);
-            this.swingResult.y = (y - this.pitchInFlight.y)/(1+this.batter.skill.offense.eye/100);
+            this.swingResult.x = (x - this.pitchInFlight.x)/(0.5+Math.random()*this.batter.skill.offense.eye/50);
+            this.swingResult.y = (y - this.pitchInFlight.y)/(0.5+Math.random()*this.batter.skill.offense.eye/50);
 
             if (!(x < 0 || x > 200)) {
                 this.swingResult.looking = false;
