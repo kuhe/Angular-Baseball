@@ -15,8 +15,52 @@
 
         <link rel="shortcut icon" href="yakk.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <link rel="stylesheet" type="text/css" href="css/internal/application.css">
         <link href="css/external/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            @-webkit-keyframes spin {
+                from {
+                    -webkit-transform: rotate(0deg);
+                }
+                to {
+                    -webkit-transform: rotate(360deg);
+                }
+            }
+            @keyframes spin {
+                from {
+                    -ms-transform: rotate(0deg);
+                    transform: rotate(360deg);
+                }
+                to {
+                    -ms-transform: rotate(0deg);
+                    transform: rotate(360deg);
+                }
+            }
+            @-webkit-keyframes flight {
+                0% {
+                }
+                25% {
+                }
+                50% {
+                }
+                75% {
+                }
+                100% {
+                }
+            }
+            @keyframes flight {
+                0% {
+                }
+                25% {
+                }
+                50% {
+                }
+                75% {
+                }
+                100% {
+                }
+            }
+        </style>
     </head>
     <body class='blue'>
         <div class='container' ng-app='YakyuuAikoukai' ng-controller='IndexController'>
@@ -30,8 +74,8 @@
                     </div>
                     <div class="no-swing col-md-4">
                         <div class="target {{y.stage}}">
-                            <div class='indicator pitch' style='top:125px;left:155px;'></div>
-                            <div class='indicator break' style='top:145px;left:135px;'></div>
+                            <div class='indicator baseball pitch' style='top:125px;left:155px;'></div>
+                            <div class='indicator baseball break' style='top:125px;left:125px;'></div>
                             <div class='indicator swing' style='top:100px;left:100px;'></div>
                             <div class='strikezone'></div>
                         </div>
@@ -50,8 +94,8 @@
                     </div>
                     <div class="no-swing col-md-4">
                         <div class="target {{y.stage}}">
-                            <div class='indicator pitch' style='top:125px;left:155px;'></div>
-                            <div class='indicator break' style='top:145px;left:135px;'></div>
+                            <div class='indicator baseball pitch' style='top:125px;left:155px;'></div>
+                            <div class='indicator baseball break' style='top:145px;left:135px;'></div>
                             <div class='strikezone'></div>
                         </div>
                     </div>
@@ -200,8 +244,8 @@
                     <div class='col-md-4'>
                         <div class="no-swing" ng-click="indicate($event)">
                             <div class="target {{y.stage}}">
-                                <div class='indicator pitch {{!y.pitchInFlight.x ? "hide" : ""}}' style='top:{{200-y.pitchTarget.y}}px;left:{{y.pitchTarget.x}}px;'></div>
-                                <div ng-class='{"hide" : y.humanBatting()}' class='indicator break {{!y.pitchInFlight.x ? "hide" : ""}}' style='top:{{200-y.pitchInFlight.y}}px;left:{{y.pitchInFlight.x}}px;'></div>
+                                <div class='indicator baseball pitch hide'></div>
+                                <div class='indicator baseball break hide'></div>
                                 <div class='indicator swing {{y.swingResult.looking ? "hide" : ""}}' style='top:{{200-y.pitchInFlight.y + y.swingResult.y}}px;left:{{y.pitchInFlight.x + y.swingResult.x}}px;'></div>
                                 <div class='strikezone'></div>
                             </div>

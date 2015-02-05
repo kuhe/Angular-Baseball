@@ -1,0 +1,28 @@
+@seamColor : #ff6261;
+
+.indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 13px;
+    padding: 13px;
+    background: white;
+    margin: -13px;
+}
+.baseball {
+    border: 4px dashed @seamColor;
+//    -webkit-animation: flight 1s infinite 0s linear; /* Chrome, Safari, Opera */
+//    animation: flight 1s infinite 0s linear;
+}
+.spin {
+    -webkit-animation: spin 1s infinite 0s linear; /* Chrome, Safari, Opera */
+    animation: spin 1s infinite 0s linear;
+}
+.flight {
+    -webkit-animation: flight 1s 1 0s linear; /* Chrome, Safari, Opera */
+    animation: flight 1s 1 0s linear;
+}
+.break {
+//    border-left: none;
+//    border-right: 4px dashed @seamColor;
+}
