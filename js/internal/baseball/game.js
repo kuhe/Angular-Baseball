@@ -4,11 +4,13 @@ var Game = function(baseball) {
 
 Game.prototype = {
     constructor : Game,
+    gamesIntoSeason : 0,
     init : function(m) {
-        if (m) mode = m;
+        if (m) window.mode = m;
+        this.gamesIntoSeason = Math.floor(Math.random()*60);
         this.field = new Field(this);
-        this.teams.away = new Team();
-        this.teams.home = new Team();
+        this.teams.away = new Team(this);
+        this.teams.home = new Team(this);
         this.log = new Log();
         this.log.game = this;
         this.helper = helper;

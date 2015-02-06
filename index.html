@@ -294,7 +294,9 @@
                     </li>
                     <li class='list-group-item' ng-repeat="(order, player) in y.teams.away.lineup track by $index">
                         {{abbreviatePosition(player.position)}} <strong>{{player.getName()}}</strong> (#{{player.number}})
-                         {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}} - {{player.stats.batting.getBA() | number:3}}
+                         {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
+                        - {{player.stats.batting.ba | number:3}}
+                        - {{player.stats.batting.getBA() | number:3}}
                         <span class='pull-right'>
                             {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - Up to Bat' : ''}}</em>
                         </span>
@@ -306,7 +308,9 @@
                     </li>
                     <li class='list-group-item' ng-repeat="(order, player) in y.teams.home.lineup track by $index">
                         {{abbreviatePosition(player.position)}} <strong>{{player.getName()}}</strong> (#{{player.number}})
-                         {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}} - {{player.stats.batting.getBA() | number:3}}
+                         {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
+                        - {{player.stats.batting.ba | number:3}}
+                        - {{player.stats.batting.getBA() | number:3}}
                         <span class='pull-right'>
                             {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - Up to Bat' : ''}}</em>
                         </span>

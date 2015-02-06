@@ -79,15 +79,18 @@ Umpire.prototype = {
                                     break;
                                 case 2 :
                                     this.game.batter.atBats.push('2B');
+                                    batter.stats.batting.h++;
                                     batter.stats.batting['2b']++;
                                     break;
                                 case 3 :
                                     this.game.batter.atBats.push('3B');
+                                    batter.stats.batting.h++;
                                     batter.stats.batting['3b']++;
                                     break;
                                 case 4 :
                                     this.game.batter.atBats.push('HR');
                                     pitcher.stats.pitching.HR++;
+                                    batter.stats.batting.h++;
                                     batter.stats.batting.hr++;
                                     break;
                             }

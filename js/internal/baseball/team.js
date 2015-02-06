@@ -1,10 +1,10 @@
-var Team = function(baseball) {
-    this.init(baseball);
+var Team = function(game) {
+    this.init(game);
 };
 
 Team.prototype = {
     constructor : Team,
-    init : function() {
+    init : function(game) {
         this.lineup = [];
         this.bench = [];
         this.bullpen = [];
@@ -19,6 +19,7 @@ Team.prototype = {
             center : null,
             right : null
         };
+        this.game = game;
         for (var j = 0; j < 20; j++) {
             this.bench.push(new Player(this));
         }
