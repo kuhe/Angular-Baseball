@@ -1,39 +1,83 @@
 var Player = function(team) {
     this.init(team);
+    var offense = this.skill.offense;
+    var randBetween = function(a, b, skill) {
+        if (offense[skill]) skill = offense[skill];
+        skill = Math.sqrt(0.2 + Math.random()*0.8)*skill;
+        return Math.floor((skill/100) * (b - a) + a);
+    };
+    // let's just say we're about X games into the season
+    var gamesIntoSeason = Math.floor(Math.random()*50);
+    var IP, ER, GS, W, L;
+    if (this.skill.pitching > 65) {
+        IP = (this.skill.pitching - 65)*gamesIntoSeason/20;
+        ER = Math.floor(Math.random()*40)/100 + ((4.5 - (2*this.skill.pitching/100))/9 * IP);
+        ER = (IP/9)*randBetween(800, 315, this.skill.pitching)/100;
+        if (IP > gamesIntoSeason) {
+            //starter
+            GS = Math.floor(gamesIntoSeason/5);
+            W = randBetween(0, GS*0.6, this.skill.pitching/1.2);
+            L = randBetween((GS - W), 0, this.skill.pitching/3);
+        } else {
+            //reliever
+            GS = Math.floor(gamesIntoSeason/40);
+            W = randBetween(0, GS*0.6, this.skill.pitching);
+            L = randBetween((GS - W), 0, this.skill.pitching);
+        }
+    }
+    var pa = randBetween(gamesIntoSeason*3, gamesIntoSeason*5, 'speed');
+    var paRemaining = pa;
+    var bb = Math.floor(randBetween(3, 18, 'eye')*paRemaining/100);
+    paRemaining -= bb;
+    var ab = paRemaining;
+    var so = Math.floor(randBetween(33, 2, 'eye')*paRemaining/100);
+    paRemaining -= so;
+    var h = Math.floor(randBetween(97, 372, 'eye')*paRemaining/1000);
+    paRemaining -= h;
+
+    var doubles = randBetween(0, h/5, 'power');
+    var triples = randBetween(0, h/12, 'speed');
+    var hr = randBetween(0, h/5, 'power');
+    var r = randBetween(0, (h + bb)/Math.max(1, pa)/5, 'speed') + hr;
+    var rbi = randBetween(0, h/12, 'power') + hr;
+
     this.stats = {
         pitching : {
-            pitches : 0,
-            strikes : 0,
-            K : 0,
+            pitches : 0, // in game
+            GS : GS,
+            W: W,
+            L: L,
+            strikes : 0, // in game
+            K : 0, // in game
             getERA : function() {
                 return 9 * this.ER / Math.max(1/3, this.IP[0] + this.IP[1]/3)
             },
-            ER : 0,
-            H : 0,
-            HR : 0,
-            BB : 0,
-            IP : [0,0]
+            ER : ER,
+            H : 0, // in game
+            HR : 0, // in game
+            BB : 0, // in game
+            IP : [IP,0]
         },
         batting : {
             getBA : function() {
                 return this.h / (Math.max(1, this.ab))
             },
-            pa : 0,
-            ab : 0,
-            so : 0,
-            bb : 0,
-            h : 0,
-            '2b' : 0,
-            '3b' : 0,
-            hr : 0,
-            r : 0,
-            rbi : 0,
+            pa : pa,
+            ab : ab,
+            so : so,
+            bb : bb,
+            h : h,
+            '2b' : doubles,
+            '3b' : triples,
+            hr : hr,
+            r : r,
+            rbi : rbi,
             hbp : 0
         },
         fielding : {
             E : 0,
-            PO : 0,
-            A : 0
+            PO : Math.floor(Math.random()*20) + 30, // should depend on position
+            A : Math.floor(Math.random()*5) + 1 // ehh should depend on position
         }
     };
 };

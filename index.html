@@ -174,13 +174,15 @@
                                     {{y.pitcher.stats.pitching.strikes}} - {{y.pitcher.stats.pitching.pitches}}
                                 </div>
                                 <div class='col-xs-3'>
+                                    {{y.pitcher.stats.pitching.W}} - {{y.pitcher.stats.pitching.L}}
+                                    <br>
                                     {{y.pitcher.stats.pitching.getERA() | number:2}} ERA
                                 </div>
                                 <div class='col-xs-2'>
-                                    {{y.pitcher.stats.pitching.K}}K
+                                    {{y.pitcher.stats.pitching.GS}} GS
                                 </div>
                                 <div class='col-xs-2'>
-                                    {{y.pitcher.stats.pitching.H}}H
+                                    {{y.pitcher.stats.pitching.K}}K {{y.pitcher.stats.pitching.H}}H
                                 </div>
                                 <div class='col-xs-2'></div>
                             </div>
