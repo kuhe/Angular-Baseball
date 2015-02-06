@@ -3,6 +3,7 @@ var Log = function() {
 };
 
 Log.prototype = {
+    game : null instanceof Game,
     init : function() {
         this.pitchRecord = [];
     },

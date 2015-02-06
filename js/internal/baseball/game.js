@@ -10,6 +10,7 @@ Game.prototype = {
         this.teams.away = new Team();
         this.teams.home = new Team();
         this.log = new Log();
+        this.log.game = this;
         this.helper = helper;
         while (this.teams.away.name == this.teams.home.name) {
             this.teams.away.pickName();

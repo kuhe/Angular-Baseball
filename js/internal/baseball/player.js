@@ -112,7 +112,9 @@ Player.prototype = {
             strikes : 0,
             K : 0,
             ERA : 0,
+            ER : 0,
             H : 0,
+            HR : 0,
             BB : 0
         },
         batting : {
@@ -125,8 +127,14 @@ Player.prototype = {
             '2b' : 0,
             '3b' : 0,
             hr : 0,
+            r : 0,
             rbi : 0,
             hbp : 0
+        },
+        fielding : {
+            E : 0,
+            PO : 0,
+            A : 0
         }
     },
     name : '',
