@@ -46,6 +46,7 @@ Umpire.prototype = {
             if (result.contact) {
                 if (result.caught) {
                     this.count.outs++;
+                    pitcher.stats.pitching.IP[1]++;
                     this.game.batter.atBats.push('FO');
                     batter.stats.batting.pa++;
                     batter.stats.batting.ab++;
@@ -53,12 +54,14 @@ Umpire.prototype = {
                 } else {
                     if (result.foul) {
                         this.count.strikes++;
+                        pitcher.stats.pitching.strikes++;
                         if (this.count.strikes > 2) this.count.strikes = 2;
                     } else {
                         batter.stats.batting.pa++;
                         batter.stats.batting.ab++;
                         if (result.thrownOut) {
                             this.count.outs++;
+                            pitcher.stats.pitching.IP[1]++;
                             this.game.batter.atBats.push('GO');
                             this.newBatter(); //todo: sac
                         }
@@ -115,6 +118,7 @@ Umpire.prototype = {
             batter.stats.batting.so++;
             pitcher.stats.pitching.K++;
             this.count.outs++;
+            pitcher.stats.pitching.IP[1]++;
             this.count.balls = this.count.strikes = 0;
             this.says = 'Strike three. Batter out.';
             this.game.batter.atBats.push('SO');
@@ -132,6 +136,8 @@ Umpire.prototype = {
         if (this.count.outs > 2) {
             this.says = 'Three outs, change.';
             this.count.outs = this.count.balls = this.count.strikes = 0;
+            pitcher.stats.pitching.IP[0]++;
+            pitcher.stats.pitching.IP[1] = 0;
             this.changeSides();
         }
     },

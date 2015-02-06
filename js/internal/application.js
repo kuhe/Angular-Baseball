@@ -317,7 +317,7 @@ var Log = function() {
 };
 
 Log.prototype = {
-    game : null instanceof Game,
+    game : 'instance of Game',
     init : function() {
         this.pitchRecord = [];
     },
@@ -517,24 +517,6 @@ text = function(phrase) {
         }
     }[mode][phrase]
 };
-var Batter = function() {
-    this.init();
-};
-
-Batter.prototype = {
-    init : function() {
-
-    }
-};
-var Runner = function() {
-    this.init();
-};
-
-Runner.prototype = {
-    init : function() {
-
-    }
-};
 var Catcher = function() {
     this.init();
 };
@@ -558,6 +540,24 @@ var Pitcher = function() {
 };
 
 Pitcher.prototype = {
+    init : function() {
+
+    }
+};
+var Batter = function() {
+    this.init();
+};
+
+Batter.prototype = {
+    init : function() {
+
+    }
+};
+var Runner = function() {
+    this.init();
+};
+
+Runner.prototype = {
     init : function() {
 
     }
@@ -1069,6 +1069,42 @@ Manager.prototype = {
 };
 var Player = function(team) {
     this.init(team);
+    this.stats = {
+        pitching : {
+            pitches : 0,
+            strikes : 0,
+            K : 0,
+            getERA : function() {
+                return 9 * this.ER / Math.max(1/3, this.IP[0] + this.IP[1]/3)
+            },
+            ER : 0,
+            H : 0,
+            HR : 0,
+            BB : 0,
+            IP : [0,0]
+        },
+        batting : {
+            getBA : function() {
+                return this.h / (Math.max(1, this.ab))
+            },
+            pa : 0,
+            ab : 0,
+            so : 0,
+            bb : 0,
+            h : 0,
+            '2b' : 0,
+            '3b' : 0,
+            hr : 0,
+            r : 0,
+            rbi : 0,
+            hbp : 0
+        },
+        fielding : {
+            E : 0,
+            PO : 0,
+            A : 0
+        }
+    };
 };
 
 Player.prototype = {
@@ -1175,37 +1211,6 @@ Player.prototype = {
     getName : function() {
         return mode == 'n' ? this.nameJ : this.name;
     },
-    stats : {
-        pitching : {
-            pitches : 0,
-            strikes : 0,
-            K : 0,
-            ERA : 0,
-            ER : 0,
-            H : 0,
-            HR : 0,
-            BB : 0
-        },
-        batting : {
-            ba : 0,
-            pa : 0,
-            ab : 0,
-            so : 0,
-            bb : 0,
-            h : 0,
-            '2b' : 0,
-            '3b' : 0,
-            hr : 0,
-            r : 0,
-            rbi : 0,
-            hbp : 0
-        },
-        fielding : {
-            E : 0,
-            PO : 0,
-            A : 0
-        }
-    },
     name : '',
     number : 0,
     position : '',
@@ -1302,6 +1307,7 @@ Umpire.prototype = {
             if (result.contact) {
                 if (result.caught) {
                     this.count.outs++;
+                    pitcher.stats.pitching.IP[1]++;
                     this.game.batter.atBats.push('FO');
                     batter.stats.batting.pa++;
                     batter.stats.batting.ab++;
@@ -1309,12 +1315,14 @@ Umpire.prototype = {
                 } else {
                     if (result.foul) {
                         this.count.strikes++;
+                        pitcher.stats.pitching.strikes++;
                         if (this.count.strikes > 2) this.count.strikes = 2;
                     } else {
                         batter.stats.batting.pa++;
                         batter.stats.batting.ab++;
                         if (result.thrownOut) {
                             this.count.outs++;
+                            pitcher.stats.pitching.IP[1]++;
                             this.game.batter.atBats.push('GO');
                             this.newBatter(); //todo: sac
                         }
@@ -1371,6 +1379,7 @@ Umpire.prototype = {
             batter.stats.batting.so++;
             pitcher.stats.pitching.K++;
             this.count.outs++;
+            pitcher.stats.pitching.IP[1]++;
             this.count.balls = this.count.strikes = 0;
             this.says = 'Strike three. Batter out.';
             this.game.batter.atBats.push('SO');
@@ -1388,6 +1397,8 @@ Umpire.prototype = {
         if (this.count.outs > 2) {
             this.says = 'Three outs, change.';
             this.count.outs = this.count.balls = this.count.strikes = 0;
+            pitcher.stats.pitching.IP[0]++;
+            pitcher.stats.pitching.IP[1] = 0;
             this.changeSides();
         }
     },

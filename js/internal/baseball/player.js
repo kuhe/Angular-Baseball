@@ -1,5 +1,41 @@
 var Player = function(team) {
     this.init(team);
+    this.stats = {
+        pitching : {
+            pitches : 0,
+            strikes : 0,
+            K : 0,
+            getERA : function() {
+                return 9 * this.ER / Math.max(1/3, this.IP[0] + this.IP[1]/3)
+            },
+            ER : 0,
+            H : 0,
+            HR : 0,
+            BB : 0,
+            IP : [0,0]
+        },
+        batting : {
+            getBA : function() {
+                return this.h / (Math.max(1, this.ab))
+            },
+            pa : 0,
+            ab : 0,
+            so : 0,
+            bb : 0,
+            h : 0,
+            '2b' : 0,
+            '3b' : 0,
+            hr : 0,
+            r : 0,
+            rbi : 0,
+            hbp : 0
+        },
+        fielding : {
+            E : 0,
+            PO : 0,
+            A : 0
+        }
+    };
 };
 
 Player.prototype = {
@@ -105,37 +141,6 @@ Player.prototype = {
     },
     getName : function() {
         return mode == 'n' ? this.nameJ : this.name;
-    },
-    stats : {
-        pitching : {
-            pitches : 0,
-            strikes : 0,
-            K : 0,
-            ERA : 0,
-            ER : 0,
-            H : 0,
-            HR : 0,
-            BB : 0
-        },
-        batting : {
-            ba : 0,
-            pa : 0,
-            ab : 0,
-            so : 0,
-            bb : 0,
-            h : 0,
-            '2b' : 0,
-            '3b' : 0,
-            hr : 0,
-            r : 0,
-            rbi : 0,
-            hbp : 0
-        },
-        fielding : {
-            E : 0,
-            PO : 0,
-            A : 0
-        }
     },
     name : '',
     number : 0,

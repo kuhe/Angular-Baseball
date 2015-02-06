@@ -160,10 +160,29 @@
                     <div>
                         <div class='row list-group-item'>
                             <div class='col-lg-6'>
-                                <em>{{y.pitcher.throws == 'right' ? 'RHP' : 'LHP'}}</em> <strong>{{y.pitcher.getName()}}</strong> ({{y.pitcher.number}}) &raquo; {{rate(y.batter.skill.pitching)}}
+                                <em>{{y.pitcher.throws == 'right' ? 'RHP' : 'LHP'}}</em>
+                                <strong>{{y.pitcher.getName()}}</strong> ({{y.pitcher.number}})
+                                &raquo; {{rate(y.pitcher.skill.pitching)}}
                             </div>
                             <div class='col-lg-6'>
-                                <em>C</em> <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong> ({{y.pitcher.team.positions.catcher.number}}) &raquo; {{rate(y.pitcher.team.positions.catcher.skill.defense.catching)}}
+                                <em>C</em> <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
+                                ({{y.pitcher.team.positions.catcher.number}})
+                                &raquo; {{rate(y.pitcher.team.positions.catcher.skill.defense.catching)}}
+                            </div>
+                            <div class='row'>
+                                <div class='col-xs-3'>
+                                    {{y.pitcher.stats.pitching.strikes}} - {{y.pitcher.stats.pitching.pitches}}
+                                </div>
+                                <div class='col-xs-3'>
+                                    {{y.pitcher.stats.pitching.getERA() | number:2}} ERA
+                                </div>
+                                <div class='col-xs-2'>
+                                    {{y.pitcher.stats.pitching.K}}K
+                                </div>
+                                <div class='col-xs-2'>
+                                    {{y.pitcher.stats.pitching.H}}H
+                                </div>
+                                <div class='col-xs-2'></div>
                             </div>
                         </div>
                         <div class='row'></div>
@@ -198,34 +217,56 @@
                             <div>
                                 <strong>{{y.batter.getName()}}</strong> ({{y.batter.number}}) - <em>{{abbreviatePosition(y.batter.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}</em>
                             </div>
-                            <div>
-                                Eye : {{rate(y.batter.skill.offense.eye)}}
-                            </div>
-                            <div>
-                                Power : {{rate(y.batter.skill.offense.power)}}
-                            </div>
-                            <div>
-                                Speed : {{rate(y.batter.skill.offense.speed)}}
-                            </div>
-                            <div>
-                                - {{y.batter.atBats.join(', ')}} -
+                            <div class='row'>
+                                <div class='col-xs-6'>
+                                    {{y.batter.stats.batting.getBA() | number:3}} BA
+                                    <br>
+                                    {{y.batter.stats.batting.hr}} HR
+                                    <br>
+                                    {{y.batter.stats.batting.rbi}} RBI
+                                </div>
+                                <div class='col-xs-6'>
+                                    <div>
+                                        Eye : {{rate(y.batter.skill.offense.eye)}}
+                                    </div>
+                                    <div>
+                                        Power : {{rate(y.batter.skill.offense.power)}}
+                                    </div>
+                                    <div>
+                                        Speed : {{rate(y.batter.skill.offense.speed)}}
+                                    </div>
+                                    <div>
+                                        - {{y.batter.atBats.join(', ')}} -
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class='col-lg-6'>
                             <div>
                                 On Deck : <strong>{{y.deck.getName()}}</strong> ({{y.deck.number}}) - {{abbreviatePosition(y.deck.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}
                             </div>
-                            <div>
-                                Eye : {{rate(y.deck.skill.offense.eye)}}
-                            </div>
-                            <div>
-                                Power : {{rate(y.deck.skill.offense.power)}}
-                            </div>
-                            <div>
-                                Speed : {{rate(y.deck.skill.offense.speed)}}
-                            </div>
-                            <div>
-                                - {{y.deck.atBats.join(', ')}} -
+                            <div class='row'>
+                                <div class='col-xs-6'>
+                                    {{y.deck.stats.batting.getBA() | number:3}} BA
+                                    <br>
+                                    {{y.deck.stats.batting.hr}} HR
+                                    <br>
+                                    {{y.deck.stats.batting.rbi}} RBI
+                                </div>
+                                <div class='col-xs-6'>
+                                    <div>
+                                        Eye : {{rate(y.deck.skill.offense.eye)}}
+                                    </div>
+                                    <div>
+                                        Power : {{rate(y.deck.skill.offense.power)}}
+                                    </div>
+                                    <div>
+                                        Speed : {{rate(y.deck.skill.offense.speed)}}
+                                    </div>
+                                    <div>
+                                        - {{y.deck.atBats.join(', ')}} -
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
