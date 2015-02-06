@@ -1,6 +1,8 @@
-app.controller('IndexController', function($scope) {
+IndexController = function($scope) {
     window.s = $scope;
+    $scope.t = text;
     $scope.y = new Game();
+    $scope.expandScoreboard = false;
     $scope.proceedToGame = function () {
         jQ('.blocking').remove();
     };
@@ -16,11 +18,11 @@ app.controller('IndexController', function($scope) {
         }
         var keyframes = rule;
         var to = function(percent, top, left) {
-            var originTop = 0;
-            var originLeft = 100;
+            var originTop = 50;
+            var originLeft = 110 + ($scope.y.pitcher.throws == 'left' ? 20 : -20);
             Math.square = function(x) { return x*x };
             left = originLeft + Math.square(percent/100)*(left - originLeft);
-            top = Math.square(percent/100)*(top - originTop);
+            top = originTop + Math.square(percent/100)*(top - originTop);
             var padding = Math.max(Math.square(percent/100)*13, 2);
             var borderWidth = Math.square(percent/100)*4;
             return 'top: '+top+'px; left: '+left+'px; padding: '+padding+'px; border-width:'+borderWidth+'px';
@@ -51,24 +53,19 @@ app.controller('IndexController', function($scope) {
             jQ('.baseball').removeClass('flight');
             jQ('.baseball').addClass('spin');
             var horizontalBreak = (60 - Math.abs(game.pitchTarget.x - game.pitchInFlight.x))/10;
-            jQ('.baseball').css('-webkit-animation', 'spin '+horizontalBreak+'s 5 0s linear')
+            jQ('.baseball').css('-webkit-animation', 'spin '+horizontalBreak+'s 5 0s linear');
             $scope.allowInput = true;
         }, flightSpeed*1000);
 
-        if (game.humanBatting()) {
-            jQ('.baseball.break').addClass('hide');
-        } else {
-            jQ('.baseball.break').removeClass('hide');
-        }
         if (!game.pitchInFlight.x) {
             $baseballs.addClass('hide');
         } else {
             if (game.humanBatting()) {
-                jQ('.baseball.break').addClass('hide');
+                jQ('.baseball.pitch').addClass('hide');
             } else {
-                jQ('.baseball.break').removeClass('hide');
+                jQ('.baseball.pitch').removeClass('hide');
             }
-            jQ('.baseball.pitch').removeClass('hide');
+            jQ('.baseball.break').removeClass('hide');
         }
         jQ('.baseball.pitch').css({
             top: 200-game.pitchTarget.y,
@@ -96,7 +93,7 @@ app.controller('IndexController', function($scope) {
         if (!$scope.allowInput) {
             return;
         }
-        $scope.allowInput = false;
+        if ($scope.y.humanPitching()) $scope.allowInput = false;
         var offset = jQ('.target').offset();
         var relativeOffset = {
             x : $event.pageX - offset.left,
@@ -138,4 +135,4 @@ app.controller('IndexController', function($scope) {
             right : 'RF'
         }[position];
     };
-});
+};

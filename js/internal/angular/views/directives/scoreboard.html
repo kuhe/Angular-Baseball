@@ -1,0 +1,180 @@
+<div ng-show='!expandScoreboard' class='scoreboard-spacer'>
+</div>
+<div ng-show='!expandScoreboard' ng-click='expandScoreboard = !expandScoreboard' class='box-scoreboard row'>
+    <div class='row'>
+        <div class='col-xs-7'>
+            <div class='inning top-bar'>
+                <div class='row'>{{ y.getInning() }}</div>
+            </div>
+            <div class='team-names'>
+                <div class='away'>
+                    <div class='team-name col-xs-8'>{{ y.teams.away.getName().slice(0,4) }}</div>
+                    <div class='score col-xs-4'>{{y.tally.away.R}}</div>
+                </div>
+                <div class='home'>
+                    <div class='team-name col-xs-8'>{{ y.teams.home.getName().slice(0,4) }}</div>
+                    <div class='score col-xs-4'>{{y.tally.home.R}}</div>
+                </div>
+            </div>
+        </div>
+        <div class='col-xs-5'>
+            <div class='diamonds'>
+                <div class='row'>
+                    <div class='bases'>
+                        <div class='diamond-bg'>
+                            <div class='diamond {{y.field.second != null ? "filled" : ""}}'></div>
+                        </div>
+                        <div class='diamond-bg first'>
+                            <div class='diamond {{y.field.first != null ? "filled" : ""}}'></div>
+                        </div>
+                        <div class='diamond-bg third'>
+                            <div class='diamond {{y.field.third != null ? "filled" : ""}}'></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class='the-count'>
+                <div class='row'>
+                    <span class='a-count'>S</span>
+                    <div class='circle {{y.umpire.count.strikes >= 1 ? "orange" : "unlit"}}'></div>
+                    <div class='circle {{y.umpire.count.strikes >= 2 ? "orange" : "unlit"}}'></div>
+                </div>
+                <div class='row'>
+                    <span class='a-count'>B</span>
+                    <div class='circle {{y.umpire.count.balls >= 1 ? "green" : "unlit"}}'></div>
+                    <div class='circle {{y.umpire.count.balls >= 2 ? "green" : "unlit"}}'></div>
+                    <div class='circle {{y.umpire.count.balls >= 3 ? "green" : "unlit"}}'></div>
+                </div>
+                <div class='row'>
+                    <span class='a-count'>O</span>
+                    <div class='circle {{y.umpire.count.outs >= 1 ? "red" : "unlit"}}'></div>
+                    <div class='circle {{y.umpire.count.outs >= 2 ? "red" : "unlit"}}'></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div ng-show='expandScoreboard' ng-click='expandScoreboard = !expandScoreboard' class='header scoreboard row'>
+    <div class='col-md-3'>
+        <div class='text-center on-base padded'>
+            <span class='grey'>{{y.field.second.getSurname() || t('empty')}}</span>
+        </div>
+        <div class=''>
+            <div class='padded col-xs-5 on-base side-base-indicator'>
+                <span class='grey'>{{y.field.third.getSurname() || t('empty')}}</span>
+            </div>
+            <div class='text-center col-xs-2'>
+                <div class='bases'>
+                    <div class='diamond-bg'>
+                        <div class='diamond {{y.field.second != null ? "filled" : ""}}'></div>
+                    </div>
+                    <div class='diamond-bg first'>
+                        <div class='diamond {{y.field.first != null ? "filled" : ""}}'></div>
+                    </div>
+                    <div class='diamond-bg third'>
+                        <div class='diamond {{y.field.third != null ? "filled" : ""}}'></div>
+                    </div>
+                </div>
+            </div>
+            <div class='padded col-xs-5 on-base side-base-indicator'>
+                <span class='grey'>{{y.field.first.getSurname() || t('empty')}}</span>
+            </div>
+        </div>
+    </div>
+    <div class='col-md-6'>
+        <div class='center-block row'>
+            <div class='team-names col-md-3'>
+                <table class='table'>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr ng-repeat="team in y.teams">
+                        <td><span class='grey'>{{team.getName()}}</span></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="scores col-md-6">
+                <table class='table'>
+                    <tr>
+                        <td class='font-yellow' ng-repeat="(block, value) in y.scoreboard.home">
+                            <span class='grey'>{{block}}</span>
+                        </td>
+                    </tr>
+                    <tr class="team-line" ng-repeat="(side, scores) in y.scoreboard">
+                        <td class='' ng-repeat="(inning, score) in scores">
+                            <span class='grey'>{{y.inning < inning || y.inning == inning && side == 'home' && y.half == 'top' ? '-' : score}}</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="tallies col-md-3">
+                <table class='table'>
+                    <tr>
+                        <td>
+                            <span class='grey font-yellow'>H</span>
+                        </td>
+                        <td>
+                            <span class='grey font-yellow'>R</span>
+                        </td>
+                        <td>
+                            <span class='grey font-yellow'>E</span>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="side in y.tally">
+                        <td>
+                            <span class='grey'>{{side.H}}</span>
+                        </td>
+                        <td>
+                            <span class='grey'>{{side.R}}</span>
+                        </td>
+                        <td>
+                            <span class='grey'>{{side.E}}</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class='col-md-3'>
+        <div class="umpire padded">
+            <div class='row'>
+                <div class='col-xs-3 grey'>S</div>
+                <div class='col-xs-3 grey'>
+                    <div class='circle {{y.umpire.count.strikes >= 1 ? "orange" : "unlit"}}'></div>
+                </div>
+                <div class='col-xs-3 grey'>
+                    <div class='circle {{y.umpire.count.strikes >= 2 ? "orange" : "unlit"}}'></div>
+                </div>
+                <div class='col-xs-3'>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-xs-3 grey'>B</div>
+                <div class='col-xs-3 grey'>
+                    <div class='circle {{y.umpire.count.balls >= 1 ? "green" : "unlit"}}'></div>
+                </div>
+                <div class='col-xs-3 grey'>
+                    <div class='circle {{y.umpire.count.balls >= 2 ? "green" : "unlit"}}'></div>
+                </div>
+                <div class='col-xs-3 grey'>
+                    <div class='circle {{y.umpire.count.balls >= 3 ? "green" : "unlit"}}'></div>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-xs-3 grey'>O</div>
+                <div class='col-xs-3 grey'>
+                    <div class='circle {{y.umpire.count.outs >= 1 ? "red" : "unlit"}}'></div>
+                </div>
+                <div class='col-xs-3 grey'>
+                    <div class='circle {{y.umpire.count.outs >= 2 ? "red" : "unlit"}}'></div>
+                </div>
+                <div class='col-xs-3'>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

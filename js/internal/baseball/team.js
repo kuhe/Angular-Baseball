@@ -27,7 +27,12 @@ Team.prototype = {
         this.pickName();
     },
     pickName : function() {
-        this.name = this.name = data.teamNames[Math.floor(Math.random()*data.teamNames.length)];
+        var teamNameIndex = Math.floor(Math.random()*data.teamNames.length);
+        this.name = data.teamNames[teamNameIndex];
+        this.nameJ = data.teamNamesJ[teamNameIndex];
+    },
+    getName : function() {
+        return mode == 'n' ? this.nameJ : this.name;
     },
     lineup : [],
     positions : {},

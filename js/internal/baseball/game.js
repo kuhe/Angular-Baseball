@@ -4,7 +4,8 @@ var Game = function(baseball) {
 
 Game.prototype = {
     constructor : Game,
-    init : function() {
+    init : function(m) {
+        if (m) mode = m;
         this.field = new Field(this);
         this.teams.away = new Team();
         this.teams.home = new Team();
@@ -20,6 +21,9 @@ Game.prototype = {
         } else {
             this.autoPitch();
         }
+    },
+    getInning : function() {
+        return mode == 'n' ? (this.inning + (this.half == 'top' ? 'オモテ' : 'ウラ')) : this.half.toUpperCase() + ' ' + this.inning;
     },
     humanBatting : function() {
         switch (this.half) {

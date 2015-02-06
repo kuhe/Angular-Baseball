@@ -12,8 +12,11 @@ Player.prototype = {
         this.pitching = {averaging : []};
         this.number = 0;
         this.randomizeSkills();
-        this.name = data.surnames[Math.floor(Math.random()*data.surnames.length)] + ' ' +
-            data.names[Math.floor(Math.random()*data.names.length)];
+        var surnamekey = Math.floor(Math.random()*data.surnames.length),
+            nameKey = Math.floor(Math.random()*data.names.length);
+
+        this.name = data.surnames[surnamekey] + ' ' + data.names[nameKey];
+        this.nameJ = data.surnamesJ[surnamekey] + data.namesJ[nameKey];
         this.atBats = [];
     },
     randomizeSkills : function() {
@@ -98,7 +101,33 @@ Player.prototype = {
         delete this.pitching.averaging;
     },
     getSurname : function() {
-        return this.name.split(' ')[0];
+        return mode == 'n' ? this.nameJ[0] : this.name.split(' ')[0];
+    },
+    getName : function() {
+        return mode == 'n' ? this.nameJ : this.name;
+    },
+    stats : {
+        pitching : {
+            pitches : 0,
+            strikes : 0,
+            K : 0,
+            ERA : 0,
+            H : 0,
+            BB : 0
+        },
+        batting : {
+            ba : 0,
+            pa : 0,
+            ab : 0,
+            so : 0,
+            bb : 0,
+            h : 0,
+            '2b' : 0,
+            '3b' : 0,
+            hr : 0,
+            rbi : 0,
+            hbp : 0
+        }
     },
     name : '',
     number : 0,

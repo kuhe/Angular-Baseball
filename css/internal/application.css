@@ -20,41 +20,36 @@
   /* Chrome, Safari, Opera */
   animation: flight 1s 1 0s linear;
 }
+@font-face {
+  font-family: Noto;
+  src: url("../../css/external/noto/NotoSansJP-Regular.otf") format("opentype");
+}
 html body {
   border-top: 4px solid #ffc031;
+  font-family: "Noto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-.jumbotron {
+.main-area {
   padding: 10px 30px !important;
-  background: rgba(20, 20, 20, 0.46) !important;
 }
-.jumbotron * {
+.main-area .list-group-item strong {
+  font-size: 120%;
+}
+.main-area .pitch-record {
+  text-align: right;
+}
+.main-area .play-record {
+  text-align: left;
+}
+.main-area * {
   font-size: 12px;
 }
-.jumbotron .list-group-item {
+.main-area .list-group-item {
   line-height: 14px;
   padding: 5px 10px;
   border: none;
-  font-style: italic;
 }
-.jumbtotron .list-group-item:before {
+.main-area .list-group-item:before {
   content: "-";
-}
-.scoreboard {
-  /*background-image: url(../images/sb-tile.png);*/
-  background-repeat: repeat;
-  color: white;
-  font-weight: 700;
-  font-size: 14px;
-  border: 2px solid lightgrey;
-  margin-bottom: 10px;
-  background: #495e3c;
-  /* Old browsers */
-}
-.scoreboard .on-base {
-  font-size: 14px;
-}
-.scoreboard .umpire {
-  margin-top: 10px;
 }
 .grey {
   /*background-image: url(../images/sb-tile-grey.png);*/
@@ -139,11 +134,9 @@ html body {
 }
 .unlit {
   background: #959595;
-  /* Old browsers */
 }
 .blue {
-  background: #e8faff;
-  /* Old browsers */
+  background: white;
 }
 .capitalize {
   text-transform: capitalize;
@@ -183,6 +176,7 @@ html body {
 }
 .no-swing {
   padding: 0;
+  border: 2px dashed grey;
   border-left: 50px solid rgba(243, 255, 245, 0.48);
   border-right: 50px solid rgba(243, 255, 244, 0.48);
   background: white;
@@ -195,16 +189,27 @@ html body {
   position: relative;
   width: 200px;
   height: 200px;
-  background: rgba(183, 183, 183, 0.63);
-  border: 2px dashed white;
+  border: 1px dashed #d4d4d4;
+  background: rgba(207, 207, 207, 0.59);
+}
+.target.pitching {
+  background: rgba(207, 207, 207, 0.59);
+}
+.target.batting {
+  background: rgba(207, 207, 207, 0.59);
 }
 .strikezone {
   margin: 35px 50px;
   padding: 0;
   width: 100px;
   height: 130px;
-  background: rgba(137, 137, 137, 0.48);
-  border: 0px dashed #ff7160;
+  background: rgba(177, 177, 177, 0.89);
+}
+.strikezone.pitching {
+  background: rgba(177, 177, 177, 0.89);
+}
+.strikezone.batting {
+  background: rgba(177, 177, 177, 0.89);
 }
 .target.swing .indicator.swing {
   display: none;
@@ -275,10 +280,6 @@ html body {
   margin-top: -10px;
   margin-left: 15px;
 }
-.bases {
-  width: 50px;
-  margin: auto;
-}
 .container .side-base-indicator {
   min-height: 62px;
 }
@@ -286,7 +287,7 @@ html body {
   position: absolute;
   width: 100%;
   height: 200%;
-  z-index: 10;
+  z-index: 11;
   left: 0;
   top: 0;
   background: white;
@@ -300,4 +301,151 @@ html body {
 }
 .blocking .no-swing {
   border: 2px solid black;
+}
+.scoreboard {
+  /*background-image: url(../images/sb-tile.png);*/
+  background-repeat: repeat;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  border: 2px solid lightgrey;
+  margin-bottom: 10px;
+  background: #495e3c;
+  /* Old browsers */
+}
+.scoreboard .on-base {
+  font-size: 14px;
+}
+.scoreboard .umpire {
+  margin-top: 10px;
+}
+.black-gradient {
+  background: #2d2d2d;
+  /* Old browsers */
+  /* IE9 SVG, needs conditional override of 'filter' to 'none' */
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzJkMmQyZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwZTBlMGUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+  background: -moz-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2d2d2d), color-stop(100%, #0e0e0e));
+  /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* IE10+ */
+  background: linear-gradient(to bottom, #2d2d2d 0%, #0e0e0e 100%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#2d2d2d', endColorstr='#0e0e0e', GradientType=0);
+  /* IE6-8 */
+  color: white;
+}
+.scoreboard-spacer {
+  height: 120px;
+}
+.box-scoreboard {
+  z-index: 10;
+  position: fixed;
+  left: 5px;
+  top: 5px;
+  width: 200px;
+  height: 120px;
+  background: #2d2d2d;
+  /* Old browsers */
+  /* IE9 SVG, needs conditional override of 'filter' to 'none' */
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzJkMmQyZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwZTBlMGUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+  background: -moz-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2d2d2d), color-stop(100%, #0e0e0e));
+  /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* IE10+ */
+  background: linear-gradient(to bottom, #2d2d2d 0%, #0e0e0e 100%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#2d2d2d', endColorstr='#0e0e0e', GradientType=0);
+  /* IE6-8 */
+  color: white;
+  border-radius: 15px;
+  border: 5px solid #f3f3f3;
+  text-align: center;
+  padding: 3px;
+}
+.box-scoreboard .bases {
+  width: 50px;
+  margin: -10px auto 15px;
+}
+.box-scoreboard .top-bar {
+  height: 25px;
+  line-height: 25px;
+  font-size: 14px;
+  background: #2d2d2d;
+  /* Old browsers */
+  /* IE9 SVG, needs conditional override of 'filter' to 'none' */
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzJkMmQyZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwZTBlMGUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+  background: -moz-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2d2d2d), color-stop(100%, #0e0e0e));
+  /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* IE10+ */
+  background: linear-gradient(to bottom, #2d2d2d 0%, #0e0e0e 100%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#2d2d2d', endColorstr='#0e0e0e', GradientType=0);
+  /* IE6-8 */
+  color: white;
+}
+.box-scoreboard .top-bar .inning {
+  padding: 0 20px;
+}
+.box-scoreboard .team-names .home,
+.box-scoreboard .team-names .away {
+  height: 40px;
+  line-height: 40px;
+  font-size: 18px;
+  background: #2d2d2d;
+  /* Old browsers */
+  /* IE9 SVG, needs conditional override of 'filter' to 'none' */
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzJkMmQyZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwZTBlMGUiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+  background: -moz-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2d2d2d), color-stop(100%, #0e0e0e));
+  /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, #2d2d2d 0%, #0e0e0e 100%);
+  /* IE10+ */
+  background: linear-gradient(to bottom, #2d2d2d 0%, #0e0e0e 100%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#2d2d2d', endColorstr='#0e0e0e', GradientType=0);
+  /* IE6-8 */
+  color: white;
+}
+.box-scoreboard .team-names .team-name,
+.box-scoreboard .team-names .score {
+  padding: 0 2px;
+}
+.box-scoreboard .the-count {
+  text-align: left;
+}
+.box-scoreboard .the-count .circle {
+  display: inline;
+  padding: 0 8px;
+  margin: 0 2px;
+}
+.box-scoreboard .the-count .a-count {
+  padding: 0 2px;
+  font-weight: 700;
+  width: 10px;
+  display: inline-block;
+  text-align: center;
 }

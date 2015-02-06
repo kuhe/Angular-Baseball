@@ -1,5 +1,566 @@
-var app = angular.module('YakyuuAikoukai', []);
+data = {
+    surnames : [
+        'Satou',
+        'Suzuki',
+        'Takahashi',
+        'Watanabe',
+        'Itou',
+        'Yamamoto',
+        'Nakamura',
+        'Kobayashi',
+        'Katou',
+        'Yoshida',
+        'Sasaki',
+        'Yamaguchi',
+        'Saitou',
+        'Kimura',
+        'Abe',
+        'Ikeda',
+        'Iwasaki',
+        'Kinoshita',
+        'Adachi',
+        'Fujiwara',
+        'Haseyama'
+    ],
+    surnamesJ : [
+        '佐藤',
+        '鈴木',
+        '高橋',
+        '渡辺',
+        '伊藤',
+        '山本',
+        '中村',
+        '小林',
+        '加藤',
+        '吉田',
+        '佐々木',
+        '山口',
+        '斉藤',
+        '木村',
+        '阿部',
+        '池田',
+        '岩崎',
+        '木下',
+        '足立',
+        '藤原',
+        '長谷山'
+    ],
+    names : [
+        'Takumi',
+        'Hikaru',
+        'Yuuki',
+        'Shouta',
+        'Ichirou',
+        'Touma',
+        'Ren',
+        'Minato',
+        'Rui',
+        'Tatsuki',
+        'Kenji',
+        'Itsuki',
+        'Haru',
+        'Kouichi',
+        'Sousuke',
+        'Kousuke',
+        'Yuuta',
+        'Daiki',
+        'Eita'
+    ],
+        namesJ : [
+        '匠',
+        'ヒカル',
+        '結城',
+        '翔太',
+        '一郎',
+        '冬馬',
+        '漣',
+        '港区',
+        'ルイ',
+        '樹',
+        '賢治',
+        '五木',
+        '春',
+        '浩一',
+        '宗介',
+        '浩介',
+        '雄太',
+        '大樹',
+        '瑛太'
+    ],
+    teamNamesJ : [
+        '横浜',
+        '大阪',
+        '名古屋',
+        '札幌',
+        '神戸',
+        '京都',
+        '福岡',
+        '川崎',
+        '埼玉県',
+        '広島',
+        '仙台',
+        '千葉県',
+        '新潟',
+        '浜松',
+        '静岡',
+        '相模原',
+        '岡山',
+        '熊本',
+        '鹿児島',
+        '船橋',
+        '川口',
+        '姫路',
+        '松山',
+        '宇都宮',
+        '松戸',
+        '西宮',
+        '倉敷',
+        '市川',
+        '福山',
+        '尼崎',
+        '金沢',
+        '長崎',
+        '横須賀',
+        '富山',
+        '高松',
+        '町田',
+        '岐阜',
+        '枚方',
+        '藤沢',
+        '柏',
+        '豊中',
+        '長野県',
+        '豊橋',
+        '一宮',
+        '和歌山',
+        '岡崎',
+        '宮崎',
+        '奈良',
+        '吹田',
+        '高槻',
+        '旭川',
+        'いわき',
+        '高崎',
+        '所沢',
+        '川越',
+        '秋田',
+        '越谷',
+        '前橋',
+        '那覇',
+        '四日市',
+        '青森',
+        '久留米',
+        '春日井',
+        '盛岡',
+        '明石',
+        '福島',
+        '下関',
+        '長岡',
+        '市原',
+        '函館',
+        '茨城県',
+        '福井',
+        '加古川',
+        '徳島',
+        '水戸',
+        '平塚',
+        '佐世保',
+        '呉',
+        '八戸',
+        '佐賀',
+        '寝屋川',
+        '富士',
+        '春日部',
+        '茅ヶ崎',
+        '松本',
+        '厚木',
+        '大和',
+        '上尾',
+        '宝塚',
+        '筑波',
+        '沼津',
+        '熊谷',
+        '伊勢崎',
+        '岸和田',
+        '鳥取',
+        '小田原',
+        '鈴鹿',
+        '松江',
+        '日立'
+    ],
+    teamNames : [
+        'Yokohama',
+        'Osaka',
+        'Nagoya',
+        'Sapporo',
+        'Kobe',
+        'Kyoto',
+        'Fukuoka',
+        'Kawasaki',
+        'Saitama',
+        'Hiroshima',
+        'Sendai',
+        'Chiba',
+        'Niigata',
+        'Hamamatsu',
+        'Shizuoka',
+        'Sagamihara',
+        'Okayama',
+        'Kumamoto',
+        'Kagoshima',
+        'Funabashi',
+        'Kawaguchi',
+        'Himeji',
+        'Matsuyama',
+        'Utsunomiya',
+        'Matsudo',
+        'Nishinomiya',
+        'Kurashiki',
+        'Ichikawa',
+        'Fukuyama',
+        'Amagasaki',
+        'Kanazawa',
+        'Nagasaki',
+        'Yokosuka',
+        'Toyama',
+        'Takamatsu',
+        'Machida',
+        'Gifu',
+        'Hirakata',
+        'Fujisawa',
+        'Kashiwa',
+        'Toyonaka',
+        'Nagano',
+        'Toyohashi',
+        'Ichinomiya',
+        'Wakayama',
+        'Okazaki',
+        'Miyazaki',
+        'Nara',
+        'Suita',
+        'Takatsuki',
+        'Asahikawa',
+        'Iwaki',
+        'Takasaki',
+        'Tokorozawa',
+        'Kawagoe',
+        'Akita',
+        'Koshigaya',
+        'Maebashi',
+        'Naha',
+        'Yokkaichi',
+        'Aomori',
+        'Kurume',
+        'Kasugai',
+        'Morioka',
+        'Akashi',
+        'Fukushima',
+        'Shimonoseki',
+        'Nagaoka',
+        'Ichihara',
+        'Hakodate',
+        'Ibaraki',
+        'Fukui',
+        'Kakogawa',
+        'Tokushima',
+        'Mito',
+        'Hiratsuka',
+        'Sasebo',
+        'Kure',
+        'Hachinohe',
+        'Saga',
+        'Neyagawa',
+        'Fuji',
+        'Kasukabe',
+        'Chigasaki',
+        'Matsumoto',
+        'Atsugi',
+        'Yamato',
+        'Ageo',
+        'Takarazuka',
+        'Tsukuba',
+        'Numazu',
+        'Kumagaya',
+        'Isesaki',
+        'Kishiwada',
+        'Tottori',
+        'Odawara',
+        'Suzuka',
+        'Matsue',
+        'Hitachi'
+    ]
+};
+helper = {
+    pitchDefinitions : {
+        '4-seam' :      [0, 0, 1], //x movement, y movement, speed ratio
+        '2-seam' :      [20, -20, 0.90],
+        'cutter' :      [-25, -20, 0.95],
+        'sinker' :      [-15, -30, 0.95],
 
+        'slider' :      [-50, -35, 0.9],
+        'fork'   :      [0, -70, 0.87],
+        'curve'  :      [0, -90, 0.82],
+
+        'change' :    [0, -10, 0.88]
+    },
+    selectRandomPitch : function() {
+        return [
+            '4-seam', '2-seam', 'cutter', 'sinker',
+            'slider', 'fork', 'curve',
+            'change'
+        ][Math.floor(Math.random()*8)]
+    }
+};
+
+var Log = function() {
+    this.init();
+};
+
+Log.prototype = {
+    init : function() {
+        this.pitchRecord = [];
+    },
+    note : function(note) {
+        this.record.unshift(note);
+        this.shortRecord = this.record.slice(0, 6);
+    },
+    noteBatter : function(batter) {
+        var order = batter.team.nowBatting;
+        order = {
+            0 : ' 1st',
+            1 : ' 2nd',
+            2 : ' 3rd',
+            3 : ' 4th',
+            4 : ' 5th',
+            5 : ' 6th',
+            6 : ' 7th',
+            7 : ' 8th',
+            8 : ' 9th'
+        }[order];
+        var positions = this.longFormFielder;
+        this.note('Now batting'+order+', '+positions[batter.position]+', '+batter.name);
+    },
+    getPitchLocationDescription : function(pitchInFlight, batterIsLefty) {
+        var x = pitchInFlight.x, y = pitchInFlight.y, say = '';
+        var noComma = false, noComma2 = false;
+        var ball = false;
+        if (!batterIsLefty) x = 200 - x;
+        if (x < 50) {
+            say += 'way outside';
+            ball = true;
+        } else if (x < 70) {
+            say += 'outside';
+        } else if (x < 100) {
+            say += '';
+            noComma = true;
+        } else if (x < 130) {
+            say += '';
+            noComma = true;
+        } else if (x < 150) {
+            say += 'inside';
+        } else {
+            say += 'way inside';
+            ball = true;
+        }
+        if (say != '') say += ', ';
+        if (y < 35) {
+            say += 'way low';
+            ball = true;
+        } else if (y < 65) {
+            say += 'low';
+        } else if (y < 135) {
+            say += '';
+            noComma2 = true;
+        } else if (y < 165) {
+            say += 'high';
+        } else {
+            say += 'way high';
+            ball = true;
+        }
+        if (noComma || noComma2) {
+            say = say.split(', ').join('');
+            if (noComma && noComma2) {
+                say = 'down the middle';
+            }
+        }
+        // say = (ball ? 'Ball, ' : 'Strike, ') + say;
+        say = pitchInFlight.name.charAt(0).toUpperCase() + pitchInFlight.name.slice(1) + ' ' + say + '. ';
+        return say;
+    },
+    notePitch : function(pitchInFlight, batter) {
+        this.pitchRecord.unshift(
+            this.getPitchLocationDescription(pitchInFlight, batter.bats == 'left')
+        );
+    },
+    noteSwing : function(swingResult) {
+        if (swingResult.looking) {
+            if (swingResult.strike) {
+                this.pitchRecord[0] += 'Strike.'
+            } else {
+                this.pitchRecord[0] += 'Ball.'
+            }
+        } else {
+            if (swingResult.contact) {
+                if (swingResult.foul) {
+                    this.pitchRecord[0] += 'Fouled off.'
+                } else {
+                    if (swingResult.caught) {
+                        this.pitchRecord[0] += 'In play.'
+                    } else {
+                        if (swingResult.thrownOut) {
+                            this.pitchRecord[0] += 'In play.'
+                        } else {
+                            this.pitchRecord[0] += 'In play.'
+                        }
+                    }
+                }
+            } else {
+                this.pitchRecord[0] += 'Swinging strike.'
+            }
+        }
+    },
+    notePlateAppearanceResult : function(game) {
+        var r = game.swingResult;
+        var record = '';
+        var batter = game.batter.name;
+        if (r.looking) {
+            if (r.strike) {
+                record = (batter+' struck out looking.');
+            } else {
+                record = (batter+' walked.');
+            }
+        } else {
+            if (r.contact) {
+                if (r.caught) {
+                    if (['left', 'center', 'right'].indexOf(r.fielder) < 0) {
+                        record = (batter+' popped out to '+ r.fielder + '.');
+                    } else {
+                        record = (batter+' flew out to '+ r.fielder + '.');
+                    }
+                } else {
+                    if (r.foul) {
+                        // not possible to end PA on foul?
+                    } else {
+                        if (r.thrownOut) {
+                            if (Math.random() > 0.5) {
+                                record = (batter+' grounded out to '+ r.fielder + '.');
+                            } else {
+                                record = (batter+' thrown out by '+ r.fielder + '.');
+                            }
+                        } else {
+                            switch (r.bases) {
+                                case 1:
+                                    record = (batter+' reached on single to '+ r.fielder + '.');
+                                    break;
+                                case 2:
+                                    record = (batter+' doubled past '+ r.fielder + '.');
+                                    break;
+                                case 3:
+                                    record = (batter+' reached third on triple past '+ r.fielder + '.');
+                                    break;
+                                case 4:
+                                    if (r.splay < -15) {
+                                        record = (batter+' homered to left.');
+                                    } else if (r.splay < 15) {
+                                        record = (batter+' homered to center.');
+                                    } else {
+                                        record = (batter+' homered to right.');
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                record = (batter+' struck out swinging.');
+            }
+        }
+        this.record.unshift(record);
+        this.pitchRecord = ['Previous: '+record];
+    },
+    pointer : 0,
+    pitchRecord : [],
+    shortRecord : [],
+    record : [],
+    longFormFielder : {
+        first : 'first baseman',
+        second : 'second baseman',
+        third : 'third baseman',
+        short : 'shortstop',
+        pitcher : 'pitcher',
+        catcher : 'catcher',
+        left : 'left fielder',
+        center : 'center fielder',
+        right : 'right fielder'
+    }
+};
+var Renderer = function(game) {
+    this.init(game);
+};
+
+Renderer.prototype = {
+    init : function(game) {
+        this.game = game;
+    },
+    render : function() {
+
+    }
+};
+text = function(phrase) {
+    return {
+        n : {
+            empty: '空'
+        },
+        e : {
+            empty: 'empty'
+        }
+    }[mode][phrase]
+};
+var Catcher = function() {
+    this.init();
+};
+
+Catcher.prototype = {
+    init : function() {
+
+    }
+};
+var Fielder = function() {
+    this.init();
+};
+
+Fielder.prototype = {
+    init : function() {
+
+    }
+};
+var Pitcher = function() {
+    this.init();
+};
+
+Pitcher.prototype = {
+    init : function() {
+
+    }
+};
+var Batter = function() {
+    this.init();
+};
+
+Batter.prototype = {
+    init : function() {
+
+    }
+};
+var Runner = function() {
+    this.init();
+};
+
+Runner.prototype = {
+    init : function() {
+
+    }
+};
 var Field = function(game) {
     this.init(game);
 };
@@ -191,7 +752,8 @@ var Game = function(baseball) {
 
 Game.prototype = {
     constructor : Game,
-    init : function() {
+    init : function(m) {
+        if (m) mode = m;
         this.field = new Field(this);
         this.teams.away = new Team();
         this.teams.home = new Team();
@@ -207,6 +769,9 @@ Game.prototype = {
         } else {
             this.autoPitch();
         }
+    },
+    getInning : function() {
+        return mode == 'n' ? (this.inning + (this.half == 'top' ? 'オモテ' : 'ウラ')) : this.half.toUpperCase() + ' ' + this.inning;
     },
     humanBatting : function() {
         switch (this.half) {
@@ -514,8 +1079,11 @@ Player.prototype = {
         this.pitching = {averaging : []};
         this.number = 0;
         this.randomizeSkills();
-        this.name = data.surnames[Math.floor(Math.random()*data.surnames.length)] + ' ' +
-            data.names[Math.floor(Math.random()*data.names.length)];
+        var surnamekey = Math.floor(Math.random()*data.surnames.length),
+            nameKey = Math.floor(Math.random()*data.names.length);
+
+        this.name = data.surnames[surnamekey] + ' ' + data.names[nameKey];
+        this.nameJ = data.surnamesJ[surnamekey] + data.namesJ[nameKey];
         this.atBats = [];
     },
     randomizeSkills : function() {
@@ -600,7 +1168,33 @@ Player.prototype = {
         delete this.pitching.averaging;
     },
     getSurname : function() {
-        return this.name.split(' ')[0];
+        return mode == 'n' ? this.nameJ[0] : this.name.split(' ')[0];
+    },
+    getName : function() {
+        return mode == 'n' ? this.nameJ : this.name;
+    },
+    stats : {
+        pitching : {
+            pitches : 0,
+            strikes : 0,
+            K : 0,
+            ERA : 0,
+            H : 0,
+            BB : 0
+        },
+        batting : {
+            ba : 0,
+            pa : 0,
+            ab : 0,
+            so : 0,
+            bb : 0,
+            h : 0,
+            '2b' : 0,
+            '3b' : 0,
+            hr : 0,
+            rbi : 0,
+            hbp : 0
+        }
     },
     name : '',
     number : 0,
@@ -636,7 +1230,12 @@ Team.prototype = {
         this.pickName();
     },
     pickName : function() {
-        this.name = this.name = data.teamNames[Math.floor(Math.random()*data.teamNames.length)];
+        var teamNameIndex = Math.floor(Math.random()*data.teamNames.length);
+        this.name = data.teamNames[teamNameIndex];
+        this.nameJ = data.teamNamesJ[teamNameIndex];
+    },
+    getName : function() {
+        return mode == 'n' ? this.nameJ : this.name;
     },
     lineup : [],
     positions : {},
@@ -863,372 +1462,11 @@ Umpire.prototype = {
     says : 'Play ball!',
     game : null
 };
-data = {
-    surnames : [
-        'Satou',
-        'Suzuki',
-        'Takahashi',
-        'Watanabe',
-        'Itou',
-        'Yamamoto',
-        'Nakamura',
-        'Kobayashi',
-        'Katou',
-        'Yoshida',
-        'Sasaki',
-        'Yamaguchi',
-        'Saitou',
-        'Kimura',
-        'Abe',
-        'Ikeda',
-        'Iwasaki',
-        'Kinoshita',
-        'Adachi',
-        'Fujiwara',
-        'Haseyama'
-    ],
-    names : [
-        'Takumi',
-        'Hikaru',
-        'Yuuki',
-        'Shouta',
-        'Ichirou',
-        'Touma',
-        'Ren',
-        'Minato',
-        'Rui',
-        'Tatsuki',
-        'Kenji',
-        'Itsuki',
-        'Haru',
-        'Kouichi',
-        'Sousuke',
-        'Kousuke',
-        'Yuuta',
-        'Daiki',
-        'Eita'
-    ],
-    teamNames : [
-        'Yokohama',
-        'Osaka',
-        'Nagoya',
-        'Sapporo',
-        'Kobe',
-        'Kyoto',
-        'Fukuoka',
-        'Kawasaki',
-        'Saitama',
-        'Hiroshima',
-        'Sendai',
-        'Chiba',
-        'Niigata',
-        'Hamamatsu',
-        'Shizuoka',
-        'Sagamihara',
-        'Okayama',
-        'Kumamoto',
-        'Kagoshima',
-        'Funabashi',
-        'Kawaguchi',
-        'Himeji',
-        'Matsuyama',
-        'Utsunomiya',
-        'Matsudo',
-        'Nishinomiya',
-        'Kurashiki',
-        'Ichikawa',
-        'Fukuyama',
-        'Amagasaki',
-        'Kanazawa',
-        'Nagasaki',
-        'Yokosuka',
-        'Toyama',
-        'Takamatsu',
-        'Machida',
-        'Gifu',
-        'Hirakata',
-        'Fujisawa',
-        'Kashiwa',
-        'Toyonaka',
-        'Nagano',
-        'Toyohashi',
-        'Ichinomiya',
-        'Wakayama',
-        'Okazaki',
-        'Miyazaki',
-        'Nara',
-        'Suita',
-        'Takatsuki',
-        'Asahikawa',
-        'Iwaki',
-        'Takasaki',
-        'Tokorozawa',
-        'Kawagoe',
-        'Akita',
-        'Koshigaya',
-        'Maebashi',
-        'Naha',
-        'Yokkaichi',
-        'Aomori',
-        'Kurume',
-        'Kasugai',
-        'Morioka',
-        'Akashi',
-        'Fukushima',
-        'Shimonoseki',
-        'Nagaoka',
-        'Ichihara',
-        'Hakodate',
-        'Ibaraki',
-        'Fukui',
-        'Kakogawa',
-        'Tokushima',
-        'Mito',
-        'Hiratsuka',
-        'Sasebo',
-        'Kure',
-        'Hachinohe',
-        'Saga',
-        'Neyagawa',
-        'Fuji',
-        'Kasukabe',
-        'Chigasaki',
-        'Matsumoto',
-        'Atsugi',
-        'Yamato',
-        'Ageo',
-        'Takarazuka',
-        'Tsukuba',
-        'Numazu',
-        'Kumagaya',
-        'Isesaki',
-        'Kishiwada',
-        'Tottori',
-        'Odawara',
-        'Suzuka',
-        'Matsue',
-        'Hitachi',
-    ]
-};
-helper = {
-    pitchDefinitions : {
-        '4-seam' :      [0, 0, 1], //x movement, y movement, speed ratio
-        '2-seam' :      [20, -20, 0.90],
-        'cutter' :      [-25, -20, 0.95],
-        'sinker' :      [-15, -30, 0.95],
-
-        'slider' :      [-50, -35, 0.9],
-        'fork'   :      [0, -70, 0.87],
-        'curve'  :      [0, -90, 0.82],
-
-        'change' :    [0, -10, 0.88]
-    },
-    selectRandomPitch : function() {
-        return [
-            '4-seam', '2-seam', 'cutter', 'sinker',
-            'slider', 'fork', 'curve',
-            'change'
-        ][Math.floor(Math.random()*8)]
-    }
-};
-
-var Log = function() {
-    this.init();
-};
-
-Log.prototype = {
-    init : function() {
-        this.pitchRecord = [];
-    },
-    note : function(note) {
-        this.record.unshift(note);
-        this.shortRecord = this.record.slice(0, 6);
-    },
-    noteBatter : function(batter) {
-        var order = batter.team.nowBatting;
-        order = {
-            0 : ' 1st',
-            1 : ' 2nd',
-            2 : ' 3rd',
-            3 : ' 4th',
-            4 : ' 5th',
-            5 : ' 6th',
-            6 : ' 7th',
-            7 : ' 8th',
-            8 : ' 9th'
-        }[order];
-        var positions = this.longFormFielder;
-        this.note('Now batting'+order+', '+positions[batter.position]+', '+batter.name);
-    },
-    getPitchLocationDescription : function(pitchInFlight, batterIsLefty) {
-        var x = pitchInFlight.x, y = pitchInFlight.y, say = '';
-        var noComma = false, noComma2 = false;
-        var ball = false;
-        if (!batterIsLefty) x = 200 - x;
-        if (x < 50) {
-            say += 'way outside';
-            ball = true;
-        } else if (x < 70) {
-            say += 'outside';
-        } else if (x < 100) {
-            say += '';
-            noComma = true;
-        } else if (x < 130) {
-            say += '';
-            noComma = true;
-        } else if (x < 150) {
-            say += 'inside';
-        } else {
-            say += 'way inside';
-            ball = true;
-        }
-        if (say != '') say += ', ';
-        if (y < 35) {
-            say += 'way low';
-            ball = true;
-        } else if (y < 65) {
-            say += 'low';
-        } else if (y < 135) {
-            say += '';
-            noComma2 = true;
-        } else if (y < 165) {
-            say += 'high';
-        } else {
-            say += 'way high';
-            ball = true;
-        }
-        if (noComma || noComma2) {
-            say = say.split(', ').join('');
-            if (noComma && noComma2) {
-                say = 'down the middle';
-            }
-        }
-        // say = (ball ? 'Ball, ' : 'Strike, ') + say;
-        say = pitchInFlight.name.charAt(0).toUpperCase() + pitchInFlight.name.slice(1) + ' ' + say + '. ';
-        return say;
-    },
-    notePitch : function(pitchInFlight, batter) {
-        this.pitchRecord.unshift(
-            this.getPitchLocationDescription(pitchInFlight, batter.bats == 'left')
-        );
-    },
-    noteSwing : function(swingResult) {
-        if (swingResult.looking) {
-            if (swingResult.strike) {
-                this.pitchRecord[0] += 'Strike.'
-            } else {
-                this.pitchRecord[0] += 'Ball.'
-            }
-        } else {
-            if (swingResult.contact) {
-                if (swingResult.foul) {
-                    this.pitchRecord[0] += 'Fouled off.'
-                } else {
-                    if (swingResult.caught) {
-                        this.pitchRecord[0] += 'In play.'
-                    } else {
-                        if (swingResult.thrownOut) {
-                            this.pitchRecord[0] += 'In play.'
-                        } else {
-                            this.pitchRecord[0] += 'In play.'
-                        }
-                    }
-                }
-            } else {
-                this.pitchRecord[0] += 'Swinging strike.'
-            }
-        }
-    },
-    notePlateAppearanceResult : function(game) {
-        var r = game.swingResult;
-        var record = '';
-        var batter = game.batter.name;
-        if (r.looking) {
-            if (r.strike) {
-                record = (batter+' struck out looking.');
-            } else {
-                record = (batter+' walked.');
-            }
-        } else {
-            if (r.contact) {
-                if (r.caught) {
-                    if (['left', 'center', 'right'].indexOf(r.fielder) < 0) {
-                        record = (batter+' popped out to '+ r.fielder + '.');
-                    } else {
-                        record = (batter+' flew out to '+ r.fielder + '.');
-                    }
-                } else {
-                    if (r.foul) {
-                        // not possible to end PA on foul?
-                    } else {
-                        if (r.thrownOut) {
-                            if (Math.random() > 0.5) {
-                                record = (batter+' grounded out to '+ r.fielder + '.');
-                            } else {
-                                record = (batter+' thrown out by '+ r.fielder + '.');
-                            }
-                        } else {
-                            switch (r.bases) {
-                                case 1:
-                                    record = (batter+' reached on single to '+ r.fielder + '.');
-                                    break;
-                                case 2:
-                                    record = (batter+' doubled past '+ r.fielder + '.');
-                                    break;
-                                case 3:
-                                    record = (batter+' reached third on triple past '+ r.fielder + '.');
-                                    break;
-                                case 4:
-                                    if (r.splay < -15) {
-                                        record = (batter+' homered to left.');
-                                    } else if (r.splay < 15) {
-                                        record = (batter+' homered to center.');
-                                    } else {
-                                        record = (batter+' homered to right.');
-                                    }
-                                    break;
-                            }
-                        }
-                    }
-                }
-            } else {
-                record = (batter+' struck out swinging.');
-            }
-        }
-        this.record.unshift(record);
-        this.pitchRecord = ['Previous: '+record];
-    },
-    pointer : 0,
-    pitchRecord : [],
-    shortRecord : [],
-    record : [],
-    longFormFielder : {
-        first : 'first baseman',
-        second : 'second baseman',
-        third : 'third baseman',
-        short : 'shortstop',
-        pitcher : 'pitcher',
-        catcher : 'catcher',
-        left : 'left fielder',
-        center : 'center fielder',
-        right : 'right fielder'
-    }
-};
-var Renderer = function(game) {
-    this.init(game);
-};
-
-Renderer.prototype = {
-    init : function(game) {
-        this.game = game;
-    },
-    render : function() {
-
-    }
-};
-app.controller('IndexController', function($scope) {
+IndexController = function($scope) {
     window.s = $scope;
+    $scope.t = text;
     $scope.y = new Game();
+    $scope.expandScoreboard = false;
     $scope.proceedToGame = function () {
         jQ('.blocking').remove();
     };
@@ -1244,11 +1482,11 @@ app.controller('IndexController', function($scope) {
         }
         var keyframes = rule;
         var to = function(percent, top, left) {
-            var originTop = 0;
-            var originLeft = 100;
+            var originTop = 50;
+            var originLeft = 110 + ($scope.y.pitcher.throws == 'left' ? 20 : -20);
             Math.square = function(x) { return x*x };
             left = originLeft + Math.square(percent/100)*(left - originLeft);
-            top = Math.square(percent/100)*(top - originTop);
+            top = originTop + Math.square(percent/100)*(top - originTop);
             var padding = Math.max(Math.square(percent/100)*13, 2);
             var borderWidth = Math.square(percent/100)*4;
             return 'top: '+top+'px; left: '+left+'px; padding: '+padding+'px; border-width:'+borderWidth+'px';
@@ -1279,24 +1517,19 @@ app.controller('IndexController', function($scope) {
             jQ('.baseball').removeClass('flight');
             jQ('.baseball').addClass('spin');
             var horizontalBreak = (60 - Math.abs(game.pitchTarget.x - game.pitchInFlight.x))/10;
-            jQ('.baseball').css('-webkit-animation', 'spin '+horizontalBreak+'s 5 0s linear')
+            jQ('.baseball').css('-webkit-animation', 'spin '+horizontalBreak+'s 5 0s linear');
             $scope.allowInput = true;
         }, flightSpeed*1000);
 
-        if (game.humanBatting()) {
-            jQ('.baseball.break').addClass('hide');
-        } else {
-            jQ('.baseball.break').removeClass('hide');
-        }
         if (!game.pitchInFlight.x) {
             $baseballs.addClass('hide');
         } else {
             if (game.humanBatting()) {
-                jQ('.baseball.break').addClass('hide');
+                jQ('.baseball.pitch').addClass('hide');
             } else {
-                jQ('.baseball.break').removeClass('hide');
+                jQ('.baseball.pitch').removeClass('hide');
             }
-            jQ('.baseball.pitch').removeClass('hide');
+            jQ('.baseball.break').removeClass('hide');
         }
         jQ('.baseball.pitch').css({
             top: 200-game.pitchTarget.y,
@@ -1324,7 +1557,7 @@ app.controller('IndexController', function($scope) {
         if (!$scope.allowInput) {
             return;
         }
-        $scope.allowInput = false;
+        if ($scope.y.humanPitching()) $scope.allowInput = false;
         var offset = jQ('.target').offset();
         var relativeOffset = {
             x : $event.pageX - offset.left,
@@ -1366,49 +1599,29 @@ app.controller('IndexController', function($scope) {
             right : 'RF'
         }[position];
     };
-});
-var Catcher = function() {
-    this.init();
 };
-
-Catcher.prototype = {
-    init : function() {
-
-    }
+ScoreboardDirective = function() {
+    return {
+        scope: {
+            game: '=',
+            text: '='
+        },
+        templateUrl: '/js/internal/angular/views/directives/scoreboard.html?cache='+cacheKey,
+        link: function(scope) {
+            window.s2 = scope;
+            scope.t = scope.text;
+            scope.y = scope.game;
+        }
+    };
 };
-var Fielder = function() {
-    this.init();
-};
+var app = angular.module('YakyuuAikoukai', ['directives']);
 
-Fielder.prototype = {
-    init : function() {
+cacheKey = Math.floor(Math.random()*1500);
 
-    }
-};
-var Pitcher = function() {
-    this.init();
-};
+angular.module('directives', [])
+    .directive('scoreboard', ScoreboardDirective);
 
-Pitcher.prototype = {
-    init : function() {
+angular.module('controllers', [])
+    .controller('IndexController', IndexController);
 
-    }
-};
-var Batter = function() {
-    this.init();
-};
-
-Batter.prototype = {
-    init : function() {
-
-    }
-};
-var Runner = function() {
-    this.init();
-};
-
-Runner.prototype = {
-    init : function() {
-
-    }
-};
+var mode = 'n';

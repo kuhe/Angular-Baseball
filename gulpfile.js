@@ -18,7 +18,12 @@ gulp.task('default', function() {
 });
 
 gulp.task('scripts', function() {
-    gulp.src('js/internal/**/*.js')
+    gulp.src([
+        'js/internal/utility/**/*.js',
+        'js/internal/baseball/**/*.js',
+        'js/internal/angular/controllers/**/*.js',
+        'js/internal/angular/application.js'
+    ])
         .pipe(concat('application.js'))
         .pipe(gulp.dest('js/internal'))
 });
