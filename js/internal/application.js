@@ -1076,7 +1076,7 @@ var Player = function(team) {
         return Math.floor((skill/100) * (b - a) + a);
     };
     // let's just say we're about X games into the season
-    var gamesIntoSeason = 35;
+    var gamesIntoSeason = Math.floor(Math.random()*50);
     var IP, ER, GS, W, L;
     if (this.skill.pitching > 65) {
         IP = (this.skill.pitching - 65)*gamesIntoSeason/20;
