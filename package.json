@@ -1,0 +1,27 @@
+{
+  "name": "Angular-Baseball",
+  "version": "1.0.0",
+  "description": "baseball",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "del": "^1.1.1",
+    "gulp-concat": "^2.5.2",
+    "gulp": "^3.8.11",
+    "gulp-watch": "^4.2.4",
+    "gulp-less": "^3.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kuhe/Angular-Baseball.git"
+  },
+  "author": "georgejf/kuhe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kuhe/Angular-Baseball/issues"
+  },
+  "homepage": "https://github.com/kuhe/Angular-Baseball"
+}
