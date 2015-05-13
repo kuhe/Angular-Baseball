@@ -10,6 +10,17 @@ Field.prototype = {
         this.second = null;
         this.third = null;
     },
+    translateSwingResultToStylePosition: function(swingResult) {
+        // CF HR bottom: 95px, centerline: left: 190px;
+        var bottom = 0, left = 190;
+
+        bottom = Math.cos(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300;
+        left = Math.sin(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300 + 190;
+
+        swingResult.bottom = bottom + 'px';
+        swingResult.left = left + 'px';
+        return swingResult;
+    },
     determineSwingContactResult : function(swing) {
         if (typeof swing == 'undefined') swing = this;
         var x = swing.x, y = swing.y;
@@ -55,7 +66,7 @@ Field.prototype = {
                     swing.bases = 1;
                     var fieldingReturnDelay = -1*((interceptRating/(1 + fielder.skill.defense.throwing/100))/fieldingEase - this.game.batter.skill.offense.speed);
                     log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
-                    while (fieldingReturnDelay - 100 > 0) {
+                    while (fieldingReturnDelay - 100 > 0 && swing.bases <= 3) {
                         swing.bases++;
                         fieldingReturnDelay  -= 80;
                     }
@@ -70,7 +81,7 @@ Field.prototype = {
             }
         }
 
-        return swing;
+        return this.translateSwingResultToStylePosition(swing);
     },
     findFielder : function(splayAngle, landingDistance) {
         if (Math.abs(90 - splayAngle) > 50) return false;

@@ -105,6 +105,22 @@
                 </div>
             </div>
             <div scoreboard='' game='y' text='t'></div>
+            <hr>
+            <div class='diamond-display row'>
+                <div class='col-md-4'></div>
+                <div class='col-md-4'>
+                    <div class='splay-indicator'>
+                        <div class='splay-indicator-ball' ng-show='y.swingResult.contact'
+                                ng-style='{
+                                    bottom: y.swingResult.bottom,
+                                    left: y.swingResult.left
+                                }'>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-md-4'></div>
+            </div>
+            <hr>
             <div class='main-area noselect row'>
                 <div class='row'>
                     <div class='col-md-4 background-color visible-lg visible-md'>
@@ -189,7 +205,7 @@
                             </div>
                         </div>
                         <div class='row'></div>
-                        <div>
+                        <div class='row'>
                             <table class='list-group-item table table-condensed'>
                                 <thead>
                                     <tr>
