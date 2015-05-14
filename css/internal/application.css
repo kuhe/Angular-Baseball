@@ -473,3 +473,7 @@ html body {
   display: inline-block;
   text-align: center;
 }
+.centered {
+  text-align: center;
+  margin: auto;
+}

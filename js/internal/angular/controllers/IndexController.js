@@ -2,6 +2,12 @@ IndexController = function($scope) {
     window.s = $scope;
     $scope.t = text;
     $scope.y = new Game();
+    $scope.mode = function(set) {
+        if (set) {
+            mode = set;
+        }
+        return mode;
+    };
     $scope.expandScoreboard = false;
     $scope.proceedToGame = function () {
         jQ('.blocking').remove();

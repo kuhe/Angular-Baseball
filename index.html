@@ -107,7 +107,15 @@
             <div scoreboard='' game='y' text='t'></div>
             <hr>
             <div class='diamond-display row'>
-                <div class='col-md-4'></div>
+                <div class='col-md-4'>
+                    <div class='pull-right'>
+                        <strong class='pointer' ng-show='mode() == "e"'>English</strong>
+                        <em class='pointer' ng-click='mode("e")' ng-show='mode() != "e"'>English</em>
+                        <br>
+                        <strong class='pointer' ng-show='mode() == "n"'>日本語</strong>
+                        <em class='pointer' ng-click='mode("n")' ng-show='mode() != "n"'>日本語</em>
+                    </div>
+                </div>
                 <div class='col-md-4'>
                     <div class='splay-indicator'>
                         <div class='splay-indicator-ball' ng-show='y.swingResult.contact'
@@ -147,14 +155,20 @@
                                 <div class='strikezone' ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'></div>
                             </div>
                         </div>
-                        <div>
+                        <div class='centered'>
                             <div class="list-group-item umpire">
-                                {{y.umpire.says}}
+                                Umpire: {{y.umpire.says}}
                             </div>
-                            <div class='list-group-item'>
+                            <ul class='list-inline'>
                                 {{y.stage == 'swing' ? 'Batting, ' + y.battersEye : ''}}
-                                {{y.stage == 'pitch' ? ('Catching : ' + y.pitchInFlight.name + ' selected.') : ''}}
-                            </div>
+                                <hr ng-if='y.stage == "pitch"'/>
+                                <li ng-if='y.stage == "pitch"' class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
+                                    <span ng-click="selectPitch(name)">
+                                        <strong ng-show='y.pitchInFlight.name == name'>{{ name }}</strong>
+                                        <em ng-show='y.pitchInFlight.name != name'>{{ name }}</em>
+                                    </span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                     <div class='col-md-4 background-color visible-lg visible-md'>

@@ -17,6 +17,9 @@ Field.prototype = {
         bottom = Math.cos(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300;
         left = Math.sin(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300 + 190;
 
+        bottom = Math.max(Math.min(bottom, 400), -20);
+        left = Math.max(Math.min(left, 280), 100);
+
         swingResult.bottom = bottom + 'px';
         swingResult.left = left + 'px';
         return swingResult;

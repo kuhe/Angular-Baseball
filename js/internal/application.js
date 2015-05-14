@@ -495,18 +495,6 @@ Log.prototype = {
         right : 'right fielder'
     }
 };
-var Renderer = function(game) {
-    this.init(game);
-};
-
-Renderer.prototype = {
-    init : function(game) {
-        this.game = game;
-    },
-    render : function() {
-
-    }
-};
 text = function(phrase) {
     return {
         n : {
@@ -580,6 +568,9 @@ Field.prototype = {
 
         bottom = Math.cos(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300;
         left = Math.sin(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300 + 190;
+
+        bottom = Math.max(Math.min(bottom, 400), -20);
+        left = Math.max(Math.min(left, 280), 100);
 
         swingResult.bottom = bottom + 'px';
         swingResult.left = left + 'px';
@@ -777,7 +768,6 @@ Game.prototype = {
         while (this.teams.away.name == this.teams.home.name) {
             this.teams.away.pickName();
         }
-        this.renderer = new Renderer(this);
         this.umpire = new Umpire(this);
         if (this.humanPitching()) {
             this.stage = 'pitch';
@@ -1580,6 +1570,12 @@ IndexController = function($scope) {
     window.s = $scope;
     $scope.t = text;
     $scope.y = new Game();
+    $scope.mode = function(set) {
+        if (set) {
+            mode = set;
+        }
+        return mode;
+    };
     $scope.expandScoreboard = false;
     $scope.proceedToGame = function () {
         jQ('.blocking').remove();

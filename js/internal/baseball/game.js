@@ -17,7 +17,6 @@ Game.prototype = {
         while (this.teams.away.name == this.teams.home.name) {
             this.teams.away.pickName();
         }
-        this.renderer = new Renderer(this);
         this.umpire = new Umpire(this);
         if (this.humanPitching()) {
             this.stage = 'pitch';
