@@ -164,10 +164,10 @@ text.contactResult = function(batter, fielder, bases, outBy) {
             fielder = text.fielderShortName(fielder);
             switch (outBy) {
                 case 'pop':
-                    statement += 'ポップフライで飛' + fielder;
+                    statement += 'ポップフライで' + fielder + '飛';
                     break;
                 case 'fly':
-                    statement += '飛' + fielder;
+                    statement += fielder + '飛';
                     break;
                 case 'ground':
                     statement += fielder + 'ゴロ';
