@@ -14,18 +14,18 @@ Log.prototype = {
     noteBatter : function(batter) {
         var order = batter.team.nowBatting;
         order = {
-            0 : ' 1st',
-            1 : ' 2nd',
-            2 : ' 3rd',
-            3 : ' 4th',
-            4 : ' 5th',
-            5 : ' 6th',
-            6 : ' 7th',
-            7 : ' 8th',
-            8 : ' 9th'
+            0 : text(' 1st'),
+            1 : text(' 2nd'),
+            2 : text(' 3rd'),
+            3 : text(' 4th'),
+            4 : text(' 5th'),
+            5 : text(' 6th'),
+            6 : text(' 7th'),
+            7 : text(' 8th'),
+            8 : text(' 9th')
         }[order];
-        var positions = this.longFormFielder;
-        this.note('Now batting'+order+', '+positions[batter.position]+', '+batter.name);
+        var positions = this.longFormFielder();
+        this.note(text('Now batting')+order+text.comma()+positions[batter.position]+text.comma()+batter.getName());
     },
     getPitchLocationDescription : function(pitchInFlight, batterIsLefty) {
         var x = pitchInFlight.x, y = pitchInFlight.y, say = '';
@@ -33,10 +33,10 @@ Log.prototype = {
         var ball = false;
         if (!batterIsLefty) x = 200 - x;
         if (x < 50) {
-            say += 'way outside';
+            say += text('way outside');
             ball = true;
         } else if (x < 70) {
-            say += 'outside';
+            say += text('outside');
         } else if (x < 100) {
             say += '';
             noComma = true;
@@ -44,34 +44,34 @@ Log.prototype = {
             say += '';
             noComma = true;
         } else if (x < 150) {
-            say += 'inside';
+            say += text('inside');
         } else {
-            say += 'way inside';
+            say += text('way inside');
             ball = true;
         }
-        if (say != '') say += ', ';
+        if (say != '') say += text.comma();
         if (y < 35) {
-            say += 'way low';
+            say += text('way low');
             ball = true;
         } else if (y < 65) {
-            say += 'low';
+            say += text('low');
         } else if (y < 135) {
             say += '';
             noComma2 = true;
         } else if (y < 165) {
-            say += 'high';
+            say += text('high');
         } else {
-            say += 'way high';
+            say += text('way high');
             ball = true;
         }
         if (noComma || noComma2) {
-            say = say.split(', ').join('');
+            say = say.split(text.comma()).join('');
             if (noComma && noComma2) {
-                say = 'down the middle';
+                say = text('down the middle');
             }
         }
         // say = (ball ? 'Ball, ' : 'Strike, ') + say;
-        say = pitchInFlight.name.charAt(0).toUpperCase() + pitchInFlight.name.slice(1) + ' ' + say + '. ';
+        say = text.namePitch(pitchInFlight) + text.comma() + say + text.stop();
         return say;
     },
     notePitch : function(pitchInFlight, batter) {
@@ -82,47 +82,48 @@ Log.prototype = {
     noteSwing : function(swingResult) {
         if (swingResult.looking) {
             if (swingResult.strike) {
-                this.pitchRecord[0] += 'Strike.'
+                this.pitchRecord[0] += text('Strike.')
             } else {
-                this.pitchRecord[0] += 'Ball.'
+                this.pitchRecord[0] += text('Ball.')
             }
         } else {
             if (swingResult.contact) {
                 if (swingResult.foul) {
-                    this.pitchRecord[0] += 'Fouled off.'
+                    this.pitchRecord[0] += text('Fouled off.')
                 } else {
                     if (swingResult.caught) {
-                        this.pitchRecord[0] += 'In play.'
+                        this.pitchRecord[0] += text('In play.')
                     } else {
                         if (swingResult.thrownOut) {
-                            this.pitchRecord[0] += 'In play.'
+                            this.pitchRecord[0] += text('In play.')
                         } else {
-                            this.pitchRecord[0] += 'In play.'
+                            this.pitchRecord[0] += text('In play.')
                         }
                     }
                 }
             } else {
-                this.pitchRecord[0] += 'Swinging strike.'
+                this.pitchRecord[0] += text('Swinging strike.')
             }
         }
     },
     notePlateAppearanceResult : function(game) {
         var r = game.swingResult;
         var record = '';
-        var batter = game.batter.name;
+        var batter = game.batter.getName();
         if (r.looking) {
             if (r.strike) {
-                record = (batter+' struck out looking.');
+                record = (batter + text(' struck out looking.'));
             } else {
-                record = (batter+' walked.');
+                record = (batter + text(' walked.'));
             }
         } else {
             if (r.contact) {
+                var fielder = r.fielder, bases = r.bases, outBy;
                 if (r.caught) {
                     if (['left', 'center', 'right'].indexOf(r.fielder) < 0) {
-                        record = (batter+' popped out to '+ r.fielder + '.');
+                        outBy = 'pop';
                     } else {
-                        record = (batter+' flew out to '+ r.fielder + '.');
+                        outBy = 'fly';
                     }
                 } else {
                     if (r.foul) {
@@ -130,54 +131,54 @@ Log.prototype = {
                     } else {
                         if (r.thrownOut) {
                             if (Math.random() > 0.5) {
-                                record = (batter+' grounded out to '+ r.fielder + '.');
+                                outBy = 'ground';
                             } else {
-                                record = (batter+' thrown out by '+ r.fielder + '.');
+                                outBy = 'thrown';
                             }
                         } else {
                             switch (r.bases) {
                                 case 1:
-                                    record = (batter+' reached on single to '+ r.fielder + '.');
-                                    break;
                                 case 2:
-                                    record = (batter+' doubled past '+ r.fielder + '.');
-                                    break;
                                 case 3:
-                                    record = (batter+' reached third on triple past '+ r.fielder + '.');
+                                    bases = r.bases;
                                     break;
                                 case 4:
+                                    bases = 4;
                                     if (r.splay < -15) {
-                                        record = (batter+' homered to left.');
+                                        fielder = 'left';
                                     } else if (r.splay < 15) {
-                                        record = (batter+' homered to center.');
+                                        fielder = 'center';
                                     } else {
-                                        record = (batter+' homered to right.');
+                                        fielder = 'right';
                                     }
                                     break;
                             }
                         }
                     }
                 }
+                record = text.contactResult(batter, fielder, bases, outBy);
             } else {
-                record = (batter+' struck out swinging.');
+                record = (batter+text(' struck out swinging.'));
             }
         }
         this.record.unshift(record);
-        this.pitchRecord = ['Previous: '+record];
+        this.pitchRecord = [text('Previous: ')+record];
     },
     pointer : 0,
     pitchRecord : [],
     shortRecord : [],
     record : [],
-    longFormFielder : {
-        first : 'first baseman',
-        second : 'second baseman',
-        third : 'third baseman',
-        short : 'shortstop',
-        pitcher : 'pitcher',
-        catcher : 'catcher',
-        left : 'left fielder',
-        center : 'center fielder',
-        right : 'right fielder'
+    longFormFielder : function() {
+        return {
+            first : text('first baseman'),
+            second : text('second baseman'),
+            third : text('third baseman'),
+            short : text('shortstop'),
+            pitcher : text('pitcher'),
+            catcher : text('catcher'),
+            left : text('left fielder'),
+            center : text('center fielder'),
+            right : text('right fielder')
+        }
     }
 };

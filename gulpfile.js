@@ -5,6 +5,8 @@ var del = require('del');
 var less = require('gulp-less');
 
 gulp.task('default', function() {
+    gulp.run('scripts');
+    gulp.run('styles');
     gulp.watch('js/internal/**/*.js', function() {
         del('js/internal/application.js', function() {
             gulp.run('scripts');
@@ -19,7 +21,8 @@ gulp.task('default', function() {
 
 gulp.task('scripts', function() {
     gulp.src([
-        'js/internal/utility/**/*.js',
+        'js/internal/utility/primary/*.js',
+        'js/internal/utility/*.js',
         'js/internal/baseball/**/*.js',
         'js/internal/angular/controllers/**/*.js',
         'js/internal/angular/application.js'

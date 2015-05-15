@@ -1,3 +1,206 @@
+text = function(phrase) {
+    if (!mode) mode = 'n';
+    var string = {
+        n : {
+            empty: '空',
+            ' 1st' : '一番',
+            ' 2nd' : '二番',
+            ' 3rd' : '三番',
+            ' 4th' : '四番',
+            ' 5th' : '五番',
+            ' 6th' : '六番',
+            ' 7th' : '七番',
+            ' 8th' : '八番',
+            ' 9th' : '九番',
+            'Now batting' : '次のバッタ、',
+            'way outside' : '相当外角',
+            'outside' : '外角',
+            'inside' : '内角',
+            'way inside' : '相当内角',
+            'way low' : '相当低め',
+            'low' : '低め',
+            'high' : '高め',
+            'way high' : '相当高め',
+            'down the middle' : '真ん中',
+            'first baseman': 'ファースト',
+            'second baseman': 'セカンド',
+            'third baseman': 'サード',
+            'shortstop': 'ショート',
+            'pitcher': 'ピッチャー',
+            'catcher': 'キャッチャー',
+            'left fielder': 'レフト',
+            'center fielder': 'センター',
+            'right fielder': 'ライト',
+            'Strike.' : 'ストライク。',
+            'Ball.' : 'ボール。',
+            'Fouled off.': 'ファウル。',
+            'In play.': 'インプレー。',
+            'Swinging strike.': '空振り。',
+            '4-seam': 'ストレイト',
+            '2-seam': 'シュート',
+            'slider': 'スライダ',
+            'fork': 'フォーク',
+            'cutter': 'カット',
+            'sinker': 'シンカー',
+            'curve': 'カーブ',
+            'change': 'チェンジ',
+            ' struck out looking.': '、見送り三振。',
+            ' walked.': '、フォアボール。',
+            ' struck out swinging.': '、空振り三振。',
+            'Previous: ': '前：'
+        },
+        e : {
+            empty: 'empty'
+        }
+    }[mode][phrase];
+    return string ? string : phrase;
+};
+
+text.fielderShortName = function(fielder) {
+    if (mode == 'n') {
+        return {
+            'first': '一',
+            'second': '二',
+            'third': '三',
+            'short': '遊',
+            'pitcher': '投',
+            'catcher': '捕',
+            'left': '左',
+            'center': '中',
+            'right': '右'
+        }[fielder];
+    }
+    return fielder;
+};
+
+text.fielderLongName = function(fielder) {
+    if (mode == 'n') {
+        return {
+            'first': 'ファースト',
+            'second': 'セカンド',
+            'third': 'サード',
+            'short': 'ショート',
+            'pitcher': 'ピッチャー',
+            'catcher': 'キャッチャー',
+            'left': 'レフト',
+            'center': 'センター',
+            'right': 'ライト'
+        }[fielder]
+    }
+    return {
+        first : text('first baseman'),
+        second : text('second baseman'),
+        third : text('third baseman'),
+        short : text('shortstop'),
+        pitcher : text('pitcher'),
+        catcher : text('catcher'),
+        left : text('left fielder'),
+        center : text('center fielder'),
+        right : text('right fielder')
+    }[fielder];
+};
+
+text.comma = function() {
+    return {n: '、', e: ', '}[mode];
+};
+text.stop = function() {
+    return {n: '。', e: '. '}[mode];
+};
+
+text.namePitch = function(pitch) {
+    if (mode == 'e') {
+        return pitch.name.charAt(0).toUpperCase() + pitch.name.slice(1)
+    }
+    if (mode == 'n') {
+        return text(pitch.name)
+    }
+};
+
+text.contactResult = function(batter, fielder, bases, outBy) {
+    var statement = '';
+    var infield = ['left', 'center', 'right'].indexOf(fielder) < 0;
+    if (mode == 'e') {
+        statement += batter;
+        if (outBy) {
+            switch (outBy) {
+                case 'pop':
+                    statement += ' popped out to ' + text.fielderShortName(fielder);
+                    break;
+                case 'fly':
+                    statement += ' flew out to ' + text.fielderShortName(fielder);
+                    break;
+                case 'ground':
+                    statement += ' grounded out to ' + text.fielderShortName(fielder);
+                    break;
+                case 'thrown':
+                    statement += ' was thrown out by ' + text.fielderShortName(fielder);
+                    break;
+            }
+        } else {
+            switch (bases) {
+                case 1:
+                    if (infield) {
+                        statement += ' reached first on an infield hit to ' + text.fielderShortName(fielder);
+                    } else {
+                        statement += ' reached on a single to ' + text.fielderShortName(fielder);
+                    }
+                    break;
+                case 2:
+                    statement += ' doubled past ' + text.fielderShortName(fielder);
+                    break;
+                case 3:
+                    statement += ' tripled past ' + text.fielderShortName(fielder);
+                    break;
+                case 4:
+                    statement += ' homered to ' + text.fielderShortName(fielder);
+                    break;
+            }
+        }
+        statement += text.stop();
+    }
+    if (mode == 'n') {
+        statement += batter + 'は';
+        if (outBy) {
+            fielder = text.fielderShortName(fielder);
+            switch (outBy) {
+                case 'pop':
+                    statement += 'ポップフライで飛' + fielder;
+                    break;
+                case 'fly':
+                    statement += '飛' + fielder;
+                    break;
+                case 'ground':
+                    statement += fielder + 'ゴロ';
+                    break;
+                case 'thrown':
+                    statement += fielder + 'ゴロ';
+                    break;
+            }
+        } else {
+            fielder = text.fielderLongName(fielder);
+            switch (bases) {
+                case 1:
+                    if (infield) {
+                        statement += '内野' + '('+fielder+')'+ '安打で出塁';
+                    } else {
+                        statement += '('+fielder+')' + '安打で出塁';
+                    }
+                    break;
+                case 2:
+                    statement += '二塁打（'+fielder+'）で出塁';
+                    break;
+                case 3:
+                    statement += '三塁打（'+fielder+'）で出塁';
+                    break;
+                case 4:
+                    statement += '本塁打（'+fielder+'）を打った';
+                    break;
+            }
+        }
+        statement += text.stop();
+    }
+    return statement;
+};
 data = {
     surnames : [
         'Satou',
@@ -328,18 +531,18 @@ Log.prototype = {
     noteBatter : function(batter) {
         var order = batter.team.nowBatting;
         order = {
-            0 : ' 1st',
-            1 : ' 2nd',
-            2 : ' 3rd',
-            3 : ' 4th',
-            4 : ' 5th',
-            5 : ' 6th',
-            6 : ' 7th',
-            7 : ' 8th',
-            8 : ' 9th'
+            0 : text(' 1st'),
+            1 : text(' 2nd'),
+            2 : text(' 3rd'),
+            3 : text(' 4th'),
+            4 : text(' 5th'),
+            5 : text(' 6th'),
+            6 : text(' 7th'),
+            7 : text(' 8th'),
+            8 : text(' 9th')
         }[order];
-        var positions = this.longFormFielder;
-        this.note('Now batting'+order+', '+positions[batter.position]+', '+batter.name);
+        var positions = this.longFormFielder();
+        this.note(text('Now batting')+order+text.comma()+positions[batter.position]+text.comma()+batter.getName());
     },
     getPitchLocationDescription : function(pitchInFlight, batterIsLefty) {
         var x = pitchInFlight.x, y = pitchInFlight.y, say = '';
@@ -347,10 +550,10 @@ Log.prototype = {
         var ball = false;
         if (!batterIsLefty) x = 200 - x;
         if (x < 50) {
-            say += 'way outside';
+            say += text('way outside');
             ball = true;
         } else if (x < 70) {
-            say += 'outside';
+            say += text('outside');
         } else if (x < 100) {
             say += '';
             noComma = true;
@@ -358,34 +561,34 @@ Log.prototype = {
             say += '';
             noComma = true;
         } else if (x < 150) {
-            say += 'inside';
+            say += text('inside');
         } else {
-            say += 'way inside';
+            say += text('way inside');
             ball = true;
         }
-        if (say != '') say += ', ';
+        if (say != '') say += text.comma();
         if (y < 35) {
-            say += 'way low';
+            say += text('way low');
             ball = true;
         } else if (y < 65) {
-            say += 'low';
+            say += text('low');
         } else if (y < 135) {
             say += '';
             noComma2 = true;
         } else if (y < 165) {
-            say += 'high';
+            say += text('high');
         } else {
-            say += 'way high';
+            say += text('way high');
             ball = true;
         }
         if (noComma || noComma2) {
-            say = say.split(', ').join('');
+            say = say.split(text.comma()).join('');
             if (noComma && noComma2) {
-                say = 'down the middle';
+                say = text('down the middle');
             }
         }
         // say = (ball ? 'Ball, ' : 'Strike, ') + say;
-        say = pitchInFlight.name.charAt(0).toUpperCase() + pitchInFlight.name.slice(1) + ' ' + say + '. ';
+        say = text.namePitch(pitchInFlight) + text.comma() + say + text.stop();
         return say;
     },
     notePitch : function(pitchInFlight, batter) {
@@ -396,47 +599,48 @@ Log.prototype = {
     noteSwing : function(swingResult) {
         if (swingResult.looking) {
             if (swingResult.strike) {
-                this.pitchRecord[0] += 'Strike.'
+                this.pitchRecord[0] += text('Strike.')
             } else {
-                this.pitchRecord[0] += 'Ball.'
+                this.pitchRecord[0] += text('Ball.')
             }
         } else {
             if (swingResult.contact) {
                 if (swingResult.foul) {
-                    this.pitchRecord[0] += 'Fouled off.'
+                    this.pitchRecord[0] += text('Fouled off.')
                 } else {
                     if (swingResult.caught) {
-                        this.pitchRecord[0] += 'In play.'
+                        this.pitchRecord[0] += text('In play.')
                     } else {
                         if (swingResult.thrownOut) {
-                            this.pitchRecord[0] += 'In play.'
+                            this.pitchRecord[0] += text('In play.')
                         } else {
-                            this.pitchRecord[0] += 'In play.'
+                            this.pitchRecord[0] += text('In play.')
                         }
                     }
                 }
             } else {
-                this.pitchRecord[0] += 'Swinging strike.'
+                this.pitchRecord[0] += text('Swinging strike.')
             }
         }
     },
     notePlateAppearanceResult : function(game) {
         var r = game.swingResult;
         var record = '';
-        var batter = game.batter.name;
+        var batter = game.batter.getName();
         if (r.looking) {
             if (r.strike) {
-                record = (batter+' struck out looking.');
+                record = (batter + text(' struck out looking.'));
             } else {
-                record = (batter+' walked.');
+                record = (batter + text(' walked.'));
             }
         } else {
             if (r.contact) {
+                var fielder = r.fielder, bases = r.bases, outBy;
                 if (r.caught) {
                     if (['left', 'center', 'right'].indexOf(r.fielder) < 0) {
-                        record = (batter+' popped out to '+ r.fielder + '.');
+                        outBy = 'pop';
                     } else {
-                        record = (batter+' flew out to '+ r.fielder + '.');
+                        outBy = 'fly';
                     }
                 } else {
                     if (r.foul) {
@@ -444,110 +648,55 @@ Log.prototype = {
                     } else {
                         if (r.thrownOut) {
                             if (Math.random() > 0.5) {
-                                record = (batter+' grounded out to '+ r.fielder + '.');
+                                outBy = 'ground';
                             } else {
-                                record = (batter+' thrown out by '+ r.fielder + '.');
+                                outBy = 'thrown';
                             }
                         } else {
                             switch (r.bases) {
                                 case 1:
-                                    record = (batter+' reached on single to '+ r.fielder + '.');
-                                    break;
                                 case 2:
-                                    record = (batter+' doubled past '+ r.fielder + '.');
-                                    break;
                                 case 3:
-                                    record = (batter+' reached third on triple past '+ r.fielder + '.');
+                                    bases = r.bases;
                                     break;
                                 case 4:
+                                    bases = 4;
                                     if (r.splay < -15) {
-                                        record = (batter+' homered to left.');
+                                        fielder = 'left';
                                     } else if (r.splay < 15) {
-                                        record = (batter+' homered to center.');
+                                        fielder = 'center';
                                     } else {
-                                        record = (batter+' homered to right.');
+                                        fielder = 'right';
                                     }
                                     break;
                             }
                         }
                     }
                 }
+                record = text.contactResult(batter, fielder, bases, outBy);
             } else {
-                record = (batter+' struck out swinging.');
+                record = (batter+text(' struck out swinging.'));
             }
         }
         this.record.unshift(record);
-        this.pitchRecord = ['Previous: '+record];
+        this.pitchRecord = [text('Previous: ')+record];
     },
     pointer : 0,
     pitchRecord : [],
     shortRecord : [],
     record : [],
-    longFormFielder : {
-        first : 'first baseman',
-        second : 'second baseman',
-        third : 'third baseman',
-        short : 'shortstop',
-        pitcher : 'pitcher',
-        catcher : 'catcher',
-        left : 'left fielder',
-        center : 'center fielder',
-        right : 'right fielder'
-    }
-};
-text = function(phrase) {
-    return {
-        n : {
-            empty: '空'
-        },
-        e : {
-            empty: 'empty'
+    longFormFielder : function() {
+        return {
+            first : text('first baseman'),
+            second : text('second baseman'),
+            third : text('third baseman'),
+            short : text('shortstop'),
+            pitcher : text('pitcher'),
+            catcher : text('catcher'),
+            left : text('left fielder'),
+            center : text('center fielder'),
+            right : text('right fielder')
         }
-    }[mode][phrase]
-};
-var Catcher = function() {
-    this.init();
-};
-
-Catcher.prototype = {
-    init : function() {
-
-    }
-};
-var Fielder = function() {
-    this.init();
-};
-
-Fielder.prototype = {
-    init : function() {
-
-    }
-};
-var Pitcher = function() {
-    this.init();
-};
-
-Pitcher.prototype = {
-    init : function() {
-
-    }
-};
-var Batter = function() {
-    this.init();
-};
-
-Batter.prototype = {
-    init : function() {
-
-    }
-};
-var Runner = function() {
-    this.init();
-};
-
-Runner.prototype = {
-    init : function() {
-
     }
 };
 var Field = function(game) {
@@ -1565,6 +1714,51 @@ Umpire.prototype = {
     },
     says : 'Play ball!',
     game : null
+};
+var Catcher = function() {
+    this.init();
+};
+
+Catcher.prototype = {
+    init : function() {
+
+    }
+};
+var Fielder = function() {
+    this.init();
+};
+
+Fielder.prototype = {
+    init : function() {
+
+    }
+};
+var Pitcher = function() {
+    this.init();
+};
+
+Pitcher.prototype = {
+    init : function() {
+
+    }
+};
+var Batter = function() {
+    this.init();
+};
+
+Batter.prototype = {
+    init : function() {
+
+    }
+};
+var Runner = function() {
+    this.init();
+};
+
+Runner.prototype = {
+    init : function() {
+
+    }
 };
 IndexController = function($scope) {
     window.s = $scope;
