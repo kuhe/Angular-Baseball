@@ -1714,7 +1714,12 @@ Umpire.prototype = {
         }
         offense = this.game.half == 'top' ? 'away' : 'home';
         defense = this.game.half == 'top' ? 'home' : 'away';
-        this.game.log.note((this.game.half == 'top' ? 'Top' : 'Bottom')+' '+this.game.inning);
+        if (mode == 'n') {
+            this.game.log.note(this.game.inning+'回の'+(this.game.half == 'top' ? 'オモテ' : 'ウラ')
+            +'、'+this.game.teams[(this.game.half == 'top' ? 'away' : 'home')].getName()+'の攻撃。');
+        } else {
+            this.game.log.note((this.game.half == 'top' ? 'Top' : 'Bottom')+' '+this.game.inning);
+        }
         var team = this.game.teams[offense];
         this.game.batter = team.lineup[team.nowBatting];
         this.game.deck = team.lineup[(team.nowBatting + 1)%9];
