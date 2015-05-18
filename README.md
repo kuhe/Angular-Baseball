@@ -1,4 +1,4 @@
-Yakyuu-Aikoukai（Baseball Club）
+[Yakyuu-Aikoukai（Baseball Club）](htttp://georgefu.info/y)
 ===============
 
 A game of one of the top five bat-based sports! Namely, baseball! Now in JavaScript form.
@@ -8,7 +8,7 @@ and strikeouts from opposing batters, and use your batter's eye to hit the ball 
 
 -George Fu
 
-currently hosted at georgefu.info/y/
+currently hosted at [georgefu.info/y/](htttp://georgefu.info/y)
 
 todo :
 
