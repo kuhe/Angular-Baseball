@@ -133,8 +133,8 @@ Game.prototype = {
             this.pitchTarget.y = y;
 
             this.pitchInFlight.breakDirection = this.helper.pitchDefinitions[this.pitchInFlight.name].slice(0, 2);
-            this.battersEye = 'looks like: '+(Math.abs(this.pitchInFlight.breakDirection[0])+Math.abs(this.pitchInFlight.breakDirection[1]) > 40 ?
-                'breaking ball' : 'fastball');
+            this.battersEye = text('looks like: ')+(Math.abs(this.pitchInFlight.breakDirection[0])+Math.abs(this.pitchInFlight.breakDirection[1]) > 40 ?
+                text('breaking ball') : text('fastball'));
 
             var control = this.pitchInFlight.control;
             this.pitchTarget.x = Math.min(199.9, Math.max(0.1, this.pitchTarget.x + (50 - Math.random()*100)/(1+control/100)));

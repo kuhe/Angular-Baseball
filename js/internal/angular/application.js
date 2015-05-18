@@ -7,5 +7,3 @@ angular.module('directives', [])
 
 angular.module('controllers', [])
     .controller('IndexController', IndexController);
-
-var mode = 'n';

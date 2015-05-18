@@ -164,8 +164,8 @@
                                 <hr ng-if='y.stage == "pitch"'/>
                                 <li ng-if='y.stage == "pitch"' class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
                                     <span ng-click="selectPitch(name)">
-                                        <strong ng-show='y.pitchInFlight.name == name'>{{ name }}</strong>
-                                        <em ng-show='y.pitchInFlight.name != name'>{{ name }}</em>
+                                        <strong ng-show='y.pitchInFlight.name == name'>{{ t(name) }}</strong>
+                                        <em ng-show='y.pitchInFlight.name != name'>{{ t(name) }}</em>
                                     </span>
                                 </li>
                             </ul>

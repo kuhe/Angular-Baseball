@@ -1,3 +1,5 @@
+var mode = 'n';
+
 text = function(phrase) {
     if (!mode) mode = 'n';
     var string = {
@@ -47,7 +49,10 @@ text = function(phrase) {
             ' struck out looking.': '、見送り三振。',
             ' walked.': '、フォアボール。',
             ' struck out swinging.': '、空振り三振。',
-            'Previous: ': '前：'
+            'Previous: ': '前：',
+            'looks like: ': '予想',
+            'breaking ball': '変化球',
+            'fastball': 'ストレート'
         },
         e : {
             empty: 'empty'

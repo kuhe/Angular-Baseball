@@ -1,3 +1,5 @@
+var mode = 'n';
+
 text = function(phrase) {
     if (!mode) mode = 'n';
     var string = {
@@ -47,7 +49,10 @@ text = function(phrase) {
             ' struck out looking.': '、見送り三振。',
             ' walked.': '、フォアボール。',
             ' struck out swinging.': '、空振り三振。',
-            'Previous: ': '前：'
+            'Previous: ': '前：',
+            'looks like: ': '予想',
+            'breaking ball': '変化球',
+            'fastball': 'ストレート'
         },
         e : {
             empty: 'empty'
@@ -1033,8 +1038,8 @@ Game.prototype = {
             this.pitchTarget.y = y;
 
             this.pitchInFlight.breakDirection = this.helper.pitchDefinitions[this.pitchInFlight.name].slice(0, 2);
-            this.battersEye = 'looks like: '+(Math.abs(this.pitchInFlight.breakDirection[0])+Math.abs(this.pitchInFlight.breakDirection[1]) > 40 ?
-                'breaking ball' : 'fastball');
+            this.battersEye = text('looks like: ')+(Math.abs(this.pitchInFlight.breakDirection[0])+Math.abs(this.pitchInFlight.breakDirection[1]) > 40 ?
+                text('breaking ball') : text('fastball'));
 
             var control = this.pitchInFlight.control;
             this.pitchTarget.x = Math.min(199.9, Math.max(0.1, this.pitchTarget.x + (50 - Math.random()*100)/(1+control/100)));
@@ -1482,9 +1487,15 @@ Umpire.prototype = {
         this.game.deck = this.game.teams.away.lineup[1];
         this.game.hole = this.game.teams.away.lineup[2];
         this.game.pitcher = this.game.teams.home.positions.pitcher;
-        this.game.log.note(
-            'Top 1, '+this.game.teams.away.name+' offense vs. '+this.game.teams.home.positions.pitcher.name+' starting for '+this.game.teams.home.name
-        );
+        if (mode == 'n') {
+            this.game.log.note(
+                '一回のオモテ、'+this.game.teams.away.getName()+'の攻撃対'+this.game.teams.home.getName()+'、ピッチャーは'+this.game.teams.home.positions.pitcher.getName()+'。'
+            );
+        } else {
+            this.game.log.note(
+                'Top 1, '+this.game.teams.away.name+' offense vs. '+this.game.teams.home.positions.pitcher.name+' starting for '+this.game.teams.home.name
+            );
+        }
         this.game.log.noteBatter(
             this.game.batter
         );
@@ -1927,5 +1938,3 @@ angular.module('directives', [])
 
 angular.module('controllers', [])
     .controller('IndexController', IndexController);
-
-var mode = 'n';

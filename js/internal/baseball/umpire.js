@@ -20,9 +20,15 @@ Umpire.prototype = {
         this.game.deck = this.game.teams.away.lineup[1];
         this.game.hole = this.game.teams.away.lineup[2];
         this.game.pitcher = this.game.teams.home.positions.pitcher;
-        this.game.log.note(
-            'Top 1, '+this.game.teams.away.name+' offense vs. '+this.game.teams.home.positions.pitcher.name+' starting for '+this.game.teams.home.name
-        );
+        if (mode == 'n') {
+            this.game.log.note(
+                '一回のオモテ、'+this.game.teams.away.getName()+'の攻撃対'+this.game.teams.home.getName()+'、ピッチャーは'+this.game.teams.home.positions.pitcher.getName()+'。'
+            );
+        } else {
+            this.game.log.note(
+                'Top 1, '+this.game.teams.away.name+' offense vs. '+this.game.teams.home.positions.pitcher.name+' starting for '+this.game.teams.home.name
+            );
+        }
         this.game.log.noteBatter(
             this.game.batter
         );
