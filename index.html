@@ -152,7 +152,7 @@
                                 <div class='indicator baseball pitch hide'></div>
                                 <div class='indicator baseball break hide'></div>
                                 <div class='indicator swing {{y.swingResult.looking ? "hide" : ""}}'
-                                     ng-style='{top:200-y.pitchInFlight.y + y.swingResult.y + "px", left:y.pitchInFlight.x + y.swingResult.x + "px"}'>
+                                     ng-style='{top:200-y.pitchInFlight.y-y.swingResult.y + "px", left:y.pitchInFlight.x + y.swingResult.x + "px"}'>
 
                                 </div>
                                 <div class='strikezone' ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'></div>
