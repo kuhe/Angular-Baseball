@@ -53,7 +53,8 @@ text = function(phrase) {
             'looks like: ': '予想',
             'breaking ball': '変化球',
             'fastball': 'ストレート',
-            'Batting, ': '打球'
+            'Batting, ': '打球',
+            'Catching, pitch selection': '捕球選択'
         },
         e : {
             empty: '-'

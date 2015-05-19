@@ -165,6 +165,8 @@
                             <ul class='list-inline'>
                                 {{y.stage == 'swing' ? t('Batting, ') + y.battersEye : ''}}
                                 <hr ng-if='y.stage == "pitch"'/>
+                                {{y.stage == 'pitch' ? t('Catching, pitch selection') : '' }}
+                                <br>
                                 <li ng-if='y.stage == "pitch"' class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
                                     <span ng-click="selectPitch(name)">
                                         <strong ng-show='y.pitchInFlight.name == name'>{{ t(name) }}</strong>
