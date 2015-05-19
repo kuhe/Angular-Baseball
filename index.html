@@ -163,7 +163,7 @@
                                 Umpire: {{y.umpire.says}}
                             </div>
                             <ul class='list-inline'>
-                                {{y.stage == 'swing' ? 'Batting, ' + y.battersEye : ''}}
+                                {{y.stage == 'swing' ? t('Batting, ') + y.battersEye : ''}}
                                 <hr ng-if='y.stage == "pitch"'/>
                                 <li ng-if='y.stage == "pitch"' class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
                                     <span ng-click="selectPitch(name)">

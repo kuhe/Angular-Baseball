@@ -129,29 +129,34 @@ Log.prototype = {
                     if (r.foul) {
                         // not possible to end PA on foul?
                     } else {
-                        if (r.thrownOut) {
-                            if (Math.random() > 0.5) {
-                                outBy = 'ground';
-                            } else {
-                                outBy = 'thrown';
-                            }
+                        if (r.error) {
+                            bases = 1;
+                            outBy = 'error';
                         } else {
-                            switch (r.bases) {
-                                case 1:
-                                case 2:
-                                case 3:
-                                    bases = r.bases;
-                                    break;
-                                case 4:
-                                    bases = 4;
-                                    if (r.splay < -15) {
-                                        fielder = 'left';
-                                    } else if (r.splay < 15) {
-                                        fielder = 'center';
-                                    } else {
-                                        fielder = 'right';
-                                    }
-                                    break;
+                            if (r.thrownOut) {
+                                if (Math.random() > 0.5) {
+                                    outBy = 'ground';
+                                } else {
+                                    outBy = 'thrown';
+                                }
+                            } else {
+                                switch (r.bases) {
+                                    case 1:
+                                    case 2:
+                                    case 3:
+                                        bases = r.bases;
+                                        break;
+                                    case 4:
+                                        bases = 4;
+                                        if (r.splay < -15) {
+                                            fielder = 'left';
+                                        } else if (r.splay < 15) {
+                                            fielder = 'center';
+                                        } else {
+                                            fielder = 'right';
+                                        }
+                                        break;
+                                }
                             }
                         }
                     }

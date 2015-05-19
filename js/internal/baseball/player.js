@@ -1,8 +1,10 @@
 var Player = function(team) {
     this.init(team);
     var offense = this.skill.offense;
+    var defense = this.skill.defense;
     var randBetween = function(a, b, skill) {
         if (offense[skill]) skill = offense[skill];
+        if (defense[skill]) skill = defense[skill];
         skill = Math.sqrt(0.2 + Math.random()*0.8)*skill;
         return Math.floor((skill/100) * (b - a) + a);
     };
@@ -11,7 +13,6 @@ var Player = function(team) {
     var IP, ER, GS, W, L;
     if (this.skill.pitching > 65) {
         IP = (this.skill.pitching - 65)*gamesIntoSeason/20;
-        ER = Math.floor(Math.random()*40)/100 + ((4.5 - (2*this.skill.pitching/100))/9 * IP);
         ER = (IP/9)*randBetween(800, 315, this.skill.pitching)/100;
         if (IP > gamesIntoSeason) {
             //starter
@@ -40,6 +41,10 @@ var Player = function(team) {
     var hr = randBetween(0, h/5, 'power');
     var r = randBetween(0, (h + bb)/Math.max(1, pa)/5, 'speed') + hr;
     var rbi = randBetween(0, h/3, 'power') + hr;
+
+    var chances = randBetween(0, gamesIntoSeason*10, 'fielding');
+    var E = randBetween(chances/10, 0, 'fielding');
+    var PO = chances - E;
 
     this.stats = {
         pitching : {
@@ -77,8 +82,8 @@ var Player = function(team) {
             hbp : 0
         },
         fielding : {
-            E : 0,
-            PO : Math.floor(Math.random()*20) + 30, // should depend on position
+            E : E,
+            PO : PO, // should depend on position
             A : Math.floor(Math.random()*5) + 1 // ehh should depend on position
         }
     };

@@ -4,7 +4,7 @@ text = function(phrase) {
     if (!mode) mode = 'n';
     var string = {
         n : {
-            empty: '空',
+            empty: '-',
             ' 1st' : '一番',
             ' 2nd' : '二番',
             ' 3rd' : '三番',
@@ -52,10 +52,11 @@ text = function(phrase) {
             'Previous: ': '前：',
             'looks like: ': '予想',
             'breaking ball': '変化球',
-            'fastball': 'ストレート'
+            'fastball': 'ストレート',
+            'Batting, ': '打球'
         },
         e : {
-            empty: 'empty'
+            empty: '-'
         }
     }[mode][phrase];
     return string ? string : phrase;
@@ -128,6 +129,9 @@ text.contactResult = function(batter, fielder, bases, outBy) {
         statement += batter;
         if (outBy) {
             switch (outBy) {
+                case 'error':
+                    statement += ' reached on error by ' + text.fielderShortName(fielder);
+                    break;
                 case 'pop':
                     statement += ' popped out to ' + text.fielderShortName(fielder);
                     break;
@@ -145,7 +149,7 @@ text.contactResult = function(batter, fielder, bases, outBy) {
             switch (bases) {
                 case 1:
                     if (infield) {
-                        statement += ' reached first on an infield hit to ' + text.fielderShortName(fielder);
+                        statement += ' reached on an infield hit to ' + text.fielderShortName(fielder);
                     } else {
                         statement += ' reached on a single to ' + text.fielderShortName(fielder);
                     }
@@ -168,6 +172,9 @@ text.contactResult = function(batter, fielder, bases, outBy) {
         if (outBy) {
             fielder = text.fielderShortName(fielder);
             switch (outBy) {
+                case 'error':
+                    statement += 'エラー('+fielder+')で出塁';
+                    break;
                 case 'pop':
                     statement += 'ポップフライで' + fielder + '飛';
                     break;
@@ -198,7 +205,7 @@ text.contactResult = function(batter, fielder, bases, outBy) {
                     statement += '三塁打（'+fielder+'）で出塁';
                     break;
                 case 4:
-                    statement += '本塁打（'+fielder+'）を打った';
+                    statement += '本塁打（'+fielder+'）';
                     break;
             }
         }
@@ -651,29 +658,34 @@ Log.prototype = {
                     if (r.foul) {
                         // not possible to end PA on foul?
                     } else {
-                        if (r.thrownOut) {
-                            if (Math.random() > 0.5) {
-                                outBy = 'ground';
-                            } else {
-                                outBy = 'thrown';
-                            }
+                        if (r.error) {
+                            bases = 1;
+                            outBy = 'error';
                         } else {
-                            switch (r.bases) {
-                                case 1:
-                                case 2:
-                                case 3:
-                                    bases = r.bases;
-                                    break;
-                                case 4:
-                                    bases = 4;
-                                    if (r.splay < -15) {
-                                        fielder = 'left';
-                                    } else if (r.splay < 15) {
-                                        fielder = 'center';
-                                    } else {
-                                        fielder = 'right';
-                                    }
-                                    break;
+                            if (r.thrownOut) {
+                                if (Math.random() > 0.5) {
+                                    outBy = 'ground';
+                                } else {
+                                    outBy = 'thrown';
+                                }
+                            } else {
+                                switch (r.bases) {
+                                    case 1:
+                                    case 2:
+                                    case 3:
+                                        bases = r.bases;
+                                        break;
+                                    case 4:
+                                        bases = 4;
+                                        if (r.splay < -15) {
+                                            fielder = 'left';
+                                        } else if (r.splay < 15) {
+                                            fielder = 'center';
+                                        } else {
+                                            fielder = 'right';
+                                        }
+                                        break;
+                                }
                             }
                         }
                     }
@@ -748,16 +760,15 @@ Field.prototype = {
 
         if (swing.fielder) {
             var fielder = (this.game.half == top ? this.game.teams.home.positions[swing.fielder] : this.game.teams.away.positions[swing.fielder]);
-
+            swing.error = false;
             var fieldingEase = fielder.skill.defense.fielding/100;
             //reach the batted ball?
             swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle, landingDistance]);
             var interceptRating = fielder.skill.defense.speed + flyAngle - swing.fielderTravel*1.65;
             if (interceptRating > 0 && flyAngle > -10) {
                 //caught cleanly?
-                if ((100-fielder.skill.defense)*0.08 > Math.random()) { //error
+                if ((100-fielder.skill.defense.fielding)*0.25 + 0.02 > Math.random()) { //error
                     fieldingEase *= 0.5;
-                    this.game.tally[this.game.half == 'top' ? 'home' : 'away']['E']++;
                     swing.error = true;
                     swing.caught = false;
                 } else {
@@ -770,17 +781,22 @@ Field.prototype = {
                 if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] != 1 && (interceptRating/(1 + fielder.skill.defense.throwing/100))/fieldingEase
                        -this.game.batter.skill.offense.speed > -75) {
                     swing.thrownOut = true;
+                    swing.error = false;
                 } else {
                     swing.thrownOut = false;
                     swing.bases = 1;
                     if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1) {
                         var fieldingReturnDelay = -1*((interceptRating/(1 + fielder.skill.defense.throwing/100))/fieldingEase - this.game.batter.skill.offense.speed);
-                        log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
                         while (fieldingReturnDelay - 100 > 0 && swing.bases <= 3) {
                             swing.bases++;
                             fieldingReturnDelay  -= 80;
                         }
                     }
+                }
+                log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
+                if (swing.error && swing.bases > 0) {
+                    this.game.tally[this.game.half == 'top' ? 'home' : 'away']['E']++;
+                    fielder.stats.fielding.E++;
                 }
             }
         } else {
@@ -983,9 +999,9 @@ Game.prototype = {
         if (this.stage == 'pitch') {
             this.autoPitchSelect();
             if (Math.random() < 0.5) {
-                var x = 50 + Math.floor(Math.random()*25) - Math.floor(Math.random()*25);
+                var x = 50 + Math.floor(Math.random()*50) - Math.floor(Math.random()*25);
             } else {
-                x = 150 + Math.floor(Math.random()*25) - Math.floor(Math.random()*25);
+                x = 150 + Math.floor(Math.random()*25) - Math.floor(Math.random()*50);
             }
             var y = 200 - Math.floor(Math.sqrt(Math.random()*40000));
             this.thePitch(x, y);
@@ -1242,8 +1258,10 @@ Manager.prototype = {
 var Player = function(team) {
     this.init(team);
     var offense = this.skill.offense;
+    var defense = this.skill.defense;
     var randBetween = function(a, b, skill) {
         if (offense[skill]) skill = offense[skill];
+        if (defense[skill]) skill = defense[skill];
         skill = Math.sqrt(0.2 + Math.random()*0.8)*skill;
         return Math.floor((skill/100) * (b - a) + a);
     };
@@ -1252,7 +1270,6 @@ var Player = function(team) {
     var IP, ER, GS, W, L;
     if (this.skill.pitching > 65) {
         IP = (this.skill.pitching - 65)*gamesIntoSeason/20;
-        ER = Math.floor(Math.random()*40)/100 + ((4.5 - (2*this.skill.pitching/100))/9 * IP);
         ER = (IP/9)*randBetween(800, 315, this.skill.pitching)/100;
         if (IP > gamesIntoSeason) {
             //starter
@@ -1281,6 +1298,10 @@ var Player = function(team) {
     var hr = randBetween(0, h/5, 'power');
     var r = randBetween(0, (h + bb)/Math.max(1, pa)/5, 'speed') + hr;
     var rbi = randBetween(0, h/3, 'power') + hr;
+
+    var chances = randBetween(0, gamesIntoSeason*10, 'fielding');
+    var E = randBetween(chances/10, 0, 'fielding');
+    var PO = chances - E;
 
     this.stats = {
         pitching : {
@@ -1318,8 +1339,8 @@ var Player = function(team) {
             hbp : 0
         },
         fielding : {
-            E : 0,
-            PO : Math.floor(Math.random()*20) + 30, // should depend on position
+            E : E,
+            PO : PO, // should depend on position
             A : Math.floor(Math.random()*5) + 1 // ehh should depend on position
         }
     };
@@ -1562,8 +1583,12 @@ Umpire.prototype = {
                                     this.game.batter.atBats.push('GO');
                                     break;
                                 case 1 :
-                                    this.game.batter.atBats.push('H');
-                                    batter.stats.batting.h++;
+                                    if (result.error) {
+                                        this.game.batter.atBats.push('ROE');
+                                    } else {
+                                        this.game.batter.atBats.push('H');
+                                        batter.stats.batting.h++;
+                                    }
                                     break;
                                 case 2 :
                                     this.game.batter.atBats.push('2B');

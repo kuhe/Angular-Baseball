@@ -4,7 +4,7 @@ text = function(phrase) {
     if (!mode) mode = 'n';
     var string = {
         n : {
-            empty: '空',
+            empty: '-',
             ' 1st' : '一番',
             ' 2nd' : '二番',
             ' 3rd' : '三番',
@@ -52,10 +52,11 @@ text = function(phrase) {
             'Previous: ': '前：',
             'looks like: ': '予想',
             'breaking ball': '変化球',
-            'fastball': 'ストレート'
+            'fastball': 'ストレート',
+            'Batting, ': '打球'
         },
         e : {
-            empty: 'empty'
+            empty: '-'
         }
     }[mode][phrase];
     return string ? string : phrase;
@@ -128,6 +129,9 @@ text.contactResult = function(batter, fielder, bases, outBy) {
         statement += batter;
         if (outBy) {
             switch (outBy) {
+                case 'error':
+                    statement += ' reached on error by ' + text.fielderShortName(fielder);
+                    break;
                 case 'pop':
                     statement += ' popped out to ' + text.fielderShortName(fielder);
                     break;
@@ -145,7 +149,7 @@ text.contactResult = function(batter, fielder, bases, outBy) {
             switch (bases) {
                 case 1:
                     if (infield) {
-                        statement += ' reached first on an infield hit to ' + text.fielderShortName(fielder);
+                        statement += ' reached on an infield hit to ' + text.fielderShortName(fielder);
                     } else {
                         statement += ' reached on a single to ' + text.fielderShortName(fielder);
                     }
@@ -168,6 +172,9 @@ text.contactResult = function(batter, fielder, bases, outBy) {
         if (outBy) {
             fielder = text.fielderShortName(fielder);
             switch (outBy) {
+                case 'error':
+                    statement += 'エラー('+fielder+')で出塁';
+                    break;
                 case 'pop':
                     statement += 'ポップフライで' + fielder + '飛';
                     break;
@@ -198,7 +205,7 @@ text.contactResult = function(batter, fielder, bases, outBy) {
                     statement += '三塁打（'+fielder+'）で出塁';
                     break;
                 case 4:
-                    statement += '本塁打（'+fielder+'）を打った';
+                    statement += '本塁打（'+fielder+'）';
                     break;
             }
         }

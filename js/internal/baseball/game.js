@@ -76,9 +76,9 @@ Game.prototype = {
         if (this.stage == 'pitch') {
             this.autoPitchSelect();
             if (Math.random() < 0.5) {
-                var x = 50 + Math.floor(Math.random()*25) - Math.floor(Math.random()*25);
+                var x = 50 + Math.floor(Math.random()*50) - Math.floor(Math.random()*25);
             } else {
-                x = 150 + Math.floor(Math.random()*25) - Math.floor(Math.random()*25);
+                x = 150 + Math.floor(Math.random()*25) - Math.floor(Math.random()*50);
             }
             var y = 200 - Math.floor(Math.sqrt(Math.random()*40000));
             this.thePitch(x, y);

@@ -42,16 +42,15 @@ Field.prototype = {
 
         if (swing.fielder) {
             var fielder = (this.game.half == top ? this.game.teams.home.positions[swing.fielder] : this.game.teams.away.positions[swing.fielder]);
-
+            swing.error = false;
             var fieldingEase = fielder.skill.defense.fielding/100;
             //reach the batted ball?
             swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle, landingDistance]);
             var interceptRating = fielder.skill.defense.speed + flyAngle - swing.fielderTravel*1.65;
             if (interceptRating > 0 && flyAngle > -10) {
                 //caught cleanly?
-                if ((100-fielder.skill.defense)*0.08 > Math.random()) { //error
+                if ((100-fielder.skill.defense.fielding)*0.25 + 0.02 > Math.random()) { //error
                     fieldingEase *= 0.5;
-                    this.game.tally[this.game.half == 'top' ? 'home' : 'away']['E']++;
                     swing.error = true;
                     swing.caught = false;
                 } else {
@@ -64,17 +63,22 @@ Field.prototype = {
                 if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] != 1 && (interceptRating/(1 + fielder.skill.defense.throwing/100))/fieldingEase
                        -this.game.batter.skill.offense.speed > -75) {
                     swing.thrownOut = true;
+                    swing.error = false;
                 } else {
                     swing.thrownOut = false;
                     swing.bases = 1;
                     if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1) {
                         var fieldingReturnDelay = -1*((interceptRating/(1 + fielder.skill.defense.throwing/100))/fieldingEase - this.game.batter.skill.offense.speed);
-                        log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
                         while (fieldingReturnDelay - 100 > 0 && swing.bases <= 3) {
                             swing.bases++;
                             fieldingReturnDelay  -= 80;
                         }
                     }
+                }
+                log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
+                if (swing.error && swing.bases > 0) {
+                    this.game.tally[this.game.half == 'top' ? 'home' : 'away']['E']++;
+                    fielder.stats.fielding.E++;
                 }
             }
         } else {

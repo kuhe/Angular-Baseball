@@ -80,8 +80,12 @@ Umpire.prototype = {
                                     this.game.batter.atBats.push('GO');
                                     break;
                                 case 1 :
-                                    this.game.batter.atBats.push('H');
-                                    batter.stats.batting.h++;
+                                    if (result.error) {
+                                        this.game.batter.atBats.push('ROE');
+                                    } else {
+                                        this.game.batter.atBats.push('H');
+                                        batter.stats.batting.h++;
+                                    }
                                     break;
                                 case 2 :
                                     this.game.batter.atBats.push('2B');
