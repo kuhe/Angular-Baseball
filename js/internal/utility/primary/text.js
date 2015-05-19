@@ -54,7 +54,19 @@ text = function(phrase) {
             'breaking ball': '変化球',
             'fastball': 'ストレート',
             'Batting, ': '打球',
-            'Catching, pitch selection': '捕球選択'
+            'Catching, pitch selection': '捕球選択',
+            'Season': 'シーズン',
+            'Game': '試合',
+            'Pitch': '球',
+            'Control': '制球',
+            'Velocity': '速度',
+            'Break': '変化',
+            'At Bat :': 'バッタ',
+            'On Deck :': '次バッタ',
+            'Eye :': '目',
+            'Power :': '力',
+            'Speed :': '速',
+            'Up to Bat': '打席'
         },
         e : {
             empty: '-'

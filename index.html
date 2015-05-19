@@ -206,14 +206,14 @@
                             </div>
                             <div class='row'>
                                 <div class='col-xs-3'>
-                                    Season
+                                    {{ t('Season') }}
                                     <br>
                                     {{y.pitcher.stats.pitching.W}} - {{y.pitcher.stats.pitching.L}}, {{y.pitcher.stats.pitching.GS}} GS
                                     <br>
                                     {{y.pitcher.stats.pitching.getERA() | number:2}} ERA
                                 </div>
                                 <div class='col-xs-2'>
-                                    Game:
+                                    {{ t('Game') }}
                                     <br>
                                     {{y.pitcher.stats.pitching.strikes}} - {{y.pitcher.stats.pitching.pitches}}
                                     <br>
@@ -228,21 +228,21 @@
                             <table class='list-group-item table table-condensed'>
                                 <thead>
                                     <tr>
-                                        <th>Pitch</th>
+                                        <th>{{ t('Pitch') }}</th>
                                         <th class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
-                                            <span ng-click="selectPitch(name)">{{name}}</span>
+                                            <span ng-click="selectPitch(name)">{{t(name)}}</span>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Control</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'>{{rate(pitch.control)}}</td>
+                                        <td>{{ t('Control') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'>{{rate(pitch.control)}}</td>
                                     </tr>
                                     <tr>
-                                        <td>Velocity</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'>{{rate(pitch.velocity)}}</td>
+                                        <td>{{ t('Velocity') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'>{{rate(pitch.velocity)}}</td>
                                     </tr>
                                     <tr>
-                                        <td>Break</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'>{{rate(pitch.break)}}</td>
+                                        <td>{{ t('Break') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'>{{rate(pitch.break)}}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -253,7 +253,7 @@
                     <div class='row'>
                         <div class='col-lg-6'>
                             <div>
-                                At Bat: <strong>{{y.batter.getName()}}</strong> ({{y.batter.number}}) - <em>{{abbreviatePosition(y.batter.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}</em>
+                                {{ t('At Bat :') }} <strong>{{y.batter.getName()}}</strong> ({{y.batter.number}}) - <em>{{abbreviatePosition(y.batter.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}</em>
                             </div>
                             <div class='row'>
                                 <div class='col-xs-6'>
@@ -265,13 +265,13 @@
                                 </div>
                                 <div class='col-xs-6'>
                                     <div>
-                                        Eye : {{rate(y.batter.skill.offense.eye)}}
+                                        {{ t('Eye :') }} {{rate(y.batter.skill.offense.eye)}}
                                     </div>
                                     <div>
-                                        Power : {{rate(y.batter.skill.offense.power)}}
+                                        {{ t('Power :') }} {{rate(y.batter.skill.offense.power)}}
                                     </div>
                                     <div>
-                                        Speed : {{rate(y.batter.skill.offense.speed)}}
+                                        {{ t('Speed :') }} {{rate(y.batter.skill.offense.speed)}}
                                     </div>
                                     <div>
                                         - {{y.batter.atBats.join(', ')}} -
@@ -281,7 +281,7 @@
                         </div>
                         <div class='col-lg-6'>
                             <div>
-                                On Deck : <strong>{{y.deck.getName()}}</strong> ({{y.deck.number}}) - {{abbreviatePosition(y.deck.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}
+                                {{ t('On Deck :') }} <strong>{{y.deck.getName()}}</strong> ({{y.deck.number}}) - {{abbreviatePosition(y.deck.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}
                             </div>
                             <div class='row'>
                                 <div class='col-xs-6'>
@@ -293,13 +293,13 @@
                                 </div>
                                 <div class='col-xs-6'>
                                     <div>
-                                        Eye : {{rate(y.deck.skill.offense.eye)}}
+                                        {{ t('Eye :') }} {{rate(y.deck.skill.offense.eye)}}
                                     </div>
                                     <div>
-                                        Power : {{rate(y.deck.skill.offense.power)}}
+                                        {{ t('Power :') }} {{rate(y.deck.skill.offense.power)}}
                                     </div>
                                     <div>
-                                        Speed : {{rate(y.deck.skill.offense.speed)}}
+                                        {{ t('Speed :') }} {{rate(y.deck.skill.offense.speed)}}
                                     </div>
                                     <div>
                                         - {{y.deck.atBats.join(', ')}} -
@@ -334,7 +334,7 @@
                         - {{player.stats.batting.ba | number:3}}
                         - {{player.stats.batting.getBA() | number:3}}
                         <span class='pull-right'>
-                            {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - Up to Bat' : ''}}</em>
+                            {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
                         </span>
                     </li>
                 </ul>
@@ -348,7 +348,7 @@
                         - {{player.stats.batting.ba | number:3}}
                         - {{player.stats.batting.getBA() | number:3}}
                         <span class='pull-right'>
-                            {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - Up to Bat' : ''}}</em>
+                            {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
                         </span>
                     </li>
                 </ul>
