@@ -773,11 +773,13 @@ Field.prototype = {
                 } else {
                     swing.thrownOut = false;
                     swing.bases = 1;
-                    var fieldingReturnDelay = -1*((interceptRating/(1 + fielder.skill.defense.throwing/100))/fieldingEase - this.game.batter.skill.offense.speed);
-                    log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
-                    while (fieldingReturnDelay - 100 > 0 && swing.bases <= 3) {
-                        swing.bases++;
-                        fieldingReturnDelay  -= 80;
+                    if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1) {
+                        var fieldingReturnDelay = -1*((interceptRating/(1 + fielder.skill.defense.throwing/100))/fieldingEase - this.game.batter.skill.offense.speed);
+                        log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
+                        while (fieldingReturnDelay - 100 > 0 && swing.bases <= 3) {
+                            swing.bases++;
+                            fieldingReturnDelay  -= 80;
+                        }
                     }
                 }
             }
@@ -980,31 +982,44 @@ Game.prototype = {
     autoPitch : function() {
         if (this.stage == 'pitch') {
             this.autoPitchSelect();
-            var x = 100 + Math.floor(Math.random()*100) - Math.floor(Math.random()*100);
-            var y = Math.floor(Math.sqrt(Math.random()*40000));
+            if (Math.random() < 0.5) {
+                var x = 50 + Math.floor(Math.random()*25) - Math.floor(Math.random()*25);
+            } else {
+                x = 150 + Math.floor(Math.random()*25) - Math.floor(Math.random()*25);
+            }
+            var y = 200 - Math.floor(Math.sqrt(Math.random()*40000));
             this.thePitch(x, y);
         }
     },
     autoSwing : function(deceptiveX, deceptiveY) {
-        var x = Math.floor(Math.random()*200), y = Math.floor(Math.random()*200);
+        var x = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15),
+            y = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15);
+        var convergence = 1.35 * this.batter.skill.offense.eye/100,
+            convergenceSum = 1 + convergence;
         if (100*Math.random() < this.batter.skill.offense.eye) {
-            x = (this.pitchInFlight.x*(1 + 3*this.batter.skill.offense.eye/100) + x)/4;
-            y = (this.pitchInFlight.y*(1 + 3*this.batter.skill.offense.eye/100) + y)/4;
-        } else {
-            x = (deceptiveX*(1 + 3*this.batter.skill.offense.eye/100) + x)/4;
-            y = (deceptiveY*(1 + 3*this.batter.skill.offense.eye/100) + y)/4;
+            deceptiveX = this.pitchInFlight.x;
+            deceptiveY = this.pitchInFlight.y;
         }
-        var swingLikelihood = 50;
-        if (x < 50 || x > 150 || y < 35 || y > 165) {
-            swingLikelihood = Math.min(50, (100 - (this.batter.skill.offense.eye)));
+        x = (deceptiveX*(convergence) + x)/convergenceSum;
+        y = (deceptiveY*(convergence) + y)/convergenceSum;
+
+        var swingLikelihood = (200 - Math.abs(100 - x) - Math.abs(100 - y))/2;
+
+        if (x < 60 || x > 140 || y < 50 || y > 150) { // ball
+            swingLikelihood = Math.min(swingLikelihood, 100 - this.batter.skill.offense.eye);
         } else {
-            swingLikelihood = Math.min(50, this.batter.skill.offense.eye);
+            swingLikelihood = Math.max(45, (swingLikelihood + this.batter.skill.offense.eye)/2);
         }
+
+        log('actual pitch target', deceptiveX, deceptiveY);
+        log('swing target', x, y);
+        console.log('swing likelihood', swingLikelihood, - 10*(this.umpire.count.balls - this.umpire.count.strikes));
+
         if (swingLikelihood - 10*(this.umpire.count.balls - this.umpire.count.strikes) > Math.random()*100) {
+            this.theSwing(x, y);
+        } else {
             // no swing;
             this.theSwing(-20, y);
-        } else {
-            this.theSwing(x, y);
         }
     },
     pitchTarget : {x : 100, y : 100},
@@ -1845,11 +1860,11 @@ IndexController = function($scope) {
             $baseballs.addClass('hide');
         } else {
             if (game.humanBatting()) {
-                jQ('.baseball.pitch').addClass('hide');
+                jQ('.baseball.break').addClass('hide');
             } else {
-                jQ('.baseball.pitch').removeClass('hide');
+                jQ('.baseball.break').removeClass('hide');
             }
-            jQ('.baseball.break').removeClass('hide');
+            jQ('.baseball.pitch').removeClass('hide');
         }
         jQ('.baseball.pitch').css({
             top: 200-game.pitchTarget.y,

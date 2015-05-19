@@ -67,11 +67,13 @@ Field.prototype = {
                 } else {
                     swing.thrownOut = false;
                     swing.bases = 1;
-                    var fieldingReturnDelay = -1*((interceptRating/(1 + fielder.skill.defense.throwing/100))/fieldingEase - this.game.batter.skill.offense.speed);
-                    log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
-                    while (fieldingReturnDelay - 100 > 0 && swing.bases <= 3) {
-                        swing.bases++;
-                        fieldingReturnDelay  -= 80;
+                    if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1) {
+                        var fieldingReturnDelay = -1*((interceptRating/(1 + fielder.skill.defense.throwing/100))/fieldingEase - this.game.batter.skill.offense.speed);
+                        log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
+                        while (fieldingReturnDelay - 100 > 0 && swing.bases <= 3) {
+                            swing.bases++;
+                            fieldingReturnDelay  -= 80;
+                        }
                     }
                 }
             }

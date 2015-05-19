@@ -67,11 +67,11 @@ IndexController = function($scope) {
             $baseballs.addClass('hide');
         } else {
             if (game.humanBatting()) {
-                jQ('.baseball.pitch').addClass('hide');
+                jQ('.baseball.break').addClass('hide');
             } else {
-                jQ('.baseball.pitch').removeClass('hide');
+                jQ('.baseball.break').removeClass('hide');
             }
-            jQ('.baseball.break').removeClass('hide');
+            jQ('.baseball.pitch').removeClass('hide');
         }
         jQ('.baseball.pitch').css({
             top: 200-game.pitchTarget.y,
