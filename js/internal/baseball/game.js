@@ -170,8 +170,11 @@ Game.prototype = {
     theSwing : function(x, y) {
         if (this.stage == 'swing') {
             this.swingResult = {};
-            this.swingResult.x = (x - this.pitchInFlight.x)/(0.5+Math.random()*this.batter.skill.offense.eye/50);
-            this.swingResult.y = (y - this.pitchInFlight.y)/(0.5+Math.random()*this.batter.skill.offense.eye/50);
+            this.swingResult.x = (100 - x)/(0.5+Math.random()*this.batter.skill.offense.eye/50);
+            this.swingResult.y = (100 - y)/(0.5+Math.random()*this.batter.skill.offense.eye/50);
+
+            log('click', x, y);
+            log('swing', this.swingResult.x, this.swingResult.y);
 
             if (!(x < 0 || x > 200)) {
                 this.swingResult.looking = false;
