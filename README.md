@@ -12,10 +12,12 @@ currently hosted at [georgefu.info/y/](htttp://georgefu.info/y)
 
 todo :
 
+    直球か変化球かのスイング
+
     AIバッター騙される方法
 
     送りバント
 
-    日本語版
-
     選手名前なんか足りないじゃん
+
+    攻撃の難しさ

@@ -195,12 +195,12 @@
                     <div>
                         <div class='row list-group-item'>
                             <div class='col-lg-6'>
-                                <em>{{y.pitcher.throws == 'right' ? 'RHP' : 'LHP'}}</em>
+                                <em>{{y.pitcher.throws == 'right' ? 'RHP' : 'LHP'}}</em> &raquo;
                                 <strong>{{y.pitcher.getName()}}</strong>
                                 ({{t('#')+y.pitcher.number}})
                             </div>
                             <div class='col-lg-6'>
-                                <em>C</em>
+                                <em>C</em> &raquo;
                                 <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
                                 ({{t('#')+y.pitcher.team.positions.catcher.number}})
                             </div>
@@ -253,7 +253,7 @@
                     <div class='row'>
                         <div class='col-lg-6'>
                             <div>
-                                {{ t('At Bat :') }} <strong>{{y.batter.getName()}}</strong> ({{y.batter.number}}) - <em>{{abbreviatePosition(y.batter.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}</em>
+                                {{ t('At Bat :') }} &raquo; <strong>{{y.batter.getName()}}</strong> ({{y.batter.number}}) - <em>{{abbreviatePosition(y.batter.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}</em>
                             </div>
                             <div class='row'>
                                 <div class='col-xs-6'>
@@ -285,7 +285,7 @@
                         </div>
                         <div class='col-lg-6'>
                             <div>
-                                {{ t('On Deck :') }} <strong>{{y.deck.getName()}}</strong> ({{y.deck.number}}) - {{abbreviatePosition(y.deck.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}
+                                {{ t('On Deck :') }} &raquo; <strong>{{y.deck.getName()}}</strong> ({{y.deck.number}}) - {{abbreviatePosition(y.deck.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}
                             </div>
                             <div class='row'>
                                 <div class='col-xs-6'>
