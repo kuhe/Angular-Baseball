@@ -1012,11 +1012,12 @@ Game.prototype = {
         if (this.stage == 'pitch') {
             this.autoPitchSelect();
             if (Math.random() < 0.5) {
-                var x = 50 + Math.floor(Math.random()*50) - Math.floor(Math.random()*25);
+                var x = 50 + Math.floor(Math.random()*70) - Math.floor(Math.random()*15);
             } else {
-                x = 150 + Math.floor(Math.random()*25) - Math.floor(Math.random()*50);
+                x = 150 + Math.floor(Math.random()*15) - Math.floor(Math.random()*70);
             }
-            var y = 200 - Math.floor(Math.sqrt(Math.random()*40000));
+            var y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
+            log(x, y);
             this.thePitch(x, y);
         }
     },
@@ -1039,10 +1040,6 @@ Game.prototype = {
         } else {
             swingLikelihood = Math.max(45, (swingLikelihood + this.batter.skill.offense.eye)/2);
         }
-
-        log('actual pitch target', deceptiveX, deceptiveY);
-        log('swing target', x, y);
-        console.log('swing likelihood', swingLikelihood, - 10*(this.umpire.count.balls - this.umpire.count.strikes));
 
         if (swingLikelihood - 10*(this.umpire.count.balls - this.umpire.count.strikes) > Math.random()*100) {
             this.theSwing(x, y);
@@ -1941,6 +1938,9 @@ IndexController = function($scope) {
         $scope.updateFlightPath($event);
     };
     $scope.rate = function(rating) {
+
+        return
+
         if (rating > 95) {
             return 'A+';
         } else if (rating > 90) {

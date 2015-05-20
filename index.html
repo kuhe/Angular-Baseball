@@ -197,12 +197,12 @@
                             <div class='col-lg-6'>
                                 <em>{{y.pitcher.throws == 'right' ? 'RHP' : 'LHP'}}</em>
                                 <strong>{{y.pitcher.getName()}}</strong> ({{y.pitcher.number}})
-                                &raquo; {{rate(y.pitcher.skill.pitching)}}
+                                &raquo; <span class='rating-block' ng-style='{opacity: y.pitcher.skill.pitching/100}'></span>
                             </div>
                             <div class='col-lg-6'>
                                 <em>C</em> <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
                                 ({{y.pitcher.team.positions.catcher.number}})
-                                &raquo; {{rate(y.pitcher.team.positions.catcher.skill.defense.catching)}}
+                                &raquo; <span class='rating-block' ng-style='{opacity: y.pitcher.team.positions.catcher.skill.defense.catching/100}'></span>
                             </div>
                             <div class='row'>
                                 <div class='col-xs-3'>
@@ -236,13 +236,13 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>{{ t('Control') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'>{{rate(pitch.control)}}</td>
+                                        <td>{{ t('Control') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{opacity: pitch.control/100}'></span></td>
                                     </tr>
                                     <tr>
-                                        <td>{{ t('Velocity') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'>{{rate(pitch.velocity)}}</td>
+                                        <td>{{ t('Velocity') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{opacity: pitch.velocity/100}'></span></td>
                                     </tr>
                                     <tr>
-                                        <td>{{ t('Break') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'>{{rate(pitch.break)}}</td>
+                                        <td>{{ t('Break') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{opacity: pitch.break/100}'></span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -265,13 +265,13 @@
                                 </div>
                                 <div class='col-xs-6'>
                                     <div>
-                                        {{ t('Eye :') }} {{rate(y.batter.skill.offense.eye)}}
+                                        {{ t('Eye :') }} <span class='rating-block' ng-style='{opacity: y.batter.skill.offense.eye/100}'></span>
                                     </div>
                                     <div>
-                                        {{ t('Power :') }} {{rate(y.batter.skill.offense.power)}}
+                                        {{ t('Power :') }} <span class='rating-block' ng-style='{opacity: y.batter.skill.offense.power/100}'></span>
                                     </div>
                                     <div>
-                                        {{ t('Speed :') }} {{rate(y.batter.skill.offense.speed)}}
+                                        {{ t('Speed :') }} <span class='rating-block' ng-style='{opacity: y.batter.skill.offense.speed/100}'></span>
                                     </div>
                                     <div>
                                         - {{y.batter.atBats.join(', ')}} -
@@ -293,13 +293,13 @@
                                 </div>
                                 <div class='col-xs-6'>
                                     <div>
-                                        {{ t('Eye :') }} {{rate(y.deck.skill.offense.eye)}}
+                                        {{ t('Eye :') }} <span class='rating-block' ng-style='{opacity: y.deck.skill.offense.eye/100}'></span>
                                     </div>
                                     <div>
-                                        {{ t('Power :') }} {{rate(y.deck.skill.offense.power)}}
+                                        {{ t('Power :') }} <span class='rating-block' ng-style='{opacity: y.deck.skill.offense.power/100}'></span>
                                     </div>
                                     <div>
-                                        {{ t('Speed :') }} {{rate(y.deck.skill.offense.speed)}}
+                                        {{ t('Speed :') }} <span class='rating-block' ng-style='{opacity: y.deck.skill.offense.speed/100}'></span>
                                     </div>
                                     <div>
                                         - {{y.deck.atBats.join(', ')}} -

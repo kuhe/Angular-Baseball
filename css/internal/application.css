@@ -473,6 +473,11 @@ html body {
   display: inline-block;
   text-align: center;
 }
+.rating-block {
+  margin: 0 6px;
+  padding: 0 6px;
+  background: black;
+}
 .centered {
   text-align: center;
   margin: auto;

@@ -110,6 +110,9 @@ IndexController = function($scope) {
         $scope.updateFlightPath($event);
     };
     $scope.rate = function(rating) {
+
+        return
+
         if (rating > 95) {
             return 'A+';
         } else if (rating > 90) {
