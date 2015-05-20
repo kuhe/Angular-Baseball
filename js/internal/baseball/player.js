@@ -5,6 +5,7 @@ var Player = function(team) {
     var randBetween = function(a, b, skill) {
         if (offense[skill]) skill = offense[skill];
         if (defense[skill]) skill = defense[skill];
+        if (isNaN(skill)) skill = 50;
         skill = Math.sqrt(0.2 + Math.random()*0.8)*skill;
         return Math.floor((skill/100) * (b - a) + a);
     };
@@ -41,6 +42,8 @@ var Player = function(team) {
     var hr = randBetween(0, h/5, 'power');
     var r = randBetween(0, (h + bb)/Math.max(1, pa)/5, 'speed') + hr;
     var rbi = randBetween(0, h/3, 'power') + hr;
+    var hbp = randBetween(0, gamesIntoSeason/25);
+    var sf = randBetween(0, gamesIntoSeason/5, 'eye');
 
     var chances = randBetween(0, gamesIntoSeason*10, 'fielding');
     var E = randBetween(chances/10, 0, 'fielding');
@@ -69,6 +72,14 @@ var Player = function(team) {
                 return this.h / (Math.max(1, this.ab))
             },
             ba : null,
+            getOBP : function() {
+                return (h + bb + hbp)/(ab + bb + hbp + sf);
+            },
+            obp : null,
+            getSLG : function() {
+                return ((h - doubles - triples - hr) + 2*doubles + 3*triples + 4*hr)/ab
+            },
+            slg : null,
             pa : pa,
             ab : ab,
             so : so,
@@ -79,7 +90,7 @@ var Player = function(team) {
             hr : hr,
             r : r,
             rbi : rbi,
-            hbp : 0
+            hbp : hbp
         },
         fielding : {
             E : E,

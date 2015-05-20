@@ -7,7 +7,7 @@ Game.prototype = {
     gamesIntoSeason : 0,
     init : function(m) {
         if (m) window.mode = m;
-        this.gamesIntoSeason = 15 + Math.floor(Math.random()*60);
+        this.gamesIntoSeason = 60 + Math.floor(Math.random()*20);
         this.field = new Field(this);
         this.teams.away = new Team(this);
         this.teams.home = new Team(this);

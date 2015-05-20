@@ -66,7 +66,8 @@ text = function(phrase) {
             'Eye :': '目',
             'Power :': '力',
             'Speed :': '速',
-            'Up to Bat': '打席'
+            'Up to Bat': '打席',
+            'Fielding': '守備'
         },
         e : {
             empty: '-'
@@ -206,9 +207,9 @@ text.contactResult = function(batter, fielder, bases, outBy) {
             switch (bases) {
                 case 1:
                     if (infield) {
-                        statement += '内野' + '('+fielder+')'+ '安打で出塁';
+                        statement += '内野安打' + '('+fielder+')'+ 'で出塁';
                     } else {
-                        statement += '('+fielder+')' + '安打で出塁';
+                        statement += '安打('+fielder+')' + 'で出塁';
                     }
                     break;
                 case 2:

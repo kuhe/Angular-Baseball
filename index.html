@@ -196,13 +196,13 @@
                         <div class='row list-group-item'>
                             <div class='col-lg-6'>
                                 <em>{{y.pitcher.throws == 'right' ? 'RHP' : 'LHP'}}</em>
-                                <strong>{{y.pitcher.getName()}}</strong> ({{y.pitcher.number}})
-                                &raquo; <span class='rating-block' ng-style='{opacity: y.pitcher.skill.pitching/100}'></span>
+                                <strong>{{y.pitcher.getName()}}</strong>
+                                ({{t('#')+y.pitcher.number}})
                             </div>
                             <div class='col-lg-6'>
-                                <em>C</em> <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
-                                ({{y.pitcher.team.positions.catcher.number}})
-                                &raquo; <span class='rating-block' ng-style='{opacity: y.pitcher.team.positions.catcher.skill.defense.catching/100}'></span>
+                                <em>C</em>
+                                <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
+                                ({{t('#')+y.pitcher.team.positions.catcher.number}})
                             </div>
                             <div class='row'>
                                 <div class='col-xs-3'>
@@ -259,6 +259,10 @@
                                 <div class='col-xs-6'>
                                     {{y.batter.stats.batting.getBA() | number:3}} BA
                                     <br>
+                                    {{y.batter.stats.batting.getOBP() | number:3}} OBP
+                                    <br>
+                                    {{y.batter.stats.batting.getOBP() + y.batter.stats.batting.getSLG() | number:3}} OPS
+                                    <br>
                                     {{y.batter.stats.batting.hr}} HR
                                     <br>
                                     {{y.batter.stats.batting.rbi}} RBI
@@ -286,6 +290,10 @@
                             <div class='row'>
                                 <div class='col-xs-6'>
                                     {{y.deck.stats.batting.getBA() | number:3}} BA
+                                    <br>
+                                    {{y.deck.stats.batting.getOBP() | number:3}} OBP
+                                    <br>
+                                    {{y.deck.stats.batting.getOBP() + y.batter.stats.batting.getSLG() | number:3}} OPS
                                     <br>
                                     {{y.deck.stats.batting.hr}} HR
                                     <br>
@@ -329,10 +337,9 @@
                         {{y.teams.away.getName()}}
                     </li>
                     <li class='list-group-item' ng-repeat="(order, player) in y.teams.away.lineup track by $index">
-                        {{abbreviatePosition(player.position)}} <strong>{{player.getName()}}</strong> (#{{player.number}})
+                        {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{opacity: player.skill.defense.fielding/100}'></span> &raquo;
+                        <strong>{{player.getName()}}</strong> ({{t('#')+player.number}})
                          {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
-                        - {{player.stats.batting.ba | number:3}}
-                        - {{player.stats.batting.getBA() | number:3}}
                         <span class='pull-right'>
                             {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
                         </span>
@@ -343,10 +350,9 @@
                         {{y.teams.home.getName()}}
                     </li>
                     <li class='list-group-item' ng-repeat="(order, player) in y.teams.home.lineup track by $index">
-                        {{abbreviatePosition(player.position)}} <strong>{{player.getName()}}</strong> (#{{player.number}})
+                        {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{opacity: player.skill.defense.fielding/100}'></span> &raquo;
+                        <strong>{{player.getName()}}</strong> ({{t('#')+player.number}})
                          {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
-                        - {{player.stats.batting.ba | number:3}}
-                        - {{player.stats.batting.getBA() | number:3}}
                         <span class='pull-right'>
                             {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
                         </span>
