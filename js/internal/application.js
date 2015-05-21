@@ -496,7 +496,7 @@ data = {
         'Justice',
         'Hideo',
         'Hajime',
-        'Month',
+        'Akari',
         'Katsumi',
         'Masao',
         'Mitsuo',
@@ -2069,6 +2069,24 @@ Umpire.prototype = {
     says : 'Play ball!',
     game : null
 };
+var Batter = function() {
+    this.init();
+};
+
+Batter.prototype = {
+    init : function() {
+
+    }
+};
+var Runner = function() {
+    this.init();
+};
+
+Runner.prototype = {
+    init : function() {
+
+    }
+};
 var Catcher = function() {
     this.init();
 };
@@ -2092,24 +2110,6 @@ var Pitcher = function() {
 };
 
 Pitcher.prototype = {
-    init : function() {
-
-    }
-};
-var Batter = function() {
-    this.init();
-};
-
-Batter.prototype = {
-    init : function() {
-
-    }
-};
-var Runner = function() {
-    this.init();
-};
-
-Runner.prototype = {
     init : function() {
 
     }

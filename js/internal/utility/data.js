@@ -266,7 +266,7 @@ data = {
         'Justice',
         'Hideo',
         'Hajime',
-        'Month',
+        'Akari',
         'Katsumi',
         'Masao',
         'Mitsuo',
