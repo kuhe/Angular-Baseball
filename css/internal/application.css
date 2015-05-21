@@ -485,10 +485,9 @@ html body {
 .windup {
   margin: auto;
   height: 5px;
-  background: #353535;
-  transition: width 3s ease;
-  display: none;
+  background: white;
 }
 .windup.winding {
   display: block;
+  background: #484848;
 }

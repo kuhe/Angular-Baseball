@@ -55,12 +55,6 @@ IndexController = function($scope) {
         $baseballs.removeClass('flight');
         $baseballs.addClass('flight');
 
-        if ($scope.y.humanBatting() && !$scope.y.humanPitching()) {
-            $scope.holdUpTimeout = setTimeout(function() {
-                $scope.holdUp();
-            }, (flightSpeed + 1.2) * 1000);
-        }
-
         $scope.lastTimeout = setTimeout(function() {
             jQ('.baseball').removeClass('flight');
             jQ('.baseball').addClass('spin');
@@ -92,6 +86,12 @@ IndexController = function($scope) {
                 newOne = elm.cloneNode(true);
             elm.parentNode.replaceChild(newOne, elm);
         });
+
+        if ($scope.y.humanBatting() && !$scope.y.humanPitching()) {
+            $scope.holdUpTimeout = setTimeout(function() {
+                $scope.holdUp();
+            }, (flightSpeed + 1.2) * 1000);
+        }
     };
     $scope.selectPitch = function(pitchName) {
         if ($scope.y.stage == 'pitch') {
@@ -103,6 +103,7 @@ IndexController = function($scope) {
     $scope.allowInput = true;
     $scope.holdUp = function() {
         jQ('.no-swing').click();
+        $scope.$apply();
         //$scope.y.receiveInput(-20, 100, function() {
         //    $scope.updateFlightPath();
         //});
@@ -123,18 +124,16 @@ IndexController = function($scope) {
             $scope.updateFlightPath();
         });
         if ($scope.y.pitcher.windingUp) {
+            $scope.y.swingResult.looking = true;
             var windup = jQ('.windup');
-            windup.css('transition', 'none');
             windup.css('width', '100%');
             if ($scope.y.field.hasRunnersOn()) {
                 setTimeout(function(){
-                    windup.css('transition', 'width 1.5s linear');
-                    windup.css('width', '0%');
+                    windup.animate({width: 0}, 1500);
                 }, 1);
             } else {
                 setTimeout(function(){
-                    windup.css('transition', 'width 3s linear');
-                    windup.css('width', '0%');
+                    windup.animate({width: 0}, 3000);
                 }, 1);
             }
         }
