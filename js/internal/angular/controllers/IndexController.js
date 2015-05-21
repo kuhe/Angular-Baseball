@@ -8,6 +8,7 @@ IndexController = function($scope) {
         }
         return mode;
     };
+    $scope.holdUpTimeouts = [];
     $scope.expandScoreboard = false;
     $scope.proceedToGame = function () {
         jQ('.blocking').remove();
@@ -88,9 +89,9 @@ IndexController = function($scope) {
         });
 
         if ($scope.y.humanBatting() && !$scope.y.humanPitching()) {
-            $scope.holdUpTimeout = setTimeout(function() {
+            $scope.holdUpTimeouts.push(setTimeout(function() {
                 $scope.holdUp();
-            }, (flightSpeed + 1.2) * 1000);
+            }, (flightSpeed + 1.2) * 1000));
         }
     };
     $scope.selectPitch = function(pitchName) {
@@ -119,7 +120,9 @@ IndexController = function($scope) {
             y : 200 - ($event.pageY - offset.top)
         };
         clearTimeout($scope.lastTimeout);
-        clearTimeout($scope.holdUpTimeout);
+        while ($scope.holdUpTimeouts.length) {
+            clearTimeout($scope.holdUpTimeouts.shift());
+        }
         $scope.y.receiveInput(relativeOffset.x, relativeOffset.y, function() {
             $scope.updateFlightPath();
         });

@@ -55,8 +55,8 @@ text = function(phrase) {
             'fastball': 'ストレート',
             'Batting, ': '打球',
             'Catching, pitch selection': '捕球選択',
-            'Season': 'シーズン',
-            'Game': '試合',
+            'Season': '記録',
+            'Game': '今試合',
             'Pitch': '球',
             'Control': '制球',
             'Velocity': '速度',
@@ -70,7 +70,8 @@ text = function(phrase) {
             'Fielding': '守備'
         },
         e : {
-            empty: '-'
+            empty: '-',
+            'Season': 'Career'
         }
     }[mode][phrase];
     return string ? string : phrase;
