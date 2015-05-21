@@ -123,9 +123,9 @@ Player.prototype = {
         this.hero = hero;
         var giraffe = this;
         var randValue = function(isPitching) {
-            var value = Math.floor(Math.sqrt(Math.random())*100);
+            var value = Math.floor(Math.pow(Math.random(), 0.75)*80 + Math.random()*20);
             if (hero) {
-                value += Math.floor((100 - value)*Math.max(Math.random(), 0.65));
+                value += Math.floor((100 - value)*Math.max(Math.random(), isPitching ? 0 : 0.65));
             }
             if (isPitching) giraffe.pitching.averaging.push(value);
             return value

@@ -993,7 +993,6 @@ Game.prototype = {
         if (this.stage == 'end') {
             return;
         }
-        log('callback', typeof callback, this.stage);
         if (this.stage == 'pitch') {
             this.thePitch(x, y, callback);
         } else if (this.stage == 'swing') {
@@ -1396,9 +1395,9 @@ Player.prototype = {
         this.hero = hero;
         var giraffe = this;
         var randValue = function(isPitching) {
-            var value = Math.floor(Math.sqrt(Math.random())*100);
+            var value = Math.floor(Math.pow(Math.random(), 0.75)*80 + Math.random()*20);
             if (hero) {
-                value += Math.floor((100 - value)*Math.max(Math.random(), 0.65));
+                value += Math.floor((100 - value)*Math.max(Math.random(), isPitching ? 0 : 0.65));
             }
             if (isPitching) giraffe.pitching.averaging.push(value);
             return value
@@ -1858,9 +1857,9 @@ IndexController = function($scope) {
     window.s = $scope;
     $scope.t = text;
     $scope.y = new Game();
-    $scope.mode = function(set) {
-        if (set) {
-            mode = set;
+    $scope.mode = function(setMode) {
+        if (setMode) {
+            mode = setMode;
         }
         return mode;
     };
@@ -1868,7 +1867,7 @@ IndexController = function($scope) {
     $scope.proceedToGame = function () {
         jQ('.blocking').remove();
     };
-    $scope.updateFlightPath = function($event) {
+    $scope.updateFlightPath = function() {
         var ss = document.styleSheets;
         var animation = 'flight';
         for (var i = 0; i < ss.length; ++i) {
@@ -1893,7 +1892,7 @@ IndexController = function($scope) {
         var top = 200-game.pitchTarget.y;
         var left = game.pitchTarget.x;
         var breakTop = 200-game.pitchInFlight.y,
-            breakleft = game.pitchInFlight.x;
+            breakLeft = game.pitchInFlight.x;
         keyframes.deleteRule('0%');
         keyframes.deleteRule('25%');
         keyframes.deleteRule('50%');
@@ -1903,13 +1902,19 @@ IndexController = function($scope) {
         keyframes.insertRule('25% { '+to(20, top, left)+' }');
         keyframes.insertRule('50% { '+to(35, top, left)+' }');
         keyframes.insertRule('75% { '+to(65, top, left)+' }');
-        keyframes.insertRule('100% { '+to(100, breakTop, breakleft)+' }');
+        keyframes.insertRule('100% { '+to(100, breakTop, breakLeft)+' }');
 
-        $baseballs = jQ('.baseball');
+        var $baseballs = jQ('.baseball');
         var flightSpeed = 1.3 - 0.6*(game.pitchInFlight.velocity + 300)/400;
         $baseballs.css('-webkit-animation', 'flight '+flightSpeed+'s 1 0s linear');
         $baseballs.removeClass('flight');
         $baseballs.addClass('flight');
+
+        if ($scope.y.humanBatting() && !$scope.y.humanPitching()) {
+            $scope.holdUpTimeout = setTimeout(function() {
+                $scope.holdUp();
+            }, (flightSpeed + 1.2) * 1000);
+        }
 
         $scope.lastTimeout = setTimeout(function() {
             jQ('.baseball').removeClass('flight');
@@ -1939,8 +1944,8 @@ IndexController = function($scope) {
         });
         $baseballs.each(function(k, item) {
             var elm = item,
-                newone = elm.cloneNode(true);
-            elm.parentNode.replaceChild(newone, elm);
+                newOne = elm.cloneNode(true);
+            elm.parentNode.replaceChild(newOne, elm);
         });
     };
     $scope.selectPitch = function(pitchName) {
@@ -1951,6 +1956,12 @@ IndexController = function($scope) {
         }
     };
     $scope.allowInput = true;
+    $scope.holdUp = function() {
+        jQ('.no-swing').click();
+        //$scope.y.receiveInput(-20, 100, function() {
+        //    $scope.updateFlightPath();
+        //});
+    };
     $scope.indicate = function($event) {
         if (!$scope.allowInput) {
             return;
@@ -1962,8 +1973,9 @@ IndexController = function($scope) {
             y : 200 - ($event.pageY - offset.top)
         };
         clearTimeout($scope.lastTimeout);
+        clearTimeout($scope.holdUpTimeout);
         $scope.y.receiveInput(relativeOffset.x, relativeOffset.y, function() {
-            $scope.updateFlightPath($event);
+            $scope.updateFlightPath();
         });
         if ($scope.y.pitcher.windingUp) {
             var windup = jQ('.windup');

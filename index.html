@@ -237,13 +237,13 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>{{ t('Control') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{opacity: pitch.control/100}'></span></td>
+                                        <td>{{ t('Control') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.control/120+")"}'></span></td>
                                     </tr>
                                     <tr>
-                                        <td>{{ t('Velocity') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{opacity: pitch.velocity/100}'></span></td>
+                                        <td>{{ t('Velocity') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.velocity/120+")"}'></span></td>
                                     </tr>
                                     <tr>
-                                        <td>{{ t('Break') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{opacity: pitch.break/100}'></span></td>
+                                        <td>{{ t('Break') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.break/120+")"}'></span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -272,13 +272,13 @@
                                 </div>
                                 <div class='col-xs-6'>
                                     <div>
-                                        {{ t('Eye :') }} <span class='rating-block' ng-style='{opacity: y.batter.skill.offense.eye/100}'></span>
+                                        {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.eye/120+")"}'></span>
                                     </div>
                                     <div>
-                                        {{ t('Power :') }} <span class='rating-block' ng-style='{opacity: y.batter.skill.offense.power/100}'></span>
+                                        {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.power/120+")"}'></span>
                                     </div>
                                     <div>
-                                        {{ t('Speed :') }} <span class='rating-block' ng-style='{opacity: y.batter.skill.offense.speed/100}'></span>
+                                        {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.speed/120+")"}'></span>
                                     </div>
                                     <div>
                                         - {{y.batter.atBats.join(', ')}} -
@@ -306,13 +306,13 @@
                                 </div>
                                 <div class='col-xs-6'>
                                     <div>
-                                        {{ t('Eye :') }} <span class='rating-block' ng-style='{opacity: y.deck.skill.offense.eye/100}'></span>
+                                        {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.eye/120+")"}'></span>
                                     </div>
                                     <div>
-                                        {{ t('Power :') }} <span class='rating-block' ng-style='{opacity: y.deck.skill.offense.power/100}'></span>
+                                        {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.power/120+")"}'></span>
                                     </div>
                                     <div>
-                                        {{ t('Speed :') }} <span class='rating-block' ng-style='{opacity: y.deck.skill.offense.speed/100}'></span>
+                                        {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.speed/120+")"}'></span>
                                     </div>
                                     <div>
                                         - {{y.deck.atBats.join(', ')}} -
@@ -342,7 +342,7 @@
                         {{y.teams.away.getName()}}
                     </li>
                     <li class='list-group-item' ng-repeat="(order, player) in y.teams.away.lineup track by $index">
-                        {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{opacity: player.skill.defense.fielding/100}'></span> &raquo;
+                        {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.defense.fielding/120+")"}'></span> &raquo;
                         <strong>{{player.getName()}}</strong> ({{t('#')+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
                          {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
                         <span class='pull-right'>
@@ -355,7 +355,7 @@
                         {{y.teams.home.getName()}}
                     </li>
                     <li class='list-group-item' ng-repeat="(order, player) in y.teams.home.lineup track by $index">
-                        {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{opacity: player.skill.defense.fielding/100}'></span> &raquo;
+                        {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.defense.fielding/120+")"}'></span> &raquo;
                         <strong>{{player.getName()}}</strong> ({{t('#')+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
                          {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
                         <span class='pull-right'>

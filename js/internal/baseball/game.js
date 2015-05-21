@@ -57,7 +57,6 @@ Game.prototype = {
         if (this.stage == 'end') {
             return;
         }
-        log('callback', typeof callback, this.stage);
         if (this.stage == 'pitch') {
             this.thePitch(x, y, callback);
         } else if (this.stage == 'swing') {
