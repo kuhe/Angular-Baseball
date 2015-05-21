@@ -74,15 +74,20 @@ Game.prototype = {
     },
     autoPitch : function() {
         if (this.stage == 'pitch') {
-            this.autoPitchSelect();
-            if (Math.random() < 0.5) {
-                var x = 50 + Math.floor(Math.random()*70) - Math.floor(Math.random()*15);
-            } else {
-                x = 150 + Math.floor(Math.random()*15) - Math.floor(Math.random()*70);
-            }
-            var y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
-            log(x, y);
-            this.thePitch(x, y);
+            this.winding = true;
+            var giraffe = this;
+            setTimeout(function() {
+                giraffe.autoPitchSelect();
+                if (Math.random() < 0.5) {
+                    var x = 50 + Math.floor(Math.random()*70) - Math.floor(Math.random()*15);
+                } else {
+                    x = 150 + Math.floor(Math.random()*15) - Math.floor(Math.random()*70);
+                }
+                var y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
+                log(x, y);
+                giraffe.thePitch(x, y);
+                giraffe.winding = false;
+            }, 3000);
         }
     },
     autoSwing : function(deceptiveX, deceptiveY) {

@@ -10,6 +10,16 @@
 }
 
 .centered {
-  text-align: center;
-  margin: auto;
+    text-align: center;
+    margin: auto;
+}
+
+.windup {
+    margin: auto;
+    height: 5px;
+    background: #353535;
+    transition: width 3s ease;
+    &.winding {
+        width: 0;
+    }
 }

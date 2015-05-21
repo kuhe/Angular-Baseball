@@ -147,6 +147,7 @@
                         </ul>
                     </div>
                     <div class='col-md-4'>
+                        <div class='windup' ng-class='{winding: y.humanBatting() && !y.humanPitching() && y.winding}'></div>
                         <div class="no-swing" ng-click="indicate($event)">
                             <div class="target {{y.stage}}" ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'>
                                 <div class='indicator baseball pitch hide'></div>

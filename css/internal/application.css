@@ -482,3 +482,12 @@ html body {
   text-align: center;
   margin: auto;
 }
+.windup {
+  margin: auto;
+  height: 5px;
+  background: #353535;
+  transition: width 3s ease;
+}
+.windup.winding {
+  width: 0;
+}

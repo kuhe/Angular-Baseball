@@ -1007,15 +1007,20 @@ Game.prototype = {
     },
     autoPitch : function() {
         if (this.stage == 'pitch') {
-            this.autoPitchSelect();
-            if (Math.random() < 0.5) {
-                var x = 50 + Math.floor(Math.random()*70) - Math.floor(Math.random()*15);
-            } else {
-                x = 150 + Math.floor(Math.random()*15) - Math.floor(Math.random()*70);
-            }
-            var y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
-            log(x, y);
-            this.thePitch(x, y);
+            this.winding = true;
+            var giraffe = this;
+            setTimeout(function() {
+                giraffe.autoPitchSelect();
+                if (Math.random() < 0.5) {
+                    var x = 50 + Math.floor(Math.random()*70) - Math.floor(Math.random()*15);
+                } else {
+                    x = 150 + Math.floor(Math.random()*15) - Math.floor(Math.random()*70);
+                }
+                var y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
+                log(x, y);
+                giraffe.thePitch(x, y);
+                giraffe.winding = false;
+            }, 3000);
         }
     },
     autoSwing : function(deceptiveX, deceptiveY) {
@@ -1955,28 +1960,6 @@ IndexController = function($scope) {
         clearTimeout($scope.lastTimeout);
         $scope.y.receiveInput(relativeOffset.x, relativeOffset.y);
         $scope.updateFlightPath($event);
-    };
-    $scope.rate = function(rating) {
-
-        return
-
-        if (rating > 95) {
-            return 'A+';
-        } else if (rating > 90) {
-            return 'A';
-        } else if (rating > 85) {
-            return 'A-';
-        } else if (rating > 80) {
-            return 'B+';
-        } else if (rating > 70) {
-            return 'B';
-        } else if (rating > 60) {
-            return 'C';
-        } else if (rating > 50) {
-            return 'C-';
-        } else {
-            return 'D';
-        }
     };
     $scope.abbreviatePosition = function(position) {
         return {

@@ -109,28 +109,6 @@ IndexController = function($scope) {
         $scope.y.receiveInput(relativeOffset.x, relativeOffset.y);
         $scope.updateFlightPath($event);
     };
-    $scope.rate = function(rating) {
-
-        return
-
-        if (rating > 95) {
-            return 'A+';
-        } else if (rating > 90) {
-            return 'A';
-        } else if (rating > 85) {
-            return 'A-';
-        } else if (rating > 80) {
-            return 'B+';
-        } else if (rating > 70) {
-            return 'B';
-        } else if (rating > 60) {
-            return 'C';
-        } else if (rating > 50) {
-            return 'C-';
-        } else {
-            return 'D';
-        }
-    };
     $scope.abbreviatePosition = function(position) {
         return {
             pitcher : 'P',
