@@ -191,18 +191,18 @@
                 </div>
             </div>
             <div class='row list-group-item'>
-                <div class='col-lg-6'>
+                <div class='col-lg-6' ng-class='{"pull-right": y.half=="top"}'>
                     <div>
                         <div class='row list-group-item'>
                             <div class='col-lg-6'>
                                 <em>{{y.pitcher.throws == 'right' ? 'RHP' : 'LHP'}}</em> &raquo;
                                 <strong>{{y.pitcher.getName()}}</strong>
-                                ({{t('#')+y.pitcher.number}})
+                                ({{t('#')+y.pitcher.number}}) <span ng-if='y.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>
                             </div>
                             <div class='col-lg-6'>
                                 <em>C</em> &raquo;
                                 <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
-                                ({{t('#')+y.pitcher.team.positions.catcher.number}})
+                                ({{t('#')+y.pitcher.team.positions.catcher.number}}) <span ng-if='y.pitcher.team.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
                             </div>
                             <div class='row'>
                                 <div class='col-xs-3'>
@@ -249,11 +249,13 @@
                         </div>
                     </div>
                 </div>
-                <div class='col-lg-6 list-group-item'>
+                <div class='col-lg-6 list-group-item' ng-class='{"pull-left": y.half=="top"}'>
                     <div class='row'>
                         <div class='col-lg-6'>
                             <div>
-                                {{ t('At Bat :') }} &raquo; <strong>{{y.batter.getName()}}</strong> ({{y.batter.number}}) - <em>{{abbreviatePosition(y.batter.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}</em>
+                                {{ t('At Bat :') }} &raquo; <strong>{{y.batter.getName()}}</strong>
+                                ({{t('#')+y.batter.number}}) <span ng-if='y.batter.hero' class='glyphicon glyphicon-chevron-up'></span> -
+                                <em>{{abbreviatePosition(y.batter.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}</em>
                             </div>
                             <div class='row'>
                                 <div class='col-xs-6'>
@@ -285,7 +287,9 @@
                         </div>
                         <div class='col-lg-6'>
                             <div>
-                                {{ t('On Deck :') }} &raquo; <strong>{{y.deck.getName()}}</strong> ({{y.deck.number}}) - {{abbreviatePosition(y.deck.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}
+                                {{ t('On Deck :') }} &raquo; <strong>{{y.deck.getName()}}</strong>
+                                ({{t('#')+y.deck.number}}) <span ng-if='y.deck.hero' class='glyphicon glyphicon-chevron-up'></span> -
+                                {{abbreviatePosition(y.deck.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}
                             </div>
                             <div class='row'>
                                 <div class='col-xs-6'>
@@ -293,7 +297,7 @@
                                     <br>
                                     {{y.deck.stats.batting.getOBP() | number:3}} OBP
                                     <br>
-                                    {{y.deck.stats.batting.getOBP() + y.batter.stats.batting.getSLG() | number:3}} OPS
+                                    {{y.deck.stats.batting.getOBP() + y.deck.stats.batting.getSLG() | number:3}} OPS
                                     <br>
                                     {{y.deck.stats.batting.hr}} HR
                                     <br>
@@ -338,7 +342,7 @@
                     </li>
                     <li class='list-group-item' ng-repeat="(order, player) in y.teams.away.lineup track by $index">
                         {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{opacity: player.skill.defense.fielding/100}'></span> &raquo;
-                        <strong>{{player.getName()}}</strong> ({{t('#')+player.number}})
+                        <strong>{{player.getName()}}</strong> ({{t('#')+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
                          {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
                         <span class='pull-right'>
                             {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
@@ -351,7 +355,7 @@
                     </li>
                     <li class='list-group-item' ng-repeat="(order, player) in y.teams.home.lineup track by $index">
                         {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{opacity: player.skill.defense.fielding/100}'></span> &raquo;
-                        <strong>{{player.getName()}}</strong> ({{t('#')+player.number}})
+                        <strong>{{player.getName()}}</strong> ({{t('#')+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
                          {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
                         <span class='pull-right'>
                             {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>

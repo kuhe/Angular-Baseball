@@ -40,7 +40,7 @@ text = function(phrase) {
             'Swinging strike.': '空振り。',
             '4-seam': 'ストレイト',
             '2-seam': 'シュート',
-            'slider': 'スライダ',
+            'slider': 'スライダー',
             'fork': 'フォーク',
             'cutter': 'カット',
             'sinker': 'シンカー',

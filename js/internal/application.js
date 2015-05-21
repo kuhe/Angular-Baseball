@@ -40,7 +40,7 @@ text = function(phrase) {
             'Swinging strike.': '空振り。',
             '4-seam': 'ストレイト',
             '2-seam': 'シュート',
-            'slider': 'スライダ',
+            'slider': 'スライダー',
             'fork': 'フォーク',
             'cutter': 'カット',
             'sinker': 'シンカー',
@@ -808,10 +808,6 @@ Field.prototype = {
                     }
                 }
                 log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
-                if (swing.error && swing.bases > 0) {
-                    this.game.tally[this.game.half == 'top' ? 'home' : 'away']['E']++;
-                    fielder.stats.fielding.E++;
-                }
             }
         } else {
             if (Math.abs(90 - splayAngle) < 45 && landingDistance > 300) {
@@ -1107,11 +1103,8 @@ Game.prototype = {
     theSwing : function(x, y) {
         if (this.stage == 'swing') {
             this.swingResult = {};
-            this.swingResult.x = (100 - x)/(0.5+Math.random()*this.batter.skill.offense.eye/50);
-            this.swingResult.y = (100 - y)/(0.5+Math.random()*this.batter.skill.offense.eye/50);
-
-            log('click', x, y);
-            log('swing', this.swingResult.x, this.swingResult.y);
+            this.swingResult.x = 100 + (x - 100)*(0.5+Math.random()*this.batter.skill.offense.eye/200) - this.pitchInFlight.x;
+            this.swingResult.y = 100 + (y - 100)*(0.5+Math.random()*this.batter.skill.offense.eye/200) - this.pitchInFlight.y;
 
             if (!(x < 0 || x > 200)) {
                 this.swingResult.looking = false;
@@ -1310,8 +1303,8 @@ var Player = function(team) {
 
     var doubles = randBetween(0, h/4, 'power');
     var triples = randBetween(0, h/12, 'speed');
-    var hr = randBetween(0, h/5, 'power');
-    var r = randBetween(0, (h + bb)/Math.max(1, pa)/5, 'speed') + hr;
+    var hr = Math.max(0, randBetween(-h/5, h/5, 'power'));
+    var r = randBetween(0, (h + bb)/4, 'speed') + hr;
     var rbi = randBetween(0, h/3, 'power') + hr;
     var hbp = randBetween(0, gamesIntoSeason/25);
     var sf = randBetween(0, gamesIntoSeason/5, 'eye');
@@ -1382,18 +1375,22 @@ Player.prototype = {
         this.skill = {};
         this.pitching = {averaging : []};
         this.number = 0;
-        this.randomizeSkills();
-        var surnamekey = Math.floor(Math.random()*data.surnames.length),
+        this.randomizeSkills(Math.random() > 0.9);
+        var surnameKey = Math.floor(Math.random()*data.surnames.length),
             nameKey = Math.floor(Math.random()*data.names.length);
 
-        this.name = data.surnames[surnamekey] + ' ' + data.names[nameKey];
-        this.nameJ = data.surnamesJ[surnamekey] + data.namesJ[nameKey];
+        this.name = data.surnames[surnameKey] + ' ' + data.names[nameKey];
+        this.nameJ = data.surnamesJ[surnameKey] + data.namesJ[nameKey];
         this.atBats = [];
     },
-    randomizeSkills : function() {
+    randomizeSkills : function(hero) {
+        this.hero = hero;
         var giraffe = this;
         var randValue = function(isPitching) {
             var value = Math.floor(Math.sqrt(Math.random())*100);
+            if (hero) {
+                value += Math.floor((100 - value)*Math.max(Math.random(), 0.65));
+            }
             if (isPitching) giraffe.pitching.averaging.push(value);
             return value
         };
@@ -1600,9 +1597,16 @@ Umpire.prototype = {
                             this.newBatter(); //todo: sac
                         }
                         if (result.bases) {
-                            this.game.tally[this.game.half == 'top' ? 'away' : 'home']['H']++;
+                            if (!result.error) {
+                                this.game.tally[this.game.half == 'top' ? 'away' : 'home']['H']++;
+                                pitcher.stats.pitching.H++;
+                            } else {
+                                if (result.bases > 0) {
+                                    this.game.tally[this.game.half == 'top' ? 'home' : 'away']['E']++;
+                                    this.game.teams[this.game.half == 'top' ? 'home' : 'away'].positions[result.fielder].stats.fielding.E++;
+                                }
+                            }
                             var bases = result.bases;
-                            pitcher.stats.pitching.H++;
                             switch (bases) {
                                 case 0 :
                                     this.game.batter.atBats.push('GO');

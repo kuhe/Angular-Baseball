@@ -39,8 +39,8 @@ var Player = function(team) {
 
     var doubles = randBetween(0, h/4, 'power');
     var triples = randBetween(0, h/12, 'speed');
-    var hr = randBetween(0, h/5, 'power');
-    var r = randBetween(0, (h + bb)/Math.max(1, pa)/5, 'speed') + hr;
+    var hr = Math.max(0, randBetween(-h/5, h/5, 'power'));
+    var r = randBetween(0, (h + bb)/4, 'speed') + hr;
     var rbi = randBetween(0, h/3, 'power') + hr;
     var hbp = randBetween(0, gamesIntoSeason/25);
     var sf = randBetween(0, gamesIntoSeason/5, 'eye');
@@ -111,18 +111,22 @@ Player.prototype = {
         this.skill = {};
         this.pitching = {averaging : []};
         this.number = 0;
-        this.randomizeSkills();
-        var surnamekey = Math.floor(Math.random()*data.surnames.length),
+        this.randomizeSkills(Math.random() > 0.9);
+        var surnameKey = Math.floor(Math.random()*data.surnames.length),
             nameKey = Math.floor(Math.random()*data.names.length);
 
-        this.name = data.surnames[surnamekey] + ' ' + data.names[nameKey];
-        this.nameJ = data.surnamesJ[surnamekey] + data.namesJ[nameKey];
+        this.name = data.surnames[surnameKey] + ' ' + data.names[nameKey];
+        this.nameJ = data.surnamesJ[surnameKey] + data.namesJ[nameKey];
         this.atBats = [];
     },
-    randomizeSkills : function() {
+    randomizeSkills : function(hero) {
+        this.hero = hero;
         var giraffe = this;
         var randValue = function(isPitching) {
             var value = Math.floor(Math.sqrt(Math.random())*100);
+            if (hero) {
+                value += Math.floor((100 - value)*Math.max(Math.random(), 0.65));
+            }
             if (isPitching) giraffe.pitching.averaging.push(value);
             return value
         };

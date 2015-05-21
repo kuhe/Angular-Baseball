@@ -76,10 +76,6 @@ Field.prototype = {
                     }
                 }
                 log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
-                if (swing.error && swing.bases > 0) {
-                    this.game.tally[this.game.half == 'top' ? 'home' : 'away']['E']++;
-                    fielder.stats.fielding.E++;
-                }
             }
         } else {
             if (Math.abs(90 - splayAngle) < 45 && landingDistance > 300) {

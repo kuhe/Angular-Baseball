@@ -72,9 +72,16 @@ Umpire.prototype = {
                             this.newBatter(); //todo: sac
                         }
                         if (result.bases) {
-                            this.game.tally[this.game.half == 'top' ? 'away' : 'home']['H']++;
+                            if (!result.error) {
+                                this.game.tally[this.game.half == 'top' ? 'away' : 'home']['H']++;
+                                pitcher.stats.pitching.H++;
+                            } else {
+                                if (result.bases > 0) {
+                                    this.game.tally[this.game.half == 'top' ? 'home' : 'away']['E']++;
+                                    this.game.teams[this.game.half == 'top' ? 'home' : 'away'].positions[result.fielder].stats.fielding.E++;
+                                }
+                            }
                             var bases = result.bases;
-                            pitcher.stats.pitching.H++;
                             switch (bases) {
                                 case 0 :
                                     this.game.batter.atBats.push('GO');
