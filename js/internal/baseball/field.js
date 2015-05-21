@@ -72,7 +72,7 @@ Field.prototype = {
                     swing.bases = 1;
                     if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1) {
                         var fieldingReturnDelay = -1*((interceptRating/(1 + fielder.skill.defense.throwing/100))/fieldingEase - this.game.batter.skill.offense.speed);
-                        while (fieldingReturnDelay - 100 > 0 && swing.bases <= 3) {
+                        while (fieldingReturnDelay - 100 > 0 && swing.bases < 3) {
                             swing.bases++;
                             fieldingReturnDelay  -= 80;
                         }
