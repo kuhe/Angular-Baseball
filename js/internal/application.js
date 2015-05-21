@@ -1010,10 +1010,14 @@ Game.prototype = {
         this.pitchInFlight = pitch;
     },
     autoPitch : function(callback) {
-        var runnersOn = this.field.hasRunnersOn();
+        var pitcher = this.pitcher;
         if (this.stage == 'pitch') {
+            jQ('.baseball').addClass('hide');
+            pitcher.windingUp = true;
+            this.swingResult.looking = true;
+            var windup = jQ('.windup');
+            windup.css('width', '100%');
             var giraffe = this;
-            this.pitcher.windingUp = true;
             this.autoPitchSelect();
             if (Math.random() < 0.5) {
                 var x = 50 + Math.floor(Math.random()*70) - Math.floor(Math.random()*15);
@@ -1021,10 +1025,17 @@ Game.prototype = {
                 x = 150 + Math.floor(Math.random()*15) - Math.floor(Math.random()*70);
             }
             var y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
-            setTimeout(function() {
+
+            windup.animate({width: 0}, this.field.hasRunnersOn() ? 1500 : 3000, function() {
+                if (giraffe.batter.skill.offense.eye > Math.random()*100) {
+                    jQ('.baseball.break').removeClass('hide');
+                } else {
+                    jQ('.baseball.break').removeClass('hide');
+                }
+                jQ('.baseball.pitch').removeClass('hide');
                 giraffe.thePitch(x, y, callback);
-                giraffe.pitcher.windingUp = false;
-            }, runnersOn ? 1500 : 3000);
+                pitcher.windingUp = false;
+            });
         }
     },
     autoSwing : function(deceptiveX, deceptiveY, callback) {
@@ -1969,6 +1980,9 @@ IndexController = function($scope) {
         if (!$scope.allowInput) {
             return;
         }
+        if ($scope.y.pitcher.windingUp) {
+            return;
+        }
         if ($scope.y.humanPitching()) $scope.allowInput = false;
         var offset = jQ('.target').offset();
         var relativeOffset = {
@@ -1982,20 +1996,6 @@ IndexController = function($scope) {
         $scope.y.receiveInput(relativeOffset.x, relativeOffset.y, function() {
             $scope.updateFlightPath();
         });
-        if ($scope.y.pitcher.windingUp) {
-            $scope.y.swingResult.looking = true;
-            var windup = jQ('.windup');
-            windup.css('width', '100%');
-            if ($scope.y.field.hasRunnersOn()) {
-                setTimeout(function(){
-                    windup.animate({width: 0}, 1500);
-                }, 1);
-            } else {
-                setTimeout(function(){
-                    windup.animate({width: 0}, 3000);
-                }, 1);
-            }
-        }
     };
     $scope.abbreviatePosition = function(position) {
         return {

@@ -113,6 +113,9 @@ IndexController = function($scope) {
         if (!$scope.allowInput) {
             return;
         }
+        if ($scope.y.pitcher.windingUp) {
+            return;
+        }
         if ($scope.y.humanPitching()) $scope.allowInput = false;
         var offset = jQ('.target').offset();
         var relativeOffset = {
@@ -126,20 +129,6 @@ IndexController = function($scope) {
         $scope.y.receiveInput(relativeOffset.x, relativeOffset.y, function() {
             $scope.updateFlightPath();
         });
-        if ($scope.y.pitcher.windingUp) {
-            $scope.y.swingResult.looking = true;
-            var windup = jQ('.windup');
-            windup.css('width', '100%');
-            if ($scope.y.field.hasRunnersOn()) {
-                setTimeout(function(){
-                    windup.animate({width: 0}, 1500);
-                }, 1);
-            } else {
-                setTimeout(function(){
-                    windup.animate({width: 0}, 3000);
-                }, 1);
-            }
-        }
     };
     $scope.abbreviatePosition = function(position) {
         return {
