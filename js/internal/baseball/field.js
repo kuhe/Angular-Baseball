@@ -10,6 +10,9 @@ Field.prototype = {
         this.second = null;
         this.third = null;
     },
+    hasRunnersOn : function() {
+        return this.first instanceof Player || this.second instanceof Player || this.third instanceof Player;
+    },
     translateSwingResultToStylePosition: function(swingResult) {
         // CF HR bottom: 95px, centerline: left: 190px;
         var bottom = 0, left = 190;

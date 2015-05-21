@@ -74,6 +74,7 @@ Game.prototype = {
         this.pitchInFlight = pitch;
     },
     autoPitch : function(callback) {
+        var runnersOn = this.field.hasRunnersOn();
         if (this.stage == 'pitch') {
             var giraffe = this;
             this.pitcher.windingUp = true;
@@ -87,7 +88,7 @@ Game.prototype = {
             setTimeout(function() {
                 giraffe.thePitch(x, y, callback);
                 giraffe.pitcher.windingUp = false;
-            }, 3000);
+            }, runnersOn ? 1500 : 3000);
         }
     },
     autoSwing : function(deceptiveX, deceptiveY, callback) {

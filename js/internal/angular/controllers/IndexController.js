@@ -113,10 +113,17 @@ IndexController = function($scope) {
             var windup = jQ('.windup');
             windup.css('transition', 'none');
             windup.css('width', '100%');
-            setTimeout(function(){
-                windup.css('transition', 'width 3s linear');
-                windup.css('width', '0%');
-            }, 1);
+            if ($scope.y.field.hasRunnersOn()) {
+                setTimeout(function(){
+                    windup.css('transition', 'width 1.5s linear');
+                    windup.css('width', '0%');
+                }, 1);
+            } else {
+                setTimeout(function(){
+                    windup.css('transition', 'width 3s linear');
+                    windup.css('width', '0%');
+                }, 1);
+            }
         }
     };
     $scope.abbreviatePosition = function(position) {

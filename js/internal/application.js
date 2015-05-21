@@ -742,6 +742,9 @@ Field.prototype = {
         this.second = null;
         this.third = null;
     },
+    hasRunnersOn : function() {
+        return this.first instanceof Player || this.second instanceof Player || this.third instanceof Player;
+    },
     translateSwingResultToStylePosition: function(swingResult) {
         // CF HR bottom: 95px, centerline: left: 190px;
         var bottom = 0, left = 190;
@@ -1007,6 +1010,7 @@ Game.prototype = {
         this.pitchInFlight = pitch;
     },
     autoPitch : function(callback) {
+        var runnersOn = this.field.hasRunnersOn();
         if (this.stage == 'pitch') {
             var giraffe = this;
             this.pitcher.windingUp = true;
@@ -1020,7 +1024,7 @@ Game.prototype = {
             setTimeout(function() {
                 giraffe.thePitch(x, y, callback);
                 giraffe.pitcher.windingUp = false;
-            }, 3000);
+            }, runnersOn ? 1500 : 3000);
         }
     },
     autoSwing : function(deceptiveX, deceptiveY, callback) {
@@ -1965,10 +1969,17 @@ IndexController = function($scope) {
             var windup = jQ('.windup');
             windup.css('transition', 'none');
             windup.css('width', '100%');
-            setTimeout(function(){
-                windup.css('transition', 'width 3s linear');
-                windup.css('width', '0%');
-            }, 1);
+            if ($scope.y.field.hasRunnersOn()) {
+                setTimeout(function(){
+                    windup.css('transition', 'width 1.5s linear');
+                    windup.css('width', '0%');
+                }, 1);
+            } else {
+                setTimeout(function(){
+                    windup.css('transition', 'width 3s linear');
+                    windup.css('width', '0%');
+                }, 1);
+            }
         }
     };
     $scope.abbreviatePosition = function(position) {
