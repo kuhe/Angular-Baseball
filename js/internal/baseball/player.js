@@ -116,7 +116,11 @@ Player.prototype = {
             nameKey = Math.floor(Math.random()*data.names.length);
 
         this.name = data.surnames[surnameKey] + ' ' + data.names[nameKey];
-        this.nameJ = data.surnamesJ[surnameKey] + data.namesJ[nameKey];
+        var jSurname = data.surnamesJ[surnameKey],
+            jGivenName = data.namesJ[nameKey];
+        if (jSurname.length == 1 && jGivenName.length <= 2) jSurname += '・';
+        if (jGivenName.length == 1 && jSurname.indexOf('・') < 0) jSurname += '・';
+        this.nameJ = jSurname + jGivenName;
         this.atBats = [];
     },
     randomizeSkills : function(hero) {
