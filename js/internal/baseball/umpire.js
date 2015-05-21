@@ -245,10 +245,10 @@ Umpire.prototype = {
         this.game.field.second = null;
         this.game.field.third = null;
         if (this.game.half == 'top') {
-            this.game.half = 'bottom';
             if (this.game.inning == 9 && this.game.tally.home.R > this.game.tally.away.R) {
                 return this.game.end();
             }
+            this.game.half = 'bottom';
         } else {
             this.game.half = 'top';
             this.game.inning++;

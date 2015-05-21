@@ -106,8 +106,9 @@ IndexController = function($scope) {
             y : 200 - ($event.pageY - offset.top)
         };
         clearTimeout($scope.lastTimeout);
-        $scope.y.receiveInput(relativeOffset.x, relativeOffset.y);
-        $scope.updateFlightPath($event);
+        $scope.y.receiveInput(relativeOffset.x, relativeOffset.y, function() {
+            $scope.updateFlightPath($event);
+        });
     };
     $scope.abbreviatePosition = function(position) {
         return {

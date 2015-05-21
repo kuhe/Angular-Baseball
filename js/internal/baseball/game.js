@@ -21,7 +21,7 @@ Game.prototype = {
         if (this.humanPitching()) {
             this.stage = 'pitch';
         } else {
-            this.autoPitch();
+            this.autoPitch(function(){});
         }
     },
     getInning : function() {
@@ -53,14 +53,15 @@ Game.prototype = {
     },
     stage : 'pitch', //pitch, swing
     humanControl : 'home', //home, away, both
-    receiveInput : function(x, y) {
+    receiveInput : function(x, y, callback) {
         if (this.stage == 'end') {
             return;
         }
+        log('callback', typeof callback, this.stage);
         if (this.stage == 'pitch') {
-            this.thePitch(x, y);
+            this.thePitch(x, y, callback);
         } else if (this.stage == 'swing') {
-            this.theSwing(x, y);
+            this.theSwing(x, y, callback);
         }
     },
     autoPitchSelect : function() {
@@ -72,7 +73,7 @@ Game.prototype = {
         pitch.name = pitchName;
         this.pitchInFlight = pitch;
     },
-    autoPitch : function() {
+    autoPitch : function(callback) {
         if (this.stage == 'pitch') {
             this.winding = true;
             var giraffe = this;
@@ -84,13 +85,12 @@ Game.prototype = {
                     x = 150 + Math.floor(Math.random()*15) - Math.floor(Math.random()*70);
                 }
                 var y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
-                log(x, y);
-                giraffe.thePitch(x, y);
+                giraffe.thePitch(x, y, callback);
                 giraffe.winding = false;
             }, 3000);
         }
     },
-    autoSwing : function(deceptiveX, deceptiveY) {
+    autoSwing : function(deceptiveX, deceptiveY, callback) {
         var x = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15),
             y = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15);
         var convergence = 1.35 * this.batter.skill.offense.eye/100,
@@ -111,38 +111,13 @@ Game.prototype = {
         }
 
         if (swingLikelihood - 10*(this.umpire.count.balls - this.umpire.count.strikes) > Math.random()*100) {
-            this.theSwing(x, y);
+            this.theSwing(x, y, callback);
         } else {
             // no swing;
-            this.theSwing(-20, y);
+            this.theSwing(-20, y, callback);
         }
     },
-    pitchTarget : {x : 100, y : 100},
-    pitchInFlight : {
-        x : 100,
-        y : 100,
-        breakDirection : [0, 0],
-        name : 'slider',
-        velocity : 50,
-        break : 50,
-        control : 50
-    },
-    swingResult : {
-        x : 100, //difference to pitch location
-        y : 100, //difference to pitch location
-        strike : false,
-        foul : false,
-        caught : false,
-        contact : false,
-        looking : true,
-        bases : 0,
-        fielder : 'short',
-        outs : 0
-    },
-    pitchSelect : function() {
-
-    },
-    thePitch : function(x, y) {
+    thePitch : function(x, y, callback) {
         if (this.stage == 'pitch') {
             this.pitchTarget.x = x;
             this.pitchTarget.y = y;
@@ -165,14 +140,14 @@ Game.prototype = {
 
             this.stage = 'swing';
             if (this.humanControl == 'both' || this.teams[this.humanControl].lineup[this.batter.team.nowBatting] == this.batter) {
-
+                callback();
             } else {
-                this.autoSwing(x, y);
+                this.autoSwing(x, y, callback);
             }
         }
     },
     battersEye : '',
-    theSwing : function(x, y) {
+    theSwing : function(x, y, callback) {
         if (this.stage == 'swing') {
             this.swingResult = {};
             this.swingResult.x = 100 + (x - 100)*(0.5+Math.random()*this.batter.skill.offense.eye/200) - this.pitchInFlight.x;
@@ -199,11 +174,36 @@ Game.prototype = {
             this.umpire.makeCall();
 
             if (this.humanControl == 'both' || this.teams[this.humanControl].positions.pitcher == this.pitcher) {
-
+                callback();
             } else {
-                this.autoPitch();
+                this.autoPitch(callback);
             }
         }
+    },
+    pitchTarget : {x : 100, y : 100},
+    pitchInFlight : {
+        x : 100,
+        y : 100,
+        breakDirection : [0, 0],
+        name : 'slider',
+        velocity : 50,
+        break : 50,
+        control : 50
+    },
+    swingResult : {
+        x : 100, //difference to pitch location
+        y : 100, //difference to pitch location
+        strike : false,
+        foul : false,
+        caught : false,
+        contact : false,
+        looking : true,
+        bases : 0,
+        fielder : 'short',
+        outs : 0
+    },
+    pitchSelect : function() {
+
     },
     field : null,
     teams : {
