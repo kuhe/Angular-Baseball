@@ -2,9 +2,9 @@ IndexController = function($scope) {
     window.s = $scope;
     $scope.t = text;
     $scope.y = new Game();
-    $scope.mode = function(set) {
-        if (set) {
-            mode = set;
+    $scope.mode = function(setMode) {
+        if (setMode) {
+            mode = setMode;
         }
         return mode;
     };
@@ -37,7 +37,7 @@ IndexController = function($scope) {
         var top = 200-game.pitchTarget.y;
         var left = game.pitchTarget.x;
         var breakTop = 200-game.pitchInFlight.y,
-            breakleft = game.pitchInFlight.x;
+            breakLeft = game.pitchInFlight.x;
         keyframes.deleteRule('0%');
         keyframes.deleteRule('25%');
         keyframes.deleteRule('50%');
@@ -47,9 +47,9 @@ IndexController = function($scope) {
         keyframes.insertRule('25% { '+to(20, top, left)+' }');
         keyframes.insertRule('50% { '+to(35, top, left)+' }');
         keyframes.insertRule('75% { '+to(65, top, left)+' }');
-        keyframes.insertRule('100% { '+to(100, breakTop, breakleft)+' }');
+        keyframes.insertRule('100% { '+to(100, breakTop, breakLeft)+' }');
 
-        $baseballs = jQ('.baseball');
+        var $baseballs = jQ('.baseball');
         var flightSpeed = 1.3 - 0.6*(game.pitchInFlight.velocity + 300)/400;
         $baseballs.css('-webkit-animation', 'flight '+flightSpeed+'s 1 0s linear');
         $baseballs.removeClass('flight');
@@ -83,8 +83,8 @@ IndexController = function($scope) {
         });
         $baseballs.each(function(k, item) {
             var elm = item,
-                newone = elm.cloneNode(true);
-            elm.parentNode.replaceChild(newone, elm);
+                newOne = elm.cloneNode(true);
+            elm.parentNode.replaceChild(newOne, elm);
         });
     };
     $scope.selectPitch = function(pitchName) {
