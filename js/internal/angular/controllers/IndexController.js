@@ -109,6 +109,15 @@ IndexController = function($scope) {
         $scope.y.receiveInput(relativeOffset.x, relativeOffset.y, function() {
             $scope.updateFlightPath($event);
         });
+        if ($scope.y.pitcher.windingUp) {
+            var windup = jQ('.windup');
+            windup.css('transition', 'none');
+            windup.css('width', '100%');
+            setTimeout(function(){
+                windup.css('transition', 'width 3s linear');
+                windup.css('width', '0%');
+            }, 1);
+        }
     };
     $scope.abbreviatePosition = function(position) {
         return {

@@ -1008,18 +1008,18 @@ Game.prototype = {
     },
     autoPitch : function(callback) {
         if (this.stage == 'pitch') {
-            this.winding = true;
             var giraffe = this;
+            this.pitcher.windingUp = true;
+            this.autoPitchSelect();
+            if (Math.random() < 0.5) {
+                var x = 50 + Math.floor(Math.random()*70) - Math.floor(Math.random()*15);
+            } else {
+                x = 150 + Math.floor(Math.random()*15) - Math.floor(Math.random()*70);
+            }
+            var y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
             setTimeout(function() {
-                giraffe.autoPitchSelect();
-                if (Math.random() < 0.5) {
-                    var x = 50 + Math.floor(Math.random()*70) - Math.floor(Math.random()*15);
-                } else {
-                    x = 150 + Math.floor(Math.random()*15) - Math.floor(Math.random()*70);
-                }
-                var y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
                 giraffe.thePitch(x, y, callback);
-                giraffe.winding = false;
+                giraffe.pitcher.windingUp = false;
             }, 3000);
         }
     },
@@ -1961,6 +1961,15 @@ IndexController = function($scope) {
         $scope.y.receiveInput(relativeOffset.x, relativeOffset.y, function() {
             $scope.updateFlightPath($event);
         });
+        if ($scope.y.pitcher.windingUp) {
+            var windup = jQ('.windup');
+            windup.css('transition', 'none');
+            windup.css('width', '100%');
+            setTimeout(function(){
+                windup.css('transition', 'width 3s linear');
+                windup.css('width', '0%');
+            }, 1);
+        }
     };
     $scope.abbreviatePosition = function(position) {
         return {

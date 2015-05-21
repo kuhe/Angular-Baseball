@@ -487,7 +487,8 @@ html body {
   height: 5px;
   background: #353535;
   transition: width 3s ease;
+  display: none;
 }
 .windup.winding {
-  width: 0;
+  display: block;
 }
