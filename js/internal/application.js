@@ -1202,14 +1202,13 @@ Game.prototype = {
         this.umpire = new Umpire(this);
         if (this.humanPitching()) {
             this.stage = 'pitch';
-        } else {
-            this.autoPitch(function(){});
         }
     },
     getInning : function() {
         return mode == 'n' ? (this.inning + (this.half == 'top' ? 'オモテ' : 'ウラ')) : this.half.toUpperCase() + ' ' + this.inning;
     },
     humanBatting : function() {
+        if (this.humanControl == 'none') return false;
         switch (this.half) {
             case 'top':
                 return this.humanControl == 'both' || this.humanControl == 'away';
@@ -1220,6 +1219,7 @@ Game.prototype = {
         }
     },
     humanPitching : function() {
+        if (this.humanControl == 'none') return false;
         switch (this.half) {
             case 'top':
                 return this.humanControl == 'both' || this.humanControl == 'home';
@@ -1234,14 +1234,27 @@ Game.prototype = {
         this.log.note(this.tally.home.R > this.tally.away.R ? 'Home team wins!' : (this.tally.home.R == this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!'));
     },
     stage : 'pitch', //pitch, swing
-    humanControl : 'home', //home, away, both
-    receiveInput : function(x, y, callback) {
+    humanControl : 'none', //home, away, both, none
+    simulateInput : function(callback) {
         if (this.stage == 'end') {
             return;
         }
         if (this.stage == 'pitch') {
-            this.thePitch(x, y, callback);
+            this.autoPitch(callback);
         } else if (this.stage == 'swing') {
+            this.autoSwing(this.pitchTarget.x, this.pitchTarget.y, callback);
+        }
+    },
+    receiveInput : function(x, y, callback) {
+        if (this.humanControl == 'none') {
+            return;
+        }
+        if (this.stage == 'end') {
+            return;
+        }
+        if (this.stage == 'pitch' && this.humanPitching()) {
+            this.thePitch(x, y, callback);
+        } else if (this.stage == 'swing'  && this.humanBatting()) {
             this.theSwing(x, y, callback);
         }
     },
@@ -1284,6 +1297,7 @@ Game.prototype = {
         }
     },
     autoSwing : function(deceptiveX, deceptiveY, callback) {
+        var giraffe = this;
         var x = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15),
             y = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15);
         var convergence = 1.35 * this.batter.skill.offense.eye/100,
@@ -1300,15 +1314,18 @@ Game.prototype = {
         if (x < 60 || x > 140 || y < 50 || y > 150) { // ball
             swingLikelihood = Math.min(swingLikelihood, 100 - this.batter.skill.offense.eye);
         } else {
-            swingLikelihood = Math.max(45, (swingLikelihood + this.batter.skill.offense.eye)/2);
+            swingLikelihood = Math.max(45, (2*swingLikelihood + this.batter.skill.offense.eye)/3);
         }
+        var chance = Math.random()*100,
+            totalLikelihood = swingLikelihood - 10*(this.umpire.count.balls - this.umpire.count.strikes);
 
-        if (swingLikelihood - 10*(this.umpire.count.balls - this.umpire.count.strikes) > Math.random()*100) {
-            this.theSwing(x, y, callback);
-        } else {
-            // no swing;
-            this.theSwing(-20, y, callback);
+        if (totalLikelihood < chance ) {
+            x = -20;
         }
+        log('swing like', totalLikelihood, chance);
+        callback(function() {
+            giraffe.theSwing(x, y);
+        });
     },
     thePitch : function(x, y, callback) {
         if (this.stage == 'pitch') {
@@ -1332,7 +1349,7 @@ Game.prototype = {
             this.log.notePitch(this.pitchInFlight, this.batter);
 
             this.stage = 'swing';
-            if (this.humanControl == 'both' || this.teams[this.humanControl].lineup[this.batter.team.nowBatting] == this.batter) {
+            if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl].lineup[this.batter.team.nowBatting] == this.batter)) {
                 callback();
             } else {
                 this.autoSwing(x, y, callback);
@@ -1366,10 +1383,12 @@ Game.prototype = {
 
             this.umpire.makeCall();
 
-            if (this.humanControl == 'both' || this.teams[this.humanControl].positions.pitcher == this.pitcher) {
-                callback();
-            } else {
-                this.autoPitch(callback);
+            if (typeof callback == 'function') {
+                if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl].positions.pitcher == this.pitcher)) {
+                    callback();
+                } else {
+                    this.autoPitch(callback);
+                }
             }
         }
     },
@@ -2044,11 +2063,11 @@ Umpire.prototype = {
             }
             this.game.half = 'bottom';
         } else {
-            this.game.half = 'top';
-            this.game.inning++;
-            if (this.game.inning > 9) {
+            if (this.game.inning + 1 > 9) {
                 return this.game.end();
             }
+            this.game.inning++;
+            this.game.half = 'top';
         }
         offense = this.game.half == 'top' ? 'away' : 'home';
         defense = this.game.half == 'top' ? 'home' : 'away';
@@ -2068,24 +2087,6 @@ Umpire.prototype = {
     },
     says : 'Play ball!',
     game : null
-};
-var Batter = function() {
-    this.init();
-};
-
-Batter.prototype = {
-    init : function() {
-
-    }
-};
-var Runner = function() {
-    this.init();
-};
-
-Runner.prototype = {
-    init : function() {
-
-    }
 };
 var Catcher = function() {
     this.init();
@@ -2114,6 +2115,24 @@ Pitcher.prototype = {
 
     }
 };
+var Batter = function() {
+    this.init();
+};
+
+Batter.prototype = {
+    init : function() {
+
+    }
+};
+var Runner = function() {
+    this.init();
+};
+
+Runner.prototype = {
+    init : function() {
+
+    }
+};
 IndexController = function($scope) {
     window.s = $scope;
     $scope.t = text;
@@ -2126,10 +2145,27 @@ IndexController = function($scope) {
     };
     $scope.holdUpTimeouts = [];
     $scope.expandScoreboard = false;
-    $scope.proceedToGame = function () {
+    $scope.proceedToGame = function() {
         jQ('.blocking').remove();
+        if ($scope.y.humanControl == 'none') {
+            var auto = setInterval(function() {
+                if ($scope.y.stage == 'end') {
+                    clearInterval(auto);
+                }
+                $scope.$apply();
+                $scope.y.simulateInput(function(callback) {
+                    $scope.$apply();
+                    $scope.updateFlightPath(callback);
+                });
+            }, $scope.y.field.hasRunnersOn() ? 1800 : 3300);
+        }
+        if ($scope.y.humanControl == 'away') {
+            $scope.y.simulateInput(function(callback) {
+                $scope.updateFlightPath(callback);
+            });
+        }
     };
-    $scope.updateFlightPath = function() {
+    $scope.updateFlightPath = function(callback) {
         var ss = document.styleSheets;
         var animation = 'flight';
         for (var i = 0; i < ss.length; ++i) {
@@ -2178,6 +2214,9 @@ IndexController = function($scope) {
             var horizontalBreak = (60 - Math.abs(game.pitchTarget.x - game.pitchInFlight.x))/10;
             jQ('.baseball').css('-webkit-animation', 'spin '+horizontalBreak+'s 5 0s linear');
             $scope.allowInput = true;
+            if (typeof callback == 'function') {
+                callback();
+            }
         }, flightSpeed*1000);
 
         if (!game.pitchInFlight.x) {
@@ -2242,8 +2281,8 @@ IndexController = function($scope) {
         while ($scope.holdUpTimeouts.length) {
             clearTimeout($scope.holdUpTimeouts.shift());
         }
-        $scope.y.receiveInput(relativeOffset.x, relativeOffset.y, function() {
-            $scope.updateFlightPath();
+        $scope.y.receiveInput(relativeOffset.x, relativeOffset.y, function(callback) {
+            $scope.updateFlightPath(callback);
         });
     };
     $scope.abbreviatePosition = function(position) {

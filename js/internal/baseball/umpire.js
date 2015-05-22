@@ -250,11 +250,11 @@ Umpire.prototype = {
             }
             this.game.half = 'bottom';
         } else {
-            this.game.half = 'top';
-            this.game.inning++;
-            if (this.game.inning > 9) {
+            if (this.game.inning + 1 > 9) {
                 return this.game.end();
             }
+            this.game.inning++;
+            this.game.half = 'top';
         }
         offense = this.game.half == 'top' ? 'away' : 'home';
         defense = this.game.half == 'top' ? 'home' : 'away';

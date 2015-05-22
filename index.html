@@ -5,364 +5,364 @@
     };
 </script>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>野球愛好会</title>
-        <script src="js/external/angular/angular.js"></script>
-        <script src="js/external/jquery/jquery-1.10.2.min.js"></script>
+<head>
+    <meta charset="utf-8">
+    <title>野球愛好会</title>
+    <script src="js/external/angular/angular.js"></script>
+    <script src="js/external/jquery/jquery-1.10.2.min.js"></script>
 
-        <script src="js/internal/application.js"></script>
+    <script src="js/internal/application.js"></script>
 
-        <link rel="shortcut icon" href="yakk.ico">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="css/internal/application.css">
-        <link href="css/external/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            @-webkit-keyframes spin {
-                from {
-                    -webkit-transform: rotate(0deg);
-                }
-                to {
-                    -webkit-transform: rotate(360deg);
-                }
+    <link rel="shortcut icon" href="yakk.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/internal/application.css">
+    <link href="css/external/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @-webkit-keyframes spin {
+            from {
+                -webkit-transform: rotate(0deg);
             }
-            @keyframes spin {
-                from {
-                    -ms-transform: rotate(0deg);
-                    transform: rotate(0deg);
-                }
-                to {
-                    -ms-transform: rotate(360deg);
-                    transform: rotate(360deg);
-                }
+            to {
+                -webkit-transform: rotate(360deg);
             }
-            @-webkit-keyframes flight {
-                0% {
-                }
-                25% {
-                }
-                50% {
-                }
-                75% {
-                }
-                100% {
-                }
+        }
+        @keyframes spin {
+            from {
+                -ms-transform: rotate(0deg);
+                transform: rotate(0deg);
             }
-            @keyframes flight {
-                0% {
-                }
-                25% {
-                }
-                50% {
-                }
-                75% {
-                }
-                100% {
-                }
+            to {
+                -ms-transform: rotate(360deg);
+                transform: rotate(360deg);
             }
-        </style>
-    </head>
-    <body class='blue'>
-        <div class='container' ng-app='YakyuuAikoukai' ng-controller='IndexController'>
-            <div class='blocking instructions' ng-click="proceedToGame()">
-                <div class='row'>
-                    <div class='col-md-4'>
-                        <p>When catching, click in the strike/ball zone to locate a pitch. A crudely css'd wheel of cheese in side profile
-                            which is actually representing a bat will indicate where the opponent swung
-                            while the cross-section of a candy cane which is really a ball will indicate
-                            where the ball was thrown (transparent) and where it broke (opaque).</p>
-                    </div>
-                    <div class="no-swing col-md-4">
-                        <div class="target {{y.stage}}">
-                            <div class='indicator baseball pitch' style='top:125px;left:155px;'></div>
-                            <div class='indicator baseball break' style='top:125px;left:125px;'></div>
-                            <div class='indicator swing' style='top:100px;left:100px;'></div>
-                            <div class='strikezone'></div>
-                        </div>
-                    </div>
-                    <div class='col-md-4'>
-                        <p>
-                            You can call for a different pitch by clicking on the pitch name in the pitching data display
-                            in the lower left or below the strike zone indicator.
-                        </p>
-                    </div>
-                </div>
-                <div class='row'>
-                    <div class='col-md-4'>
-                        <p>When batting, you'll see a ball...
-                        Click inside the strike or ball zone to swing, or click on the side to the left or right of the ball zone to hold up (not swing).</p>
-                    </div>
-                    <div class="no-swing col-md-4">
-                        <div class="target {{y.stage}}">
-                            <div class='indicator baseball pitch' style='top:125px;left:155px;'></div>
-                            <div class='indicator baseball break' style='top:145px;left:135px;'></div>
-                            <div class='strikezone'></div>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <em>Click anywhere to continue</em>
+        }
+        @-webkit-keyframes flight {
+            0% {
+            }
+            25% {
+            }
+            50% {
+            }
+            75% {
+            }
+            100% {
+            }
+        }
+        @keyframes flight {
+            0% {
+            }
+            25% {
+            }
+            50% {
+            }
+            75% {
+            }
+            100% {
+            }
+        }
+    </style>
+</head>
+<body class='blue'>
+<div class='container' ng-app='YakyuuAikoukai' ng-controller='IndexController'>
+    <div class='blocking instructions' ng-click="proceedToGame()">
+        <div class='row'>
+            <div class='col-md-4'>
+                <p>When catching, click in the strike/ball zone to locate a pitch. A crudely css'd wheel of cheese in side profile
+                    which is actually representing a bat will indicate where the opponent swung
+                    while the cross-section of a candy cane which is really a ball will indicate
+                    where the ball was thrown (transparent) and where it broke (opaque).</p>
+            </div>
+            <div class="no-swing col-md-4">
+                <div class="target {{y.stage}}">
+                    <div class='indicator baseball pitch' style='top:125px;left:155px;'></div>
+                    <div class='indicator baseball break' style='top:125px;left:125px;'></div>
+                    <div class='indicator swing' style='top:100px;left:100px;'></div>
+                    <div class='strikezone'></div>
                 </div>
             </div>
-            <div scoreboard='' game='y' text='t'></div>
-            <hr>
-            <div class='diamond-display row'>
-                <div class='col-md-4'>
-                    <div class='pull-right'>
-                        <strong class='pointer' ng-show='mode() == "e"'>English</strong>
-                        <em class='pointer' ng-click='mode("e")' ng-show='mode() != "e"'>English</em>
-                        <br>
-                        <strong class='pointer' ng-show='mode() == "n"'>日本語</strong>
-                        <em class='pointer' ng-click='mode("n")' ng-show='mode() != "n"'>日本語</em>
-                    </div>
+            <div class='col-md-4'>
+                <p>
+                    You can call for a different pitch by clicking on the pitch name in the pitching data display
+                    in the lower left or below the strike zone indicator.
+                </p>
+            </div>
+        </div>
+        <div class='row'>
+            <div class='col-md-4'>
+                <p>When batting, you'll see a ball...
+                    Click inside the strike or ball zone to swing, or click on the side to the left or right of the ball zone to hold up (not swing).</p>
+            </div>
+            <div class="no-swing col-md-4">
+                <div class="target {{y.stage}}">
+                    <div class='indicator baseball pitch' style='top:125px;left:155px;'></div>
+                    <div class='indicator baseball break' style='top:145px;left:135px;'></div>
+                    <div class='strikezone'></div>
                 </div>
-                <div class='col-md-4'>
-                    <div class='splay-indicator visible-lg'>
-                        <div class='splay-indicator-ball' ng-show='y.swingResult.contact'
-                                ng-style='{
+            </div>
+        </div>
+        <div>
+            <em>Click anywhere to continue</em>
+        </div>
+    </div>
+    <div scoreboard='' game='y' text='t'></div>
+    <hr>
+    <div class='diamond-display row'>
+        <div class='col-md-4'>
+            <div class='pull-right'>
+                <strong class='pointer' ng-show='mode() == "e"'>English</strong>
+                <em class='pointer' ng-click='mode("e")' ng-show='mode() != "e"'>English</em>
+                <br>
+                <strong class='pointer' ng-show='mode() == "n"'>日本語</strong>
+                <em class='pointer' ng-click='mode("n")' ng-show='mode() != "n"'>日本語</em>
+            </div>
+        </div>
+        <div class='col-md-4'>
+            <div class='splay-indicator visible-lg'>
+                <div class='splay-indicator-ball' ng-show='y.swingResult.contact'
+                     ng-style='{
                                     bottom: y.swingResult.bottom,
                                     left: y.swingResult.left
                                 }'>
+                </div>
+            </div>
+        </div>
+        <div class='col-md-4'></div>
+    </div>
+    <hr>
+    <div class='main-area noselect row'>
+        <div class='row'>
+            <div class='col-md-4 background-color visible-lg visible-md'>
+                <!--<div ng-repeat='(key, val) in y.swingResult'>-->
+                <!--{{key}} : {{val}}-->
+                <!--</div>-->
+                <ul class="list-group pitch-record">
+                    <li class='list-group-item' ng-repeat="event in y.log.pitchRecord track by $index">
+                        <strong ng-if="$index == 0">
+                            {{event}}
+                        </strong>
+                        <span ng-if="$index">
+                            {{event}}
+                        </span>
+                    </li>
+                </ul>
+            </div>
+            <div class='col-md-4'>
+                <div class='windup' ng-class='{winding: y.humanControl == "none" || (y.humanBatting() && !y.humanPitching())}'></div>
+                <div class="no-swing" ng-click="indicate($event)">
+                    <div class="target {{y.stage}}" ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'>
+                        <div class='indicator baseball pitch hide'></div>
+                        <div class='indicator baseball break hide'></div>
+                        <div class='indicator swing {{y.swingResult.looking ? "hide" : ""}}'
+                             ng-style='{top:200-y.pitchInFlight.y-y.swingResult.y + "px", left:y.pitchInFlight.x + y.swingResult.x + "px"}'>
                         </div>
+                        <div class='strikezone' ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'></div>
                     </div>
                 </div>
-                <div class='col-md-4'></div>
-            </div>
-            <hr>
-            <div class='main-area noselect row'>
-                <div class='row'>
-                    <div class='col-md-4 background-color visible-lg visible-md'>
-                        <!--<div ng-repeat='(key, val) in y.swingResult'>-->
-                            <!--{{key}} : {{val}}-->
-                        <!--</div>-->
-                        <ul class="list-group pitch-record">
-                            <li class='list-group-item' ng-repeat="event in y.log.pitchRecord track by $index">
-                                <strong ng-if="$index == 0">
-                                    {{event}}
-                                </strong>
-                                <span ng-if="$index">
-                                    {{event}}
-                                </span>
-                            </li>
-                        </ul>
+                <div class='centered'>
+                    <div class="list-group-item umpire">
+                        Umpire: {{y.umpire.says}}
                     </div>
-                    <div class='col-md-4'>
-                        <div class='windup' ng-class='{winding: y.humanBatting() && !y.humanPitching()}'></div>
-                        <div class="no-swing" ng-click="indicate($event)">
-                            <div class="target {{y.stage}}" ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'>
-                                <div class='indicator baseball pitch hide'></div>
-                                <div class='indicator baseball break hide'></div>
-                                <div class='indicator swing {{y.swingResult.looking ? "hide" : ""}}'
-                                     ng-style='{top:200-y.pitchInFlight.y-y.swingResult.y + "px", left:y.pitchInFlight.x + y.swingResult.x + "px"}'>
-                                </div>
-                                <div class='strikezone' ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'></div>
-                            </div>
-                        </div>
-                        <div class='centered'>
-                            <div class="list-group-item umpire">
-                                Umpire: {{y.umpire.says}}
-                            </div>
-                            <ul class='list-inline'>
-                                {{y.stage == 'swing' || y.pitcher.windingUp ? t('Batting, ') + y.battersEye : ''}}
-                                <hr ng-if='y.stage == "pitch" && !y.pitcher.windingUp'/>
-                                {{y.stage == 'pitch' && !y.pitcher.windingUp ? t('Catching, pitch selection') : '' }}
-                                <br>
-                                <li ng-if='y.stage == "pitch" && !y.pitcher.windingUp' class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
+                    <ul class='list-inline'>
+                        {{y.stage == 'swing' || y.pitcher.windingUp ? t('Batting, ') + y.battersEye : ''}}
+                        <hr ng-if='y.stage == "pitch" && !y.pitcher.windingUp'/>
+                        {{y.stage == 'pitch' && !y.pitcher.windingUp ? t('Catching, pitch selection') : '' }}
+                        <br>
+                        <li ng-if='y.stage == "pitch" && !y.pitcher.windingUp' class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
                                     <span ng-click="selectPitch(name)">
                                         <strong ng-show='y.pitchInFlight.name == name'>{{ t(name) }}</strong>
                                         <em ng-show='y.pitchInFlight.name != name'>{{ t(name) }}</em>
                                     </span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class='col-md-4 background-color visible-lg visible-md'>
-                        <ul class="list-group play-record">
-                            <li class='list-group-item' ng-repeat="event in y.log.shortRecord track by $index">
-                                <strong ng-if="$index == 0">
-                                    {{event}}
-                                </strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class='col-md-4 background-color visible-lg visible-md'>
+                <ul class="list-group play-record">
+                    <li class='list-group-item' ng-repeat="event in y.log.shortRecord track by $index">
+                        <strong ng-if="$index == 0">
+                            {{event}}
+                        </strong>
                                 <span ng-if="$index">
                                     {{event}}
                                 </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class='row list-group-item'>
-                <div class='col-lg-6' ng-class='{"pull-right": y.half=="top"}'>
-                    <div>
-                        <div class='row list-group-item'>
-                            <div class='col-lg-6'>
-                                <em>{{y.pitcher.throws == 'right' ? 'RHP' : 'LHP'}}</em> &raquo;
-                                <strong>{{y.pitcher.getName()}}</strong>
-                                ({{t('#')+y.pitcher.number}}) <span ng-if='y.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>
-                            </div>
-                            <div class='col-lg-6'>
-                                <em>C</em> &raquo;
-                                <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
-                                ({{t('#')+y.pitcher.team.positions.catcher.number}}) <span ng-if='y.pitcher.team.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
-                            </div>
-                            <div class='row'>
-                                <div class='col-xs-3'>
-                                    {{ t('Season') }}
-                                    <br>
-                                    {{y.pitcher.stats.pitching.W}} - {{y.pitcher.stats.pitching.L}}, {{y.pitcher.stats.pitching.GS}} GS
-                                    <br>
-                                    {{y.pitcher.stats.pitching.getERA() | number:2}} ERA
-                                </div>
-                                <div class='col-xs-2'>
-                                    {{ t('Game') }}
-                                    <br>
-                                    {{y.pitcher.stats.pitching.strikes}} - {{y.pitcher.stats.pitching.pitches}}
-                                    <br>
-                                    {{y.pitcher.stats.pitching.K}}K {{y.pitcher.stats.pitching.H}}H
-                                </div>
-                                <div class='col-xs-7'>
-                                </div>
-                            </div>
-                        </div>
-                        <div class='row'></div>
-                        <div class='row'>
-                            <table class='list-group-item table table-condensed'>
-                                <thead>
-                                    <tr>
-                                        <th>{{ t('Pitch') }}</th>
-                                        <th class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
-                                            <span ng-click="selectPitch(name)">{{t(name)}}</span>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>{{ t('Control') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.control/120+")"}'></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>{{ t('Velocity') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.velocity/120+")"}'></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>{{ t('Break') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.break/120+")"}'></span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class='col-lg-6 list-group-item' ng-class='{"pull-left": y.half=="top"}'>
-                    <div class='row'>
-                        <div class='col-lg-6'>
-                            <div>
-                                {{ t('At Bat :') }} &raquo; <strong>{{y.batter.getName()}}</strong>
-                                ({{t('#')+y.batter.number}}) <span ng-if='y.batter.hero' class='glyphicon glyphicon-chevron-up'></span> -
-                                <em>{{abbreviatePosition(y.batter.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}</em>
-                            </div>
-                            <div class='row'>
-                                <div class='col-xs-6'>
-                                    {{y.batter.stats.batting.getBA() | number:3}} BA
-                                    <br>
-                                    {{y.batter.stats.batting.getOBP() | number:3}} OBP
-                                    <br>
-                                    {{y.batter.stats.batting.getOBP() + y.batter.stats.batting.getSLG() | number:3}} OPS
-                                    <br>
-                                    {{y.batter.stats.batting.hr}} HR
-                                    <br>
-                                    {{y.batter.stats.batting.rbi}} RBI
-                                </div>
-                                <div class='col-xs-6'>
-                                    <div>
-                                        {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.eye/120+")"}'></span>
-                                    </div>
-                                    <div>
-                                        {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.power/120+")"}'></span>
-                                    </div>
-                                    <div>
-                                        {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.speed/120+")"}'></span>
-                                    </div>
-                                    <div>
-                                        - {{y.batter.atBats.join(', ')}} -
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class='col-lg-6'>
-                            <div>
-                                {{ t('On Deck :') }} &raquo; <strong>{{y.deck.getName()}}</strong>
-                                ({{t('#')+y.deck.number}}) <span ng-if='y.deck.hero' class='glyphicon glyphicon-chevron-up'></span> -
-                                {{abbreviatePosition(y.deck.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}
-                            </div>
-                            <div class='row'>
-                                <div class='col-xs-6'>
-                                    {{y.deck.stats.batting.getBA() | number:3}} BA
-                                    <br>
-                                    {{y.deck.stats.batting.getOBP() | number:3}} OBP
-                                    <br>
-                                    {{y.deck.stats.batting.getOBP() + y.deck.stats.batting.getSLG() | number:3}} OPS
-                                    <br>
-                                    {{y.deck.stats.batting.hr}} HR
-                                    <br>
-                                    {{y.deck.stats.batting.rbi}} RBI
-                                </div>
-                                <div class='col-xs-6'>
-                                    <div>
-                                        {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.eye/120+")"}'></span>
-                                    </div>
-                                    <div>
-                                        {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.power/120+")"}'></span>
-                                    </div>
-                                    <div>
-                                        {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.speed/120+")"}'></span>
-                                    </div>
-                                    <div>
-                                        - {{y.deck.atBats.join(', ')}} -
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class='block col-lg-12 hidden-lg hidden-md'>
-                <ul class="list-group pitch-record col-lg-6">
-                    <li class='list-group-item' ng-repeat="event in y.log.pitchRecord track by $index">
-                        {{event}}
-                    </li>
-                </ul>
-                <ul class="list-group pitch-record col-lg-6">
-                    <li class='list-group-item' ng-repeat="event in y.log.shortRecord track by $index">
-                        {{event}}
-                    </li>
-                </ul>
-            </div>
-            <div class='clear'></div>
-            <div class='col-lg-12'>
-                <ul class='list-group col-lg-6'>
-                    <li class='list-group-item'>
-                        {{y.teams.away.getName()}}
-                    </li>
-                    <li class='list-group-item' ng-repeat="(order, player) in y.teams.away.lineup track by $index">
-                        {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.defense.fielding/120+")"}'></span> &raquo;
-                        <strong>{{player.getName()}}</strong> ({{t('#')+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
-                         {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
-                        <span class='pull-right'>
-                            {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
-                        </span>
-                    </li>
-                </ul>
-                <ul class='list-group col-lg-6'>
-                    <li class='list-group-item'>
-                        {{y.teams.home.getName()}}
-                    </li>
-                    <li class='list-group-item' ng-repeat="(order, player) in y.teams.home.lineup track by $index">
-                        {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.defense.fielding/120+")"}'></span> &raquo;
-                        <strong>{{player.getName()}}</strong> ({{t('#')+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
-                         {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
-                        <span class='pull-right'>
-                            {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
-                        </span>
                     </li>
                 </ul>
             </div>
         </div>
-    </body>
+    </div>
+    <div class='row list-group-item'>
+        <div class='col-lg-6' ng-class='{"pull-right": y.half=="top"}'>
+            <div>
+                <div class='row list-group-item'>
+                    <div class='col-lg-6'>
+                        <em>{{y.pitcher.throws == 'right' ? 'RHP' : 'LHP'}}</em> &raquo;
+                        <strong>{{y.pitcher.getName()}}</strong>
+                        ({{t('#')+y.pitcher.number}}) <span ng-if='y.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+                    </div>
+                    <div class='col-lg-6'>
+                        <em>C</em> &raquo;
+                        <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
+                        ({{t('#')+y.pitcher.team.positions.catcher.number}}) <span ng-if='y.pitcher.team.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+                    </div>
+                    <div class='row'>
+                        <div class='col-xs-3'>
+                            {{ t('Season') }}
+                            <br>
+                            {{y.pitcher.stats.pitching.W}} - {{y.pitcher.stats.pitching.L}}, {{y.pitcher.stats.pitching.GS}} GS
+                            <br>
+                            {{y.pitcher.stats.pitching.getERA() | number:2}} ERA
+                        </div>
+                        <div class='col-xs-2'>
+                            {{ t('Game') }}
+                            <br>
+                            {{y.pitcher.stats.pitching.strikes}} - {{y.pitcher.stats.pitching.pitches}}
+                            <br>
+                            {{y.pitcher.stats.pitching.K}}K {{y.pitcher.stats.pitching.H}}H
+                        </div>
+                        <div class='col-xs-7'>
+                        </div>
+                    </div>
+                </div>
+                <div class='row'></div>
+                <div class='row'>
+                    <table class='list-group-item table table-condensed'>
+                        <thead>
+                        <tr>
+                            <th>{{ t('Pitch') }}</th>
+                            <th class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
+                                <span ng-click="selectPitch(name)">{{t(name)}}</span>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>{{ t('Control') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.control/120+")"}'></span></td>
+                        </tr>
+                        <tr>
+                            <td>{{ t('Velocity') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.velocity/120+")"}'></span></td>
+                        </tr>
+                        <tr>
+                            <td>{{ t('Break') }}</td><td ng-repeat='(name, pitch) in y.pitcher.pitching'><span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.break/120+")"}'></span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class='col-lg-6 list-group-item' ng-class='{"pull-left": y.half=="top"}'>
+            <div class='row'>
+                <div class='col-lg-6'>
+                    <div>
+                        {{ t('At Bat :') }} &raquo; <strong>{{y.batter.getName()}}</strong>
+                        ({{t('#')+y.batter.number}}) <span ng-if='y.batter.hero' class='glyphicon glyphicon-chevron-up'></span> -
+                        <em>{{abbreviatePosition(y.batter.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}</em>
+                    </div>
+                    <div class='row'>
+                        <div class='col-xs-6'>
+                            {{y.batter.stats.batting.getBA() | number:3}} BA
+                            <br>
+                            {{y.batter.stats.batting.getOBP() | number:3}} OBP
+                            <br>
+                            {{y.batter.stats.batting.getOBP() + y.batter.stats.batting.getSLG() | number:3}} OPS
+                            <br>
+                            {{y.batter.stats.batting.hr}} HR
+                            <br>
+                            {{y.batter.stats.batting.rbi}} RBI
+                        </div>
+                        <div class='col-xs-6'>
+                            <div>
+                                {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.eye/120+")"}'></span>
+                            </div>
+                            <div>
+                                {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.power/120+")"}'></span>
+                            </div>
+                            <div>
+                                {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.speed/120+")"}'></span>
+                            </div>
+                            <div>
+                                - {{y.batter.atBats.join(', ')}} -
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class='col-lg-6'>
+                    <div>
+                        {{ t('On Deck :') }} &raquo; <strong>{{y.deck.getName()}}</strong>
+                        ({{t('#')+y.deck.number}}) <span ng-if='y.deck.hero' class='glyphicon glyphicon-chevron-up'></span> -
+                        {{abbreviatePosition(y.deck.position)}}, {{y.batter.bats == 'left' ? 'LHB' : 'RHB'}}
+                    </div>
+                    <div class='row'>
+                        <div class='col-xs-6'>
+                            {{y.deck.stats.batting.getBA() | number:3}} BA
+                            <br>
+                            {{y.deck.stats.batting.getOBP() | number:3}} OBP
+                            <br>
+                            {{y.deck.stats.batting.getOBP() + y.deck.stats.batting.getSLG() | number:3}} OPS
+                            <br>
+                            {{y.deck.stats.batting.hr}} HR
+                            <br>
+                            {{y.deck.stats.batting.rbi}} RBI
+                        </div>
+                        <div class='col-xs-6'>
+                            <div>
+                                {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.eye/120+")"}'></span>
+                            </div>
+                            <div>
+                                {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.power/120+")"}'></span>
+                            </div>
+                            <div>
+                                {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.speed/120+")"}'></span>
+                            </div>
+                            <div>
+                                - {{y.deck.atBats.join(', ')}} -
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class='block col-lg-12 hidden-lg hidden-md'>
+        <ul class="list-group pitch-record col-lg-6">
+            <li class='list-group-item' ng-repeat="event in y.log.pitchRecord track by $index">
+                {{event}}
+            </li>
+        </ul>
+        <ul class="list-group pitch-record col-lg-6">
+            <li class='list-group-item' ng-repeat="event in y.log.shortRecord track by $index">
+                {{event}}
+            </li>
+        </ul>
+    </div>
+    <div class='clear'></div>
+    <div class='col-lg-12'>
+        <ul class='list-group col-lg-6'>
+            <li class='list-group-item'>
+                {{y.teams.away.getName()}}
+            </li>
+            <li class='list-group-item' ng-repeat="(order, player) in y.teams.away.lineup track by $index">
+                {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.defense.fielding/120+")"}'></span> &raquo;
+                <strong>{{player.getName()}}</strong> ({{t('#')+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
+                {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
+                <span class='pull-right'>
+                    {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
+                </span>
+            </li>
+        </ul>
+        <ul class='list-group col-lg-6'>
+            <li class='list-group-item'>
+                {{y.teams.home.getName()}}
+            </li>
+            <li class='list-group-item' ng-repeat="(order, player) in y.teams.home.lineup track by $index">
+                {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.defense.fielding/120+")"}'></span> &raquo;
+                <strong>{{player.getName()}}</strong> ({{t('#')+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
+                {{player.bats == 'left' ? 'L' : 'R'}}/{{player.throws == 'left' ? 'L' : 'R'}}
+                <span class='pull-right'>
+                    {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
+                </span>
+            </li>
+        </ul>
+    </div>
+</div>
+</body>
 </html>

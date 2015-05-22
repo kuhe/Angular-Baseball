@@ -10,10 +10,27 @@ IndexController = function($scope) {
     };
     $scope.holdUpTimeouts = [];
     $scope.expandScoreboard = false;
-    $scope.proceedToGame = function () {
+    $scope.proceedToGame = function() {
         jQ('.blocking').remove();
+        if ($scope.y.humanControl == 'none') {
+            var auto = setInterval(function() {
+                if ($scope.y.stage == 'end') {
+                    clearInterval(auto);
+                }
+                $scope.$apply();
+                $scope.y.simulateInput(function(callback) {
+                    $scope.$apply();
+                    $scope.updateFlightPath(callback);
+                });
+            }, $scope.y.field.hasRunnersOn() ? 1800 : 3300);
+        }
+        if ($scope.y.humanControl == 'away') {
+            $scope.y.simulateInput(function(callback) {
+                $scope.updateFlightPath(callback);
+            });
+        }
     };
-    $scope.updateFlightPath = function() {
+    $scope.updateFlightPath = function(callback) {
         var ss = document.styleSheets;
         var animation = 'flight';
         for (var i = 0; i < ss.length; ++i) {
@@ -62,6 +79,9 @@ IndexController = function($scope) {
             var horizontalBreak = (60 - Math.abs(game.pitchTarget.x - game.pitchInFlight.x))/10;
             jQ('.baseball').css('-webkit-animation', 'spin '+horizontalBreak+'s 5 0s linear');
             $scope.allowInput = true;
+            if (typeof callback == 'function') {
+                callback();
+            }
         }, flightSpeed*1000);
 
         if (!game.pitchInFlight.x) {
@@ -126,8 +146,8 @@ IndexController = function($scope) {
         while ($scope.holdUpTimeouts.length) {
             clearTimeout($scope.holdUpTimeouts.shift());
         }
-        $scope.y.receiveInput(relativeOffset.x, relativeOffset.y, function() {
-            $scope.updateFlightPath();
+        $scope.y.receiveInput(relativeOffset.x, relativeOffset.y, function(callback) {
+            $scope.updateFlightPath(callback);
         });
     };
     $scope.abbreviatePosition = function(position) {
