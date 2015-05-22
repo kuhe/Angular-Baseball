@@ -251,6 +251,12 @@ html body {
   border-right: none;
   background: #f0e69b;
 }
+.indicator.swing.left {
+  border-left: 3px solid #645f40;
+}
+.indicator.swing.right {
+  border-right: 3px solid #645f40;
+}
 .diamond {
   width: 0;
   height: 0;

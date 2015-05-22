@@ -5,7 +5,7 @@ var Game = function(baseball) {
 Game.prototype = {
     constructor : Game,
     gamesIntoSeason : 0,
-    humanControl : 'none', //home, away, both, none
+    humanControl : 'home', //home, away, both, none
     init : function(m) {
         if (m) window.mode = m;
         this.gamesIntoSeason = 60 + Math.floor(Math.random()*20);
