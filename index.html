@@ -166,12 +166,11 @@
                     <span>
                         {{y.humanControl == 'none' || y.stage == 'swing' || y.pitcher.windingUp ? t('Batting, ') + y.battersEye : ''}}
                     </span>
-                    <hr ng-if='y.humanControl != "none" && y.stage == "pitch" && !y.pitcher.windingUp'/>
                     <span ng-if='y.humanControl != "none"'>
                         {{y.stage == 'pitch' && !y.pitcher.windingUp ? t('Catching, pitch selection') : '' }}
                     </span>
-                    <br>
-                    <ul class='list-inline'>
+                    <hr>
+                    <ul class='list-inline pitch-selection'>
                         <li ng-if='y.humanControl != "none" && y.stage == "pitch" && !y.pitcher.windingUp' class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
                             <span ng-click="selectPitch(name)">
                                 <strong ng-show='y.pitchInFlight.name == name'>{{ t(name) }}</strong>
