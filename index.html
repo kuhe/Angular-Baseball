@@ -165,7 +165,7 @@
                     <span>
                         {{y.humanControl == 'none' || y.stage == 'swing' || y.pitcher.windingUp ? t('Batting, ') + y.battersEye : ''}}
                     </span>
-                    <hr ng-if='y.stage == "pitch" && !y.pitcher.windingUp'/>
+                    <hr ng-if='y.humanControl != "none" && y.stage == "pitch" && !y.pitcher.windingUp'/>
                     <span ng-if='y.humanControl != "none"'>
                         {{y.stage == 'pitch' && !y.pitcher.windingUp ? t('Catching, pitch selection') : '' }}
                     </span>
