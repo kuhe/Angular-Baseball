@@ -201,7 +201,11 @@ Game.prototype = {
             this.log.noteSwing(this.swingResult);
             this.stage = 'pitch';
 
+            var half = this.half;
             this.umpire.makeCall();
+            if (half != this.half) {
+                callback = this.startOpponentPitching;
+            }
 
             if (typeof callback == 'function') {
                 if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl] == this.pitcher.team)) {
@@ -212,6 +216,7 @@ Game.prototype = {
             }
         }
     },
+    startOpponentPitching : null, // late function
     pitchTarget : {x : 100, y : 100},
     pitchInFlight : {
         x : 100,

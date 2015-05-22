@@ -133,6 +133,9 @@ IndexController = function($scope) {
         //    $scope.updateFlightPath();
         //});
     };
+    $scope.y.startOpponentPitching = function(callback) {
+        $scope.updateFlightPath(callback);
+    };
     $scope.indicate = function($event) {
         if (!$scope.allowInput) {
             return;
