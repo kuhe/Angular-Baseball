@@ -29,6 +29,9 @@ IndexController = function($scope) {
                 $scope.updateFlightPath(callback);
             });
         }
+        if ($scope.y.humanControl == 'home') {
+
+        }
     };
     $scope.updateFlightPath = function(callback) {
         var ss = document.styleSheets;
@@ -81,6 +84,7 @@ IndexController = function($scope) {
             $scope.allowInput = true;
             if (typeof callback == 'function') {
                 callback();
+                $scope.$apply();
             }
         }, flightSpeed*1000);
 

@@ -52,7 +52,7 @@ Field.prototype = {
             var interceptRating = fielder.skill.defense.speed + flyAngle - swing.fielderTravel*1.65;
             if (interceptRating > 0 && flyAngle > -10) {
                 //caught cleanly?
-                if ((100-fielder.skill.defense.fielding)*0.25 + 0.02 > Math.random()) { //error
+                if ((100-fielder.skill.defense.fielding)*0.25 + 0.02 > Math.random()*100) { //error
                     fieldingEase *= 0.5;
                     swing.error = true;
                     swing.caught = false;

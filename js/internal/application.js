@@ -1030,7 +1030,7 @@ Field.prototype = {
             var interceptRating = fielder.skill.defense.speed + flyAngle - swing.fielderTravel*1.65;
             if (interceptRating > 0 && flyAngle > -10) {
                 //caught cleanly?
-                if ((100-fielder.skill.defense.fielding)*0.25 + 0.02 > Math.random()) { //error
+                if ((100-fielder.skill.defense.fielding)*0.25 + 0.02 > Math.random()*100) { //error
                     fieldingEase *= 0.5;
                     swing.error = true;
                     swing.caught = false;
@@ -1187,6 +1187,7 @@ var Game = function(baseball) {
 Game.prototype = {
     constructor : Game,
     gamesIntoSeason : 0,
+    humanControl : 'none', //home, away, both, none
     init : function(m) {
         if (m) window.mode = m;
         this.gamesIntoSeason = 60 + Math.floor(Math.random()*20);
@@ -1234,7 +1235,6 @@ Game.prototype = {
         this.log.note(this.tally.home.R > this.tally.away.R ? 'Home team wins!' : (this.tally.home.R == this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!'));
     },
     stage : 'pitch', //pitch, swing
-    humanControl : 'none', //home, away, both, none
     simulateInput : function(callback) {
         if (this.stage == 'end') {
             return;
@@ -1242,6 +1242,9 @@ Game.prototype = {
         if (this.stage == 'pitch') {
             this.autoPitch(callback);
         } else if (this.stage == 'swing') {
+            if (typeof this.pitchTarget != 'object') {
+                this.pitchTarget = {x: 100, y: 100};
+            }
             this.autoSwing(this.pitchTarget.x, this.pitchTarget.y, callback);
         }
     },
@@ -1322,7 +1325,6 @@ Game.prototype = {
         if (totalLikelihood < chance ) {
             x = -20;
         }
-        log('swing like', totalLikelihood, chance);
         callback(function() {
             giraffe.theSwing(x, y);
         });
@@ -1349,7 +1351,7 @@ Game.prototype = {
             this.log.notePitch(this.pitchInFlight, this.batter);
 
             this.stage = 'swing';
-            if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl].lineup[this.batter.team.nowBatting] == this.batter)) {
+            if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl] == this.batter.team)) {
                 callback();
             } else {
                 this.autoSwing(x, y, callback);
@@ -1384,7 +1386,7 @@ Game.prototype = {
             this.umpire.makeCall();
 
             if (typeof callback == 'function') {
-                if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl].positions.pitcher == this.pitcher)) {
+                if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl] == this.pitcher.team)) {
                     callback();
                 } else {
                     this.autoPitch(callback);
@@ -2164,6 +2166,9 @@ IndexController = function($scope) {
                 $scope.updateFlightPath(callback);
             });
         }
+        if ($scope.y.humanControl == 'home') {
+
+        }
     };
     $scope.updateFlightPath = function(callback) {
         var ss = document.styleSheets;
@@ -2216,6 +2221,7 @@ IndexController = function($scope) {
             $scope.allowInput = true;
             if (typeof callback == 'function') {
                 callback();
+                $scope.$apply();
             }
         }, flightSpeed*1000);
 
