@@ -20,15 +20,9 @@ Umpire.prototype = {
         this.game.deck = this.game.teams.away.lineup[1];
         this.game.hole = this.game.teams.away.lineup[2];
         this.game.pitcher = this.game.teams.home.positions.pitcher;
-        if (mode == 'n') {
-            this.game.log.note(
-                '一回のオモテ、'+this.game.teams.away.getName()+'の攻撃対'+this.game.teams.home.getName()+'、ピッチャーは'+this.game.teams.home.positions.pitcher.getName()+'。'
-            );
-        } else {
-            this.game.log.note(
-                'Top 1, '+this.game.teams.away.name+' offense vs. '+this.game.teams.home.positions.pitcher.name+' starting for '+this.game.teams.home.name
-            );
-        }
+        var n = '一回のオモテ、'+this.game.teams.away.getName()+'の攻撃対'+this.game.teams.home.getName()+'、ピッチャーは'+this.game.teams.home.positions.pitcher.getName()+'。',
+            e = 'Top 1, '+this.game.teams.away.name+' offense vs. '+this.game.teams.home.positions.pitcher.name+' starting for '+this.game.teams.home.name;
+        this.game.log.note(e, n);
         this.game.log.noteBatter(
             this.game.batter
         );
@@ -258,12 +252,10 @@ Umpire.prototype = {
         }
         offense = this.game.half == 'top' ? 'away' : 'home';
         defense = this.game.half == 'top' ? 'home' : 'away';
-        if (mode == 'n') {
-            this.game.log.note(this.game.inning+'回の'+(this.game.half == 'top' ? 'オモテ' : 'ウラ')
-            +'、'+this.game.teams[(this.game.half == 'top' ? 'away' : 'home')].getName()+'の攻撃。');
-        } else {
-            this.game.log.note((this.game.half == 'top' ? 'Top' : 'Bottom')+' '+this.game.inning);
-        }
+        var n = this.game.inning+'回の'+(this.game.half == 'top' ? 'オモテ' : 'ウラ')
+        +'、'+this.game.teams[(this.game.half == 'top' ? 'away' : 'home')].getName()+'の攻撃。',
+            e = (this.game.half == 'top' ? 'Top' : 'Bottom')+' '+this.game.inning;
+        this.game.log.note(e, n);
         var team = this.game.teams[offense];
         this.game.batter = team.lineup[team.nowBatting];
         this.game.deck = team.lineup[(team.nowBatting + 1)%9];

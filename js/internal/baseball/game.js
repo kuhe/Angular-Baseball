@@ -50,7 +50,10 @@ Game.prototype = {
     },
     end : function() {
         this.stage = 'end';
-        this.log.note(this.tally.home.R > this.tally.away.R ? 'Home team wins!' : (this.tally.home.R == this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!'));
+        var e, n;
+        e = this.tally.home.R > this.tally.away.R ? 'Home team wins!' : (this.tally.home.R == this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!');
+        n = this.tally.home.R > this.tally.away.R ? 'Home team wins!' : (this.tally.home.R == this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!');
+        this.log.note(e, n);
     },
     stage : 'pitch', //pitch, swing
     simulateInput : function(callback) {

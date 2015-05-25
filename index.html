@@ -136,7 +136,7 @@
                 <!--{{key}} : {{val}}-->
                 <!--</div>-->
                 <ul class="list-group pitch-record">
-                    <li class='list-group-item' ng-repeat="event in y.log.pitchRecord track by $index">
+                    <li class='list-group-item' ng-repeat="event in y.log.pitchRecord[mode()] track by $index">
                         <strong ng-if="$index == 0">
                             {{event}}
                         </strong>
@@ -182,7 +182,7 @@
             </div>
             <div class='col-md-4 background-color visible-lg visible-md'>
                 <ul class="list-group play-record">
-                    <li class='list-group-item' ng-repeat="event in y.log.shortRecord track by $index">
+                    <li class='list-group-item' ng-repeat="event in y.log.shortRecord[mode()] track by $index">
                         <strong ng-if="$index == 0">
                             {{event}}
                         </strong>
@@ -328,12 +328,12 @@
     </div>
     <div class='block col-lg-12 hidden-lg hidden-md'>
         <ul class="list-group pitch-record col-lg-6">
-            <li class='list-group-item' ng-repeat="event in y.log.pitchRecord track by $index">
+            <li class='list-group-item' ng-repeat="event in y.log.pitchRecord[mode()] track by $index">
                 {{event}}
             </li>
         </ul>
         <ul class="list-group pitch-record col-lg-6">
-            <li class='list-group-item' ng-repeat="event in y.log.shortRecord track by $index">
+            <li class='list-group-item' ng-repeat="event in y.log.shortRecord[mode()] track by $index">
                 {{event}}
             </li>
         </ul>

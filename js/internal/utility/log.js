@@ -5,13 +5,19 @@ var Log = function() {
 Log.prototype = {
     game : 'instance of Game',
     init : function() {
-        this.pitchRecord = [];
+        this.pitchRecord = {
+            e: [],
+            n: []
+        };
     },
-    note : function(note) {
-        this.record.unshift(note);
-        this.shortRecord = this.record.slice(0, 6);
+    note : function(note, noteJ) {
+        this.record.e.unshift(note);
+        this.shortRecord.e = this.record.e.slice(0, 6);
+
+        this.record.n.unshift(noteJ);
+        this.shortRecord.n = this.record.n.slice(0, 6);
     },
-    noteBatter : function(batter) {
+    getBatter : function(batter) {
         var order = batter.team.nowBatting;
         order = {
             0 : text(' 1st'),
@@ -25,7 +31,16 @@ Log.prototype = {
             8 : text(' 9th')
         }[order];
         var positions = this.longFormFielder();
-        this.note(text('Now batting')+order+text.comma()+positions[batter.position]+text.comma()+batter.getName());
+        return text('Now batting')+order+text.comma()+positions[batter.position]+text.comma()+batter.getName();
+    },
+    noteBatter : function(batter) {
+        var m = mode, record, recordJ;
+        mode = 'e';
+        record = this.getBatter(batter);
+        mode = 'n';
+        recordJ = this.getBatter(batter);
+        mode = m;
+        this.note(record, recordJ);
     },
     getPitchLocationDescription : function(pitchInFlight, batterIsLefty) {
         var x = pitchInFlight.x, y = pitchInFlight.y, say = '';
@@ -75,38 +90,55 @@ Log.prototype = {
         return say;
     },
     notePitch : function(pitchInFlight, batter) {
-        this.pitchRecord.unshift(
-            this.getPitchLocationDescription(pitchInFlight, batter.bats == 'left')
-        );
+        var m = mode, record, recordJ;
+        mode = 'e';
+        record = this.getPitchLocationDescription(pitchInFlight, batter.bats == 'left');
+        this.pitchRecord.e.unshift(record);
+        mode = 'n';
+        recordJ = this.getPitchLocationDescription(pitchInFlight, batter.bats == 'left');
+        this.pitchRecord.n.unshift(recordJ);
+        mode = m;
     },
-    noteSwing : function(swingResult) {
+    getSwing : function(swingResult) {
+        var result = '';
         if (swingResult.looking) {
             if (swingResult.strike) {
-                this.pitchRecord[0] += text('Strike.')
+                result += text('Strike.')
             } else {
-                this.pitchRecord[0] += text('Ball.')
+                result += text('Ball.')
             }
         } else {
             if (swingResult.contact) {
                 if (swingResult.foul) {
-                    this.pitchRecord[0] += text('Fouled off.')
+                    result += text('Fouled off.')
                 } else {
                     if (swingResult.caught) {
-                        this.pitchRecord[0] += text('In play.')
+                        result += text('In play.')
                     } else {
                         if (swingResult.thrownOut) {
-                            this.pitchRecord[0] += text('In play.')
+                            result += text('In play.')
                         } else {
-                            this.pitchRecord[0] += text('In play.')
+                            result += text('In play.')
                         }
                     }
                 }
             } else {
-                this.pitchRecord[0] += text('Swinging strike.')
+                result += text('Swinging strike.')
             }
         }
+        return result;
     },
-    notePlateAppearanceResult : function(game) {
+    noteSwing : function(swingResult) {
+        var m = mode, record, recordJ;
+        mode = 'e';
+        record = this.getSwing(swingResult);
+        this.pitchRecord.e[0] += record;
+        mode = 'n';
+        recordJ = this.getSwing(swingResult);
+        this.pitchRecord.n[0] += recordJ;
+        mode = m;
+    },
+    getPlateAppearanceResult : function(game) {
         var r = game.swingResult;
         var record = '';
         var batter = game.batter.getName();
@@ -166,13 +198,33 @@ Log.prototype = {
                 record = (batter+text(' struck out swinging.'));
             }
         }
-        this.record.unshift(record);
-        this.pitchRecord = [text('Previous: ')+record];
+        return record;
+    },
+    notePlateAppearanceResult : function(game) {
+        var m = mode, record, recordJ;
+        mode = 'e';
+        record = this.getPlateAppearanceResult(game);
+        this.record.e.unshift(record);
+        this.pitchRecord.e = [text('Previous: ')+record];
+        mode = 'n';
+        recordJ = this.getPlateAppearanceResult(game);
+        this.record.n.unshift(recordJ);
+        this.pitchRecord.n = [text('Previous: ')+recordJ];
+        mode = m;
     },
     pointer : 0,
-    pitchRecord : [],
-    shortRecord : [],
-    record : [],
+    pitchRecord : {
+        e: [],
+        n: []
+    },
+    shortRecord : {
+        e: [],
+        n: []
+    },
+    record : {
+        e: [],
+        n: []
+    },
     longFormFielder : function() {
         return {
             first : text('first baseman'),
