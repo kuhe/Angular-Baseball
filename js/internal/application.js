@@ -1357,16 +1357,18 @@ Game.prototype = {
     },
     autoSwing : function(deceptiveX, deceptiveY, callback) {
         var giraffe = this;
-        var bonus = this.batter.eye.bonus || 0;
+        var bonus = this.batter.eye.bonus || 0,
+            eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
+
         var x = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15),
             y = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15);
-        if (100*Math.random() < this.batter.skill.offense.eye + bonus) {
-            var convergence = 1.35 * 5*this.batter.skill.offense.eye/100,
+        if (100*Math.random() < eye) {
+            var convergence = 1.35 * 5*eye/100,
                 convergenceSum = 1 + convergence;
             deceptiveX = this.pitchInFlight.x;
             deceptiveY = this.pitchInFlight.y;
         } else {
-            convergence = 1.35 * 2*this.batter.skill.offense.eye/100;
+            convergence = 1.35 * 2*eye/100;
             convergenceSum = 1 + convergence;
         }
         x = (deceptiveX*(convergence) + x)/convergenceSum;
@@ -1375,9 +1377,9 @@ Game.prototype = {
         var swingLikelihood = (200 - Math.abs(100 - x) - Math.abs(100 - y))/2;
 
         if (x < 60 || x > 140 || y < 50 || y > 150) { // ball
-            swingLikelihood = Math.min(swingLikelihood, 100 - this.batter.skill.offense.eye) - 15*this.umpire.count.balls;
+            swingLikelihood = Math.min(swingLikelihood, 100 - eye) - 15*this.umpire.count.balls;
         } else {
-            swingLikelihood = Math.max(45, (2*swingLikelihood + this.batter.skill.offense.eye)/3);
+            swingLikelihood = Math.max(45, (2*swingLikelihood + eye)/3);
         }
         var chance = Math.random()*100,
             totalLikelihood = swingLikelihood - 35 + 10*(this.umpire.count.balls + 2*this.umpire.count.strikes);
@@ -1424,14 +1426,16 @@ Game.prototype = {
         if (this.stage == 'swing') {
             this.batter.fatigue++;
             this.swingResult = {};
-            this.swingResult.x = 100 + (x - 100)*(0.5+Math.random()*this.batter.skill.offense.eye/200) - this.pitchInFlight.x;
-            this.swingResult.y = 100 + (y - 100)*(0.5+Math.random()*this.batter.skill.offense.eye/200) - this.pitchInFlight.y;
+            var bonus = this.batter.eye.bonus || 0,
+                eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
+            this.swingResult.x = 100 + (x - 100)*(0.5+Math.random()*eye/200) - this.pitchInFlight.x;
+            this.swingResult.y = 100 + (y - 100)*(0.5+Math.random()*eye/200) - this.pitchInFlight.y;
 
             if (!(x < 0 || x > 200)) {
                 this.swingResult.looking = false;
                 if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {
                     this.swingResult.contact = true;
-                    this.batter.eye.bonus = Math.max(0, this.batter.skill.offense.eye -
+                    this.batter.eye.bonus = Math.max(0, eye -
                         Math.sqrt(Math.pow(this.batter.eye.x - this.pitchInFlight.x, 2) + Math.pow(this.batter.eye.y - this.pitchInFlight.y, 2)) * 1.5);
                     this.swingResult = this.field.determineSwingContactResult(this.swingResult);
                 } else {
@@ -1445,6 +1449,8 @@ Game.prototype = {
                 this.batter.eye.x = this.pitchInFlight.x;
                 this.batter.eye.y = this.pitchInFlight.y;
             }
+
+            log('current bonus', this.batter.eye);
 
             this.log.noteSwing(this.swingResult);
             this.stage = 'pitch';
