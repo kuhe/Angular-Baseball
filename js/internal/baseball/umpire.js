@@ -157,6 +157,7 @@ Umpire.prototype = {
     },
     reachBase : function() {
         this.game.field.first = this.game.batter;
+        this.game.field.first.fatigue += 2;
         return this;
     },
     advanceRunners : function(isWalk) {

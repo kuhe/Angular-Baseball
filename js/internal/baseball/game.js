@@ -124,11 +124,14 @@ Game.prototype = {
         var giraffe = this;
         var x = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15),
             y = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15);
-        var convergence = 1.35 * this.batter.skill.offense.eye/100,
-            convergenceSum = 1 + convergence;
         if (100*Math.random() < this.batter.skill.offense.eye) {
+            var convergence = 1.35 * 5*this.batter.skill.offense.eye/100,
+                convergenceSum = 1 + convergence;
             deceptiveX = this.pitchInFlight.x;
             deceptiveY = this.pitchInFlight.y;
+        } else {
+            convergence = 1.35 * 2*this.batter.skill.offense.eye/100;
+            convergenceSum = 1 + convergence;
         }
         x = (deceptiveX*(convergence) + x)/convergenceSum;
         y = (deceptiveY*(convergence) + y)/convergenceSum;
@@ -152,6 +155,7 @@ Game.prototype = {
     },
     thePitch : function(x, y, callback) {
         if (this.stage == 'pitch') {
+            this.pitcher.fatigue++;
             this.pitchTarget.x = x;
             this.pitchTarget.y = y;
 
@@ -182,6 +186,7 @@ Game.prototype = {
     battersEye : '',
     theSwing : function(x, y, callback) {
         if (this.stage == 'swing') {
+            this.batter.fatigue++;
             this.swingResult = {};
             this.swingResult.x = 100 + (x - 100)*(0.5+Math.random()*this.batter.skill.offense.eye/200) - this.pitchInFlight.x;
             this.swingResult.y = 100 + (y - 100)*(0.5+Math.random()*this.batter.skill.offense.eye/200) - this.pitchInFlight.y;

@@ -214,6 +214,8 @@ Player.prototype = {
     getName : function() {
         return mode == 'n' ? this.nameJ : this.name;
     },
+    eye : {},
+    fatigue : 0,
     name : '',
     number : 0,
     position : '',
