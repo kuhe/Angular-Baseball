@@ -2092,7 +2092,10 @@ Umpire.prototype = {
         return this;
     },
     newBatter : function() {
-        this.game.log.pitchRecord = [];
+        this.game.log.pitchRecord = {
+            e: [],
+            n: []
+        };
         this.count.balls = this.count.strikes = 0;
         this.game.log.notePlateAppearanceResult(this.game);
         var team = this.game.half == 'bottom' ? this.game.teams.home : this.game.teams.away;
@@ -2108,7 +2111,10 @@ Umpire.prototype = {
         this.game.swingResult.looking = true; // hide bat
         this.game.pitchInFlight.x = null; // hide ball
         this.game.pitchInFlight.y = null; // hide ball
-        this.game.log.pitchRecord = [];
+        this.game.log.pitchRecord = {
+            e: [],
+            n: []
+        };
         var offense, defense;
         this.game.field.first = null;
         this.game.field.second = null;
