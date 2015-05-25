@@ -122,9 +122,10 @@ Game.prototype = {
     },
     autoSwing : function(deceptiveX, deceptiveY, callback) {
         var giraffe = this;
+        var bonus = this.batter.eye.bonus || 0;
         var x = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15),
             y = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15);
-        if (100*Math.random() < this.batter.skill.offense.eye) {
+        if (100*Math.random() < this.batter.skill.offense.eye + bonus) {
             var convergence = 1.35 * 5*this.batter.skill.offense.eye/100,
                 convergenceSum = 1 + convergence;
             deceptiveX = this.pitchInFlight.x;
@@ -139,12 +140,12 @@ Game.prototype = {
         var swingLikelihood = (200 - Math.abs(100 - x) - Math.abs(100 - y))/2;
 
         if (x < 60 || x > 140 || y < 50 || y > 150) { // ball
-            swingLikelihood = Math.min(swingLikelihood, 100 - this.batter.skill.offense.eye);
+            swingLikelihood = Math.min(swingLikelihood, 100 - this.batter.skill.offense.eye) - 15*this.umpire.count.balls;
         } else {
             swingLikelihood = Math.max(45, (2*swingLikelihood + this.batter.skill.offense.eye)/3);
         }
         var chance = Math.random()*100,
-            totalLikelihood = swingLikelihood - 10*(this.umpire.count.balls - this.umpire.count.strikes);
+            totalLikelihood = swingLikelihood - 35 + 10*(this.umpire.count.balls + 2*this.umpire.count.strikes);
 
         if (totalLikelihood < chance ) {
             x = -20;
@@ -195,6 +196,8 @@ Game.prototype = {
                 this.swingResult.looking = false;
                 if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {
                     this.swingResult.contact = true;
+                    this.batter.eye.bonus = Math.max(0, this.batter.skill.offense.eye -
+                        Math.sqrt(Math.pow(this.batter.eye.x - this.pitchInFlight.x, 2) + Math.pow(this.batter.eye.y - this.pitchInFlight.y, 2)) * 1.5);
                     this.swingResult = this.field.determineSwingContactResult(this.swingResult);
                 } else {
                     this.swingResult.contact = false;
@@ -204,6 +207,8 @@ Game.prototype = {
                     && this.pitchInFlight.y > 35 && this.pitchInFlight.y < 165;
                 this.swingResult.contact = false;
                 this.swingResult.looking = true;
+                this.batter.eye.x = this.pitchInFlight.x;
+                this.batter.eye.y = this.pitchInFlight.y;
             }
 
             this.log.noteSwing(this.swingResult);

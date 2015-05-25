@@ -97,7 +97,7 @@ IndexController = function($scope) {
         if (!game.pitchInFlight.x) {
             $baseballs.addClass('hide');
         } else {
-            if (game.humanBatting()) {
+            if (game.humanBatting() && Math.random()*100 > game.batter.skill.offense.eye) {
                 jQ('.baseball.break').addClass('hide');
             } else {
                 jQ('.baseball.break').removeClass('hide');

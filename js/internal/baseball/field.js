@@ -32,7 +32,7 @@ Field.prototype = {
         var x = swing.x, y = swing.y;
         var splayAngle = 90 - 1.5*x;
         var flyAngle = -3*y;
-        var power = this.game.batter.skill.offense.power;
+        var power = this.game.batter.skill.offense.power + this.game.batter.eye.bonus;
         var landingDistance = (50 + Math.random()*300 + (power/100)*75) * (1 - Math.abs(flyAngle - 30)/60);
 
         if (Math.abs(90 - splayAngle) > 50) swing.foul = true;

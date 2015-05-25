@@ -109,6 +109,10 @@ Player.prototype = {
         this.bats = Math.random() > 0.75 ? 'left' : 'right';
         this.team = team;
         this.skill = {};
+        this.eye = {
+            x: 100,
+            y: 100
+        };
         this.pitching = {averaging : []};
         this.number = 0;
         this.randomizeSkills(Math.random() > 0.9);
