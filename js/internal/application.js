@@ -1674,7 +1674,7 @@ var Player = function(team) {
     var h = Math.floor(randBetween(185, 472, 'eye')*paRemaining/1000);
     paRemaining -= h;
 
-    var doubles = randBetween(0, h/4, 'power');
+    var doubles = randBetween(0, h/3, 'power');
     var triples = randBetween(0, h/12, 'speed');
     var hr = Math.max(0, randBetween(-h/5, h/5, 'power'));
     var r = randBetween(h/8, (h + bb)/3, 'speed') + hr;
