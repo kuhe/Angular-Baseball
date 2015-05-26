@@ -14,11 +14,11 @@ var Player = function(team) {
     var IP, ER, GS, W, L;
     if (this.skill.pitching > 65) {
         IP = (this.skill.pitching - 65)*gamesIntoSeason/20;
-        ER = (IP/9)*randBetween(800, 315, this.skill.pitching)/100;
+        ER = (IP/9)*randBetween(800, 215, this.skill.pitching)/100;
         if (IP > gamesIntoSeason) {
             //starter
             GS = Math.floor(gamesIntoSeason/5);
-            W = randBetween(0, GS*0.6, this.skill.pitching/1.2);
+            W = randBetween(GS * 0.1, GS * 0.8, this.skill.pitching/1.20);
             L = randBetween((GS - W), 0, this.skill.pitching/3);
         } else {
             //reliever
