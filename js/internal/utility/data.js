@@ -263,7 +263,7 @@ data = {
         'Yoshio',
         'Noboru',
         'Yoshiaki',
-        'Justice',
+        'Tadayoshi',
         'Hideo',
         'Hajime',
         'Akari',
