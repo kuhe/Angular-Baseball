@@ -1891,7 +1891,8 @@ Team.prototype = {
     manager : null,
     bench : [],
     bullpen : [],
-    nowBatting : 0
+    nowBatting : 0,
+    expanded : 'Player&'
 };
 var Umpire = function(game) {
     this.init(game);
