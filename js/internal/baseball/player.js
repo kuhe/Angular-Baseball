@@ -29,19 +29,19 @@ var Player = function(team) {
     }
     var pa = randBetween(gamesIntoSeason*3, gamesIntoSeason*5, 'speed');
     var paRemaining = pa;
-    var bb = Math.floor(randBetween(3, 18, 'eye')*paRemaining/100);
+    var bb = Math.floor(randBetween(0, 18, 'power')*paRemaining/100);
     paRemaining -= bb;
     var ab = paRemaining;
     var so = Math.floor(randBetween(33, 2, 'eye')*paRemaining/100);
     paRemaining -= so;
-    var h = Math.floor(randBetween(97, 372, 'eye')*paRemaining/1000);
+    var h = Math.floor(randBetween(185, 472, 'eye')*paRemaining/1000);
     paRemaining -= h;
 
     var doubles = randBetween(0, h/4, 'power');
     var triples = randBetween(0, h/12, 'speed');
     var hr = Math.max(0, randBetween(-h/5, h/5, 'power'));
-    var r = randBetween(0, (h + bb)/4, 'speed') + hr;
-    var rbi = randBetween(0, h/3, 'power') + hr;
+    var r = randBetween(h/8, (h + bb)/3, 'speed') + hr;
+    var rbi = randBetween(h/8, (h)/2, 'power') + hr;
     var hbp = randBetween(0, gamesIntoSeason/25);
     var sf = randBetween(0, gamesIntoSeason/5, 'eye');
 

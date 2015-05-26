@@ -269,15 +269,15 @@
                     </div>
                     <div class='row'>
                         <div class='col-xs-6'>
-                            {{y.batter.stats.batting.getBA() | number:3}} BA
+                            {{y.batter.stats.batting.getBA() | number:3}} {{ t('BA') }}
                             <br>
-                            {{y.batter.stats.batting.getOBP() | number:3}} OBP
+                            {{y.batter.stats.batting.getOBP() | number:3}} {{ t('OBP') }}
                             <br>
-                            {{y.batter.stats.batting.getOBP() + y.batter.stats.batting.getSLG() | number:3}} OPS
+                            {{y.batter.stats.batting.getOBP() + y.batter.stats.batting.getSLG() | number:3}} {{ t('OPS') }}
                             <br>
-                            {{y.batter.stats.batting.hr}} HR
+                            {{y.batter.stats.batting.hr}} {{ t('HR') }}
                             <br>
-                            {{y.batter.stats.batting.rbi}} RBI
+                            {{y.batter.stats.batting.rbi}} {{ t('RBI') }}
                         </div>
                         <div class='col-xs-6'>
                             <div>
@@ -303,15 +303,15 @@
                     </div>
                     <div class='row'>
                         <div class='col-xs-6'>
-                            {{y.deck.stats.batting.getBA() | number:3}} BA
+                            {{y.deck.stats.batting.getBA() | number:3}} {{ t('BA') }}
                             <br>
-                            {{y.deck.stats.batting.getOBP() | number:3}} OBP
+                            {{y.deck.stats.batting.getOBP() | number:3}} {{ t('OBP') }}
                             <br>
-                            {{y.deck.stats.batting.getOBP() + y.deck.stats.batting.getSLG() | number:3}} OPS
+                            {{y.deck.stats.batting.getOBP() + y.deck.stats.batting.getSLG() | number:3}} {{ t('OPS') }}
                             <br>
-                            {{y.deck.stats.batting.hr}} HR
+                            {{y.deck.stats.batting.hr}} {{ t('HR') }}
                             <br>
-                            {{y.deck.stats.batting.rbi}} RBI
+                            {{y.deck.stats.batting.rbi}} {{ t('RBI') }}
                         </div>
                         <div class='col-xs-6'>
                             <div>
@@ -365,10 +365,8 @@
                         <li class='col-xs-1'>{{ t('OBP') }} </li>
                         <li class='col-xs-1'>{{ t('OPS') }} </li>
                         <li class='col-xs-1'>{{ t('PA') }} </li>
-                        <li class='col-xs-1'>{{ t('H') }} </li>
-                        <li class='col-xs-1'>{{ t('2B') }} </li>
-                        <li class='col-xs-1'>{{ t('3B') }} </li>
-                        <li class='col-xs-1'>{{ t('HR') }} </li>
+                        <li class='col-xs-3'>{{ t('H/2B/3B/HR') }} </li>
+                        <li class='col-xs-1'>{{ t('RBI') }} </li>
                         <li class='col-xs-1'>{{ t('R') }} </li>
                         <li class='col-xs-1'>{{ t('BB') }} </li>
                         <li class='col-xs-1'>{{ t('SO') }} </li>
@@ -377,14 +375,21 @@
                         <li class='col-xs-1'> {{ stats.getOBP() | number:3 }}</li>
                         <li class='col-xs-1'> {{ stats.getOBP() + stats.getSLG() | number:3 }}</li>
                         <li class='col-xs-1'> {{ stats.pa }}</li>
-                        <li class='col-xs-1'> {{ stats.h }}</li>
-                        <li class='col-xs-1'> {{ stats['2b'] }}</li>
-                        <li class='col-xs-1'> {{ stats['3b'] }}</li>
-                        <li class='col-xs-1'> {{ stats.hr }}</li>
+                        <li class='col-xs-3'> {{ stats.h }} - {{ stats['2b'] }} - {{ stats['3b'] }} - {{ stats.hr }}</li>
+                        <li class='col-xs-1'> {{ stats.rbi }} </li>
                         <li class='col-xs-1'> {{ stats.r }}</li>
                         <li class='col-xs-1'> {{ stats.bb }}</li>
                         <li class='col-xs-1'> {{ stats.so }}</li>
                     </ul>
+                    <span>
+                        {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.offense.eye/120+")"}'></span>
+                    </span>
+                    <span>
+                        {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.offense.power/120+")"}'></span>
+                    </span>
+                    <span>
+                        {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.offense.speed/120+")"}'></span>
+                    </span>
                 </section>
             </li>
         </ul>
@@ -407,10 +412,8 @@
                         <li class='col-xs-1'>{{ t('OBP') }} </li>
                         <li class='col-xs-1'>{{ t('OPS') }} </li>
                         <li class='col-xs-1'>{{ t('PA') }} </li>
-                        <li class='col-xs-1'>{{ t('H') }} </li>
-                        <li class='col-xs-1'>{{ t('2B') }} </li>
-                        <li class='col-xs-1'>{{ t('3B') }} </li>
-                        <li class='col-xs-1'>{{ t('HR') }} </li>
+                        <li class='col-xs-3'>{{ t('H/2B/3B/HR') }} </li>
+                        <li class='col-xs-1'>{{ t('RBI') }} </li>
                         <li class='col-xs-1'>{{ t('R') }} </li>
                         <li class='col-xs-1'>{{ t('BB') }} </li>
                         <li class='col-xs-1'>{{ t('SO') }} </li>
@@ -419,14 +422,21 @@
                         <li class='col-xs-1'> {{ stats.getOBP() | number:3 }}</li>
                         <li class='col-xs-1'> {{ stats.getOBP() + stats.getSLG() | number:3 }}</li>
                         <li class='col-xs-1'> {{ stats.pa }}</li>
-                        <li class='col-xs-1'> {{ stats.h }}</li>
-                        <li class='col-xs-1'> {{ stats['2b'] }}</li>
-                        <li class='col-xs-1'> {{ stats['3b'] }}</li>
-                        <li class='col-xs-1'> {{ stats.hr }}</li>
+                        <li class='col-xs-3'> {{ stats.h }} - {{ stats['2b'] }} - {{ stats['3b'] }} - {{ stats.hr }}</li>
+                        <li class='col-xs-1'> {{ stats.rbi }} </li>
                         <li class='col-xs-1'> {{ stats.r }}</li>
                         <li class='col-xs-1'> {{ stats.bb }}</li>
                         <li class='col-xs-1'> {{ stats.so }}</li>
                     </ul>
+                    <span>
+                        {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.offense.eye/120+")"}'></span>
+                    </span>
+                    <span>
+                        {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.offense.power/120+")"}'></span>
+                    </span>
+                    <span>
+                        {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.offense.speed/120+")"}'></span>
+                    </span>
                 </section>
             </li>
         </ul>

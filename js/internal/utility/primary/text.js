@@ -67,7 +67,20 @@ text = function(phrase) {
             'Power :': '力',
             'Speed :': '速',
             'Up to Bat': '打席',
-            'Fielding': '守備'
+            'Fielding': '守備',
+            'BA' : '打率',
+            'OBP' : '出塁',
+            'OPS' : '出長',
+            'PA' : '打席',
+            'H/2B/3B/HR' : '安／二／三／本',
+            'H' : '安',
+            '2B' : '二',
+            '3B' : '三',
+            'HR' : '本塁打',
+            'RBI' : '打点',
+            'R' : '得点',
+            'BB' : '四球',
+            'SO' : '三振'
         },
         e : {
             empty: '-',
