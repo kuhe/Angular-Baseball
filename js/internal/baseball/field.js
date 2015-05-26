@@ -79,7 +79,7 @@ Field.prototype = {
                         }
                     }
                 }
-                log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
+                // log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
             }
         } else {
             if (Math.abs(90 - splayAngle) < 45 && landingDistance > 300) {

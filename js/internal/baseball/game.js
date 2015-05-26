@@ -1,11 +1,12 @@
-var Game = function(baseball) {
-    this.init(baseball);
+var Game = function(m) {
+    this.init(m);
 };
 
 Game.prototype = {
     constructor : Game,
     gamesIntoSeason : 0,
-    humanControl : 'home', //home, away, both, none
+    humanControl : 'none', //home, away, both, none
+    quickMode : true,
     init : function(m) {
         if (m) window.mode = m;
         this.gamesIntoSeason = 60 + Math.floor(Math.random()*20);
@@ -107,17 +108,15 @@ Game.prototype = {
                 x = 150 + Math.floor(Math.random()*15) - Math.floor(Math.random()*70);
             }
             var y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
-
-            windup.animate({width: 0}, this.field.hasRunnersOn() ? 1500 : 3000, function() {
-                if (giraffe.batter.skill.offense.eye > Math.random()*100) {
-                    jQ('.baseball.break').removeClass('hide');
-                } else {
-                    jQ('.baseball.break').removeClass('hide');
-                }
-                jQ('.baseball.pitch').removeClass('hide');
+            if (this.quickMode) {
                 giraffe.thePitch(x, y, callback);
-                pitcher.windingUp = false;
-            });
+            } else {
+                windup.animate({width: 0}, this.field.hasRunnersOn() ? 1500 : 3000, function() {
+                    jQ('.baseball.pitch').removeClass('hide');
+                    giraffe.thePitch(x, y, callback);
+                    pitcher.windingUp = false;
+                });
+            }
         }
     },
     autoSwing : function(deceptiveX, deceptiveY, callback) {
@@ -214,8 +213,6 @@ Game.prototype = {
                 this.batter.eye.x = this.pitchInFlight.x;
                 this.batter.eye.y = this.pitchInFlight.y;
             }
-
-            log('current bonus', this.batter.eye);
 
             this.log.noteSwing(this.swingResult);
             this.stage = 'pitch';

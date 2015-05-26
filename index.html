@@ -100,8 +100,14 @@
                 </div>
             </div>
         </div>
-        <div>
-            <em>Click anywhere to continue</em>
+        <div ng-click="proceedToGame(); $event.stopPropagation()" class='pointer'>
+            <em>Play Ball!</em>
+        </div>
+        <div ng-click="proceedToGame(false, true); $event.stopPropagation()" class='pointer'>
+            <em>Spectate AI</em>
+        </div>
+        <div ng-click='proceedToGame(true, true); $event.stopPropagation()' class='pointer'>
+            Run Fast Simulation &raquo;
         </div>
     </div>
     <div scoreboard='' game='y' text='t'></div>
