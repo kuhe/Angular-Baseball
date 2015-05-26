@@ -6,7 +6,7 @@ var Player = function(team) {
         if (offense[skill]) skill = offense[skill];
         if (defense[skill]) skill = defense[skill];
         if (isNaN(skill)) skill = 50;
-        skill = Math.sqrt(0.2 + Math.random()*0.8)*skill;
+        skill = Math.sqrt(0.05 + Math.random()*0.95)*skill;
         return Math.floor((skill/100) * (b - a) + a);
     };
     // let's just say we're about X games into the season
