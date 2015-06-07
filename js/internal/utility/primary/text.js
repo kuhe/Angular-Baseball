@@ -83,7 +83,7 @@ text = function(phrase) {
             'SO' : '三振',
 
             'Select Language:' : '言語',
-            'Run Fast Simulation' : 'シミュレーションを行う',
+            'Run Fast Simulation' : 'シミュレーションを試合終了まで行う',
             'Play Ball!' : 'プレーボール',
             'Spectate the CPU': 'CPU観戦',
 
