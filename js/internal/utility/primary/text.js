@@ -46,7 +46,7 @@ text = function(phrase) {
             'sinker': 'シンカー',
             'curve': 'カーブ',
             'change': 'チェンジ',
-            ' struck out looking.': '、見送り三振。',
+            ' struck out looking.': '、見逃し三振。',
             ' walked.': '、フォアボール。',
             ' struck out swinging.': '、空振り三振。',
             'Previous: ': '前：',
@@ -80,7 +80,12 @@ text = function(phrase) {
             'RBI' : '打点',
             'R' : '得点',
             'BB' : '四球',
-            'SO' : '三振'
+            'SO' : '三振',
+
+            'Select Language:' : '言語',
+            'Run Fast Simulation' : 'シミュレーションを行う',
+            'Play Ball!' : 'プレーボール',
+            'Spectate the CPU': 'CPU観戦'
         },
         e : {
             empty: '-',

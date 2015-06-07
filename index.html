@@ -64,33 +64,63 @@
 </head>
 <body class='blue'>
 <div class='container' ng-app='YakyuuAikoukai' ng-controller='IndexController'>
-    <div class='blocking instructions' ng-click="proceedToGame()">
+    <div class='blocking instructions'>
+        <section class='row'>
+            <div class='col-md-4'></div>
+            <div class='col-md-4'>
+                <span>
+                    {{ t('Select Language:') }} &nbsp;
+                </span>
+                <button class='pointer' ng-click='mode("e"); $event.stopPropagation()'>
+                    English
+                </button>
+                <button class='pointer' ng-click='mode("n"); $event.stopPropagation()'>
+                    日本語
+                </button>
+            </div>
+            <div class='col-md-4'></div>
+        </section>
+        <br/>
         <div class='row'>
             <div class='col-md-4'>
-                <p>When catching, click in the strike/ball zone to locate a pitch. A crudely css'd wheel of cheese in side profile
+                <p ng-show='mode() == "e"'>
+                    When catching, click in the strike/ball zone to locate a pitch. A crudely css'd wheel of cheese in side profile
                     which is actually representing a bat will indicate where the opponent swung
                     while the cross-section of a candy cane which is really a ball will indicate
-                    where the ball was thrown (transparent) and where it broke (opaque).</p>
+                    where the ball was thrown (transparent) and where it broke (opaque).
+                </p>
+                <p ng-show='mode() == "n"'>
+                    守備でのは投手役でプレーを行う。ストライクゾーンにクリックすると、投手を狙い投げさせる。微妙にチーズに見えるんだけど、実はバットが
+                    現れるところがバッタの振り。透明なボールは狙った投球、不透明なのは変化を示す。
+                </p>
             </div>
             <div class="no-swing col-md-4">
                 <div class="target {{y.stage}}">
                     <div class='indicator baseball pitch' style='top:125px;left:155px;'></div>
-                    <div class='indicator baseball break' style='top:125px;left:125px;'></div>
-                    <div class='indicator swing right' style='top:100px;left:100px;'></div>
+                    <div class='indicator baseball break' style='top:145px;left:125px;'></div>
+                    <div class='indicator swing right' style='top:110px;left:140px;'></div>
                     <div class='strikezone'></div>
                 </div>
             </div>
             <div class='col-md-4'>
-                <p>
+                <p ng-show='mode() == "e"'>
                     You can call for a different pitch by clicking on the pitch name in the pitching data display
                     in the lower left or below the strike zone indicator.
+                </p>
+                <p ng-show='mode() == "n"'>
+                    ストライクゾーンの下に投手のどの球で挑戦することも選択できる。
                 </p>
             </div>
         </div>
         <div class='row'>
             <div class='col-md-4'>
-                <p>When batting, you'll see a ball...
-                    Click inside the strike or ball zone to swing, or don't click to hold up (not swing) and try to draw a walk or wait for a better pitch.</p>
+                <p ng-show='mode() == "e"'>
+                    When batting, you'll see a ball...
+                    Click inside the strike or ball zone to swing, or don't click to hold up (not swing) and try to draw a walk or wait for a better pitch.
+                </p>
+                <p ng-show='mode() == "n"'>
+                    攻撃でのはバッタ役を次々務める。投球が飛んでくるときにストライクゾーンにクリックすれば、バットを振る。しない場合は見送る。打てる球待つんだ！
+                </p>
             </div>
             <div class="no-swing col-md-4">
                 <div class="target {{y.stage}}">
@@ -99,16 +129,29 @@
                     <div class='strikezone'></div>
                 </div>
             </div>
+            <div class='col-md-4'>
+                <p ng-show='mode() == "e"'>
+                    To restart into a new game simply reload the page.
+                </p>
+                <p ng-show='mode() == "n"'>
+                    新しい試合を再開したいときにウエブページをリロードしてください。
+                </p>
+            </div>
         </div>
-        <div ng-click="proceedToGame(); $event.stopPropagation()" class='pointer'>
-            <em>Play Ball!</em>
-        </div>
-        <div ng-click="proceedToGame(false, true); $event.stopPropagation()" class='pointer'>
-            <em>Spectate AI</em>
-        </div>
-        <div ng-click='proceedToGame(true, true); $event.stopPropagation()' class='pointer'>
-            Run Fast Simulation &raquo;
-        </div>
+        <section class='row options'>
+            <div class='col-md-12'>
+                <button ng-click="proceedToGame(); $event.stopPropagation()" class='pointer'>
+                    {{ t('Play Ball!') }}
+                </button>
+                <button ng-click="proceedToGame(false, true); $event.stopPropagation()" class='pointer'>
+                    {{ t('Spectate the CPU') }}
+                </button>
+                <button ng-click='proceedToGame(true, true); $event.stopPropagation()' class='pointer'>
+                    {{ t('Run Fast Simulation') }} &raquo;
+                </button>
+            </div>
+        </section>
+
     </div>
     <div scoreboard='' game='y' text='t'></div>
     <hr>

@@ -1,7 +1,13 @@
 IndexController = function($scope) {
     window.s = $scope;
-    $scope.y = new Game();
     $scope.t = text;
+
+    $scope.mode = function(setMode) {
+        if (setMode) {
+            mode = setMode;
+        }
+        return mode;
+    };
 
     $scope.proceedToGame = function(quickMode, AIonly) {
         Game.prototype.humanControl = AIonly ? 'none' : 'home';
@@ -12,7 +18,6 @@ IndexController = function($scope) {
         jQ('.blocking').remove();
         if ($scope.y.humanControl == 'none' && $scope.y.quickMode) {
             var game = $scope.y;
-            $scope.y = new Game();
             var n = 0;
             do {
                 n++;
@@ -46,12 +51,6 @@ IndexController = function($scope) {
     };
 
     var bindMethods = function() {
-        $scope.mode = function(setMode) {
-            if (setMode) {
-                mode = setMode;
-            }
-            return mode;
-        };
         $scope.holdUpTimeouts = [];
         $scope.expandScoreboard = false;
         $scope.updateFlightPath = function(callback) {
