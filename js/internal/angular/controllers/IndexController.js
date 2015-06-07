@@ -184,17 +184,20 @@ IndexController = function($scope) {
             });
         };
         $scope.abbreviatePosition = function(position) {
-            return {
-                pitcher : 'P',
-                catcher : 'C',
-                first : '1B',
-                second : '2B',
-                short : 'SS',
-                third : '3B',
-                left : 'LF',
-                center : 'CF',
-                right : 'RF'
-            }[position];
+            if (mode == 'e') {
+                return {
+                    pitcher : 'P',
+                    catcher : 'C',
+                    first : '1B',
+                    second : '2B',
+                    short : 'SS',
+                    third : '3B',
+                    left : 'LF',
+                    center : 'CF',
+                    right : 'RF'
+                }[position];
+            }
+            return text.fielderShortName(position);
         };
     };
 

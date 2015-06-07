@@ -5,15 +5,15 @@ text = function(phrase) {
     var string = {
         n : {
             empty: '-',
-            ' 1st' : '一番',
-            ' 2nd' : '二番',
-            ' 3rd' : '三番',
-            ' 4th' : '四番',
-            ' 5th' : '五番',
-            ' 6th' : '六番',
-            ' 7th' : '七番',
-            ' 8th' : '八番',
-            ' 9th' : '九番',
+            ' 1st' : '1番',
+            ' 2nd' : '2番',
+            ' 3rd' : '3番',
+            ' 4th' : '4番',
+            ' 5th' : '5番',
+            ' 6th' : '6番',
+            ' 7th' : '7番',
+            ' 8th' : '8番',
+            ' 9th' : '9番',
             'Now batting' : '次のバッタ、',
             'way outside' : '相当外角',
             'outside' : '外角',
@@ -85,7 +85,15 @@ text = function(phrase) {
             'Select Language:' : '言語',
             'Run Fast Simulation' : 'シミュレーションを行う',
             'Play Ball!' : 'プレーボール',
-            'Spectate the CPU': 'CPU観戦'
+            'Spectate the CPU': 'CPU観戦',
+
+            'LHP' : '左投',
+            'RHP' : '右投',
+            'LHB' : '左打',
+            'RHB' : '右打',
+            'L' : '左',
+            'R ' : '右',
+            '#' : '背番号'
         },
         e : {
             empty: '-',
@@ -110,6 +118,13 @@ text.fielderShortName = function(fielder) {
         }[fielder];
     }
     return fielder;
+};
+
+text.slash = function() {
+    if (mode == 'n') {
+        return '・';
+    }
+    return '/';
 };
 
 text.fielderLongName = function(fielder) {

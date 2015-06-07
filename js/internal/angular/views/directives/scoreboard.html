@@ -2,7 +2,7 @@
 </div>
 <div ng-show='!expandScoreboard' ng-click='expandScoreboard = !expandScoreboard' class='box-scoreboard row'>
     <div class='row'>
-        <div class='col-xs-7'>
+        <div class='col-xs-5'>
             <div class='inning top-bar'>
                 <div class='row'>{{ y.getInning() }}</div>
             </div>
@@ -17,7 +17,7 @@
                 </div>
             </div>
         </div>
-        <div class='col-xs-5'>
+        <div class='col-xs-3'>
             <div class='diamonds'>
                 <div class='row'>
                     <div class='bases'>
@@ -52,10 +52,22 @@
                 </div>
             </div>
         </div>
+        <div class='at-bat col-xs-3'>
+            <div class='order'>
+                {{ y.batter.getOrder().trim() }}
+            </div>
+            <div class='name'>
+                {{ y.batter.getSurname() }}
+            </div>
+            <div class='ba'>
+                AV .{{ 1000*y.batter.stats.batting.getBA() | number:0 }}
+            </div>
+            <div class='rbi-hr'>
+                {{ y.batter.stats.batting.rbi }} RBI {{ y.batter.stats.batting.hr }} HR
+            </div>
+        </div>
     </div>
 </div>
-
-
 
 
 <div ng-show='expandScoreboard' ng-click='expandScoreboard = !expandScoreboard' class='header scoreboard row'>

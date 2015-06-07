@@ -125,6 +125,8 @@ Player.prototype = {
         if (jSurname.length == 1 && jGivenName.length <= 2) jSurname += '・';
         if (jGivenName.length == 1 && jSurname.indexOf('・') < 0) jSurname += '・';
         this.nameJ = jSurname + jGivenName;
+        this.surname = data.surnames[surnameKey];
+        this.surnameJ = data.surnamesJ[surnameKey];
         this.atBats = [];
     },
     randomizeSkills : function(hero) {
@@ -213,10 +215,16 @@ Player.prototype = {
         delete this.pitching.averaging;
     },
     getSurname : function() {
-        return mode == 'n' ? this.nameJ[0] : this.name.split(' ')[0];
+        return mode == 'n' ? this.surnameJ : this.surname;
     },
     getName : function() {
         return mode == 'n' ? this.nameJ : this.name;
+    },
+    getUniformNumber : function() {
+        return text('#') + this.number
+    },
+    getOrder : function() {
+        return text([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
     },
     eye : {},
     fatigue : 0,

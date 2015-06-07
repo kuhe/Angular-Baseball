@@ -5,15 +5,15 @@ text = function(phrase) {
     var string = {
         n : {
             empty: '-',
-            ' 1st' : '一番',
-            ' 2nd' : '二番',
-            ' 3rd' : '三番',
-            ' 4th' : '四番',
-            ' 5th' : '五番',
-            ' 6th' : '六番',
-            ' 7th' : '七番',
-            ' 8th' : '八番',
-            ' 9th' : '九番',
+            ' 1st' : '1番',
+            ' 2nd' : '2番',
+            ' 3rd' : '3番',
+            ' 4th' : '4番',
+            ' 5th' : '5番',
+            ' 6th' : '6番',
+            ' 7th' : '7番',
+            ' 8th' : '8番',
+            ' 9th' : '9番',
             'Now batting' : '次のバッタ、',
             'way outside' : '相当外角',
             'outside' : '外角',
@@ -85,7 +85,15 @@ text = function(phrase) {
             'Select Language:' : '言語',
             'Run Fast Simulation' : 'シミュレーションを行う',
             'Play Ball!' : 'プレーボール',
-            'Spectate the CPU': 'CPU観戦'
+            'Spectate the CPU': 'CPU観戦',
+
+            'LHP' : '左投',
+            'RHP' : '右投',
+            'LHB' : '左打',
+            'RHB' : '右打',
+            'L' : '左',
+            'R ' : '右',
+            '#' : '背番号'
         },
         e : {
             empty: '-',
@@ -110,6 +118,13 @@ text.fielderShortName = function(fielder) {
         }[fielder];
     }
     return fielder;
+};
+
+text.slash = function() {
+    if (mode == 'n') {
+        return '・';
+    }
+    return '/';
 };
 
 text.fielderLongName = function(fielder) {
@@ -838,7 +853,9 @@ Log.prototype = {
             8 : text(' 9th')
         }[order];
         var positions = this.longFormFielder();
-        return text('Now batting')+order+text.comma()+positions[batter.position]+text.comma()+batter.getName();
+        return text('Now batting')+order+text.comma()+positions[batter.position]+text.comma()+
+            batter.getUniformNumber()+text.comma()+
+            batter.getName();
     },
     noteBatter : function(batter) {
         var m = mode, record, recordJ;
@@ -1767,6 +1784,8 @@ Player.prototype = {
         if (jSurname.length == 1 && jGivenName.length <= 2) jSurname += '・';
         if (jGivenName.length == 1 && jSurname.indexOf('・') < 0) jSurname += '・';
         this.nameJ = jSurname + jGivenName;
+        this.surname = data.surnames[surnameKey];
+        this.surnameJ = data.surnamesJ[surnameKey];
         this.atBats = [];
     },
     randomizeSkills : function(hero) {
@@ -1855,10 +1874,16 @@ Player.prototype = {
         delete this.pitching.averaging;
     },
     getSurname : function() {
-        return mode == 'n' ? this.nameJ[0] : this.name.split(' ')[0];
+        return mode == 'n' ? this.surnameJ : this.surname;
     },
     getName : function() {
         return mode == 'n' ? this.nameJ : this.name;
+    },
+    getUniformNumber : function() {
+        return text('#') + this.number
+    },
+    getOrder : function() {
+        return text([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
     },
     eye : {},
     fatigue : 0,
@@ -2419,17 +2444,20 @@ IndexController = function($scope) {
             });
         };
         $scope.abbreviatePosition = function(position) {
-            return {
-                pitcher : 'P',
-                catcher : 'C',
-                first : '1B',
-                second : '2B',
-                short : 'SS',
-                third : '3B',
-                left : 'LF',
-                center : 'CF',
-                right : 'RF'
-            }[position];
+            if (mode == 'e') {
+                return {
+                    pitcher : 'P',
+                    catcher : 'C',
+                    first : '1B',
+                    second : '2B',
+                    short : 'SS',
+                    third : '3B',
+                    left : 'LF',
+                    center : 'CF',
+                    right : 'RF'
+                }[position];
+            }
+            return text.fielderShortName(position);
         };
     };
 

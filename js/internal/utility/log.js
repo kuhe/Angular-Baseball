@@ -31,7 +31,9 @@ Log.prototype = {
             8 : text(' 9th')
         }[order];
         var positions = this.longFormFielder();
-        return text('Now batting')+order+text.comma()+positions[batter.position]+text.comma()+batter.getName();
+        return text('Now batting')+order+text.comma()+positions[batter.position]+text.comma()+
+            batter.getUniformNumber()+text.comma()+
+            batter.getName();
     },
     noteBatter : function(batter) {
         var m = mode, record, recordJ;
