@@ -70,6 +70,19 @@ Game.prototype = {
             this.autoSwing(this.pitchTarget.x, this.pitchTarget.y, callback);
         }
     },
+    simulatePitchAndSwing : function(callback) {
+        if (this.stage == 'end') {
+            return;
+        }
+        this.autoPitch(callback);
+        var giraffe = this;
+        setTimeout(function() {
+            if (typeof giraffe.pitchTarget != 'object') {
+                giraffe.pitchTarget = {x: 100, y: 100};
+            }
+            giraffe.autoSwing(giraffe.pitchTarget.x, giraffe.pitchTarget.y, function(callback) {callback()});
+        }, giraffe.field.hasRunnersOn() ? 2400 : 3900);
+    },
     receiveInput : function(x, y, callback) {
         if (this.humanControl == 'none') {
             return;

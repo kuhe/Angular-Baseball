@@ -34,12 +34,11 @@ IndexController = function($scope) {
                 if ($scope.y.stage == 'end') {
                     clearInterval(auto);
                 }
-                $scope.$apply();
-                $scope.y.simulateInput(function(callback) {
+                $scope.y.simulatePitchAndSwing(function(callback) {
                     $scope.y.quickMode ? void 0 : $scope.$apply();
                     $scope.updateFlightPath(callback);
                 });
-            }, scalar*($scope.y.field.hasRunnersOn() ? 1800 : 3300));
+            }, scalar*($scope.y.field.hasRunnersOn() ? 4000 : 5500));
         }
         if ($scope.y.humanControl == 'away') {
             $scope.y.simulateInput(function(callback) {
