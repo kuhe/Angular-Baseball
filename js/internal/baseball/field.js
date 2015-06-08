@@ -41,13 +41,19 @@ Field.prototype = {
         swing.travelDistance = landingDistance;
         swing.flyAngle = flyAngle;
         swing.splay = splayAngle - 90;
-        swing.foul = false;
+
+        if (!this.game.debug) {
+            this.game.debug = [];
+        }
+
+        var debugData = {}, dd = debugData;
 
         if (swing.fielder) {
             var fielder = (this.game.half == top ? this.game.teams.home.positions[swing.fielder] : this.game.teams.away.positions[swing.fielder]);
             fielder.fatigue += 4;
             swing.error = false;
-            var fieldingEase = fielder.skill.defense.fielding/100;
+            var fieldingEase = fielder.skill.defense.fielding/100,
+                throwingEase = (fielder.skill.defense.throwing/100);
             //reach the batted ball?
             swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle, landingDistance]);
             var interceptRating = fielder.skill.defense.speed + flyAngle - swing.fielderTravel*1.65;
@@ -63,20 +69,37 @@ Field.prototype = {
             } else {
                 swing.caught = false;
             }
+            dd.caught = swing.caught;
+            dd.grounder = flyAngle < 0;
+
             if (!swing.caught) {
-                if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] != 1 && (interceptRating/(1 + fielder.skill.defense.throwing/100))/fieldingEase
-                       -this.game.batter.skill.offense.speed > -75) {
+                // intercept rating is negative
+                var plus = interceptRating + 100*throwingEase*fieldingEase;
+                var gatherAndThrowSuccess = plus - this.game.batter.skill.offense.speed/2 > -50;
+
+                //log('flew at angle', flyAngle, 'distance of', swing.fielderTravel,
+                //    'gives intercept rating of', interceptRating, 'fielder throw/fielding', fielder.skill.defense.throwing, fielder.skill.defense.fielding,
+                //    '+', plus, '-runner speed', this.game.batter.skill.offense.speed,
+                //    'success', gatherAndThrowSuccess
+                //);
+
+                dd.thrownOut = gatherAndThrowSuccess;
+                dd.outFielder = {'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1;
+
+                if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] != 1 && gatherAndThrowSuccess) {
                     swing.thrownOut = true;
                     swing.error = false;
                 } else {
                     swing.thrownOut = false;
                     swing.bases = 1;
                     if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1) {
-                        var fieldingReturnDelay = -1*((interceptRating/(1 + fielder.skill.defense.throwing/100))/fieldingEase - this.game.batter.skill.offense.speed);
-                        while (fieldingReturnDelay - 100 > 0 && swing.bases < 3) {
+                        var fieldingReturnDelay = -1*(interceptRating + 100*throwingEase*fieldingEase) + this.game.batter.skill.offense.speed;
+                        dd.delay = fieldingReturnDelay;
+                        while (fieldingReturnDelay - 125 > 0 && swing.bases < 3) {
                             swing.bases++;
-                            fieldingReturnDelay  -= 80;
+                            fieldingReturnDelay  -= 65;
                         }
+                        dd.bases = swing.bases;
                     }
                 }
                 // log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
@@ -84,11 +107,14 @@ Field.prototype = {
         } else {
             if (Math.abs(90 - splayAngle) < 45 && landingDistance > 300) {
                 swing.bases = 4;
+                dd.bases = 4;
             } else {
                 swing.foul = true;
                 swing.caught = false;
             }
         }
+        dd.foul = swing.foul;
+        this.game.debug.push(dd);
 
         return this.translateSwingResultToStylePosition(swing);
     },

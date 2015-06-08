@@ -205,11 +205,11 @@ Umpire.prototype = {
                 this.game.tally[this.game.half == 'top' ? 'away' : 'home']['R']++;
                 if (this.game.batter != this.game.field.third) {
                     this.game.batter.atBats.push('RBI');
-                    this.game.batter.stats.batting.rbi++;
                     this.game.field.third.atBats.push('R');
-                    this.game.field.third.stats.batting.r++;
-                    this.game.pitcher.stats.pitching.ER++;
                 }
+                this.game.batter.stats.batting.rbi++;
+                this.game.field.third.stats.batting.r++;
+                this.game.pitcher.stats.pitching.ER++;
             }
             this.game.field.third = this.game.field.second;
             this.game.field.second = this.game.field.first;

@@ -27,6 +27,7 @@ IndexController = function($scope) {
             } while (game.stage != 'end' && n < 500);
             $scope.y = game;
             log('sim ended');
+            $scope.y.debugOut();
         } else if ($scope.y.humanControl == 'none') {
             var scalar = $scope.y.quickMode ? 0.05 : 1;
             var auto = setInterval(function() {

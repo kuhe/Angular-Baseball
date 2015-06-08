@@ -186,6 +186,27 @@ Game.prototype = {
         }
     },
     battersEye : '',
+    debugOut : function() {
+        log('grounders', this.debug.filter(function(a){return !a.caught && !a.foul && a.grounder}).length);
+        log('grounders thrown out', this.debug.filter(function(a){return !a.caught && !a.foul && a.grounder && a.thrownOut}).length);
+        log('weak outfield hits', this.debug.filter(function(a){return !a.caught && !a.foul && !a.grounder && a.thrownOut}).length);
+        log('good outfield hits', this.debug.filter(function(a){return !a.caught && !a.foul && !a.grounder && !a.thrownOut}).length);
+        log('singles', this.debug.filter(function(a){return a.bases == 1}).length);
+        log('2b', this.debug.filter(function(a){return a.bases == 2}).length);
+        log('3b', this.debug.filter(function(a){return a.bases == 3}).length);
+        log('homeruns', this.debug.filter(function(a){return a.bases == 4}).length);
+
+        log('fly outs', this.debug.filter(function(a){return !a.grounder && !a.bases && a.caught}).length);
+        log('groundouts', this.debug.filter(function(a){return a.grounder && !a.bases && !a.caught}).length);
+        var SO = this.teams.away.lineup.map(function(p) {return p.atBats}).reduce(function(a, b) {
+            return a + b.filter(function(ab) {return ab == 'SO'}).length;
+        });
+        SO += this.teams.home.lineup.map(function(p) {return p.atBats.filter(function(ab) {return ab == 'SO'})}).reduce(function(a, b) {
+            return a.length + b.length;
+        });
+        log('strikeouts', this.debug.filter(function(a){return a.grounder && !a.bases && !a.caught}).length);
+        log('fouls', this.debug.filter(function(a){return a.foul}).length);
+    },
     theSwing : function(x, y, callback) {
         if (this.stage == 'swing') {
             this.batter.fatigue++;
