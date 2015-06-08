@@ -47,7 +47,7 @@ Umpire.prototype = {
                 if (result.caught) {
                     this.count.outs++;
                     pitcher.stats.pitching.IP[1]++;
-                    this.game.batter.atBats.push('FO');
+                    this.game.batter.atBats.push(Log.prototype.FLYOUT);
                     batter.stats.batting.pa++;
                     batter.stats.batting.ab++;
                     this.newBatter(); //todo: sac fly
@@ -62,12 +62,12 @@ Umpire.prototype = {
                         if (result.thrownOut) {
                             this.count.outs++;
                             pitcher.stats.pitching.IP[1]++;
-                            this.game.batter.atBats.push('GO');
+                            this.game.batter.atBats.push(Log.prototype.GROUNDOUT);
                             this.newBatter(); //todo: sac
                         }
                         if (result.bases) {
                             if (!result.error) {
-                                this.game.tally[this.game.half == 'top' ? 'away' : 'home']['H']++;
+                                this.game.tally[this.game.half == 'top' ? 'away' : 'home'][Log.prototype.SINGLE]++;
                                 pitcher.stats.pitching.H++;
                             } else {
                                 if (result.bases > 0) {
@@ -78,32 +78,37 @@ Umpire.prototype = {
                             var bases = result.bases;
                             switch (bases) {
                                 case 0 :
-                                    this.game.batter.atBats.push('GO');
+                                    this.game.batter.atBats.push(Log.prototype.GROUNDOUT);
                                     break;
                                 case 1 :
                                     if (result.error) {
-                                        this.game.batter.atBats.push('ROE');
+                                        this.game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
                                     } else {
-                                        this.game.batter.atBats.push('H');
+                                        this.game.batter.atBats.push(Log.prototype.SINGLE);
                                         batter.stats.batting.h++;
                                     }
                                     break;
                                 case 2 :
-                                    this.game.batter.atBats.push('2B');
+                                    this.game.batter.atBats.push(Log.prototype.DOUBLE);
                                     batter.stats.batting.h++;
                                     batter.stats.batting['2b']++;
                                     break;
                                 case 3 :
-                                    this.game.batter.atBats.push('3B');
+                                    this.game.batter.atBats.push(Log.prototype.TRIPLE);
                                     batter.stats.batting.h++;
                                     batter.stats.batting['3b']++;
                                     break;
                                 case 4 :
-                                    this.game.batter.atBats.push('HR');
+                                    this.game.batter.atBats.push(Log.prototype.HOMERUN);
                                     pitcher.stats.pitching.HR++;
                                     batter.stats.batting.h++;
                                     batter.stats.batting.hr++;
                                     break;
+                            }
+                            if (bases > 0 && bases < 4 && !result.error) {
+                                if (['left', 'right', 'center'].indexOf(result.fielder) == -1) {
+                                    batter.recordInfieldHit();
+                                }
                             }
                             var onBase = false;
                             while (bases > 0) {
@@ -135,7 +140,7 @@ Umpire.prototype = {
             pitcher.stats.pitching.IP[1]++;
             this.count.balls = this.count.strikes = 0;
             this.says = 'Strike three. Batter out.';
-            batter.atBats.push('SO');
+            batter.atBats.push(Log.prototype.STRIKEOUT);
             this.newBatter();
         }
         if (this.count.balls > 3) {
@@ -144,7 +149,7 @@ Umpire.prototype = {
             pitcher.stats.pitching.BB++;
             this.says = 'Ball four.';
             this.count.balls = this.count.strikes = 0;
-            batter.atBats.push('BB');
+            batter.atBats.push(Log.prototype.WALK);
             this.advanceRunners(true).reachBase().newBatter();
         }
         if (this.count.outs > 2) {
@@ -170,7 +175,7 @@ Umpire.prototype = {
                         //bases loaded
                         this.game.batter.recordRBI();
                         this.game.batter.stats.batting.rbi++;
-                        this.game.field.third.atBats.push('R');
+                        this.game.field.third.atBats.push(Log.prototype.RUN);
                         this.game.field.third.stats.batting.r++;
                         this.game.pitcher.stats.pitching.ER++;
                         this.game.scoreboard[this.game.half == 'top' ? 'away' : 'home'][this.game.inning]++;
@@ -205,7 +210,7 @@ Umpire.prototype = {
                 this.game.tally[this.game.half == 'top' ? 'away' : 'home']['R']++;
                 if (this.game.batter != this.game.field.third) {
                     this.game.batter.recordRBI();
-                    this.game.field.third.atBats.push('R');
+                    this.game.field.third.atBats.push(Log.prototype.RUN);
                 }
                 this.game.batter.stats.batting.rbi++;
                 this.game.field.third.stats.batting.r++;

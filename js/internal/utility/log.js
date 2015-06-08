@@ -10,6 +10,19 @@ Log.prototype = {
             n: []
         };
     },
+    SINGLE : 'H',
+    DOUBLE : '2B',
+    TRIPLE : '3B',
+    HOMERUN : 'HR',
+    WALK : 'BB',
+    GROUNDOUT : 'GO',
+    FLYOUT : 'FO',
+    LINEOUT : 'L',
+    RUN : 'R',
+    STRIKEOUT : 'SO',
+    SACRIFICE : 'SAC',
+    REACHED_ON_ERROR : 'ROE',
+    FIELDERS_CHOICE : 'FC',
     note : function(note, noteJ) {
         this.record.e.unshift(note);
         this.shortRecord.e = this.record.e.slice(0, 6);

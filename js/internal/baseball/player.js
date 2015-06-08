@@ -132,21 +132,17 @@ Player.prototype = {
     atBatObjects : [],
     getAtBats : function() {
         if (this.atBats.length > this.atBatObjects.length) {
-            var beneficial = ['BB', 'H', 'HR', '2B', '3B', 'SAC', 'ROE'];
-            var atBatObjects = [];
-            this.atBats.map(function(item) {
-                var atBat = new AtBat(item);
-                if (beneficial.indexOf(atBat.text) > -1) {
-                    atBat.beneficial = true;
-                }
-                atBatObjects.push(atBat);
+            this.atBatObjects = this.atBats.map(function(item) {
+                return new AtBat(item);
             });
-            this.atBatObjects = atBatObjects;
         }
         return this.atBatObjects;
     },
     recordRBI : function() {
-        this.atBats[this.atBats.length - 1] += '*';
+        this.atBats[this.atBats.length - 1] += AtBat.prototype.RBI_INDICATOR;
+    },
+    recordInfieldHit : function() {
+        this.atBats[this.atBats.length - 1] += AtBat.prototype.INFIELD_HIT_INDICATOR;
     },
     randomizeSkills : function(hero) {
         this.hero = hero;

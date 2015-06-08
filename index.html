@@ -378,8 +378,8 @@
                 {{t(player.bats == 'left' ? 'L' : 'R ')}}{{t.slash()}}{{t(player.throws == 'left' ? 'L' : 'R ')}}
                 <span class='pull-right'>
                     <span class='at-bat' ng-repeat='atBat in player.getAtBats() track by $index'>
-                        <strong ng-show='atBat.beneficial'>{{ atBat + atBat.rbi }}</strong>
-                        <span ng-show='!atBat.beneficial'>{{ atBat + atBat.rbi }}</span>
+                        <strong ng-show='atBat.beneficial'>{{ atBat + '' }}</strong>
+                        <span ng-show='!atBat.beneficial'>{{ atBat + '' }}</span>
                     </span>
                     <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
                 </span>
