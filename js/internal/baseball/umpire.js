@@ -168,7 +168,7 @@ Umpire.prototype = {
                 if (this.game.field.second) {
                     if (this.game.field.third) {
                         //bases loaded
-                        this.game.batter.atBats.push('RBI');
+                        this.game.batter.recordRBI();
                         this.game.batter.stats.batting.rbi++;
                         this.game.field.third.atBats.push('R');
                         this.game.field.third.stats.batting.r++;
@@ -204,7 +204,7 @@ Umpire.prototype = {
                 this.game.scoreboard[this.game.half == 'top' ? 'away' : 'home'][this.game.inning]++;
                 this.game.tally[this.game.half == 'top' ? 'away' : 'home']['R']++;
                 if (this.game.batter != this.game.field.third) {
-                    this.game.batter.atBats.push('RBI');
+                    this.game.batter.recordRBI();
                     this.game.field.third.atBats.push('R');
                 }
                 this.game.batter.stats.batting.rbi++;

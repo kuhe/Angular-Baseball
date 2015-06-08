@@ -29,6 +29,7 @@ gulp.task('scripts', function() {
     gulp.src([
         'js/internal/utility/primary/*.js',
         'js/internal/utility/*.js',
+        'js/internal/services/*.js',
         'js/internal/baseball/**/*.js',
         'js/internal/angular/controllers/**/*.js',
         'js/internal/angular/application.js'

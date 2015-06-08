@@ -129,6 +129,25 @@ Player.prototype = {
         this.surnameJ = data.surnamesJ[surnameKey];
         this.atBats = [];
     },
+    atBatObjects : [],
+    getAtBats : function() {
+        if (this.atBats.length > this.atBatObjects.length) {
+            var beneficial = ['BB', 'H', 'HR', '2B', '3B', 'SAC', 'ROE'];
+            var atBatObjects = [];
+            this.atBats.map(function(item) {
+                var atBat = new AtBat(item);
+                if (beneficial.indexOf(atBat.text) > -1) {
+                    atBat.beneficial = true;
+                }
+                atBatObjects.push(atBat);
+            });
+            this.atBatObjects = atBatObjects;
+        }
+        return this.atBatObjects;
+    },
+    recordRBI : function() {
+        this.atBats[this.atBats.length - 1] += '*';
+    },
     randomizeSkills : function(hero) {
         this.hero = hero;
         var giraffe = this;

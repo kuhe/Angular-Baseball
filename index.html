@@ -10,6 +10,7 @@
     <title>野球愛好会</title>
     <script src='js/external/angular/angular.js'></script>
     <script src='js/external/jquery/jquery-1.10.2.min.js'></script>
+    <script src='js/external/gsap/TweenMax.min.js'></script>
 
     <script src='js/application.js'></script>
 
@@ -35,30 +36,6 @@
             to {
                 -ms-transform: rotate(360deg) translateZ(0);
                 transform: rotate(360deg) translateZ(0);
-            }
-        }
-        @-webkit-keyframes flight {
-            0% {
-            }
-            25% {
-            }
-            50% {
-            }
-            75% {
-            }
-            100% {
-            }
-        }
-        @keyframes flight {
-            0% {
-            }
-            25% {
-            }
-            50% {
-            }
-            75% {
-            }
-            100% {
             }
         }
     </style>
@@ -400,7 +377,11 @@
                 <strong>{{player.getName()}}</strong> ({{'#'+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
                 {{t(player.bats == 'left' ? 'L' : 'R ')}}{{t.slash()}}{{t(player.throws == 'left' ? 'L' : 'R ')}}
                 <span class='pull-right'>
-                    {{player.atBats.length ? ' ' + player.atBats.join(', ') : ''}} <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
+                    <span class='at-bat' ng-repeat='atBat in player.getAtBats() track by $index'>
+                        <strong ng-show='atBat.beneficial'>{{ atBat + atBat.rbi }}</strong>
+                        <span ng-show='!atBat.beneficial'>{{ atBat + atBat.rbi }}</span>
+                    </span>
+                    <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
                 </span>
                 <section ng-if='player.team.expanded == player'>
                     <ul class='list-inline personal-stats row' ng-init='stats = player.stats.batting'>
