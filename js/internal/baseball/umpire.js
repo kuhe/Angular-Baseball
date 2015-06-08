@@ -135,7 +135,7 @@ Umpire.prototype = {
             pitcher.stats.pitching.IP[1]++;
             this.count.balls = this.count.strikes = 0;
             this.says = 'Strike three. Batter out.';
-            this.game.batter.atBats.push('SO');
+            batter.atBats.push('SO');
             this.newBatter();
         }
         if (this.count.balls > 3) {
@@ -144,7 +144,7 @@ Umpire.prototype = {
             pitcher.stats.pitching.BB++;
             this.says = 'Ball four.';
             this.count.balls = this.count.strikes = 0;
-            this.game.batter.atBats.push('BB');
+            batter.atBats.push('BB');
             this.advanceRunners(true).reachBase().newBatter();
         }
         if (this.count.outs > 2) {
