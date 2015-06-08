@@ -59,12 +59,15 @@ IndexController = function($scope) {
             var animation = 'flight';
             for (var i = 0; i < ss.length; ++i) {
                 for (var j = 0; j < ss[i].cssRules.length; ++j) {
-                    if ((
-                        ss[i].cssRules[j].type == window.CSSRule.WEBKIT_KEYFRAMES_RULE ||
-                        ss[i].cssRules[j].type == window.CSSRule.KEYFRAMES_RULE
-                        )
-                        && ss[i].cssRules[j].name == animation) {
-                        var rule = ss[i].cssRules[j];
+                    if (ss[i].cssRules[j].name == animation) {
+                        if (ss[i].cssRules[j].type == window.CSSRule.WEBKIT_KEYFRAMES_RULE) {
+                            var webkit = '-webkit-';
+                            var rule = ss[i].cssRules[j];
+                        }
+                        if (ss[i].cssRules[j].type == window.CSSRule.KEYFRAMES_RULE) {
+                            webkit = '';
+                            rule = ss[i].cssRules[j];
+                        }
                     }
                 }
             }
@@ -77,7 +80,7 @@ IndexController = function($scope) {
                 top = originTop + Math.square(percent/100)*(top - originTop);
                 var padding = Math.max(Math.square(percent/100)*13, 2);
                 var borderWidth = Math.square(percent/100)*4;
-                return 'top: '+top+'px; left: '+left+'px; padding: '+padding+'px; border-width:'+borderWidth+'px';
+                return 'top: '+top+'px; left: '+left+'px; padding: '+padding+'px; border-width:'+borderWidth+'px; transform: translateZ(0);';
             };
             var game = $scope.y;
             var top = 200-game.pitchTarget.y;
@@ -91,15 +94,15 @@ IndexController = function($scope) {
             keyframes.deleteRule(0.75);
             keyframes.deleteRule(1);
 
-            keyframes.appendRule('0% { '+to(15, top, left)+' }');
-            keyframes.appendRule('25% { '+to(20, top, left)+' }');
-            keyframes.appendRule('50% { '+to(35, top, left)+' }');
-            keyframes.appendRule('75% { '+to(65, top, left)+' }');
+            keyframes.appendRule('0% { '+  to(5,   top, left)+' }');
+            keyframes.appendRule('25% { '+ to(15,  top, left)+' }');
+            keyframes.appendRule('50% { '+ to(30,  top, left)+' }');
+            keyframes.appendRule('75% { '+ to(55,  top, left)+' }');
             keyframes.appendRule('100% { '+to(100, breakTop, breakLeft)+' }');
 
             var $baseballs = jQ('.baseball');
             var flightSpeed = 1.3 - 0.6*(game.pitchInFlight.velocity + 300)/400;
-            $baseballs.css('-webkit-animation', 'flight '+flightSpeed+'s 1 0s linear');
+            $baseballs.css(webkit + 'animation', 'flight '+flightSpeed+'s 1 0s linear');
             $baseballs.removeClass('flight');
             $baseballs.addClass('flight');
 
@@ -107,7 +110,7 @@ IndexController = function($scope) {
                 jQ('.baseball').removeClass('flight');
                 jQ('.baseball').addClass('spin');
                 var horizontalBreak = (60 - Math.abs(game.pitchTarget.x - game.pitchInFlight.x))/10;
-                jQ('.baseball').css('-webkit-animation', 'spin '+horizontalBreak+'s 5 0s linear');
+                jQ('.baseball').css(webkit + 'animation', 'spin '+horizontalBreak+'s 5 0s linear');
                 $scope.allowInput = true;
                 if (typeof callback == 'function') {
                     callback();

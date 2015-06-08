@@ -6,34 +6,35 @@
 </script>
 <html>
 <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <title>野球愛好会</title>
-    <script src="js/external/angular/angular.js"></script>
-    <script src="js/external/jquery/jquery-1.10.2.min.js"></script>
+    <script src='js/external/angular/angular.js'></script>
+    <script src='js/external/jquery/jquery-1.10.2.min.js'></script>
 
-    <script src="js/internal/application.js"></script>
+    <script src='js/application.js'></script>
 
-    <link rel="shortcut icon" href="yakk.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="css/internal/application.css">
-    <link href="css/external/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel='shortcut icon' href='yakk.ico'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <link rel='stylesheet' href='css/external/bootstrap/css/bootstrap.min.css' >
+    <link rel='stylesheet' type='text/css' href='css/internal/application.css'>
+
     <style>
         @-webkit-keyframes spin {
             from {
-                -webkit-transform: rotate(0deg);
+                -webkit-transform: rotate(0deg) translateZ(0);
             }
             to {
-                -webkit-transform: rotate(360deg);
+                -webkit-transform: rotate(360deg) translateZ(0);
             }
         }
         @keyframes spin {
             from {
-                -ms-transform: rotate(0deg);
-                transform: rotate(0deg);
+                -ms-transform: rotate(0deg) translateZ(0);
+                transform: rotate(0deg) translateZ(0);
             }
             to {
-                -ms-transform: rotate(360deg);
-                transform: rotate(360deg);
+                -ms-transform: rotate(360deg) translateZ(0);
+                transform: rotate(360deg) translateZ(0);
             }
         }
         @-webkit-keyframes flight {
@@ -71,10 +72,10 @@
                 <span>
                     {{ t('Select Language:') }} &nbsp;
                 </span>
-                <button class='pointer' ng-click='mode("e"); $event.stopPropagation()'>
+                <button class='btn pointer' ng-click='mode("e"); $event.stopPropagation()'>
                     English
                 </button>
-                <button class='pointer' ng-click='mode("n"); $event.stopPropagation()'>
+                <button class='btn pointer' ng-click='mode("n"); $event.stopPropagation()'>
                     日本語
                 </button>
             </div>
@@ -140,13 +141,13 @@
         </div>
         <section class='row options'>
             <div class='col-md-12'>
-                <button ng-click="proceedToGame(); $event.stopPropagation()" class='pointer'>
+                <button ng-click="proceedToGame(); $event.stopPropagation()" class='btn pointer'>
                     {{ t('Play Ball!') }}
                 </button>
-                <button ng-click="proceedToGame(false, true); $event.stopPropagation()" class='pointer'>
+                <button ng-click="proceedToGame(false, true); $event.stopPropagation()" class='btn pointer'>
                     {{ t('Spectate the CPU') }}
                 </button>
-                <button ng-click='proceedToGame(true, true); $event.stopPropagation()' class='pointer'>
+                <button ng-click='proceedToGame(true, true); $event.stopPropagation()' class='btn pointer'>
                     {{ t('Run Fast Simulation') }} &raquo;
                 </button>
             </div>

@@ -1,5 +1,11 @@
-var gulp = require('gulp');
-var concat = require('gulp-concat');
+/**
+ * Gulpfile template based on work by https://github.com/hwillson
+ */
+
+var gulp = require('gulp'),
+    concat = require('gulp-concat'),
+    uglify = require('gulp-uglify'),
+    sourcemaps = require('gulp-sourcemaps');
 var watch = require('gulp-watch');
 var del = require('del');
 var less = require('gulp-less');
@@ -27,8 +33,11 @@ gulp.task('scripts', function() {
         'js/internal/angular/controllers/**/*.js',
         'js/internal/angular/application.js'
     ])
+        .pipe(sourcemaps.init())
         .pipe(concat('application.js'))
-        .pipe(gulp.dest('js/internal'))
+        .pipe(uglify({ mangle: false }))
+        .pipe(sourcemaps.write('./sourcemaps'))
+        .pipe(gulp.dest('js'))
 });
 
 gulp.task('styles', function() {
