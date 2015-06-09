@@ -236,21 +236,21 @@
                         ({{'#'+y.pitcher.team.positions.catcher.number}}) <span ng-if='y.pitcher.team.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
                     </div>
                     <div class='row'>
-                        <div class='col-xs-3'>
+                        <div class='col-lg-3'>
                             {{ t('Season') }}
                             <br>
                             {{y.pitcher.stats.pitching.W}} - {{y.pitcher.stats.pitching.L}}, {{y.pitcher.stats.pitching.GS}} GS
                             <br>
                             {{y.pitcher.stats.pitching.getERA() | number:2}} ERA
                         </div>
-                        <div class='col-xs-2'>
+                        <div class='col-lg-2'>
                             {{ t('Game') }}
                             <br>
                             {{y.pitcher.stats.pitching.strikes}} - {{y.pitcher.stats.pitching.pitches}}
                             <br>
                             {{y.pitcher.stats.pitching.K}}K {{y.pitcher.stats.pitching.H}}H
                         </div>
-                        <div class='col-xs-7'>
+                        <div class='col-lg-7'>
                         </div>
                     </div>
                 </div>
@@ -284,7 +284,9 @@
             <div class='row'>
                 <div class='col-lg-6'>
                     <div>
-                        {{ t('At Bat :') }} &raquo; <strong>{{y.batter.getName()}}</strong>
+                        {{ t('At Bat :') }} &raquo;
+                        <br>
+                        <strong>{{y.batter.getName()}}</strong>
                         ({{('#')+y.batter.number}}) <span ng-if='y.batter.hero' class='glyphicon glyphicon-chevron-up'></span> -
                         <em>{{abbreviatePosition(y.batter.position)}}{{t.comma()}}{{y.batter.bats == 'left' ? t('LHB') : t('RHB')}}</em>
                     </div>
@@ -311,14 +313,16 @@
                                 {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.speed/120+")"}'></span>
                             </div>
                             <div>
-                                - {{y.batter.atBats.join(', ')}} -
+                                {{y.batter.getAtBats().join(', ')}}
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class='col-lg-6'>
                     <div>
-                        {{ t('On Deck :') }} &raquo; <strong>{{y.deck.getName()}}</strong>
+                        {{ t('On Deck :') }} &raquo;
+                        <br>
+                        <strong>{{y.deck.getName()}}</strong>
                         ({{('#')+y.deck.number}}) <span ng-if='y.deck.hero' class='glyphicon glyphicon-chevron-up'></span> -
                         {{abbreviatePosition(y.deck.position)}}{{t.comma()}}{{y.batter.bats == 'left' ? t('LHB') : t('RHB')}}
                     </div>
@@ -345,7 +349,7 @@
                                 {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.speed/120+")"}'></span>
                             </div>
                             <div>
-                                - {{y.deck.atBats.join(', ')}} -
+                                {{y.deck.getAtBats().join(', ')}}
                             </div>
                         </div>
                     </div>
@@ -375,7 +379,9 @@
                 ng-click='player.team.expanded = player.team.expanded == player ? null : player'>
                 {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.defense.fielding/120+")"}'></span> &raquo;
                 <strong>{{player.getName()}}</strong> ({{'#'+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
-                {{t(player.bats == 'left' ? 'L' : 'R ')}}{{t.slash()}}{{t(player.throws == 'left' ? 'L' : 'R ')}}
+                <span class='visible-md-inline visible-lg-inline'>
+                    {{t(player.bats == 'left' ? 'L' : 'R ')}}{{t.slash()}}{{t(player.throws == 'left' ? 'L' : 'R ')}}
+                </span>
                 <span class='pull-right'>
                     <span class='at-bat' ng-repeat='atBat in player.getAtBats() track by $index'>
                         <strong ng-show='atBat.beneficial'>{{ atBat + '' }}</strong>
