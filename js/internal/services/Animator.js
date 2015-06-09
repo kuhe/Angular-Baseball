@@ -166,7 +166,7 @@ Animator.prototype = {
             distance = Math.abs(result.travelDistance),
             scalar = result.travelDistance < 0 ? -1 : 1;
 
-        Animator.prototype.memory.bounding = angle > 0;
+        Animator.prototype.memory.bounding = angle < 0;
         angle = 1 + Math.abs(angle);
         if (angle > 90) angle = 180 - angle;
 
