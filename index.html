@@ -187,6 +187,20 @@
                                 }'
                              ng-class='{left: y.batterRunner.bats == "left", right: y.batterRunner.bats == "right"}'>
                         </div>
+                        <div class='indicator swing stance-indicator'
+                             ng-class='{
+                                left: y.batter.bats == "left",
+                                right: y.batter.bats == "right",
+                                hide: !y.humanBatting()
+                             }'>
+                        </div>
+                        <div class='indicator glove stance-indicator'
+                             ng-class='{
+                                left: y.pitcher.team.positions.catcher.throws == "left",
+                                right: y.pitcher.team.positions.catcher.throws == "right",
+                                hide: !y.humanPitching()
+                             }'>
+                        </div>
                         <div class='strikezone' ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'></div>
                     </div>
                 </div>

@@ -199,27 +199,6 @@ Game.prototype = {
         }
     },
     battersEye : '',
-    debugOut : function() {
-        log('grounders', this.debug.filter(function(a){return !a.caught && !a.foul && a.grounder}).length);
-        log('grounders thrown out', this.debug.filter(function(a){return !a.caught && !a.foul && a.grounder && a.thrownOut}).length);
-        log('weak outfield hits', this.debug.filter(function(a){return !a.caught && !a.foul && !a.grounder && a.thrownOut}).length);
-        log('good outfield hits', this.debug.filter(function(a){return !a.caught && !a.foul && !a.grounder && !a.thrownOut}).length);
-        log('singles', this.debug.filter(function(a){return a.bases == 1}).length);
-        log('2b', this.debug.filter(function(a){return a.bases == 2}).length);
-        log('3b', this.debug.filter(function(a){return a.bases == 3}).length);
-        log('homeruns', this.debug.filter(function(a){return a.bases == 4}).length);
-
-        log('fly outs', this.debug.filter(function(a){return !a.grounder && !a.bases && a.caught}).length);
-        log('groundouts', this.debug.filter(function(a){return a.grounder && !a.bases && !a.caught}).length);
-        var SO = this.teams.away.lineup.map(function(p) {return p.atBats}).reduce(function(a, b) {
-            return a + b.filter(function(ab) {return ab == 'SO'}).length;
-        });
-        SO += this.teams.home.lineup.map(function(p) {return p.atBats.filter(function(ab) {return ab == 'SO'})}).reduce(function(a, b) {
-            return a.length + b.length;
-        });
-        log('strikeouts', this.debug.filter(function(a){return a.grounder && !a.bases && !a.caught}).length);
-        log('fouls', this.debug.filter(function(a){return a.foul}).length);
-    },
     theSwing : function(x, y, callback) {
         if (this.stage == 'swing') {
             this.batter.fatigue++;
@@ -228,18 +207,7 @@ Game.prototype = {
                 eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
             this.swingResult.x = 100 + (x - 100)*(0.5+Math.random()*eye/200) - this.pitchInFlight.x;
             this.swingResult.y = 100 + (y - 100)*(0.5+Math.random()*eye/200) - this.pitchInFlight.y;
-            var giraffe = this;
-            var origin = {
-                x: giraffe.batter.bats == 'left' ? 250 : -50,
-                y: 185
-            };
-            var swing = {
-                x: giraffe.pitchInFlight.x + this.swingResult.x,
-                y: giraffe.pitchInFlight.y + this.swingResult.y
-            };
-            log(origin, swing);
-            this.swingResult.angle = Math.tan((origin.y - swing.y)/(swing.x - origin.x))/Math.PI * 90;
-
+            this.swingResult.angle = this.setBatAngle();
             if (!(x < 0 || x > 200)) {
                 this.swingResult.looking = false;
                 if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {
@@ -276,6 +244,40 @@ Game.prototype = {
                 }
             }
         }
+    },
+    setBatAngle : function(x, y) {
+        var giraffe = this;
+        var origin = {
+            x: giraffe.batter.bats == 'right' ? -10 : 210,
+            y: 160
+        };
+        var swing = {
+            x: x ? x : giraffe.pitchInFlight.x + this.swingResult.x,
+            y: y ? y : giraffe.pitchInFlight.y + this.swingResult.y
+        };
+        return Math.atan((origin.y - swing.y)/(swing.x - origin.x))/Math.PI * 125;
+        // 0 is right, positive is clockwise
+    },
+    debugOut : function() {
+        log('grounders', this.debug.filter(function(a){return !a.caught && !a.foul && a.grounder}).length);
+        log('grounders thrown out', this.debug.filter(function(a){return !a.caught && !a.foul && a.grounder && a.thrownOut}).length);
+        log('weak outfield hits', this.debug.filter(function(a){return !a.caught && !a.foul && !a.grounder && a.thrownOut}).length);
+        log('good outfield hits', this.debug.filter(function(a){return !a.caught && !a.foul && !a.grounder && !a.thrownOut}).length);
+        log('singles', this.debug.filter(function(a){return a.bases == 1}).length);
+        log('2b', this.debug.filter(function(a){return a.bases == 2}).length);
+        log('3b', this.debug.filter(function(a){return a.bases == 3}).length);
+        log('homeruns', this.debug.filter(function(a){return a.bases == 4}).length);
+
+        log('fly outs', this.debug.filter(function(a){return !a.grounder && !a.bases && a.caught}).length);
+        log('groundouts', this.debug.filter(function(a){return a.grounder && !a.bases && !a.caught}).length);
+        var SO = this.teams.away.lineup.map(function(p) {return p.atBats}).reduce(function(a, b) {
+            return a + b.filter(function(ab) {return ab == 'SO'}).length;
+        });
+        SO += this.teams.home.lineup.map(function(p) {return p.atBats.filter(function(ab) {return ab == 'SO'})}).reduce(function(a, b) {
+            return a.length + b.length;
+        });
+        log('strikeouts', this.debug.filter(function(a){return a.grounder && !a.bases && !a.caught}).length);
+        log('fouls', this.debug.filter(function(a){return a.foul}).length);
     },
     startOpponentPitching : null, // late function
     pitchTarget : {x : 100, y : 100},

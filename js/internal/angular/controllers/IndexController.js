@@ -10,14 +10,14 @@ IndexController = function($scope) {
     };
 
     $scope.proceedToGame = function(quickMode, spectateCpu) {
-        Game.prototype.humanControl = spectateCpu ? 'none' : 'home';
+        Game.prototype.humanControl = spectateCpu ? 'none' : 'away';
         Game.prototype.quickMode = !!quickMode;
         $scope.y = new Game();
-        s2.y = $scope.y;
+        var game = $scope.y;
+        s2.y = game;
         bindMethods();
         jQ('.blocking').remove();
-        if ($scope.y.humanControl == 'none' && $scope.y.quickMode) {
-            var game = $scope.y;
+        if (game.humanControl == 'none' && game.quickMode) {
             var n = 0;
             do {
                 n++;
@@ -25,62 +25,88 @@ IndexController = function($scope) {
                     typeof callback == 'function' && callback();
                 });
             } while (game.stage != 'end' && n < 500);
-            $scope.y = game;
             log('sim ended');
-            $scope.y.debugOut();
-        } else if ($scope.y.humanControl == 'none') {
-            var scalar = $scope.y.quickMode ? 0.05 : 1;
+            game.debugOut();
+        } else if (game.humanControl == 'none') {
+            var scalar = game.quickMode ? 0.05 : 1;
             var auto = setInterval(function() {
-                if ($scope.y.stage == 'end') {
+                if (game.stage == 'end') {
                     clearInterval(auto);
                 }
-                $scope.y.simulatePitchAndSwing(function(callback) {
-                    $scope.y.quickMode ? void 0 : $scope.$apply();
+                game.simulatePitchAndSwing(function(callback) {
+                    game.quickMode ? void 0 : $scope.$apply();
                     $scope.updateFlightPath(callback);
                 });
-            }, scalar*($scope.y.field.hasRunnersOn() ? 4000 : 5500));
+            }, scalar*(game.field.hasRunnersOn() ? 4000 : 5500));
         }
-        if ($scope.y.humanControl == 'away') {
-            $scope.y.simulateInput(function(callback) {
+        if (game.humanControl == 'away') {
+            game.simulateInput(function(callback) {
                 $scope.updateFlightPath(callback);
             });
         }
-        if ($scope.y.humanControl == 'home') {
+        if (game.humanControl == 'home') {
 
         }
     };
 
     var bindMethods = function() {
+        var game = $scope.y;
         $scope.holdUpTimeouts = [];
         $scope.expandScoreboard = false;
         var animator = new Animator();
         $scope.updateFlightPath = animator.updateFlightPath.bind($scope);
+
+        // avoid scope cycles, any other easy way?
+        var bat = jQ('.target .swing.stance-indicator');
+        var showBat = function(event) {
+            if (game.humanBatting()) {
+                var offset = jQ('.target').offset();
+                var relativeOffset = {
+                    x : event.pageX - offset.left,
+                    y : 200 - (event.pageY - offset.top)
+                };
+                var angle = game.setBatAngle(relativeOffset.x, relativeOffset.y);
+                bat.css({
+                    top: 200-relativeOffset.y + "px",
+                    left: relativeOffset.x + "px",
+                    transform: "rotate(" + angle + "deg)"
+                });
+                if (relativeOffset.x > 200 || relativeOffset.x < 0 || relativeOffset.y > 200 || relativeOffset.y < 0) {
+                    bat.hide();
+                } else {
+                    bat.show();
+                }
+            }
+        };
+        var glove = jQ('.target .glove.stance-indicator');
+        var showGlove = function(event) {
+            if (game.humanPitching()) {
+            }
+        };
+
         $scope.selectPitch = function(pitchName) {
-            if ($scope.y.stage == 'pitch') {
-                $scope.y.pitchInFlight = jQ.extend({}, $scope.y.pitcher.pitching[pitchName]);
-                $scope.y.pitchInFlight.name = pitchName;
-                $scope.y.swingResult.looking = true;
+            if (game.stage == 'pitch') {
+                game.pitchInFlight = jQ.extend({}, game.pitcher.pitching[pitchName]);
+                game.pitchInFlight.name = pitchName;
+                game.swingResult.looking = true;
             }
         };
         $scope.allowInput = true;
         $scope.holdUp = function() {
             jQ('.no-swing').click();
             $scope.$apply();
-            //$scope.y.receiveInput(-20, 100, function() {
-            //    $scope.updateFlightPath();
-            //});
         };
-        $scope.y.startOpponentPitching = function(callback) {
+        game.startOpponentPitching = function(callback) {
             $scope.updateFlightPath(callback);
         };
         $scope.indicate = function($event) {
             if (!$scope.allowInput) {
                 return;
             }
-            if ($scope.y.pitcher.windingUp) {
+            if (game.pitcher.windingUp) {
                 return;
             }
-            if ($scope.y.humanPitching()) $scope.allowInput = false;
+            if (game.humanPitching()) $scope.allowInput = false;
             var offset = jQ('.target').offset();
             var relativeOffset = {
                 x : $event.pageX - offset.left,
@@ -90,7 +116,7 @@ IndexController = function($scope) {
             while ($scope.holdUpTimeouts.length) {
                 clearTimeout($scope.holdUpTimeouts.shift());
             }
-            $scope.y.receiveInput(relativeOffset.x, relativeOffset.y, function(callback) {
+            game.receiveInput(relativeOffset.x, relativeOffset.y, function(callback) {
                 $scope.updateFlightPath(callback);
             });
         };
@@ -110,6 +136,22 @@ IndexController = function($scope) {
             }
             return text.fielderShortName(position);
         };
+        $scope.$watch('y.humanBatting()', function() {
+            if ($scope.y.humanBatting()) {
+                jQ('.target').mousemove(showBat);
+            } else {
+                jQ('.target').unbind('mousemove', showBat);
+                bat.hide();
+            }
+        });
+        $scope.$watch('y.humanPitching()', function() {
+            if ($scope.y.humanPitching()) {
+                jQ('.target').mousemove(showGlove);
+            } else {
+                jQ('.target').unbind('mousemove', showGlove);
+                glove.hide();
+            }
+        });
     };
 
 
