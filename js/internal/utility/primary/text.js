@@ -87,12 +87,15 @@ text = function(phrase) {
             'Play Ball!' : 'プレーボール',
             'Spectate the CPU': 'CPU観戦',
 
+            'Throws/Bats' : ' ',
             'LHP' : '左投',
             'RHP' : '右投',
             'LHB' : '左打',
             'RHB' : '右打',
-            'L' : '左',
-            'R ' : '右',
+            'L' : '左投',
+            'R ' : '右投',
+            ' L ' : '左打',
+            ' R ' : '右打',
             '#' : '背番号'
         },
         e : {
