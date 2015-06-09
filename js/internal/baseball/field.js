@@ -13,20 +13,6 @@ Field.prototype = {
     hasRunnersOn : function() {
         return this.first instanceof Player || this.second instanceof Player || this.third instanceof Player;
     },
-    translateSwingResultToStylePosition: function(swingResult) {
-        // CF HR bottom: 95px, centerline: left: 190px;
-        var bottom = 0, left = 190;
-
-        bottom = Math.cos(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300;
-        left = Math.sin(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300 + 190;
-
-        bottom = Math.max(Math.min(bottom, 400), -20);
-        left = Math.max(Math.min(left, 280), 100);
-
-        swingResult.bottom = bottom + 'px';
-        swingResult.left = left + 'px';
-        return swingResult;
-    },
     determineSwingContactResult : function(swing) {
         if (typeof swing == 'undefined') swing = this;
         var x = swing.x, y = swing.y;
@@ -116,7 +102,8 @@ Field.prototype = {
         dd.foul = swing.foul;
         this.game.debug.push(dd);
 
-        return this.translateSwingResultToStylePosition(swing);
+        return Animator.prototype.animateFieldingTrajectory(this.game);
+        // return Animator.prototype.translateSwingResultToStylePosition(swing);
     },
     findFielder : function(splayAngle, landingDistance) {
         if (Math.abs(90 - splayAngle) > 50) return false;
