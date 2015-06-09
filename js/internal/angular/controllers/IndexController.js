@@ -9,8 +9,8 @@ IndexController = function($scope) {
         return mode;
     };
 
-    $scope.proceedToGame = function(quickMode, AIonly) {
-        Game.prototype.humanControl = AIonly ? 'none' : 'home';
+    $scope.proceedToGame = function(quickMode, spectateCpu) {
+        Game.prototype.humanControl = spectateCpu ? 'none' : 'home';
         Game.prototype.quickMode = !!quickMode;
         $scope.y = new Game();
         s2.y = $scope.y;

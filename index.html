@@ -76,7 +76,7 @@
                 <div class="target {{y.stage}}">
                     <div class='indicator baseball pitch' style='top:125px;left:155px;'></div>
                     <div class='indicator baseball break' style='top:145px;left:125px;'></div>
-                    <div class='indicator swing right' style='top:110px;left:140px;'></div>
+                    <div class='indicator swing right' style='top:110px;left:140px; transform: rotate(20deg);'></div>
                     <div class='strikezone'></div>
                 </div>
             </div>
@@ -180,8 +180,12 @@
                         <div class='indicator baseball pitch hide'></div>
                         <div class='indicator baseball break hide'></div>
                         <div class='indicator swing {{y.swingResult.looking ? "hide" : ""}}'
-                             ng-style='{top:200-y.pitchInFlight.y-y.swingResult.y + "px", left:y.pitchInFlight.x + y.swingResult.x + "px"}'
-                             ng-class='{left: y.batter.bats == "left", right: y.batter.bats == "right"}'>
+                             ng-style='{
+                                    top: 200-y.pitchInFlight.y-y.swingResult.y + "px",
+                                    left: y.pitchInFlight.x + y.swingResult.x + "px",
+                                    transform: "rotate(" + y.swingResult.angle + "deg)"
+                                }'
+                             ng-class='{left: y.batterRunner.bats == "left", right: y.batterRunner.bats == "right"}'>
                         </div>
                         <div class='strikezone' ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'></div>
                     </div>

@@ -228,6 +228,17 @@ Game.prototype = {
                 eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
             this.swingResult.x = 100 + (x - 100)*(0.5+Math.random()*eye/200) - this.pitchInFlight.x;
             this.swingResult.y = 100 + (y - 100)*(0.5+Math.random()*eye/200) - this.pitchInFlight.y;
+            var giraffe = this;
+            var origin = {
+                x: giraffe.batter.bats == 'left' ? 250 : -50,
+                y: 185
+            };
+            var swing = {
+                x: giraffe.pitchInFlight.x + this.swingResult.x,
+                y: giraffe.pitchInFlight.y + this.swingResult.y
+            };
+            log(origin, swing);
+            this.swingResult.angle = Math.tan((origin.y - swing.y)/(swing.x - origin.x))/Math.PI * 90;
 
             if (!(x < 0 || x > 200)) {
                 this.swingResult.looking = false;

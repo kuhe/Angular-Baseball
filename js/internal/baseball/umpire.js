@@ -17,6 +17,7 @@ Umpire.prototype = {
         this.game.half = 'top';
         this.game.inning = 1;
         this.game.batter = this.game.teams.away.lineup[0];
+        this.game.batterRunner = this.game.teams.away.lineup[0];
         this.game.deck = this.game.teams.away.lineup[1];
         this.game.hole = this.game.teams.away.lineup[2];
         this.game.pitcher = this.game.teams.home.positions.pitcher;
@@ -33,6 +34,8 @@ Umpire.prototype = {
         var result = this.game.swingResult;
         var pitcher = this.game.pitcher;
         var batter = this.game.batter;
+
+        this.game.batterRunner = this.game.batter;
 
         pitcher.stats.pitching.pitches++;
         if (result.looking) {
@@ -270,6 +273,7 @@ Umpire.prototype = {
         this.game.log.note(e, n);
         var team = this.game.teams[offense];
         this.game.batter = team.lineup[team.nowBatting];
+        this.game.batterRunner = this.game.batter;
         this.game.deck = team.lineup[(team.nowBatting + 1)%9];
         this.game.hole = team.lineup[(team.nowBatting + 2)%9];
 
