@@ -209,7 +209,7 @@
                         Umpire: {{y.umpire.says}}
                     </div>
                     <span>
-                        {{y.humanControl == 'none' || y.stage == 'swing' || y.pitcher.windingUp ? t('Batting, ') + y.battersEye : ''}}
+                        {{y.humanControl == 'none' || y.stage == 'swing' || y.pitcher.windingUp ? t('Batting, ') + y.battersEye() : ''}}
                     </span>
                     <span ng-if='y.humanControl != "none"'>
                         {{y.stage == 'pitch' && !y.pitcher.windingUp ? t('Catching, pitch selection') : '' }}
