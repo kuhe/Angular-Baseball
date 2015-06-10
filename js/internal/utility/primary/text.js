@@ -38,7 +38,7 @@ text = function(phrase) {
             'Fouled off.': 'ファウル。',
             'In play.': 'インプレー。',
             'Swinging strike.': '空振り。',
-            '4-seam': 'ストレイト',
+            '4-seam': 'ストレート',
             '2-seam': 'シュート',
             'slider': 'スライダー',
             'fork': 'フォーク',

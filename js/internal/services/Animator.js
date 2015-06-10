@@ -138,7 +138,7 @@ Animator.prototype = {
             borderWidth = 1;
         } else {
             padding = apexRatio * apexHeight/90 * 15;
-            borderWidth = 1 + (apexRatio * 2);
+            borderWidth = 2 + (apexRatio * 2);
         }
         bottom = Math.max(Math.min(bottom, 400), -20);
         left = Math.max(Math.min(left, 280), 100);
