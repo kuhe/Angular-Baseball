@@ -314,7 +314,7 @@
                             <br>
                             <strong>{{y.batter.stats.batting.getOBP() | number:3}}</strong> {{ t('OBP') }}
                             <br>
-                            <strong>{{y.batter.stats.batting.getOBP() + y.batter.stats.batting.getSLG() | number:3}}</strong> {{ t('OPS') }}
+                            <strong>{{y.batter.stats.batting.getSLG() | number:3}}</strong> {{ t('SLG') }}
                             <br>
                             <strong>{{y.batter.stats.batting.hr}}</strong> {{ t('HR') }}
                             <br>
@@ -350,7 +350,7 @@
                             <br>
                             <strong>{{y.deck.stats.batting.getOBP() | number:3}}</strong> {{ t('OBP') }}
                             <br>
-                            <strong>{{y.deck.stats.batting.getOBP() + y.batter.stats.batting.getSLG() | number:3}}</strong> {{ t('OPS') }}
+                            <strong>{{y.deck.stats.batting.getSLG() | number:3}}</strong> {{ t('SLG') }}
                             <br>
                             <strong>{{y.deck.stats.batting.hr}}</strong> {{ t('HR') }}
                             <br>
@@ -412,7 +412,7 @@
                         <li class='col-md-1'></li>
                         <li class='col-md-3'>{{ t('BA') }} <br> {{ stats.ba | number:3 }} ({{ stats.getBA() | number:3 }})</li>
                         <li class='col-md-1'>{{ t('OBP') }} <br> {{ stats.getOBP() | number:3 }}</li>
-                        <li class='col-md-1'>{{ t('OPS') }} <br> {{ stats.getOBP() + stats.getSLG() | number:3 }}</li>
+                        <li class='col-md-1'>{{ t('SLG') }} <br> {{ stats.getSLG() | number:3 }}</li>
                         <li class='col-md-1'>{{ t('PA') }} <br> {{ stats.pa }}</li>
                     </ul>
                     <hr/>

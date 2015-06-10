@@ -70,7 +70,7 @@ text = function(phrase) {
             'Fielding': '守備',
             'BA' : '打率',
             'OBP' : '出塁',
-            'OPS' : '出長',
+            'SLG' : '長打',
             'PA' : '打席',
             'H/2B/3B/HR' : '安／二／三／本',
             'H' : '安',
