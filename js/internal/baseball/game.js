@@ -9,7 +9,7 @@ Game.prototype = {
     quickMode : true,
     init : function(m) {
         if (m) window.mode = m;
-        this.gamesIntoSeason = 60 + Math.floor(Math.random()*20);
+        this.gamesIntoSeason = 1 + Math.floor(Math.random()*142);
         this.field = new Field(this);
         this.teams.away = new Team(this);
         this.teams.home = new Team(this);
@@ -85,6 +85,12 @@ Game.prototype = {
             giraffe.autoSwing(giraffe.pitchTarget.x, giraffe.pitchTarget.y, function(callback) {callback()});
         }, giraffe.field.hasRunnersOn() ? 2400 : 3900);
     },
+    /**
+     * generically receive click input and decide what to do
+     * @param x
+     * @param y
+     * @param callback
+     */
     receiveInput : function(x, y, callback) {
         if (this.humanControl == 'none') {
             return;
@@ -117,14 +123,11 @@ Game.prototype = {
             windup.css('width', '100%');
             var giraffe = this;
             this.autoPitchSelect();
-            if (Math.random() < 0.5) {
-                var x = 50 + Math.floor(Math.random()*70) - Math.floor(Math.random()*15);
-            } else {
-                x = 150 + Math.floor(Math.random()*15) - Math.floor(Math.random()*70);
-            }
-            var y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
+            var pitch = Distribution.pitchLocation(),
+                x = pitch.x,
+                y = pitch.y;
             if (this.quickMode) {
-                giraffe.thePitch(x, y, callback);
+                this.thePitch(x, y, callback);
             } else {
                 windup.animate({width: 0}, this.field.hasRunnersOn() ? 1500 : 3000, function() {
                     jQ('.baseball.pitch').removeClass('hide');
@@ -139,8 +142,8 @@ Game.prototype = {
         var bonus = this.batter.eye.bonus || 0,
             eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
 
-        var x = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15),
-            y = 100 + Math.floor(Math.random()*15) - Math.floor(Math.random()*15);
+        var x = Distribution.centralizedNumber(),
+            y = Distribution.centralizedNumber();
         if (100*Math.random() < eye) {
             var convergence = 1.35 * 5*eye/100,
                 convergenceSum = 1 + convergence;
@@ -153,17 +156,8 @@ Game.prototype = {
         x = (deceptiveX*(convergence) + x)/convergenceSum;
         y = (deceptiveY*(convergence) + y)/convergenceSum;
 
-        var swingLikelihood = (200 - Math.abs(100 - x) - Math.abs(100 - y))/2;
-
-        if (x < 60 || x > 140 || y < 50 || y > 150) { // ball
-            swingLikelihood = Math.min(swingLikelihood, 100 - eye) - 15*this.umpire.count.balls;
-        } else {
-            swingLikelihood = Math.max(45, (2*swingLikelihood + eye)/3);
-        }
-        var chance = Math.random()*100,
-            totalLikelihood = swingLikelihood - 35 + 10*(this.umpire.count.balls + 2*this.umpire.count.strikes);
-
-        if (totalLikelihood < chance ) {
+        var swingProbability = Distribution.swingLikelihood(eye, x, y, this.umpire);
+        if (swingProbability > 100*Math.random()) {
             x = -20;
         }
         callback(function() {
@@ -177,42 +171,48 @@ Game.prototype = {
             this.pitchTarget.y = y;
 
             this.pitchInFlight.breakDirection = this.helper.pitchDefinitions[this.pitchInFlight.name].slice(0, 2);
-            this.battersEye = function() {
-                return text('looks like: ')+(Math.abs(this.pitchInFlight.breakDirection[0])+Math.abs(this.pitchInFlight.breakDirection[1]) > 40 ?
-                text('breaking ball') : text('fastball'));
-            };
+            this.battersEye = text.getBattersEye(this);
 
             var control = this.pitchInFlight.control;
-            this.pitchTarget.x = Math.min(199.9, Math.max(0.1, this.pitchTarget.x + (50 - Math.random()*100)/(1+control/100)));
-            this.pitchTarget.y = Math.min(199.9, Math.max(0.1, this.pitchTarget.y + (50 - Math.random()*100)/(1+control/100)));
+            this.pitchTarget.x = Distribution.pitchControl(this.pitchTarget.x, control);
+            this.pitchTarget.y = Distribution.pitchControl(this.pitchTarget.y, control);
 
             if (this.pitcher.throws == 'right') this.pitchInFlight.breakDirection[0] *= -1;
 
-            this.pitchInFlight.x = Math.floor(this.pitchTarget.x + (this.pitchInFlight.breakDirection[0]
-                *((0.5+Math.random()*this.pitchInFlight.break)/100)));
-            this.pitchInFlight.y = Math.floor(this.pitchTarget.y + (this.pitchInFlight.breakDirection[1]
-                *((0.5+Math.random()*this.pitchInFlight.break)/100))/(0.5 + this.pitchTarget.y/200));
+            var breakEffect = Distribution.breakEffect(this.pitchInFlight, this.pitchTarget.x, this.pitchTarget.y);
+
+            this.pitchInFlight.x = breakEffect.x;
+            this.pitchInFlight.y = breakEffect.y;
+
             this.log.notePitch(this.pitchInFlight, this.batter);
 
             this.stage = 'swing';
-            if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl] == this.batter.team)) {
+            if (this.humanControl != 'none' && (this.humanControl == 'both' || this.humanBatting())) {
                 callback();
             } else {
                 this.autoSwing(x, y, callback);
             }
         }
     },
-    battersEye : function() {},
+    battersEye : {
+        e: '',
+        n: ''
+    },
     theSwing : function(x, y, callback) {
         if (this.stage == 'swing') {
             this.batter.fatigue++;
             this.swingResult = {};
             var bonus = this.batter.eye.bonus || 0,
                 eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
-            this.swingResult.x = 100 + (x - 100)*(0.5+Math.random()*eye/200) - this.pitchInFlight.x;
-            this.swingResult.y = 100 + (y - 100)*(0.5+Math.random()*eye/200) - this.pitchInFlight.y;
+            this.swingResult.x = Distribution.swing(x, this.pitchInFlight.x, eye);
+            this.swingResult.y = Distribution.swing(x, this.pitchInFlight.x, eye);
             this.swingResult.angle = this.setBatAngle();
-            if (!(x < 0 || x > 200)) {
+
+            var recalculation = Mathinator.getAngularOffset(this.swingResult, this.swingResult.angle);
+            this.swingResult.x = recalculation.x;
+            this.swingResult.y = recalculation.y;
+
+            if (x >= 0 && x <= 200) {
                 this.swingResult.looking = false;
                 if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {
                     this.swingResult.contact = true;
@@ -259,8 +259,7 @@ Game.prototype = {
             x: x ? x : giraffe.pitchInFlight.x + this.swingResult.x,
             y: y ? y : giraffe.pitchInFlight.y + this.swingResult.y
         };
-        return Math.atan((origin.y - swing.y)/(swing.x - origin.x))/Math.PI * 125;
-        // 0 is right, positive is clockwise
+        return Mathinator.battingAngle(origin, swing);
     },
     debugOut : function() {
         log('grounders', this.debug.filter(function(a){return !a.caught && !a.foul && a.grounder}).length);
@@ -291,7 +290,7 @@ Game.prototype = {
         breakDirection : [0, 0],
         name : 'slider',
         velocity : 50,
-        break : 50,
+        'break' : 50,
         control : 50
     },
     swingResult : {

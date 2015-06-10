@@ -106,6 +106,22 @@ text = function(phrase) {
     return string ? string : phrase;
 };
 
+text.getBattersEye = function(game) {
+    var eye = {},
+        breaking = Math.abs(game.pitchInFlight.breakDirection[0]) + Math.abs(game.pitchInFlight.breakDirection[1]) > 40,
+        o = mode;
+    mode = 'e';
+    eye.e =
+        text('looks like: ')+
+        breaking ? text('breaking ball') : text('fastball');
+    mode = 'n';
+    eye.n =
+        text('looks like: ')+
+        breaking ? text('breaking ball') : text('fastball');
+    mode = 0;
+    return eye;
+};
+
 text.fielderShortName = function(fielder) {
     if (mode == 'n') {
         return {

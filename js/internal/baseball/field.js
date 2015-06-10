@@ -1,3 +1,8 @@
+/**
+ * The baseball field tracks the ball's movement, fielders, and what runners are on
+ * @param game
+ * @constructor
+ */
 var Field = function(game) {
     this.init(game);
 };
@@ -10,16 +15,30 @@ Field.prototype = {
         this.second = null;
         this.third = null;
     },
+    /**
+     * @returns {boolean}
+     */
     hasRunnersOn : function() {
         return this.first instanceof Player || this.second instanceof Player || this.third instanceof Player;
     },
+    /**
+     * @param swing
+     * @returns {object}
+     */
     determineSwingContactResult : function(swing) {
         if (typeof swing == 'undefined') swing = this;
         var x = swing.x, y = swing.y;
-        var splayAngle = 90 - 1.5*x;
-        var flyAngle = -3*y;
+        /**
+         * The initial splay angle is 90 degrees for hitting up the middle and 0
+         * for a hard foul left, 180 is a foul right. Depending on the angle of the bat,
+         * a y-axis displacement which would otherwise pop or ground the ball can instead
+         * increase the left/right effect.
+         * @type {number}
+         */
+        var splayAngle = 90 - 1.5*x + (swing.angle*2 * y/35);
+        var flyAngle = -3*y - (swing.angle * y/35);
         var power = this.game.batter.skill.offense.power + this.game.batter.eye.bonus;
-        var landingDistance = (50 + Math.random()*300 + (power/100)*75) * (1 - Math.abs(flyAngle - 30)/60);
+        var landingDistance = Distribution.landingDistance(power, flyAngle);
         if (flyAngle < 0 && landingDistance > 120) {
             landingDistance = (landingDistance - 120)/4 + 120;
         }
@@ -29,6 +48,10 @@ Field.prototype = {
         swing.fielder = this.findFielder(splayAngle, landingDistance);
         swing.travelDistance = landingDistance;
         swing.flyAngle = flyAngle;
+        /**
+         * the splay for the result is adjusted to 0 being up the middle and negatives being left field
+         * @type {number}
+         */
         swing.splay = splayAngle - 90;
 
         if (!this.game.debug) {
@@ -48,7 +71,7 @@ Field.prototype = {
             var interceptRating = fielder.skill.defense.speed + flyAngle - swing.fielderTravel*1.65;
             if (interceptRating > 0 && flyAngle > -10) {
                 //caught cleanly?
-                if ((100-fielder.skill.defense.fielding)*0.40 + 4 > Math.random()*100) { //error
+                if (Distribution.error(fielder)) { //error
                     fieldingEase *= 0.5;
                     swing.error = true;
                     swing.caught = false;
@@ -105,9 +128,13 @@ Field.prototype = {
         dd.foul = swing.foul;
         this.game.debug.push(dd);
 
-        return Animator.prototype.animateFieldingTrajectory(this.game);
-        // return Animator.prototype.translateSwingResultToStylePosition(swing);
+        return Animator.animateFieldingTrajectory(this.game);
     },
+    /**
+     * @param splayAngle
+     * @param landingDistance
+     * @returns {string|bool}
+     */
     findFielder : function(splayAngle, landingDistance) {
         if (Math.abs(90 - splayAngle) > 50) return false;
         if (landingDistance < 10 && landingDistance > -20) {
@@ -149,7 +176,7 @@ Field.prototype = {
         right : [135 - 14, 280]
     },
     getPolarDistance : function(a, b) {
-        return Math.sqrt(a[1]*a[1] + b[1]*b[1] - 2*a[1]*b[1]*Math.cos(a[0]*Math.PI/180 - b[0]*Math.PI/180));
+        return Mathinator.getPolarDistance(a, b);
     },
     fieldingTest : function() {
         var fielders = {
