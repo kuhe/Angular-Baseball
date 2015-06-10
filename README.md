@@ -12,12 +12,12 @@ currently hosted at [georgefu.info/y/](htttp://georgefu.info/y)
 
 todo :
 
-    直球か変化球かのスイング
+    バット角度
 
-    AIバッター騙される方法
+    スイングタイミング
+
+    ウェブソケット
+
+    AIバッター予想
 
     送りバント
-
-    選手名前なんか足りないじゃん
-
-    攻撃の難しさ
