@@ -26,7 +26,6 @@ Field.prototype = {
      * @returns {object}
      */
     determineSwingContactResult : function(swing) {
-        if (typeof swing == 'undefined') swing = this;
         var x = swing.x, y = swing.y;
         /**
          * The initial splay angle is 90 degrees for hitting up the middle and 0
@@ -44,7 +43,6 @@ Field.prototype = {
         }
 
         if (Math.abs(90 - splayAngle) > 50) swing.foul = true;
-
         swing.fielder = this.findFielder(splayAngle, landingDistance);
         swing.travelDistance = landingDistance;
         swing.flyAngle = flyAngle;
@@ -57,8 +55,6 @@ Field.prototype = {
         if (!this.game.debug) {
             this.game.debug = [];
         }
-
-        var debugData = {}, dd = debugData;
 
         if (swing.fielder) {
             var fielder = (this.game.half == top ? this.game.teams.home.positions[swing.fielder] : this.game.teams.away.positions[swing.fielder]);
@@ -81,8 +77,6 @@ Field.prototype = {
             } else {
                 swing.caught = false;
             }
-            dd.caught = swing.caught;
-            dd.grounder = flyAngle < 0;
 
             if (!swing.caught) {
                 // intercept rating is negative
@@ -95,8 +89,8 @@ Field.prototype = {
                 //    'success', gatherAndThrowSuccess
                 //);
 
-                dd.thrownOut = gatherAndThrowSuccess;
-                dd.outFielder = {'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1;
+                swing.thrownOut = gatherAndThrowSuccess;
+                swing.outFielder = {'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1;
 
                 if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] != 1 && gatherAndThrowSuccess) {
                     swing.thrownOut = true;
@@ -106,12 +100,11 @@ Field.prototype = {
                     swing.bases = 1;
                     if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1) {
                         var fieldingReturnDelay = -1*(interceptRating + 100*throwingEase*fieldingEase) + this.game.batter.skill.offense.speed;
-                        dd.delay = fieldingReturnDelay;
+                        swing.fieldingDelay = fieldingReturnDelay;
                         while (fieldingReturnDelay - 125 > 0 && swing.bases < 3) {
                             swing.bases++;
                             fieldingReturnDelay  -= 65;
                         }
-                        dd.bases = swing.bases;
                     }
                 }
                 // log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
@@ -119,15 +112,11 @@ Field.prototype = {
         } else {
             if (Math.abs(90 - splayAngle) < 45 && landingDistance > 300) {
                 swing.bases = 4;
-                dd.bases = 4;
             } else {
                 swing.foul = true;
                 swing.caught = false;
             }
         }
-        dd.foul = swing.foul;
-        this.game.debug.push(dd);
-
         return Animator.animateFieldingTrajectory(this.game);
     },
     /**

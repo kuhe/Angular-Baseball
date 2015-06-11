@@ -17,7 +17,7 @@ Log.prototype = {
     WALK : 'BB',
     GROUNDOUT : 'GO',
     FLYOUT : 'FO',
-    LINEOUT : 'L',
+    LINEOUT : 'LO',
     RUN : 'R',
     STRIKEOUT : 'SO',
     SACRIFICE : 'SAC',

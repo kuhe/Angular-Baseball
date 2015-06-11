@@ -26,10 +26,12 @@ Mathinator.prototype = {
      * @returns {{x: number, y: number}}
      */
     getAngularOffset : function(offset, angle) {
+        var xScalar = offset.x < 0 ? -1 : 1,
+            yScalar = offset.y < 0 ? -1 : 1;
         var originalAngle = Math.atan(offset.x / offset.y)/this.RADIAN;
         var distance = Math.sqrt(offset.x * offset.x + offset.y * offset.y),
-            angledY = Math.cos((angle - originalAngle)/this.RADIAN) * distance,
-            angledX = Math.sqrt(distance * distance - angledY * angledY);
+            angledY = yScalar * Math.cos((angle - originalAngle) * this.RADIAN) * distance,
+            angledX = xScalar * Math.sqrt(distance * distance - angledY * angledY);
         return {
             x: angledX,
             y: angledY
@@ -88,6 +90,7 @@ Mathinator.prototype = {
         }
         bottom = Math.max(Math.min(bottom, 400), -20);
         left = Math.max(Math.min(left, 280), 100);
+        padding = Math.max(Math.min(padding, 40), 0);
         return {
             bottom: bottom,
             left: left,

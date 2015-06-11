@@ -50,7 +50,11 @@ Umpire.prototype = {
                 if (result.caught) {
                     this.count.outs++;
                     pitcher.stats.pitching.IP[1]++;
-                    this.game.batter.atBats.push(Log.prototype.FLYOUT);
+                    if (result.flyAngle < 10) {
+                        this.game.batter.atBats.push(Log.prototype.LINEOUT);
+                    } else {
+                        this.game.batter.atBats.push(Log.prototype.FLYOUT);
+                    }
                     batter.stats.batting.pa++;
                     batter.stats.batting.ab++;
                     this.newBatter(); //todo: sac fly

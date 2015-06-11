@@ -1,6 +1,6 @@
 var mode = 'n';
 
-text = function(phrase) {
+text = function(phrase, override) {
     if (!mode) mode = 'n';
     var string = {
         n : {
@@ -102,23 +102,19 @@ text = function(phrase) {
             empty: '-',
             'Season': 'Career'
         }
-    }[mode][phrase];
+    }[override ? override : mode][phrase];
     return string ? string : phrase;
 };
 
 text.getBattersEye = function(game) {
     var eye = {},
-        breaking = Math.abs(game.pitchInFlight.breakDirection[0]) + Math.abs(game.pitchInFlight.breakDirection[1]) > 40,
-        o = mode;
-    mode = 'e';
+        breaking = Math.abs(game.pitchInFlight.breakDirection[0]) + Math.abs(game.pitchInFlight.breakDirection[1]) > 40;
     eye.e =
-        text('looks like: ')+
-        breaking ? text('breaking ball') : text('fastball');
-    mode = 'n';
+        text('looks like: ', 'e')+
+        breaking ? text('breaking ball', 'e') : text('fastball', 'e');
     eye.n =
-        text('looks like: ')+
-        breaking ? text('breaking ball') : text('fastball');
-    mode = 0;
+        text('looks like: ', 'n')+
+        breaking ? text('breaking ball', 'n') : text('fastball', 'n');
     return eye;
 };
 
