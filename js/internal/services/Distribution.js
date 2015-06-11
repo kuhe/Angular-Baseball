@@ -21,7 +21,7 @@ Distribution.prototype = {
      * @returns {boolean}
      */
     error : function(fielder) {
-        return (100-fielder.skill.defense.fielding)*0.40 + 4 > Math.random()*100
+        return (100-fielder.skill.defense.fielding)*0.40 + 4 > Math.random()*100;
     },
     /**
      * @param power
@@ -29,18 +29,19 @@ Distribution.prototype = {
      * @returns {number}
      */
     landingDistance : function(power, flyAngle) {
-        return (50 + Math.random()*300 + (power/100)*75) * (1 - Math.abs(flyAngle - 30)/60)
+        return (50 + Math.random()*300 + (power/100)*75) * (1 - Math.abs(flyAngle - 30)/60);
     },
     /**
      * @returns {{x: number, y: number}}
      */
     pitchLocation : function() {
+        var x, y;
         if (Math.random() < 0.5) {
-            var x = 50 + Math.floor(Math.random()*70) - Math.floor(Math.random()*15);
+            x = 50 + Math.floor(Math.random()*70) - Math.floor(Math.random()*15);
         } else {
             x = 150 + Math.floor(Math.random()*15) - Math.floor(Math.random()*70);
         }
-        var y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
+        y = 30 + (170 - Math.floor(Math.sqrt(Math.random()*28900)));
         return {x: x, y: y};
     },
     /**
@@ -63,7 +64,7 @@ Distribution.prototype = {
         } else {
             swingLikelihood = Math.max(45, (2*swingLikelihood + eye)/3);
         }
-        return swingLikelihood - 35 + 10*(umpire.count.balls + 2*umpire.count.strikes)
+        return swingLikelihood - 35 + 10*(umpire.count.balls + 2*umpire.count.strikes);
     },
     /**
      * @param target {number} 0-200
@@ -82,9 +83,9 @@ Distribution.prototype = {
     breakEffect : function(pitch, x, y) {
         var effect = {};
         effect.x = Math.floor(x + (pitch.breakDirection[0]
-            *((0.5+Math.random()*pitch.break)/100)));
+            * ((0.5+Math.random()*pitch.break)/100)));
         effect.y = Math.floor(y + (pitch.breakDirection[1]
-            *((0.5+Math.random()*pitch.break)/100))/(0.5 + y/200));
+            * ((0.5+Math.random()*pitch.break)/100))/(0.5 + y/200));
         return effect;
     },
     /**
@@ -95,7 +96,7 @@ Distribution.prototype = {
      * @returns {number} 0-200
      */
     swing : function(target, actual, eye) {
-        return 100 + (target - 100)*(0.5+Math.random()*eye/200) - actual
+        return 100 + (target - 100)*(0.5+Math.random()*eye/200) - actual;
     }
 };
 

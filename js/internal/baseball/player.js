@@ -58,7 +58,7 @@ var Player = function(team) {
             strikes : 0, // in game
             K : 0, // in game
             getERA : function() {
-                return 9 * this.ER / Math.max(1/3, this.IP[0] + this.IP[1]/3)
+                return 9 * this.ER / Math.max(1/3, this.IP[0] + this.IP[1]/3);
             },
             ERA : null,
             ER : ER,
@@ -69,7 +69,7 @@ var Player = function(team) {
         },
         batting : {
             getBA : function() {
-                return this.h / (Math.max(1, this.ab))
+                return this.h / (Math.max(1, this.ab));
             },
             ba : null,
             getOBP : function() {
@@ -77,7 +77,7 @@ var Player = function(team) {
             },
             obp : null,
             getSLG : function() {
-                return ((h - doubles - triples - hr) + 2*doubles + 3*triples + 4*hr)/ab
+                return ((h - doubles - triples - hr) + 2*doubles + 3*triples + 4*hr)/ab;
             },
             slg : null,
             pa : pa,
@@ -153,7 +153,7 @@ Player.prototype = {
                 value += Math.floor((100 - value)*Math.max(Math.random(), isPitching ? 0 : 0.65));
             }
             if (isPitching) giraffe.pitching.averaging.push(value);
-            return value
+            return value;
         };
         this.skill.offense = {
             eye : randValue(),
@@ -172,7 +172,7 @@ Player.prototype = {
             'break' : randValue(true),
             control : randValue(true)
         };
-        this.pitching['slider'] = {
+        this.pitching.slider = {
             velocity : randValue(true),
             'break' : randValue(true),
             control : randValue(true)
@@ -184,48 +184,48 @@ Player.prototype = {
                     velocity : randValue(true),
                     'break' : randValue(true),
                     control : randValue(true)
-                }
+                };
             }
             if (Math.random() < 0.18) {
-                this.pitching['fork'] = {
+                this.pitching.fork = {
                     velocity : randValue(true),
                     'break' : randValue(true),
                     control : randValue(true)
-                }
+                };
             }
             if (Math.random() > 0.77) {
-                this.pitching['cutter'] = {
+                this.pitching.cutter = {
                     velocity : randValue(true),
                     'break' : randValue(true),
                     control : randValue(true)
-                }
+                };
             }
             if (Math.random() < 0.21) {
-                this.pitching['sinker'] = {
+                this.pitching.sinker = {
                     velocity : randValue(true),
                     'break' : randValue(true),
                     control : randValue(true)
-                }
+                };
             }
 
             if (Math.random() < 0.4) {
-                this.pitching['curve'] = {
+                this.pitching.curve = {
                     velocity : randValue(true),
                     'break' : randValue(true),
                     control : randValue(true)
-                }
+                };
             }
 
             if (Math.random() < 0.9) {
-                this.pitching['change'] = {
+                this.pitching.change = {
                     velocity : randValue(true),
                     'break' : randValue(true),
                     control : randValue(true)
-                }
+                };
             }
         }
-        this.skill.pitching = Math.floor((this.pitching.averaging.reduce(function(prev, current, index, arr) {
-            return prev + current
+        this.skill.pitching = Math.floor((this.pitching.averaging.reduce(function(prev, current) {
+            return prev + current;
         }))/this.pitching.averaging.length+this.pitching.averaging.length*3);
         delete this.pitching.averaging;
     },
@@ -236,7 +236,7 @@ Player.prototype = {
         return mode == 'n' ? this.nameJ : this.name;
     },
     getUniformNumber : function() {
-        return text('#') + this.number
+        return text('#') + this.number;
     },
     getOrder : function() {
         return text([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);

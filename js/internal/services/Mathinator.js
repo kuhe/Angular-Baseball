@@ -35,7 +35,7 @@ Mathinator.prototype = {
         return {
             x: angledX,
             y: angledY
-        }
+        };
     },
     /**
      * @param a {Array<Number>}
@@ -55,7 +55,7 @@ Mathinator.prototype = {
      * of various swing heights.
      */
     battingAngle : function(origin, target) {
-        return Math.atan((origin.y - target.y)/(target.x - origin.x))/Math.PI * 125
+        return Math.atan((origin.y - target.y)/(target.x - origin.x))/Math.PI * 125;
     },
     memory : {},
     /**
@@ -98,7 +98,7 @@ Mathinator.prototype = {
             borderWidth: borderWidth,
             delay: quarter * step,
             ease: bounding ? Power4.easeOut : Linear.easeNone
-        }
+        };
     },
     /**
      * @param swingResult
@@ -151,7 +151,7 @@ Mathinator.prototype = {
                 delay: quarter * step,
                 ease: Linear.easeNone
             };
-        }
+        };
     }
 };
 

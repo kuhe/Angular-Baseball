@@ -62,9 +62,10 @@ Manager.prototype = {
             jQ.each(pool, function(key, player) {
                 var skills = skillset.slice();
                 var cursor = player.skill;
-                while (property = skills.shift()) {
+                do {
+                    property = skills.shift();
                     cursor = cursor[property];
-                }
+                } while (property);
                 if (!(player.order+1) && cursor >= rating && (!mustBeRightHanded || player.throws == 'right')) {
                     rating = cursor;
                     selection = player;
@@ -75,7 +76,7 @@ Manager.prototype = {
             if (pool == this.team.bench) {
                 this.team.bench = this.team.bench.filter(function(player) {
                     return player instanceof selection.constructor;
-                })
+                });
             }
             return selection;
         }

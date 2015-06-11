@@ -168,18 +168,6 @@ Field.prototype = {
         return Mathinator.getPolarDistance(a, b);
     },
     fieldingTest : function() {
-        var fielders = {
-            pitcher : {tally : 0, distances : []},
-            catcher : {tally : 0, distances : []},
-            first : {tally : 0, distances : []},
-            second : {tally : 0, distances : []},
-            short : {tally : 0, distances : []},
-            third : {tally : 0, distances : []},
-            left : {tally : 0, distances : []},
-            center : {tally : 0, distances : []},
-            right : {tally : 0, distances : []},
-            'false' : {tally : 0, distances : []}
-        };
         var angle = Math.random()*90+45;
         var distance = Math.random()*320;
         var fielder = this.findFielder(angle, distance);
@@ -188,7 +176,7 @@ Field.prototype = {
             var fielderCandidates = this.fielderSelectionTest(angle, distance, true);
                 data.fielder = fielderCandidates[1];
                 data[fielderCandidates[0]] = this.getPolarDistance([angle, distance], [this.positions[fielderCandidates[0]][0], this.positions[fielderCandidates[0]][1]]);
-                data[fielderCandidates[1]] = this.getPolarDistance([angle, distance], [this.positions[fielderCandidates[1]][0], this.positions[fielderCandidates[1]][1]])
+                data[fielderCandidates[1]] = this.getPolarDistance([angle, distance], [this.positions[fielderCandidates[1]][0], this.positions[fielderCandidates[1]][1]]);
             return data;
         }
     },

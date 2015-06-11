@@ -78,7 +78,7 @@ Umpire.prototype = {
                                 pitcher.stats.pitching.H++;
                             } else {
                                 if (result.bases > 0) {
-                                    this.game.tally[this.game.half == 'top' ? 'home' : 'away']['E']++;
+                                    this.game.tally[this.game.half == 'top' ? 'home' : 'away'].E++;
                                     this.game.teams[this.game.half == 'top' ? 'home' : 'away'].positions[result.fielder].stats.fielding.E++;
                                 }
                             }
@@ -117,14 +117,14 @@ Umpire.prototype = {
                                     batter.recordInfieldHit();
                                 }
                             }
-                            var onBase = false;
+                            if (bases >= 1) {
+                                this.advanceRunners();
+                                this.reachBase();
+                                bases -= 1;
+                            }
                             while (bases > 0) {
                                 bases -= 1;
                                 this.advanceRunners();
-                                if (!onBase) {
-                                    this.reachBase();
-                                    onBase = true;
-                                }
                             }
                             this.newBatter();
                         }
@@ -186,7 +186,7 @@ Umpire.prototype = {
                         this.game.field.third.stats.batting.r++;
                         this.game.pitcher.stats.pitching.ER++;
                         this.game.scoreboard[this.game.half == 'top' ? 'away' : 'home'][this.game.inning]++;
-                        this.game.tally[this.game.half == 'top' ? 'away' : 'home']['R']++;
+                        this.game.tally[this.game.half == 'top' ? 'away' : 'home'].R++;
                         this.game.field.third = this.game.field.second;
                         this.game.field.second = this.game.field.first;
                         this.game.field.first = null;
@@ -214,7 +214,7 @@ Umpire.prototype = {
             if (this.game.field.third instanceof this.game.batter.constructor) {
                 // run scored
                 this.game.scoreboard[this.game.half == 'top' ? 'away' : 'home'][this.game.inning]++;
-                this.game.tally[this.game.half == 'top' ? 'away' : 'home']['R']++;
+                this.game.tally[this.game.half == 'top' ? 'away' : 'home'].R++;
                 if (this.game.batter != this.game.field.third) {
                     this.game.batter.recordRBI();
                     this.game.field.third.atBats.push(Log.prototype.RUN);
@@ -272,7 +272,7 @@ Umpire.prototype = {
         offense = this.game.half == 'top' ? 'away' : 'home';
         defense = this.game.half == 'top' ? 'home' : 'away';
         var n = this.game.inning+'回の'+(this.game.half == 'top' ? 'オモテ' : 'ウラ')
-        +'、'+this.game.teams[(this.game.half == 'top' ? 'away' : 'home')].getName()+'の攻撃。',
+                +'、'+this.game.teams[(this.game.half == 'top' ? 'away' : 'home')].getName()+'の攻撃。',
             e = (this.game.half == 'top' ? 'Top' : 'Bottom')+' '+this.game.inning;
         this.game.log.note(e, n);
         var team = this.game.teams[offense];
