@@ -156,7 +156,7 @@ Game.prototype = {
         y = (deceptiveY*(convergence) + y)/convergenceSum;
 
         var swingProbability = Distribution.swingLikelihood(eye, x, y, this.umpire);
-        if (0 && swingProbability > 100*Math.random()) {
+        if (swingProbability > 100*Math.random()) {
             x = -20;
         }
         callback(function() {
