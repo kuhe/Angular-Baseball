@@ -36,7 +36,7 @@ Field.prototype = {
          */
         var splayAngle = 90 - 1.5*x + (swing.angle * y/35);
         var flyAngle = -3*y - (swing.angle * y/35);
-        var power = this.game.batter.skill.offense.power + this.game.batter.eye.bonus;
+        var power = this.game.batter.skill.offense.power + this.game.batter.eye.bonus/5;
         var landingDistance = Distribution.landingDistance(power, flyAngle);
         if (flyAngle < 0 && landingDistance > 120) {
             landingDistance = (landingDistance - 120)/4 + 120;

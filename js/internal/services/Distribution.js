@@ -96,6 +96,7 @@ Distribution.prototype = {
      * @returns {number} 0-200
      */
     swing : function(target, actual, eye) {
+        eye = Math.max(eye, 100);
         return 100 + (target - 100)*(0.5+Math.random()*eye/200) - actual;
     }
 };

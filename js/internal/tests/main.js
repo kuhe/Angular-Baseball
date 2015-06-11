@@ -38,45 +38,46 @@ Animator.console = true;
 
 game = new Game();
 game.gamesIntoSeason = 144;
-p = player = new Player(game.teams.home);
+p = player = new Player(game.teams.home, true);
+
 game.teams.home.lineup = [p,p,p,p,p,p,p,p,p];
 
 logPlayer = function() {
     log(
         'PA ' + stat(player.stats.batting.pa),
-        'AV ' + stat(player.stats.batting.getBA()),
-        'H '  + stat(player.stats.batting.h),
-        '2B ' + stat(player.stats.batting['2b']),
-        '3B ' + stat(player.stats.batting['3b']),
-        'HR ' + stat(player.stats.batting.hr)
+        ' | AV ' + stat(player.stats.batting.getBA()),
+        ' | H '  + stat(player.stats.batting.h),
+        ' | 2B ' + stat(player.stats.batting['2b']),
+        ' | 3B ' + stat(player.stats.batting['3b']),
+        ' | HR ' + stat(player.stats.batting.hr),
+        ' | OBP ' + stat(player.stats.batting.getOBP()),
+        ' | SLG ' + stat(player.stats.batting.getSLG()),
+        ' | OPS ' + stat(player.stats.batting.getOBP() + player.stats.batting.getSLG())
     );
 };
 
 logPlayer();
 var pa = player.stats.batting.pa;
-do {
-    game.simulateInput(function(callback) {
-        typeof callback == 'function' && callback();
-    });
-    if (game.stage == 'end') {
-        game.inning = 1;
-        game.half = 'top';
-        game.stage = 'pitch';
-    }
-} while (player.stats.batting.pa < pa * 2);
+
+runSeason = function(n) {
+    do {
+        game.simulateInput(function(callback) {
+            typeof callback == 'function' && callback();
+        });
+        if (game.stage == 'end') {
+            game.inning = 1;
+            game.half = 'top';
+            game.stage = 'pitch';
+        }
+    } while (player.stats.batting.pa < pa * n);
+    logPlayer();
+};
+
+runSeason(2);
+runSeason(3);
+runSeason(4);
+
+log(player.skill.offense, player.fatigue);
 
 // game.debugOut();
 //log('last contact result', game.debug[game.debug.length - 1]);
-
-logPlayer();
-do {
-    game.simulateInput(function(callback) {
-        typeof callback == 'function' && callback();
-    });
-    if (game.stage == 'end') {
-        game.inning = 1;
-        game.half = 'top';
-        game.stage = 'pitch';
-    }
-} while (player.stats.batting.pa < pa * 3);
-logPlayer();

@@ -39,7 +39,7 @@ var Player = function(team) {
 
     var doubles = randBetween(0, h/3, 'power');
     var triples = randBetween(0, h/12, 'speed');
-    var hr = Math.max(0, randBetween(-h/5, h/5, 'power'));
+    var hr = Math.max(0, randBetween(-h/20, h/5, 'power'));
     var r = randBetween(h/8, (h + bb)/3, 'speed') + hr;
     var rbi = randBetween(h/8, (h)/2, 'power') + hr;
     var hbp = randBetween(0, gamesIntoSeason/25);
@@ -73,11 +73,11 @@ var Player = function(team) {
             },
             ba : null,
             getOBP : function() {
-                return (h + bb + hbp)/(ab + bb + hbp + sf);
+                return (this.h + this.bb + this.hbp)/(this.ab + this.bb + this.hbp + this.sf);
             },
             obp : null,
             getSLG : function() {
-                return ((h - doubles - triples - hr) + 2*doubles + 3*triples + 4*hr)/ab;
+                return ((this.h - this['2b'] - this['3b'] - this.hr) + 2*this['2b'] + 3*this['3b'] + 4*this.hr)/this.ab;
             },
             slg : null,
             pa : pa,
@@ -90,7 +90,8 @@ var Player = function(team) {
             hr : hr,
             r : r,
             rbi : rbi,
-            hbp : hbp
+            hbp : hbp,
+            sf : sf
         },
         fielding : {
             E : E,
@@ -104,7 +105,7 @@ var Player = function(team) {
 
 Player.prototype = {
     constructor : Player,
-    init : function(team) {
+    init : function(team, hero) {
         this.throws = Math.random() > 0.86 ? 'left' : 'right';
         this.bats = Math.random() > 0.75 ? 'left' : 'right';
         this.team = team;
@@ -115,7 +116,7 @@ Player.prototype = {
         };
         this.pitching = {averaging : []};
         this.number = 0;
-        this.randomizeSkills(Math.random() > 0.9);
+        this.randomizeSkills(hero || Math.random() > 0.9);
         var surnameKey = Math.floor(Math.random()*data.surnames.length),
             nameKey = Math.floor(Math.random()*data.names.length);
 
