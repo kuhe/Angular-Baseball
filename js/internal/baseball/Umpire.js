@@ -246,7 +246,9 @@ Umpire.prototype = {
         }
     },
     changeSides : function() {
+        this.game.swingResult = {};
         this.game.swingResult.looking = true; // hide bat
+        this.game.pitchInFlight = {};
         this.game.pitchInFlight.x = null; // hide ball
         this.game.pitchInFlight.y = null; // hide ball
         this.game.log.pitchRecord = {

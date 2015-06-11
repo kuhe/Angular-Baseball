@@ -1,5 +1,5 @@
 /**
- * Node
+ * Console Mode!
  */
 
 AtBat = require('../baseball/AtBat.js').AtBat;
@@ -39,5 +39,7 @@ do {
     game.simulateInput(function(callback) {
         typeof callback == 'function' && callback();
     });
-} while (game.stage != 'end' && n < 500);
+} while (game.stage != 'end' && n < 3000);
 game.debugOut();
+
+log('last contact result', game.debug[game.debug.length - 1]);
