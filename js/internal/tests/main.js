@@ -28,7 +28,9 @@ log = function() {
 };
 
 stat = function(n) {
-    return Math.floor(n*1000)/1000;
+    n = '' + Math.floor(n*1000)/1000;
+    while (n.indexOf('.') > -1 && n.length < 5) n += '0';
+    return n;
 };
 
 Game.prototype.console = true;
@@ -80,5 +82,5 @@ runSeason(4);
 
 log(player.skill.offense, player.fatigue);
 
-// game.debugOut();
+//game.debugOut();
 //log('last contact result', game.debug[game.debug.length - 1]);
