@@ -38,7 +38,7 @@ Animator.console = true;
 
 game = new Game();
 game.gamesIntoSeason = 144;
-p = player = new Player(game.teams.home, true);
+p = player = new Player(game.teams.home, false);
 
 game.teams.home.lineup = [p,p,p,p,p,p,p,p,p];
 
@@ -50,6 +50,7 @@ logPlayer = function() {
         ' | 2B ' + stat(player.stats.batting['2b']),
         ' | 3B ' + stat(player.stats.batting['3b']),
         ' | HR ' + stat(player.stats.batting.hr),
+        ' | BB ' + stat(player.stats.batting.bb),
         ' | OBP ' + stat(player.stats.batting.getOBP()),
         ' | SLG ' + stat(player.stats.batting.getSLG()),
         ' | OPS ' + stat(player.stats.batting.getOBP() + player.stats.batting.getSLG())
