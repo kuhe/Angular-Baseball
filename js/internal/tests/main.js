@@ -22,6 +22,22 @@ text = text.text;
 data = require('../utility/data.js').data;
 helper = require('../utility/helper.js').helper;
 Log = require('../utility/Log.js').Log;
+log = function() {
+    console.log.apply(console, arguments);
+};
 
 Game.prototype.console = true;
+Game.prototype.humanControl = 'none';
+Game.prototype.quickMode = true;
+
+Animator.console = true;
+
 game = new Game();
+var n = 0;
+do {
+    n++;
+    game.simulateInput(function(callback) {
+        typeof callback == 'function' && callback();
+    });
+} while (game.stage != 'end' && n < 500);
+game.debugOut();

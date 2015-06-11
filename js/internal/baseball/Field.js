@@ -57,7 +57,7 @@ Field.prototype = {
         }
 
         if (swing.fielder) {
-            var fielder = (this.game.half == top ? this.game.teams.home.positions[swing.fielder] : this.game.teams.away.positions[swing.fielder]);
+            var fielder = (this.game.half == 'top' ? this.game.teams.home.positions[swing.fielder] : this.game.teams.away.positions[swing.fielder]);
             fielder.fatigue += 4;
             swing.error = false;
             var fieldingEase = fielder.skill.defense.fielding/100,

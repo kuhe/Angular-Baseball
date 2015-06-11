@@ -5,9 +5,16 @@ Iterator.prototype = {
     identifier : 'Iterator',
     constructor : Iterator,
     each : function(collection, map) {
-        var keys = Object.keys(collection);
-        for (var i = 0; i < keys.length; i++) {
-            map(keys[i], collection[keys[i]]);
+        var keys, i;
+        if (collection instanceof Array) {
+            for (i = 0; i < collection.length; i++) {
+                map(i, collection[i]);
+            }
+        } else {
+            keys = Object.keys(collection);
+            for (i = 0; i < keys.length; i++) {
+                map(keys[i], collection[keys[i]]);
+            }
         }
     }
 };

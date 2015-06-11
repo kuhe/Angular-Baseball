@@ -264,10 +264,10 @@ Game.prototype = {
         return Mathinator.battingAngle(origin, swing);
     },
     debugOut : function() {
-        log('grounders', this.debug.filter(function(a){return !a.caught && !a.foul && a.grounder;}).length);
-        log('grounders thrown out', this.debug.filter(function(a){return !a.caught && !a.foul && a.grounder && a.thrownOut;}).length);
-        log('weak outfield hits', this.debug.filter(function(a){return !a.caught && !a.foul && !a.grounder && a.thrownOut;}).length);
-        log('good outfield hits', this.debug.filter(function(a){return !a.caught && !a.foul && !a.grounder && !a.thrownOut;}).length);
+        log('grounders', this.debug.filter(function(a){return !a.caught && !a.foul && a.flyAngle < -5;}).length);
+        log('grounders thrown out', this.debug.filter(function(a){return !a.caught && !a.foul && a.flyAngle < -5 && a.thrownOut;}).length);
+        log('weak fly hits (thrown out)', this.debug.filter(function(a){return !a.caught && !a.foul && a.flyAngle > 0 && a.thrownOut;}).length);
+        log('good fly hits (not caught)', this.debug.filter(function(a){return !a.caught && !a.foul && a.flyAngle > 0 && !a.thrownOut;}).length);
         log('slugging', this.debug.filter(function(a){return a.bases == 1;}).length,
             this.debug.filter(function(a){return a.bases == 2;}).length,
             this.debug.filter(function(a){return a.bases == 3;}).length,

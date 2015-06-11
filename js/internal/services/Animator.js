@@ -5,12 +5,14 @@ var Animator = function() {
 Animator.prototype = {
     identifier : 'Animator',
     constructor : Animator,
+    console : false,
     init : function() {
 
     },
     pitchTarget : null,
     pitchBreak : null,
     updateFlightPath: function(callback) {
+        if (Animator.console) return;
         var $scope = this,
             game = $scope.y,
             top = 200-game.pitchTarget.y,
@@ -74,6 +76,7 @@ Animator.prototype = {
         }
     },
     animateFieldingTrajectory: function(game) {
+        if (Animator.console) return game.swingResult;
         var ball = jQ('.splay-indicator-ball');
         TweenMax.killAll();
         var result = game.swingResult;
