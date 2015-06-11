@@ -52,10 +52,6 @@ Field.prototype = {
          */
         swing.splay = splayAngle - 90;
 
-        if (!this.game.debug) {
-            this.game.debug = [];
-        }
-
         if (swing.fielder) {
             var fielder = (this.game.half == 'top' ? this.game.teams.home.positions[swing.fielder] : this.game.teams.away.positions[swing.fielder]);
             fielder.fatigue += 4;
@@ -99,11 +95,12 @@ Field.prototype = {
                     swing.thrownOut = false;
                     swing.bases = 1;
                     if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1) {
-                        var fieldingReturnDelay = -1*(interceptRating + 100*throwingEase*fieldingEase) + this.game.batter.skill.offense.speed;
+                        var fieldingReturnDelay = -1*(interceptRating + 100*throwingEase*fieldingEase)
+                            + this.game.batter.skill.offense.speed + swing.travelDistance/3;
                         swing.fieldingDelay = fieldingReturnDelay;
-                        while (fieldingReturnDelay - 125 > 0 && swing.bases < 3) {
+                        while (fieldingReturnDelay - 155 > 0 && swing.bases < 3) {
                             swing.bases++;
-                            fieldingReturnDelay  -= 65;
+                            fieldingReturnDelay  -= 50;
                         }
                     }
                 }

@@ -8,6 +8,7 @@ Game.prototype = {
     humanControl : 'none', //home, away, both, none
     console : false,
     quickMode : true,
+    debug : [],
     init : function(m) {
         if (m) window.mode = m;
         this.gamesIntoSeason = 1 + Math.floor(Math.random()*142);
@@ -16,6 +17,7 @@ Game.prototype = {
         this.teams.home = new Team(this);
         this.log = new Log();
         this.log.game = this;
+        this.debug = [];
         this.helper = helper;
         while (this.teams.away.name == this.teams.home.name) {
             this.teams.away.pickName();

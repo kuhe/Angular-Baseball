@@ -22,6 +22,7 @@ text = text.text;
 data = require('../utility/data.js').data;
 helper = require('../utility/helper.js').helper;
 Log = require('../utility/Log.js').Log;
+
 log = function() {
     console.log.apply(console, arguments);
 };
@@ -29,7 +30,6 @@ log = function() {
 Game.prototype.console = true;
 Game.prototype.humanControl = 'none';
 Game.prototype.quickMode = true;
-
 Animator.console = true;
 
 game = new Game();
@@ -42,4 +42,4 @@ do {
 } while (game.stage != 'end' && n < 3000);
 game.debugOut();
 
-log('last contact result', game.debug[game.debug.length - 1]);
+//log('last contact result', game.debug[game.debug.length - 1]);
