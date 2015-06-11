@@ -37,7 +37,7 @@ Game.prototype.quickMode = true;
 Animator.console = true;
 
 game = new Game();
-game.gamesIntoSeason = 80;
+game.gamesIntoSeason = 144;
 p = player = new Player(game.teams.home);
 game.teams.home.lineup = [p,p,p,p,p,p,p,p,p];
 
@@ -68,4 +68,15 @@ do {
 // game.debugOut();
 //log('last contact result', game.debug[game.debug.length - 1]);
 
+logPlayer();
+do {
+    game.simulateInput(function(callback) {
+        typeof callback == 'function' && callback();
+    });
+    if (game.stage == 'end') {
+        game.inning = 1;
+        game.half = 'top';
+        game.stage = 'pitch';
+    }
+} while (player.stats.batting.pa < pa * 3);
 logPlayer();
