@@ -535,3 +535,5 @@ data = {
         'Hitachi'
     ]
 };
+
+exports.data = data;

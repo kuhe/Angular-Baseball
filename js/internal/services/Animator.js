@@ -121,3 +121,5 @@ for (var fn in Animator.prototype) {
         Animator[fn] = Animator.prototype[fn];
     }
 }
+
+exports.Animator = Animator;

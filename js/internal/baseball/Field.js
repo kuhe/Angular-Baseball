@@ -212,7 +212,7 @@ Field.prototype = {
         var minDistance = 300;
         var giraffe = this;
         var fielder = false;
-        jQ.each(this.positions, function(position, spot) {
+        Iterator.each(this.positions, function(position, spot) {
             var thisDistance = giraffe.getPolarDistance([angle, distance], spot);
             distances[thisDistance] = position;
             if (minDistance > thisDistance) {
@@ -223,3 +223,5 @@ Field.prototype = {
         return returnFielder ? [fielder, this.findFielder(angle, distance)] : distances;
     }
 };
+
+exports.Field = Field;

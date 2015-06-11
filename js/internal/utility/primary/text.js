@@ -276,3 +276,6 @@ text.contactResult = function(batter, fielder, bases, outBy) {
     }
     return statement;
 };
+
+exports.text = text;
+exports.mode = mode;

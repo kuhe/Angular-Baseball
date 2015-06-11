@@ -105,3 +105,5 @@ for (var fn in Distribution.prototype) {
         Distribution[fn] = Distribution.prototype[fn];
     }
 }
+
+exports.Distribution = Distribution;

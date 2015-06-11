@@ -248,3 +248,5 @@ Player.prototype = {
     position : '',
     atBats : []
 };
+
+exports.Player = Player;

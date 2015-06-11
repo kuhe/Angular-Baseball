@@ -19,3 +19,5 @@ helper = {
         ][Math.floor(Math.random()*8)]
     }
 };
+
+exports.helper = helper;

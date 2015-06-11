@@ -6,6 +6,7 @@ Game.prototype = {
     constructor : Game,
     gamesIntoSeason : 0,
     humanControl : 'none', //home, away, both, none
+    console : false,
     quickMode : true,
     init : function(m) {
         if (m) window.mode = m;
@@ -110,13 +111,15 @@ Game.prototype = {
         this.pitchInFlight = pitch;
     },
     autoPitch : function(callback) {
-        var pitcher = this.pitcher;
+        var pitcher = this.pitcher,
+            giraffe = this;
         if (this.stage == 'pitch') {
-            jQ('.baseball').addClass('hide');
             pitcher.windingUp = true;
-            var windup = jQ('.windup');
-            windup.css('width', '100%');
-            var giraffe = this;
+            if (!this.console) {
+                jQ('.baseball').addClass('hide');
+                var windup = jQ('.windup');
+                windup.css('width', '100%');
+            }
             this.autoPitchSelect();
             var pitch = Distribution.pitchLocation(),
                 x = pitch.x,
@@ -125,7 +128,7 @@ Game.prototype = {
                 this.thePitch(x, y, callback);
             } else {
                 windup.animate({width: 0}, this.field.hasRunnersOn() ? 1500 : 3000, function() {
-                    jQ('.baseball.pitch').removeClass('hide');
+                    !giraffe.console && jQ('.baseball.pitch').removeClass('hide');
                     giraffe.thePitch(x, y, callback);
                     pitcher.windingUp = false;
                 });
@@ -367,3 +370,5 @@ Game.prototype = {
         }
     }
 };
+
+exports.Game = Game;

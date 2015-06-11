@@ -18,3 +18,5 @@ AtBat.prototype.constructor = AtBat;
 AtBat.prototype.identifier = 'AtBat';
 AtBat.prototype.INFIELD_HIT_INDICATOR = '';
 AtBat.prototype.RBI_INDICATOR = '+';
+
+exports.AtBat = AtBat;

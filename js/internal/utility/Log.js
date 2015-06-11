@@ -254,3 +254,5 @@ Log.prototype = {
         }
     }
 };
+
+exports.Log = Log;

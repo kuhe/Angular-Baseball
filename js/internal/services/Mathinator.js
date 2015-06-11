@@ -160,3 +160,5 @@ for (var fn in Mathinator.prototype) {
         Mathinator[fn] = Mathinator.prototype[fn];
     }
 }
+
+exports.Mathinator = Mathinator;

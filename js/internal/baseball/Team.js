@@ -5,6 +5,7 @@ var Team = function(game) {
 Team.prototype = {
     constructor : Team,
     init : function(game) {
+        this.pickName();
         this.lineup = [];
         this.bench = [];
         this.bullpen = [];
@@ -23,9 +24,10 @@ Team.prototype = {
         for (var j = 0; j < 20; j++) {
             this.bench.push(new Player(this));
         }
-        this.manager = new Manager(this);
-        this.manager.makeLineup();
-        this.pickName();
+        if (this.bench.length == 20) {
+            this.manager = new Manager(this);
+            this.manager.makeLineup();
+        }
     },
     pickName : function() {
         var teamNameIndex = Math.floor(Math.random()*data.teamNames.length);
@@ -43,3 +45,5 @@ Team.prototype = {
     nowBatting : 0,
     expanded : 'Player&'
 };
+
+exports.Team = Team;

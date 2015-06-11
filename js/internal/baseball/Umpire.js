@@ -287,3 +287,5 @@ Umpire.prototype = {
     says : 'Play ball!',
     game : null
 };
+
+exports.Umpire = Umpire;

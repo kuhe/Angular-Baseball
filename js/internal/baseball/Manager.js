@@ -15,7 +15,7 @@ Manager.prototype = {
         this.team.positions.catcher = this.selectForSkill(this.team.bench, ['defense', 'catching'], true);
         this.team.positions.catcher.position = 'catcher';
         this.team.positions.catcher.number = jerseyNumber++;
-        jQ.each(this.team.bench, function(key, player) {
+        Iterator.each(this.team.bench, function(key, player) {
             player.number = jerseyNumber++;
         });
         this.team.positions.short = this.selectForSkill(this.team.bench, ['defense', 'fielding'], true);
@@ -53,27 +53,27 @@ Manager.prototype = {
         this.team.lineup[8].order = 8;
     },
     selectForSkill : function(pool, skillset, mustBeRightHanded) {
-        var property;
         mustBeRightHanded = !!mustBeRightHanded;
         if (this.team.bench.length || pool == this.team.positions) {
             var selection = this.team.bench[0];
             var rating = 0;
             var index = 0;
-            jQ.each(pool, function(key, player) {
+            Iterator.each(pool, function(key, player) {
                 var skills = skillset.slice();
                 var cursor = player.skill;
-                do {
-                    property = skills.shift();
+                var property = skills.shift();
+                while (property) {
                     cursor = cursor[property];
-                } while (property);
+                    property = skills.shift();
+                }
                 if (!(player.order+1) && cursor >= rating && (!mustBeRightHanded || player.throws == 'right')) {
                     rating = cursor;
                     selection = player;
                     index = key;
                 }
             });
-            delete this.team.bench[index];
             if (pool == this.team.bench) {
+                delete this.team.bench[index];
                 this.team.bench = this.team.bench.filter(function(player) {
                     return player instanceof selection.constructor;
                 });
@@ -83,3 +83,5 @@ Manager.prototype = {
         return 'no players available';
     }
 };
+
+exports.Manager = Manager;
