@@ -34,7 +34,7 @@ Field.prototype = {
          * increase the left/right effect.
          * @type {number}
          */
-        var splayAngle = 90 - 1.5*x + (swing.angle*2 * y/35);
+        var splayAngle = 90 - 1.5*x + (swing.angle * y/35);
         var flyAngle = -3*y - (swing.angle * y/35);
         var power = this.game.batter.skill.offense.power + this.game.batter.eye.bonus;
         var landingDistance = Distribution.landingDistance(power, flyAngle);

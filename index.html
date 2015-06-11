@@ -179,13 +179,17 @@
                     <div class="target {{y.stage}}" ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'>
                         <div class='indicator baseball pitch hide'></div>
                         <div class='indicator baseball break hide'></div>
-                        <div class='indicator swing {{y.swingResult.looking ? "hide" : ""}}'
+                        <div class='indicator swing'
                              ng-style='{
                                     top: 200-y.pitchInFlight.y-y.swingResult.y + "px",
                                     left: y.pitchInFlight.x + y.swingResult.x + "px",
                                     transform: "rotate(" + y.swingResult.angle + "deg)"
                                 }'
-                             ng-class='{left: y.batterRunner.bats == "left", right: y.batterRunner.bats == "right"}'>
+                             ng-class='{
+                                 left: y.batterRunner.bats == "left",
+                                 right: y.batterRunner.bats == "right",
+                                 hide: y.humanBatting() || y.swingResult.looking
+                             }'>
                         </div>
                         <div class='indicator swing stance-indicator'
                              ng-class='{
@@ -194,7 +198,7 @@
                                 hide: !y.humanBatting()
                              }'>
                         </div>
-                        <div class='indicator glove stance-indicator'
+                        <div class='indicator glove stance-indicator hide'
                              ng-class='{
                                 left: y.pitcher.team.positions.catcher.throws == "left",
                                 right: y.pitcher.team.positions.catcher.throws == "right",
