@@ -43,7 +43,7 @@ var Player = function(team) {
     var r = randBetween(h/8, (h + bb)/3, 'speed') + hr;
     var rbi = randBetween(h/8, (h)/2, 'power') + hr;
     var hbp = randBetween(0, gamesIntoSeason/25);
-    var sf = randBetween(0, gamesIntoSeason/5, 'eye');
+    var sac = randBetween(0, gamesIntoSeason/5, 'eye');
 
     var chances = randBetween(0, gamesIntoSeason*10, 'fielding');
     var E = randBetween(chances/10, 0, 'fielding');
@@ -73,7 +73,7 @@ var Player = function(team) {
             },
             ba : null,
             getOBP : function() {
-                return (this.h + this.bb + this.hbp)/(this.ab + this.bb + this.hbp + this.sf);
+                return (this.h + this.bb + this.hbp)/(this.ab + this.bb + this.hbp + this.sac);
             },
             obp : null,
             getSLG : function() {
@@ -91,7 +91,7 @@ var Player = function(team) {
             r : r,
             rbi : rbi,
             hbp : hbp,
-            sf : sf
+            sac : sac
         },
         fielding : {
             E : E,
@@ -144,6 +144,9 @@ Player.prototype = {
     },
     recordInfieldHit : function() {
         this.atBats[this.atBats.length - 1] += AtBat.prototype.INFIELD_HIT_INDICATOR;
+    },
+    getBaseRunningTime : function() {
+        return Mathinator.baseRunningTime(this.skill.offense.speed);
     },
     randomizeSkills : function(hero) {
         this.hero = hero;

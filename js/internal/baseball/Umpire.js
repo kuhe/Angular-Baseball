@@ -35,6 +35,12 @@ Umpire.prototype = {
         var pitcher = this.game.pitcher;
         var batter = this.game.batter;
 
+        if (this.game.swingResult.fielder) {
+            var fielder = this.game.teams[this.game.half == 'top' ? 'home' : 'away'].positions[result.fielder]
+        } else {
+            fielder = null;
+        }
+
         this.game.batterRunner = this.game.batter;
 
         pitcher.stats.pitching.pitches++;
@@ -70,7 +76,27 @@ Umpire.prototype = {
                             this.count.outs++;
                             pitcher.stats.pitching.IP[1]++;
                             this.game.batter.atBats.push(Log.prototype.GROUNDOUT);
-                            this.newBatter(); //todo: sac
+                            this.advanceRunners(false);
+                            this.newBatter();
+                        }
+                        if (result.fieldersChoice) {
+                            result.bases = 0;
+                            this.count.outs++;
+                            pitcher.stats.pitching.IP[1]++;
+                            this.game.batter.atBats.push(Log.prototype.FIELDERS_CHOICE);
+                            this.advanceRunners(false, result.fieldersChoice);
+                            this.reachBase();
+                        }
+                        if (result.sacrificeAdvances.length) {
+                            batter.stats.batting.ab--;
+                            batter.stats.batting.sac++;
+                            this.count.outs++;
+                            pitcher.stats.pitching.IP[1]++;
+                            this.game.batter.atBats.push(Log.prototype.SACRIFICE);
+                            this.advanceRunners(false, null, result.sacrificeAdvances);
+                        }
+                        if (result.hitByPitch) {
+                            batter.stats.batting.ab--;
                         }
                         if (result.bases) {
                             if (!result.error) {
@@ -79,7 +105,7 @@ Umpire.prototype = {
                             } else {
                                 if (result.bases > 0) {
                                     this.game.tally[this.game.half == 'top' ? 'home' : 'away'].E++;
-                                    this.game.teams[this.game.half == 'top' ? 'home' : 'away'].positions[result.fielder].stats.fielding.E++;
+                                    fielder.stats.fielding.E++;
                                 }
                             }
                             var bases = result.bases;
@@ -172,60 +198,79 @@ Umpire.prototype = {
         this.game.field.first.fatigue += 2;
         return this;
     },
-    advanceRunners : function(isWalk) {
+    advanceRunners : function(isWalk, fieldersChoice, sacrificeAdvances) {
         isWalk = !!isWalk;
-
+        var first = this.game.field.first,
+            second = this.game.field.second,
+            third = this.game.field.third,
+            game = this.game;
+        
         if (isWalk) {
-            if (this.game.field.first) {
-                if (this.game.field.second) {
-                    if (this.game.field.third) {
+            if (first) {
+                if (second) {
+                    if (third) {
                         //bases loaded
-                        this.game.batter.recordRBI();
-                        this.game.batter.stats.batting.rbi++;
-                        this.game.field.third.atBats.push(Log.prototype.RUN);
-                        this.game.field.third.stats.batting.r++;
-                        this.game.pitcher.stats.pitching.ER++;
-                        this.game.scoreboard[this.game.half == 'top' ? 'away' : 'home'][this.game.inning]++;
-                        this.game.tally[this.game.half == 'top' ? 'away' : 'home'].R++;
-                        this.game.field.third = this.game.field.second;
-                        this.game.field.second = this.game.field.first;
-                        this.game.field.first = null;
+                        game.batter.recordRBI();
+                        game.batter.stats.batting.rbi++;
+                        third.atBats.push(Log.prototype.RUN);
+                        third.stats.batting.r++;
+                        game.pitcher.stats.pitching.ER++;
+                        game.scoreboard[game.half == 'top' ? 'away' : 'home'][game.inning]++;
+                        game.tally[game.half == 'top' ? 'away' : 'home'].R++;
+                        game.field.third = second;
+                        game.field.second = first;
+                        first = null;
                     } else {
                         // 1st and second
-                        this.game.field.third = this.game.field.second;
-                        this.game.field.second = this.game.field.first;
-                        this.game.field.first = null;
+                        game.field.third = second;
+                        game.field.second = first;
+                        game.field.first = null;
                     }
                 } else {
-                    if (this.game.field.third) {
+                    if (third) {
                         // first and third
-                        this.game.field.second = this.game.field.first;
-                        this.game.field.first = null;
+                        game.field.second = first;
+                        game.field.first = null;
                     } else {
                         // first only
-                        this.game.field.second = this.game.field.first;
-                        this.game.field.first = null;
+                        game.field.second = first;
+                        game.field.first = null;
                     }
                 }
             } else {
                 // no one on first
             }
         } else {
-            if (this.game.field.third instanceof this.game.batter.constructor) {
-                // run scored
-                this.game.scoreboard[this.game.half == 'top' ? 'away' : 'home'][this.game.inning]++;
-                this.game.tally[this.game.half == 'top' ? 'away' : 'home'].R++;
-                if (this.game.batter != this.game.field.third) {
-                    this.game.batter.recordRBI();
-                    this.game.field.third.atBats.push(Log.prototype.RUN);
-                }
-                this.game.batter.stats.batting.rbi++;
-                this.game.field.third.stats.batting.r++;
-                this.game.pitcher.stats.pitching.ER++;
+            if (fieldersChoice) {
+                game.field[fieldersChoice] = null;
             }
-            this.game.field.third = this.game.field.second;
-            this.game.field.second = this.game.field.first;
-            this.game.field.first = null;
+            var canAdvance = function() {return true;};
+            if (sacrificeAdvances) {
+                canAdvance = function(position) {return sacrificeAdvances.indexOf(position) > -1;};
+            }
+            if (third instanceof Player && canAdvance('third')) {
+                // run scored
+                game.scoreboard[game.half == 'top' ? 'away' : 'home'][game.inning]++;
+                game.tally[game.half == 'top' ? 'away' : 'home'].R++;
+                if (game.batter != third) {
+                    game.batter.recordRBI();
+                    third.atBats.push(Log.prototype.RUN);
+                }
+                game.batter.stats.batting.rbi++;
+                third.stats.batting.r++;
+                game.pitcher.stats.pitching.ER++;
+            }
+            if (second && canAdvance('first')) {
+                game.field.third = second;
+            } else {
+                game.field.third = null;
+            }
+            if (first && canAdvance('first')) {
+                game.field.second = first;
+            } else {
+                game.field.second = null;
+            }
+            game.field.first = null;
         }
         return this;
     },

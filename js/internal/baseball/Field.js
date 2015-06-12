@@ -51,6 +51,7 @@ Field.prototype = {
          * @type {number}
          */
         swing.splay = splayAngle - 90;
+        swing.sacrificeAdvances = [];
 
         if (swing.fielder) {
             var fielder = (this.game.half == 'top' ? this.game.teams.home.positions[swing.fielder] : this.game.teams.away.positions[swing.fielder]);
@@ -69,6 +70,18 @@ Field.prototype = {
                     swing.caught = false;
                 } else {
                     swing.caught = true;
+                    var sacrificeThrowInTime = 2000 + Mathinator.fielderReturnDelay(
+                        swing.travelDistance, throwingEase, fieldingEase, 100
+                    );
+                    if (this.first && sacrificeThrowInTime > this.first.getBaseRunningTime()) {
+                        swing.sacrificeAdvances.push('first');
+                    }
+                    if (this.second && sacrificeThrowInTime > this.second.getBaseRunningTime()) {
+                        swing.sacrificeAdvances.push('second');
+                    }
+                    if (this.third && sacrificeThrowInTime > this.third.getBaseRunningTime()) {
+                        swing.sacrificeAdvances.push('third');
+                    }
                 }
             } else {
                 swing.caught = false;
@@ -96,7 +109,12 @@ Field.prototype = {
                     }
                 } else {
                     //log('-------- IF', fieldingReturnDelay.toString().slice(0,4), baseRunningTime.toString().slice(0,4));
+                    swing.fieldersChoice = null;
                     swing.bases = fieldingReturnDelay >= baseRunningTime + 1 ? 1 : 0;
+                    if (this.first && fieldingReturnDelay < this.first.getBaseRunningTime()) swing.fieldersChoice = 'first';
+                    if (this.second && fieldingReturnDelay < this.second.getBaseRunningTime() + 0.6) swing.fieldersChoice = 'second';
+                    if (this.third && fieldingReturnDelay < this.third.getBaseRunningTime()) swing.fieldersChoice = 'third';
+                    if (swing.fieldersChoice) swing.bases = 1;
                 }
                 swing.thrownOut = swing.bases == 0;
                 if (swing.thrownOut) {
@@ -112,6 +130,7 @@ Field.prototype = {
                 swing.caught = false;
             }
         }
+        this.game.swingResult = swing;
         return Animator.animateFieldingTrajectory(this.game);
     },
     /**

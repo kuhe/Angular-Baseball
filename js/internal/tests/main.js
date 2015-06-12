@@ -62,6 +62,8 @@ logPlayer = function() {
         ' | HR ' + stat(player.stats.batting.hr),
         ' | BB ' + stat(player.stats.batting.bb),
         ' | K  ' + stat(player.stats.batting.so),
+        ' | SAC ' + stat(player.stats.batting.sac),
+        ' | RBI ' + stat(player.stats.batting.rbi),
         ' | OBP ' + stat(player.stats.batting.getOBP()),
         ' | SLG ' + stat(player.stats.batting.getSLG()),
         ' | OPS ' + stat(player.stats.batting.getOBP() + player.stats.batting.getSLG())
