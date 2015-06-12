@@ -153,6 +153,24 @@ Mathinator.prototype = {
                 ease: Linear.easeNone
             };
         };
+    },
+    /**
+     * @param distance {number} feet
+     * @param throwing {number} 0-1
+     * @param fielding {number} 0-1
+     * @param intercept {number} approx. -140 to 140
+     * @returns {number} seconds
+     */
+    fielderReturnDelay : function(distance, throwing, fielding, intercept) {
+        return distance/90 + (distance/90)/(0.5 + throwing/2) // throwing distance
+            + 1 - (0.2 + fielding * 0.8) + (10*((distance)/310)*(Math.min(intercept - 120, 0))/-240); // gather time
+    },
+    /**
+     * @param speed {number} 0-100
+     * @returns {number} seconds
+     */
+    baseRunningTime : function(speed) {
+        return 6.0 - (speed/100 * 2.2)
     }
 };
 

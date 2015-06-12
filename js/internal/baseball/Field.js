@@ -75,36 +75,34 @@ Field.prototype = {
             }
 
             if (!swing.caught) {
-                // intercept rating is negative
-                var plus = interceptRating + 100*throwingEase*fieldingEase;
-                var gatherAndThrowSuccess = plus - this.game.batter.skill.offense.speed/2 > -50;
-
-                //log('flew at angle', flyAngle, 'distance of', swing.fielderTravel,
-                //    'gives intercept rating of', interceptRating, 'fielder throw/fielding', fielder.skill.defense.throwing, fielder.skill.defense.fielding,
-                //    '+', plus, '-runner speed', this.game.batter.skill.offense.speed,
-                //    'success', gatherAndThrowSuccess
-                //);
-
-                swing.thrownOut = gatherAndThrowSuccess;
+                swing.bases = 0;
+                swing.thrownOut = false; // default value
+                var fieldingReturnDelay = Mathinator.fielderReturnDelay(swing.travelDistance, throwingEase, fieldingEase, interceptRating);
+                swing.fieldingDelay = fieldingReturnDelay;
                 swing.outFielder = {'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1;
+                var speed = this.game.batter.skill.offense.speed,
+                    baseRunningTime = Mathinator.baseRunningTime(speed);
 
-                if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] != 1 && gatherAndThrowSuccess) {
+                if (swing.outFielder) {
+                    //log('OF', fieldingReturnDelay.toString().slice(0,4), baseRunningTime.toString().slice(0,4));
+                    swing.bases = 1;
+                    fieldingReturnDelay -= baseRunningTime;
+                    var difficulty = 1.2;
+
+                    while (fieldingReturnDelay > baseRunningTime + difficulty && swing.bases < 3) {
+                        swing.bases++;
+                        difficulty = -1.5;
+                        fieldingReturnDelay -= baseRunningTime;
+                    }
+                } else {
+                    //log('-------- IF', fieldingReturnDelay.toString().slice(0,4), baseRunningTime.toString().slice(0,4));
+                    swing.bases = fieldingReturnDelay >= baseRunningTime + 1 ? 1 : 0;
+                }
+                swing.thrownOut = swing.bases == 0;
+                if (swing.thrownOut) {
                     swing.thrownOut = true;
                     swing.error = false;
-                } else {
-                    swing.thrownOut = false;
-                    swing.bases = 1;
-                    if ({'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1) {
-                        var fieldingReturnDelay = -1*(interceptRating + 100*throwingEase*fieldingEase)
-                            + this.game.batter.skill.offense.speed + swing.travelDistance/3;
-                        swing.fieldingDelay = fieldingReturnDelay;
-                        while (fieldingReturnDelay - 155 > 0 && swing.bases < 3) {
-                            swing.bases++;
-                            fieldingReturnDelay  -= 50;
-                        }
-                    }
                 }
-                // log('fielder return delay', fieldingReturnDelay, interceptRating, fielder.skill.defense);
             }
         } else {
             if (Math.abs(90 - splayAngle) < 45 && landingDistance > 300) {

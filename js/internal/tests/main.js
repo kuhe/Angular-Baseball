@@ -40,9 +40,16 @@ Animator.console = true;
 
 game = new Game();
 game.gamesIntoSeason = 144;
-p = player = new Player(game.teams.home, false);
-
+player = new Player(game.teams.home, false);
+p = player;
 game.teams.home.lineup = [p,p,p,p,p,p,p,p,p];
+
+offense = {
+    eye: 100,
+    power: 100,
+    speed: 100
+};
+player.skill.offense = offense;
 
 logPlayer = function() {
     log(
@@ -53,6 +60,7 @@ logPlayer = function() {
         ' | 3B ' + stat(player.stats.batting['3b']),
         ' | HR ' + stat(player.stats.batting.hr),
         ' | BB ' + stat(player.stats.batting.bb),
+        ' | K  ' + stat(player.stats.batting.so),
         ' | OBP ' + stat(player.stats.batting.getOBP()),
         ' | SLG ' + stat(player.stats.batting.getSLG()),
         ' | OPS ' + stat(player.stats.batting.getOBP() + player.stats.batting.getSLG())
@@ -63,19 +71,28 @@ logPlayer();
 var pa = player.stats.batting.pa;
 
 runSeason = function(n) {
+    var x = 5000;
+    game.gamesIntoSeason = 0;
+    player = new Player(game.teams.home, false);
+    p = player;
+    game.teams.home.lineup = [p,p,p,p,p,p,p,p,p];
+
+    player.skill.offense = offense;
+
     do {
         game.simulateInput(function(callback) {
             typeof callback == 'function' && callback();
         });
         if (game.stage == 'end') {
+            game.teams.away = new Team(game);
             game.inning = 1;
             game.half = 'top';
             game.stage = 'pitch';
         }
-        if (player.stats.batting.pa % 5 == 0) {
-            game.teams.away.pitcher = new Player(game.teams.away, true);
+        if (player.stats.batting.pa % 10 == 0) {
+            game.teams.away.positions.pitcher = new Player(game.teams.away, true);
         }
-    } while (player.stats.batting.pa < pa * n);
+    } while (player.stats.batting.pa < pa && x--);
     logPlayer();
 };
 
