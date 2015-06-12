@@ -133,6 +133,9 @@ Field.prototype = {
         this.game.swingResult = swing;
         return Animator.animateFieldingTrajectory(this.game);
     },
+    //printRunnerNames : function() {
+    //    return [this.first ? this.first.getName() : '', this.second ? this.second.getName() : '', this.third ? this.third.getname() : ''];
+    //},
     /**
      * @param splayAngle
      * @param landingDistance

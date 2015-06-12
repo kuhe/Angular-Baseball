@@ -78,20 +78,25 @@ Umpire.prototype = {
                     } else {
                         batter.stats.batting.pa++;
                         batter.stats.batting.ab++;
-                        if (result.thrownOut) {
-                            this.count.outs++;
-                            pitcher.stats.pitching.IP[1]++;
-                            this.game.batter.atBats.push(Log.prototype.GROUNDOUT);
-                            this.advanceRunners(false);
-                            this.newBatter();
-                        }
-                        if (result.fieldersChoice) {
+                        if (result.fieldersChoice && this.count.outs < 2) {
                             result.bases = 0;
                             this.count.outs++;
                             pitcher.stats.pitching.IP[1]++;
                             this.game.batter.atBats.push(Log.prototype.FIELDERS_CHOICE);
                             this.advanceRunners(false, result.fieldersChoice);
                             this.reachBase();
+                            this.newBatter();
+                        } else if (result.fieldersChoice) {
+                            result.thrownOut = true;
+                        }
+                        if (result.thrownOut) {
+                            this.count.outs++;
+                            pitcher.stats.pitching.IP[1]++;
+                            this.game.batter.atBats.push(Log.prototype.GROUNDOUT);
+                            if (this.count.outs < 3) {
+                                this.advanceRunners(false);
+                            }
+                            this.newBatter();
                         }
                         if (result.hitByPitch) {
                             batter.stats.batting.ab--;
@@ -241,6 +246,9 @@ Umpire.prototype = {
         } else {
             if (fieldersChoice) {
                 game.field[fieldersChoice] = null;
+                first = this.game.field.first;
+                second = this.game.field.second;
+                third = this.game.field.third;
             }
             var canAdvance = function() {return true;};
             if (sacrificeAdvances) {
