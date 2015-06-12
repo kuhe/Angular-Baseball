@@ -345,6 +345,9 @@ html body {
 .batter-stats.lefty {
   text-align: right;
 }
+.stabilized .list-group-item {
+  height: 6em;
+}
 .scoreboard {
   /*background-image: url(../images/sb-tile.png);*/
   background-repeat: repeat;

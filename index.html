@@ -382,14 +382,14 @@
             </div>
         </div>
     </div>
-    <div class='block col-lg-12 hidden-lg hidden-md'>
-        <ul class="list-group pitch-record col-lg-6">
-            <li class='list-group-item' ng-repeat="event in y.log.pitchRecord[mode()] track by $index">
+    <div class='block stabilized col-lg-12 hidden-lg hidden-md'>
+        <ul class="list-group pitch-record col-xs-6">
+            <li class='list-group-item' ng-repeat="event in y.log.stabilized.pitchRecord[mode()] track by $index">
                 {{event}}
             </li>
         </ul>
-        <ul class="list-group pitch-record col-lg-6">
-            <li class='list-group-item' ng-repeat="event in y.log.shortRecord[mode()] track by $index">
+        <ul class="list-group pitch-record col-xs-6">
+            <li class='list-group-item' ng-repeat="event in y.log.stabilized.shortRecord[mode()] track by $index">
                 {{event}}
             </li>
         </ul>

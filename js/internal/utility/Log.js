@@ -25,10 +25,14 @@ Log.prototype = {
     FIELDERS_CHOICE : 'FC',
     note : function(note, noteJ) {
         this.record.e.unshift(note);
-        this.shortRecord.e = this.record.e.slice(0, 6);
+        var rec = this.record.e.slice(0, 6);
+        this.shortRecord.e = rec;
+        this.stabilized.shortRecord.e = rec.concat(['', '', '', '', '', '']).slice(0, 6);
 
         this.record.n.unshift(noteJ);
-        this.shortRecord.n = this.record.n.slice(0, 6);
+        var rec2 = this.record.n.slice(0, 6);
+        this.shortRecord.n = rec2;
+        this.stabilized.shortRecord.n = rec2.concat(['', '', '', '', '', '']).slice(0, 6)
     },
     getBatter : function(batter) {
         var order = batter.team.nowBatting;
@@ -109,9 +113,13 @@ Log.prototype = {
         mode = 'e';
         record = this.getPitchLocationDescription(pitchInFlight, batter.bats == 'left');
         this.pitchRecord.e.unshift(record);
+        this.stabilized.pitchRecord.e.unshift(record);
+        this.stabilized.pitchRecord.e.pop();
         mode = 'n';
         recordJ = this.getPitchLocationDescription(pitchInFlight, batter.bats == 'left');
         this.pitchRecord.n.unshift(recordJ);
+        this.stabilized.pitchRecord.n.unshift(recordJ);
+        this.stabilized.pitchRecord.n.pop();
         mode = m;
     },
     getSwing : function(swingResult) {
@@ -148,9 +156,11 @@ Log.prototype = {
         mode = 'e';
         record = this.getSwing(swingResult);
         this.pitchRecord.e[0] += record;
+        this.stabilized.pitchRecord.e[0] += record;
         mode = 'n';
         recordJ = this.getSwing(swingResult);
         this.pitchRecord.n[0] += recordJ;
+        this.stabilized.pitchRecord.n[0] += recordJ;
         mode = m;
     },
     getPlateAppearanceResult : function(game) {
@@ -221,13 +231,25 @@ Log.prototype = {
         record = this.getPlateAppearanceResult(game);
         this.record.e.unshift(record);
         this.pitchRecord.e = [text('Previous: ')+record];
+        this.stabilized.pitchRecord.e = [text('Previous: ')+record, '', '', '', '', ''];
         mode = 'n';
         recordJ = this.getPlateAppearanceResult(game);
         this.record.n.unshift(recordJ);
         this.pitchRecord.n = [text('Previous: ')+recordJ];
+        this.stabilized.pitchRecord.n = [text('Previous: ')+recordJ, '', '', '', '', ''];
         mode = m;
     },
     pointer : 0,
+    stabilized: {
+        pitchRecord : {
+            e: ['', '', '', '', '', ''],
+            n: ['', '', '', '', '', '']
+        },
+        shortRecord : {
+            e: ['', '', '', '', '', ''],
+            n: ['', '', '', '', '', '']
+        }
+    },
     pitchRecord : {
         e: [],
         n: []
