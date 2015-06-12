@@ -70,16 +70,16 @@ Field.prototype = {
                     swing.caught = false;
                 } else {
                     swing.caught = true;
-                    var sacrificeThrowInTime = 2000 + Mathinator.fielderReturnDelay(
+                    var sacrificeThrowInTime = Mathinator.fielderReturnDelay(
                         swing.travelDistance, throwingEase, fieldingEase, 100
                     );
-                    if (this.first && sacrificeThrowInTime > this.first.getBaseRunningTime()) {
+                    if (this.first && sacrificeThrowInTime > this.first.getBaseRunningTime() + 1.5) {
                         swing.sacrificeAdvances.push('first');
                     }
                     if (this.second && sacrificeThrowInTime > this.second.getBaseRunningTime()) {
                         swing.sacrificeAdvances.push('second');
                     }
-                    if (this.third && sacrificeThrowInTime > this.third.getBaseRunningTime()) {
+                    if (this.third && sacrificeThrowInTime > this.third.getBaseRunningTime() - 0.5) {
                         swing.sacrificeAdvances.push('third');
                     }
                 }

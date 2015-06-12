@@ -54,16 +54,22 @@ Umpire.prototype = {
         } else {
             if (result.contact) {
                 if (result.caught) {
-                    this.count.outs++;
-                    pitcher.stats.pitching.IP[1]++;
-                    if (result.flyAngle < 10) {
-                        this.game.batter.atBats.push(Log.prototype.LINEOUT);
-                    } else {
-                        this.game.batter.atBats.push(Log.prototype.FLYOUT);
-                    }
                     batter.stats.batting.pa++;
-                    batter.stats.batting.ab++;
-                    this.newBatter(); //todo: sac fly
+                    pitcher.stats.pitching.IP[1]++;
+                    if (result.sacrificeAdvances.length && this.count.outs < 2) {
+                        batter.stats.batting.sac++;
+                        this.game.batter.atBats.push(Log.prototype.SACRIFICE);
+                        this.advanceRunners(false, null, result.sacrificeAdvances);
+                    } else {
+                        batter.stats.batting.ab++;
+                        if (result.flyAngle < 10) {
+                            this.game.batter.atBats.push(Log.prototype.LINEOUT);
+                        } else {
+                            this.game.batter.atBats.push(Log.prototype.FLYOUT);
+                        }
+                    }
+                    this.count.outs++;
+                    this.newBatter();
                 } else {
                     if (result.foul) {
                         this.count.strikes++;
@@ -86,14 +92,6 @@ Umpire.prototype = {
                             this.game.batter.atBats.push(Log.prototype.FIELDERS_CHOICE);
                             this.advanceRunners(false, result.fieldersChoice);
                             this.reachBase();
-                        }
-                        if (result.sacrificeAdvances.length) {
-                            batter.stats.batting.ab--;
-                            batter.stats.batting.sac++;
-                            this.count.outs++;
-                            pitcher.stats.pitching.IP[1]++;
-                            this.game.batter.atBats.push(Log.prototype.SACRIFICE);
-                            this.advanceRunners(false, null, result.sacrificeAdvances);
                         }
                         if (result.hitByPitch) {
                             batter.stats.batting.ab--;
