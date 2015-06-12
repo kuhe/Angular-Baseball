@@ -80,6 +80,7 @@ Mathinator.prototype = {
 
         bottom = Math.cos(splay * radian) * percent/100 * distance * 95/300;
         left = Math.sin(splay * radian) * percent/100 * distance * 95/300 + 190;
+
         var apexRatio = Math.sqrt((50 - Math.abs(percent - 50))/100)*(1/0.7071);
         if (bounding) {
             padding = 1;

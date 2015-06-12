@@ -95,9 +95,17 @@ Distribution.prototype = {
      * @param eye {number} 0-100
      * @returns {number} 0-200
      */
-    swing : function(target, actual, eye) {
+    cpuSwing : function(target, actual, eye) {
         eye = Math.max(eye, 100);
         return 100 + (target - 100)*(0.5+Math.random()*eye/200) - actual;
+    },
+    /**
+     * Determine the swing scalar
+     * @param eye {number} 0-100
+     * @returns {number}
+     */
+    swing : function(eye) {
+        return 100/(eye + 25 + Math.random()*50);
     }
 };
 

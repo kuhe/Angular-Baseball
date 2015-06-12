@@ -157,10 +157,14 @@ Game.prototype = {
         x = (deceptiveX*(convergence) + x)/convergenceSum;
         y = (deceptiveY*(convergence) + y)/convergenceSum;
 
+        this.swingResult.x = Distribution.cpuSwing(x, this.pitchInFlight.x, eye);
+        this.swingResult.y = Distribution.cpuSwing(y, this.pitchInFlight.y, eye);
+
         var swingProbability = Distribution.swingLikelihood(eye, x, y, this.umpire);
         if (swingProbability < 100*Math.random()) {
             x = -20;
         }
+
         callback(function() {
             giraffe.theSwing(x, y);
         });
@@ -201,25 +205,28 @@ Game.prototype = {
     },
     theSwing : function(x, y, callback) {
         if (this.stage == 'swing') {
-            this.batter.fatigue++;
             this.swingResult = {};
             var bonus = this.batter.eye.bonus || 0,
                 eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
-            this.swingResult.x = Distribution.swing(x, this.pitchInFlight.x, eye);
-            this.swingResult.y = Distribution.swing(y, this.pitchInFlight.y, eye);
-
-            this.swingResult.angle = this.setBatAngle();
-
-            var recalculation = Mathinator.getAngularOffset(this.swingResult, this.swingResult.angle);
-            this.swingResult.x = recalculation.x;
-            this.swingResult.y = recalculation.y;
 
             if (x >= 0 && x <= 200) {
+                this.batter.fatigue++;
+
+                this.swingResult.x = x - this.pitchInFlight.x;
+                this.swingResult.y = y - this.pitchInFlight.y;
+                this.swingResult.angle = this.setBatAngle();
+
+                var recalculation = Mathinator.getAngularOffset(this.swingResult, this.swingResult.angle);
+                var precision = Distribution.swing(eye);
+
+                this.swingResult.x = Math.abs(recalculation.x) > 20 ? recalculation.x * precision : recalculation.x;
+                this.swingResult.y = -5 + (recalculation.y < 0 ? recalculation.y * precision : recalculation.y);
+
+                //log(recalculation.y, precision);
+
                 this.swingResult.looking = false;
                 if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {
                     this.swingResult.contact = true;
-                    this.batter.eye.bonus = Math.max(0, eye -
-                        Math.sqrt(Math.pow(this.batter.eye.x - this.pitchInFlight.x, 2) + Math.pow(this.batter.eye.y - this.pitchInFlight.y, 2)) * 1.5);
                     this.swingResult = this.field.determineSwingContactResult(this.swingResult);
                     // log(this.swingResult.flyAngle, Math.floor(this.swingResult.x), Math.floor(this.swingResult.y));
                     this.debug.push(this.swingResult);
@@ -229,6 +236,8 @@ Game.prototype = {
             } else {
                 this.swingResult.strike = this.pitchInFlight.x > 50 && this.pitchInFlight.x < 150
                     && this.pitchInFlight.y > 35 && this.pitchInFlight.y < 165;
+                this.batter.eye.bonus = Math.max(0, eye -
+                    Math.sqrt(Math.pow(this.batter.eye.x - this.pitchInFlight.x, 2) + Math.pow(this.batter.eye.y - this.pitchInFlight.y, 2)) * 1.5);
                 this.swingResult.contact = false;
                 this.swingResult.looking = true;
                 this.batter.eye.x = this.pitchInFlight.x;
