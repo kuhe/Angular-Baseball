@@ -2,8 +2,13 @@
   background: #ffffff;
   position: relative;
 }
-.diamond-display .splay-indicator {
+.diamond-display .splay-indicator-wrapper {
   margin: auto;
+  width: 200px;
+  height: 100px;
+}
+.diamond-display .splay-indicator-wrapper .splay-indicator {
+  position: relative;
   width: 0;
   height: 0;
   border-left: 100px solid transparent;
@@ -13,7 +18,7 @@
   -webkit-border-radius: 50%;
   border-radius: 50%;
 }
-.diamond-display .splay-indicator .splay-indicator-ball {
+.diamond-display .splay-indicator-wrapper .splay-indicator .splay-indicator-ball {
   position: absolute;
   width: 10px;
   height: 10px;

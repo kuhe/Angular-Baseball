@@ -20,6 +20,7 @@ Mathinator.prototype = {
      * CONST
      */
     RADIAN : Math.PI / 180,
+    SPLAY_INDICATOR_LEFT : -4,
     /**
      * @param offset {{x: number, y: number}}
      * @param angle {number}
@@ -79,7 +80,7 @@ Mathinator.prototype = {
             radian = this.RADIAN;
 
         bottom = Math.cos(splay * radian) * percent/100 * distance * 95/300;
-        left = Math.sin(splay * radian) * percent/100 * distance * 95/300 + 190;
+        left = Math.sin(splay * radian) * percent/100 * distance * 95/300 + this.SPLAY_INDICATOR_LEFT;
 
         var apexRatio = Math.sqrt((50 - Math.abs(percent - 50))/100)*(1/0.7071);
         if (bounding) {
@@ -90,7 +91,7 @@ Mathinator.prototype = {
             borderWidth = 2 + (apexRatio * 2);
         }
         bottom = Math.max(Math.min(bottom, 400), -20);
-        left = Math.max(Math.min(left, 280), 100);
+        left = Math.max(Math.min(left, 100), -100);
         padding = Math.max(Math.min(padding, 40), 0);
         return {
             bottom: bottom,
@@ -110,10 +111,10 @@ Mathinator.prototype = {
         var bottom, left;
 
         bottom = Math.cos(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300;
-        left = Math.sin(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300 + 190;
+        left = Math.sin(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300 + this.SPLAY_INDICATOR_LEFT;
 
         bottom = Math.max(Math.min(bottom, 400), -20);
-        left = Math.max(Math.min(left, 280), 100);
+        left = Math.max(Math.min(left, 100), -100);
 
         swingResult.bottom = bottom + 'px';
         swingResult.left = left + 'px';
