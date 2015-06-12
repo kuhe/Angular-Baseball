@@ -87,11 +87,11 @@ Field.prototype = {
                     //log('OF', fieldingReturnDelay.toString().slice(0,4), baseRunningTime.toString().slice(0,4));
                     swing.bases = 1;
                     fieldingReturnDelay -= baseRunningTime;
-                    var difficulty = 1.2;
+                    var difficulty = 1.8;
 
                     while (fieldingReturnDelay > baseRunningTime + difficulty && swing.bases < 3) {
                         swing.bases++;
-                        difficulty = -1.5;
+                        difficulty = -1.3;
                         fieldingReturnDelay -= baseRunningTime;
                     }
                 } else {

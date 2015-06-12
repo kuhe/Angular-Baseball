@@ -44,11 +44,12 @@ player = new Player(game.teams.home, false);
 p = player;
 game.teams.home.lineup = [p,p,p,p,p,p,p,p,p];
 
-offense = {
-    eye: 100,
-    power: 100,
-    speed: 100
-};
+//offense = {
+//    eye: 65,
+//    power: 35,
+//    speed: 45
+//};
+offense = player.skill.offense;
 player.skill.offense = offense;
 
 logPlayer = function() {
@@ -68,6 +69,7 @@ logPlayer = function() {
 };
 
 logPlayer();
+console.log('------');
 var pa = player.stats.batting.pa;
 
 runSeason = function(n) {

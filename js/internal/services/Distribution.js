@@ -29,7 +29,7 @@ Distribution.prototype = {
      * @returns {number}
      */
     landingDistance : function(power, flyAngle) {
-        return (40 + Math.random()*290 + (power/100)*75) * (1 - Math.abs(flyAngle - 30)/60);
+        return (10 + power/2 + Math.random()*310 + (power/100)*30) * (1 - Math.abs(flyAngle - 30)/60);
     },
     /**
      * @returns {{x: number, y: number}}

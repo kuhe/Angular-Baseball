@@ -162,8 +162,9 @@ Mathinator.prototype = {
      * @returns {number} seconds
      */
     fielderReturnDelay : function(distance, throwing, fielding, intercept) {
-        return distance/90 + (distance/90)/(0.5 + throwing/2) // throwing distance
-            + 1 - (0.2 + fielding * 0.8) + (10*((distance)/310)*(Math.min(intercept - 120, 0))/-240); // gather time
+        return distance/90 // bip distance
+            + (distance/90)/(0.5 + throwing/2) // throwing distance
+            + 1 - (0.2 + fielding * 0.8) + (9*((distance)/310)*(Math.min(intercept - 120, 0))/-240); // gather time
     },
     /**
      * @param speed {number} 0-100
