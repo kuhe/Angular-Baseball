@@ -331,6 +331,20 @@ html body {
 .blocking .no-swing {
   border: 2px solid black;
 }
+.batter-stats {
+  width: 100%;
+  margin: -25px auto auto;
+}
+.batter-stats .rating-block {
+  border-top: 1px solid black;
+  margin: 0 -1px -1px;
+}
+.batter-stats.righty {
+  text-align: left;
+}
+.batter-stats.lefty {
+  text-align: right;
+}
 .scoreboard {
   /*background-image: url(../images/sb-tile.png);*/
   background-repeat: repeat;
@@ -517,4 +531,8 @@ html body {
 }
 .pitch-selection {
   height: 3em;
+}
+.pitch-selection .rating-block {
+  margin: 0 -1px -1px;
+  border-top: 1px solid black;
 }
