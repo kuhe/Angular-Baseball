@@ -152,14 +152,16 @@ html body {
     margin: 0 auto 25px auto;
 }
 
-@target: rgba(207, 207, 207, 0.59);
+@target: radial-gradient(circle at 100px 100px, #c9c9c6, #4b4d50);
 .target {
+    cursor: none;
+    box-shadow: 0 0 25px 3px grey;
     margin: 0 auto;
     padding: 0;
     position: relative;
     width: 200px;
     height: 200px;
-    border: 1px dashed #d4d4d4;
+    border: 1px solid #4b4d50;
     background: @target;
     perspective: 100px;
     &.pitching {
@@ -169,13 +171,15 @@ html body {
         background: @target;
     }
 }
-@strikezone: rgba(177, 177, 177, 0.89);
+@strikezone: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
 .strikezone {
+    box-shadow: 0 0 15px 9px #4b4d50;
     margin: 35px 50px;
     padding: 0;
     width: 100px;
     height: 130px;
     background: @strikezone;
+    border: 3px solid #ccd4d1;
     &.pitching {
         background: @strikezone;
     }

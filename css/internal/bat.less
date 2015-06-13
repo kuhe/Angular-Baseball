@@ -1,7 +1,9 @@
 .indicator.swing {
     &.stance-indicator {
-        opacity: 0.5;
+        opacity: 0.85;
     }
+    -webkit-box-shadow: 0 0 12px 2px grey;
+    box-shadow: 0 0 12px 2px grey;
     padding: 10px 50px;
     margin: -10px -50px;
     border-radius: 10px;
@@ -9,7 +11,16 @@
     border-bottom: 1px solid #645f40;
     border-left: none;
     border-right: none;
-    background: #f0e69b;
+
+    background: #eaefb5; /* Old browsers */
+    background: -moz-radial-gradient(center, ellipse cover,  #eaefb5 0%, #ccc08c 100%); /* FF3.6+ */
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#eaefb5), color-stop(100%,#ccc08c)); /* Chrome,Safari4+ */
+    background: -webkit-radial-gradient(center, ellipse cover,  #eaefb5 0%,#ccc08c 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-radial-gradient(center, ellipse cover,  #eaefb5 0%,#ccc08c 100%); /* Opera 12+ */
+    background: -ms-radial-gradient(center, ellipse cover,  #eaefb5 0%,#ccc08c 100%); /* IE10+ */
+    background: radial-gradient(ellipse at center,  #eaefb5 0%,#ccc08c 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eaefb5', endColorstr='#ccc08c',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
     &.left {
         border-bottom-right-radius: 4px;
         border-top-right-radius: 4px;
@@ -24,4 +35,11 @@
 
 .target.swing .indicator.swing {
     display: none;
+}
+
+.indicator.glove {
+    &.stance-indicator {
+        opacity: 0.5;
+        background: white;
+    }
 }

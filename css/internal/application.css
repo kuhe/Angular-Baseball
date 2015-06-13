@@ -19,6 +19,7 @@
   border-radius: 50%;
 }
 .diamond-display .splay-indicator-wrapper .splay-indicator .splay-indicator-ball {
+  box-shadow: 0 0 4px 2px grey;
   position: absolute;
   width: 10px;
   height: 10px;
@@ -89,7 +90,13 @@
   background: white;
   margin: -13px;
 }
+.indicator.pitch {
+  opacity: 0.65;
+}
 .baseball {
+  -webkit-box-shadow: 0 0 6px 2px grey;
+  box-shadow: 0 0 6px 2px grey;
+  background: radial-gradient(circle at 5px 5px, #fefefa, #c8cbc2);
   border: 4px dashed #ff6261;
 }
 .spin {
@@ -98,6 +105,8 @@
   animation: spin 1s infinite 0s linear;
 }
 .indicator.swing {
+  -webkit-box-shadow: 0 0 12px 2px grey;
+  box-shadow: 0 0 12px 2px grey;
   padding: 10px 50px;
   margin: -10px -50px;
   border-radius: 10px;
@@ -105,10 +114,25 @@
   border-bottom: 1px solid #645f40;
   border-left: none;
   border-right: none;
-  background: #f0e69b;
+  background: #eaefb5;
+  /* Old browsers */
+  background: -moz-radial-gradient(center, ellipse cover, #eaefb5 0%, #ccc08c 100%);
+  /* FF3.6+ */
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #eaefb5), color-stop(100%, #ccc08c));
+  /* Chrome,Safari4+ */
+  background: -webkit-radial-gradient(center, ellipse cover, #eaefb5 0%, #ccc08c 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-radial-gradient(center, ellipse cover, #eaefb5 0%, #ccc08c 100%);
+  /* Opera 12+ */
+  background: -ms-radial-gradient(center, ellipse cover, #eaefb5 0%, #ccc08c 100%);
+  /* IE10+ */
+  background: radial-gradient(ellipse at center, #eaefb5 0%, #ccc08c 100%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eaefb5', endColorstr='#ccc08c', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
 }
 .indicator.swing.stance-indicator {
-  opacity: 0.5;
+  opacity: 0.85;
 }
 .indicator.swing.left {
   border-bottom-right-radius: 4px;
@@ -122,6 +146,10 @@
 }
 .target.swing .indicator.swing {
   display: none;
+}
+.indicator.glove.stance-indicator {
+  opacity: 0.5;
+  background: white;
 }
 @font-face {
   font-family: Noto;
@@ -283,33 +311,37 @@ html body {
   margin: 0 auto 25px auto;
 }
 .target {
+  cursor: none;
+  box-shadow: 0 0 25px 3px grey;
   margin: 0 auto;
   padding: 0;
   position: relative;
   width: 200px;
   height: 200px;
-  border: 1px dashed #d4d4d4;
-  background: rgba(207, 207, 207, 0.59);
+  border: 1px solid #4b4d50;
+  background: radial-gradient(circle at 100px 100px, #c9c9c6, #4b4d50);
   perspective: 100px;
 }
 .target.pitching {
-  background: rgba(207, 207, 207, 0.59);
+  background: radial-gradient(circle at 100px 100px, #c9c9c6, #4b4d50);
 }
 .target.batting {
-  background: rgba(207, 207, 207, 0.59);
+  background: radial-gradient(circle at 100px 100px, #c9c9c6, #4b4d50);
 }
 .strikezone {
+  box-shadow: 0 0 15px 9px #4b4d50;
   margin: 35px 50px;
   padding: 0;
   width: 100px;
   height: 130px;
-  background: rgba(177, 177, 177, 0.89);
+  background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
+  border: 3px solid #ccd4d1;
 }
 .strikezone.pitching {
-  background: rgba(177, 177, 177, 0.89);
+  background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
 }
 .strikezone.batting {
-  background: rgba(177, 177, 177, 0.89);
+  background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
 }
 .indicator.pitch {
   background-color: rgba(255, 255, 255, 0.4);

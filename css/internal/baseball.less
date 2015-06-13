@@ -8,8 +8,14 @@
     padding: 13px;
     background: white;
     margin: -13px;
+    &.pitch {
+        opacity: 0.65;
+    }
 }
 .baseball {
+    -webkit-box-shadow: 0 0 6px 2px grey;
+    box-shadow: 0 0 6px 2px grey;
+    background: radial-gradient(circle at 5px 5px, #fefefa, #c8cbc2);
     border: 4px dashed @seamColor;
 //    -webkit-animation: flight 1s infinite 0s linear; /* Chrome, Safari, Opera */
 //    animation: flight 1s infinite 0s linear;
@@ -17,8 +23,4 @@
 .spin {
     -webkit-animation: spin 1s infinite 0s linear; /* Chrome, Safari, Opera */
     animation: spin 1s infinite 0s linear;
-}
-.break {
-//    border-left: none;
-//    border-right: 4px dashed @seamColor;
 }

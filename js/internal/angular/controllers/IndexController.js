@@ -81,6 +81,20 @@ IndexController = function($scope) {
         var glove = jQ('.target .glove.stance-indicator');
         var showGlove = function(event) {
             if (game.humanPitching()) {
+                var offset = jQ('.target').offset();
+                var relativeOffset = {
+                    x : event.pageX - offset.left,
+                    y : 200 - (event.pageY - offset.top)
+                };
+                glove.css({
+                    top: 200-relativeOffset.y + "px",
+                    left: relativeOffset.x + "px"
+                });
+                if (relativeOffset.x > 200 || relativeOffset.x < 0 || relativeOffset.y > 200 || relativeOffset.y < 0) {
+                    glove.hide();
+                } else {
+                    glove.show();
+                }
             }
         };
 

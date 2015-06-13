@@ -148,8 +148,8 @@ Mathinator.prototype = {
                 _top -= 1;
             }
             _left = originLeft + Mathinator.square(percent/100)*(_left - originLeft);
-            var padding = Math.max(Mathinator.square(percent/100)*10, 1),
-                borderWidth = Math.max(Mathinator.square(percent/100)*3, 1);
+            var padding = Math.max(Mathinator.square(percent/100)*12, 1),
+                borderWidth = Math.max(Mathinator.square(percent/100)*4, 1);
             return {
                 top: _top,
                 left: _left ,
