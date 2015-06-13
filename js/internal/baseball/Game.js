@@ -82,7 +82,7 @@ Game.prototype = {
                 giraffe.pitchTarget = {x: 100, y: 100};
             }
             giraffe.autoSwing(giraffe.pitchTarget.x, giraffe.pitchTarget.y, function(callback) {callback();});
-        }, giraffe.field.hasRunnersOn() ? 2400 : 3900);
+        }, giraffe.field.hasRunnersOn() ? Animator.TIME_FROM_SET + 1200 : Animator.TIME_FROM_WINDUP + 1200);
     },
     /**
      * generically receive click input and decide what to do
@@ -129,7 +129,7 @@ Game.prototype = {
             if (this.quickMode) {
                 this.thePitch(x, y, callback);
             } else {
-                windup.animate({width: 0}, this.field.hasRunnersOn() ? 1500 : 3000, function() {
+                windup.animate({width: 0}, this.field.hasRunnersOn() ? Animator.TIME_FROM_SET : Animator.TIME_FROM_WINDUP, function() {
                     !giraffe.console && jQ('.baseball.pitch').removeClass('hide');
                     giraffe.thePitch(x, y, callback);
                     pitcher.windingUp = false;

@@ -37,7 +37,7 @@ IndexController = function($scope) {
                     game.quickMode ? void 0 : $scope.$apply();
                     $scope.updateFlightPath(callback);
                 });
-            }, scalar*(game.field.hasRunnersOn() ? 4000 : 5500));
+            }, scalar*(game.field.hasRunnersOn() ? Animator.TIME_FROM_SET + 2000 : Animator.TIME_FROM_WINDUP + 2000));
         }
         if (game.humanControl == 'away') {
             game.simulateInput(function(callback) {
@@ -69,7 +69,7 @@ IndexController = function($scope) {
                 bat.css({
                     top: 200-relativeOffset.y + "px",
                     left: relativeOffset.x + "px",
-                    transform: "rotate(" + angle + "deg)"
+                    transform: "rotate(" + angle + "deg) rotateY("+(game.batter.bats == "left" ? 0 : -0)+"deg)"
                 });
                 if (relativeOffset.x > 200 || relativeOffset.x < 0 || relativeOffset.y > 200 || relativeOffset.y < 0) {
                     bat.hide();

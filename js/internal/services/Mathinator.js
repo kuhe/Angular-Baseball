@@ -142,14 +142,14 @@ Mathinator.prototype = {
             _left = breakLeft || left;
             _top = originTop + Mathinator.square(percent/100)*(_top - originTop);
             if (step == 1) {
-                _top -= 5;
-            }
-            if (step == 2) {
                 _top -= 3;
             }
+            if (step == 2) {
+                _top -= 1;
+            }
             _left = originLeft + Mathinator.square(percent/100)*(_left - originLeft);
-            var padding = Math.max(Mathinator.square(percent/100)*13, 1),
-                borderWidth = Math.max(Mathinator.square(percent/100)*4, 1);
+            var padding = Math.max(Mathinator.square(percent/100)*10, 1),
+                borderWidth = Math.max(Mathinator.square(percent/100)*3, 1);
             return {
                 top: _top,
                 left: _left ,

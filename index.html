@@ -185,7 +185,7 @@
                              ng-style='{
                                     top: 200-y.pitchInFlight.y-y.swingResult.y + "px",
                                     left: y.pitchInFlight.x + y.swingResult.x + "px",
-                                    transform: "rotate(" + y.swingResult.angle + "deg)"
+                                    transform: "rotate(" + y.swingResult.angle + "deg) rotateY("+(y.batterRunner.bats == "left" ? 12 : -12)+"deg)"
                                 }'
                              ng-class='{
                                  left: y.batterRunner.bats == "left",

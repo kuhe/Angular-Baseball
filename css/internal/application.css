@@ -27,6 +27,59 @@
   border-radius: 50%;
   background: white;
 }
+.diamond {
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-bottom-color: #fff7ff;
+  position: relative;
+  top: -10px;
+  margin-left: -10px;
+  margin-top: 2px;
+  z-index: 1;
+}
+.diamond:after {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 10px;
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-top-color: #fff7ff;
+}
+.diamond.filled {
+  border-bottom-color: #f7bf24;
+}
+.diamond.filled:after {
+  border-top-color: #f7bf24;
+}
+.diamond-bg {
+  width: 0;
+  height: 0;
+  border: 12px solid transparent;
+  border-bottom-color: #252525;
+  position: relative;
+  margin-left: 0;
+}
+.diamond-bg:after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 12px;
+  width: 0;
+  height: 0;
+  border: 12px solid transparent;
+  border-top-color: #252525;
+}
+.diamond-bg.third {
+  margin-top: -24px;
+  margin-left: -15px;
+}
+.diamond-bg.first {
+  margin-top: -10px;
+  margin-left: 15px;
+}
 .indicator {
   position: absolute;
   top: 0;
@@ -43,6 +96,32 @@
   -webkit-animation: spin 1s infinite 0s linear;
   /* Chrome, Safari, Opera */
   animation: spin 1s infinite 0s linear;
+}
+.indicator.swing {
+  padding: 10px 50px;
+  margin: -10px -50px;
+  border-radius: 10px;
+  border-top: 1px solid #645f40;
+  border-bottom: 1px solid #645f40;
+  border-left: none;
+  border-right: none;
+  background: #f0e69b;
+}
+.indicator.swing.stance-indicator {
+  opacity: 0.5;
+}
+.indicator.swing.left {
+  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
+  border-left: 1px solid #645f40;
+}
+.indicator.swing.right {
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+  border-right: 1px solid #645f40;
+}
+.target.swing .indicator.swing {
+  display: none;
 }
 @font-face {
   font-family: Noto;
@@ -71,9 +150,6 @@ html body {
   line-height: 14px;
   padding: 5px 10px;
   border: none;
-}
-.main-area .list-group-item:before {
-  content: "-";
 }
 .grey {
   /*background-image: url(../images/sb-tile-grey.png);*/
@@ -189,7 +265,6 @@ html body {
 .noselect {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
-  -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
@@ -215,6 +290,7 @@ html body {
   height: 200px;
   border: 1px dashed #d4d4d4;
   background: rgba(207, 207, 207, 0.59);
+  perspective: 100px;
 }
 .target.pitching {
   background: rgba(207, 207, 207, 0.59);
@@ -235,84 +311,8 @@ html body {
 .strikezone.batting {
   background: rgba(177, 177, 177, 0.89);
 }
-.target.swing .indicator.swing {
-  display: none;
-}
 .indicator.pitch {
   background-color: rgba(255, 255, 255, 0.4);
-}
-.indicator.swing {
-  padding: 10px 50px;
-  margin: -10px -50px;
-  border-radius: 10px;
-  border-top: 3px solid #645f40;
-  border-bottom: 3px solid #645f40;
-  border-left: none;
-  border-right: none;
-  background: #f0e69b;
-}
-.indicator.swing.left {
-  border-bottom-right-radius: 4px;
-  border-top-right-radius: 4px;
-  border-left: 3px solid #645f40;
-}
-.indicator.swing.right {
-  border-bottom-left-radius: 4px;
-  border-top-left-radius: 4px;
-  border-right: 3px solid #645f40;
-}
-.diamond {
-  width: 0;
-  height: 0;
-  border: 10px solid transparent;
-  border-bottom-color: #fff7ff;
-  position: relative;
-  top: -10px;
-  margin-left: -10px;
-  margin-top: 2px;
-  z-index: 1;
-}
-.diamond:after {
-  content: '';
-  position: absolute;
-  left: -10px;
-  top: 10px;
-  width: 0;
-  height: 0;
-  border: 10px solid transparent;
-  border-top-color: #fff7ff;
-}
-.diamond.filled {
-  border-bottom-color: #f7bf24;
-}
-.diamond.filled:after {
-  border-top-color: #f7bf24;
-}
-.diamond-bg {
-  width: 0;
-  height: 0;
-  border: 12px solid transparent;
-  border-bottom-color: #252525;
-  position: relative;
-  margin-left: 0px;
-}
-.diamond-bg:after {
-  content: '';
-  position: absolute;
-  left: -12px;
-  top: 12px;
-  width: 0;
-  height: 0;
-  border: 12px solid transparent;
-  border-top-color: #252525;
-}
-.diamond-bg.third {
-  margin-top: -24px;
-  margin-left: -15px;
-}
-.diamond-bg.first {
-  margin-top: -10px;
-  margin-left: 15px;
 }
 .container .side-base-indicator {
   min-height: 62px;

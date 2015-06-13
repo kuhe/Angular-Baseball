@@ -30,9 +30,6 @@ html body {
     padding: 5px 10px;
     border: none;
 }
-.main-area .list-group-item:before {
-    content : "-";
-}
 
 .grey {
     /*background-image: url(../images/sb-tile-grey.png);*/
@@ -135,7 +132,6 @@ html body {
 .noselect {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
@@ -165,6 +161,7 @@ html body {
     height: 200px;
     border: 1px dashed #d4d4d4;
     background: @target;
+    perspective: 100px;
     &.pitching {
         background: @target;
     }
@@ -192,90 +189,8 @@ html body {
 
 }
 
-.target.swing .indicator.swing {
-    display: none;
-}
-
 .indicator.pitch {
     background-color : rgba(255,255,255, 0.4);
-}
-
-.indicator.swing {
-    padding: 10px 50px;
-    margin: -10px -50px;
-    border-radius: 10px;
-    border-top: 3px solid #645f40;
-    border-bottom: 3px solid #645f40;
-    border-left: none;
-    border-right: none;
-    background: #f0e69b;
-    &.left {
-        border-bottom-right-radius: 4px;
-        border-top-right-radius: 4px;
-        border-left: 3px solid #645f40;
-    }
-    &.right {
-        border-bottom-left-radius: 4px;
-        border-top-left-radius: 4px;
-        border-right: 3px solid #645f40;
-    }
-}
-
-.diamond {
-    width: 0;
-    height: 0;
-    border: 10px solid transparent;
-    border-bottom-color: #fff7ff;
-    position: relative;
-    top: -10px;
-    margin-left: -10px;
-    margin-top: 2px;
-    z-index: 1;
-}
-.diamond:after {
-    content: '';
-    position: absolute;
-    left: -10px;
-    top: 10px;
-    width: 0;
-    height: 0;
-    border: 10px solid transparent;
-    border-top-color: #fff7ff;
-}
-
-.diamond.filled {
-    border-bottom-color: #f7bf24;
-}
-.diamond.filled:after {
-    border-top-color: #f7bf24;
-}
-
-.diamond-bg {
-    width: 0;
-    height: 0;
-    border: 12px solid transparent;
-    border-bottom-color: #252525;
-    position: relative;
-    margin-left: 0px;
-}
-.diamond-bg:after {
-    content: '';
-    position: absolute;
-    left: -12px;
-    top: 12px;
-    width: 0;
-    height: 0;
-    border: 12px solid transparent;
-    border-top-color: #252525;
-}
-
-.diamond-bg.third {
-    margin-top: -24px;
-    margin-left: -15px;
-}
-.diamond-bg.first {
-    margin-top: -10px;
-    margin-left: 15px;
 }
 
 .container .side-base-indicator {
