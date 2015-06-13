@@ -96,8 +96,11 @@ runSeason = function(n) {
         if (player.stats.batting.pa % 10 == 0) {
             game.teams.away.positions.pitcher = new Player(game.teams.away, true);
         }
-    } while (player.stats.batting.pa < pa && x--);
+    } while (player.stats.batting.pa < 704 && x--);
     logPlayer();
+    player.skill.offense.eye += 2;
+    player.skill.offense.speed -= 2;
+    player.skill.offense.power += 2;
 };
 
 runSeason(2);
@@ -106,6 +109,8 @@ runSeason(4);
 runSeason(5);
 runSeason(6);
 runSeason(7);
+runSeason(8);
+runSeason(9);
 
 log(player.skill.offense, player.fatigue);
 

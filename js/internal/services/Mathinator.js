@@ -92,7 +92,7 @@ Mathinator.prototype = {
         }
         bottom = Math.max(Math.min(bottom, 400), -20);
         left = Math.max(Math.min(left, 100), -100);
-        padding = Math.max(Math.min(padding, 40), 0);
+        padding = Math.max(Math.min(padding, 12), 0);
         return {
             bottom: bottom,
             left: left,

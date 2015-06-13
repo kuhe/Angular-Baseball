@@ -85,6 +85,7 @@ Umpire.prototype = {
                             this.game.batter.atBats.push(Log.prototype.FIELDERS_CHOICE);
                             this.advanceRunners(false, result.fieldersChoice);
                             this.reachBase();
+                            result.outs = this.count.outs;
                             this.newBatter();
                         } else if (result.fieldersChoice) {
                             result.bases = 0;
@@ -97,6 +98,7 @@ Umpire.prototype = {
                             if (this.count.outs < 3) {
                                 this.advanceRunners(false);
                             }
+                            result.outs = this.count.outs;
                             this.newBatter();
                         }
                         if (result.hitByPitch) {
