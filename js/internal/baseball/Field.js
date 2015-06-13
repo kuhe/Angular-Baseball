@@ -62,7 +62,7 @@ Field.prototype = {
             //reach the batted ball?
             swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle, landingDistance]);
             var interceptRating = fielder.skill.defense.speed + flyAngle - swing.fielderTravel*1.65;
-            if (interceptRating > 0 && flyAngle > -10) {
+            if (interceptRating > 0 && flyAngle > 0) {
                 //caught cleanly?
                 if (Distribution.error(fielder)) { //error
                     fieldingEase *= 0.5;
@@ -73,7 +73,7 @@ Field.prototype = {
                     var sacrificeThrowInTime = Mathinator.fielderReturnDelay(
                         swing.travelDistance, throwingEase, fieldingEase, 100
                     );
-                    if (this.first && sacrificeThrowInTime > this.first.getBaseRunningTime() + 1.5) {
+                    if (this.first && sacrificeThrowInTime > this.first.getBaseRunningTime() + 2.5) {
                         swing.sacrificeAdvances.push('first');
                     }
                     if (this.second && sacrificeThrowInTime > this.second.getBaseRunningTime()) {
@@ -112,7 +112,7 @@ Field.prototype = {
                     swing.fieldersChoice = null;
                     swing.bases = fieldingReturnDelay >= baseRunningTime + 1 ? 1 : 0;
                     if (this.first && fieldingReturnDelay < this.first.getBaseRunningTime()) swing.fieldersChoice = 'first';
-                    if (this.second && fieldingReturnDelay < this.second.getBaseRunningTime() + 0.6) swing.fieldersChoice = 'second';
+                    if (this.first && this.second && fieldingReturnDelay < this.second.getBaseRunningTime() + 0.6) swing.fieldersChoice = 'second';
                     if (this.third && fieldingReturnDelay < this.third.getBaseRunningTime()) swing.fieldersChoice = 'third';
                     if (swing.fieldersChoice) swing.bases = 1;
                 }

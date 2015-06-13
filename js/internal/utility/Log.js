@@ -167,6 +167,7 @@ Log.prototype = {
         var r = game.swingResult;
         var record = '';
         var batter = game.batter.getName();
+        var out = [];
         if (r.looking) {
             if (r.strike) {
                 record = (batter + text(' struck out looking.'));
@@ -177,10 +178,14 @@ Log.prototype = {
             if (r.contact) {
                 var fielder = r.fielder, bases = r.bases, outBy;
                 if (r.caught) {
-                    if (['left', 'center', 'right'].indexOf(r.fielder) < 0) {
-                        outBy = 'pop';
+                    if (r.flyAngle < 15) {
+                        outBy = 'line';
                     } else {
-                        outBy = 'fly';
+                        if (['left', 'center', 'right'].indexOf(r.fielder) < 0) {
+                            outBy = 'pop';
+                        } else {
+                            outBy = 'fly';
+                        }
                     }
                 } else {
                     if (r.foul) {
@@ -191,7 +196,7 @@ Log.prototype = {
                             outBy = 'error';
                         } else {
                             if (r.thrownOut) {
-                                if (Math.random() > 0.5) {
+                                if (Math.random() < 0.5) {
                                     outBy = 'ground';
                                 } else {
                                     outBy = 'thrown';
@@ -215,10 +220,18 @@ Log.prototype = {
                                         break;
                                 }
                             }
+                            if (r.fieldersChoice) {
+                                out.push(r.fieldersChoice);
+                                if (r.outs == 3) {
+                                    outBy = 'ground';
+                                } else {
+                                    outBy = 'fieldersChoice';
+                                }
+                            }
                         }
                     }
                 }
-                record = text.contactResult(batter, fielder, bases, outBy);
+                record = text.contactResult(batter, fielder, bases, outBy, r.outs === 3 ? [] : r.sacrificeAdvances, out);
             } else {
                 record = (batter+text(' struck out swinging.'));
             }

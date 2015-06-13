@@ -82,6 +82,10 @@ text = function(phrase, override) {
             'BB' : '四球',
             'SO' : '三振',
 
+            'first' : 'ファースト',
+            'second' : 'セカンド',
+            'third' : 'サード',
+
             'Select Language:' : '言語',
             'Run Fast Simulation' : 'シミュレーションを試合終了まで行う',
             'Play Ball!' : 'プレーボール',
@@ -185,24 +189,33 @@ text.namePitch = function(pitch) {
     }
 };
 
-text.contactResult = function(batter, fielder, bases, outBy) {
+text.contactResult = function(batter, fielder, bases, outBy, sacrificeAdvances, out) {
     var statement = '';
     var infield = ['left', 'center', 'right'].indexOf(fielder) < 0;
     if (mode == 'e') {
         statement += batter;
         if (outBy) {
             switch (outBy) {
+                case 'fieldersChoice':
+                    var plural = out.length > 1;
+                    var runner = plural ? 'Runners' : 'Runner';
+                    var is = plural ? 'are' : 'is';
+                    statement += ' reached on a fielder\'s choice by ' + text.fielderShortName(fielder) + '. '+runner+' from ' + text(out.join(text.comma())) + ' ' + is + ' out';
+                    break;
+                case 'line':
+                    statement += ' lined out to ' + text.fielderShortName(fielder);
+                    break;
+                case 'fly':
+                    statement += ' flew out to ' + text.fielderShortName(fielder);
+                    break;
                 case 'error':
                     statement += ' reached on error by ' + text.fielderShortName(fielder);
                     break;
                 case 'pop':
                     statement += ' popped out to ' + text.fielderShortName(fielder);
                     break;
-                case 'fly':
-                    statement += ' flew out to ' + text.fielderShortName(fielder);
-                    break;
                 case 'ground':
-                    statement += ' grounded out to ' + text.fielderShortName(fielder);
+                    statement += ' grounded into a force out by ' + text.fielderShortName(fielder);
                     break;
                 case 'thrown':
                     statement += ' was thrown out by ' + text.fielderShortName(fielder);
@@ -228,31 +241,46 @@ text.contactResult = function(batter, fielder, bases, outBy) {
                     break;
             }
         }
+        if (sacrificeAdvances) {
+            sacrificeAdvances.map(function(base) {
+                if (base == 'third') {
+                    statement += text.stop() + 'Runner on third scores';
+                } else {
+                    statement += text.stop() + 'Runner on ' + base + ' advances';
+                }
+            });
+        }
         statement += text.stop();
     }
     if (mode == 'n') {
+        var stop = text.stop();
         statement += batter + 'は';
         if (outBy) {
+            var fielderLong = text.fielderLongName(fielder);
             fielder = text.fielderShortName(fielder);
             switch (outBy) {
+                case 'fieldersChoice':
+                    statement += '野選('+fielder+')で出塁。' + text(out.join(text.comma())) + 'ランナーはアウト';
+                    break;
+                case 'line':
+                case 'fly':
+                    statement += fielder + '飛';
+                    break;
                 case 'error':
                     statement += 'エラー('+fielder+')で出塁';
                     break;
                 case 'pop':
                     statement += 'ポップフライで' + fielder + '飛';
                     break;
-                case 'fly':
-                    statement += fielder + '飛';
-                    break;
                 case 'ground':
-                    statement += fielder + 'ゴロ';
+                    statement += fielderLong + 'ゴロに封殺';
                     break;
                 case 'thrown':
                     statement += fielder + 'ゴロ';
                     break;
             }
         } else {
-            fielder = text.fielderLongName(fielder);
+            fielder = text.fielderShortName(fielder);
             switch (bases) {
                 case 1:
                     if (infield) {
@@ -272,8 +300,21 @@ text.contactResult = function(batter, fielder, bases, outBy) {
                     break;
             }
         }
-        statement += text.stop();
+        if (sacrificeAdvances) {
+            sacrificeAdvances.map(function(base) {
+                if (base == 'third') {
+                    statement += stop + 'サードランナーホームイン';
+                } else {
+                    statement += stop + text(base) + 'ランナー進塁';
+                }
+            });
+        }
+        statement += stop;
     }
+    if (statement.length < 10) {
+        log(statement, arguments);
+    }
+    (sacrificeAdvances.length || out.length) && log(statement, arguments);
     return statement;
 };
 

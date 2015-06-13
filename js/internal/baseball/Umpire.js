@@ -62,7 +62,7 @@ Umpire.prototype = {
                         this.advanceRunners(false, null, result.sacrificeAdvances);
                     } else {
                         batter.stats.batting.ab++;
-                        if (result.flyAngle < 10) {
+                        if (result.flyAngle < 15) {
                             this.game.batter.atBats.push(Log.prototype.LINEOUT);
                         } else {
                             this.game.batter.atBats.push(Log.prototype.FLYOUT);
@@ -167,6 +167,8 @@ Umpire.prototype = {
 
         this.says = (this.count.balls + ' and ' + this.count.strikes);
 
+        result.outs = this.count.outs;
+
         if (this.count.strikes > 2) {
             batter.stats.batting.pa++;
             batter.stats.batting.ab++;
@@ -252,7 +254,16 @@ Umpire.prototype = {
             }
             var canAdvance = function() {return true;};
             if (sacrificeAdvances) {
-                canAdvance = function(position) {return sacrificeAdvances.indexOf(position) > -1;};
+                canAdvance = function(position) {
+                    switch (position) {
+                        case 'first':
+                            return sacrificeAdvances.indexOf('first') > -1 && (canAdvance('second') || !second);
+                        case 'second':
+                            return sacrificeAdvances.indexOf('second') > -1 && (canAdvance('third') || !third);
+                        case 'third':
+                            return sacrificeAdvances.indexOf('third') > -1;
+                    }
+                };
             }
             if (third instanceof Player && canAdvance('third')) {
                 // run scored
@@ -266,7 +277,7 @@ Umpire.prototype = {
                 third.stats.batting.r++;
                 game.pitcher.stats.pitching.ER++;
             }
-            if (second && canAdvance('first')) {
+            if (second && canAdvance('second')) {
                 game.field.third = second;
             } else {
                 game.field.third = null;
