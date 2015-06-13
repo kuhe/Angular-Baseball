@@ -70,17 +70,19 @@ Field.prototype = {
                     swing.caught = false;
                 } else {
                     swing.caught = true;
-                    var sacrificeThrowInTime = Mathinator.fielderReturnDelay(
-                        swing.travelDistance, throwingEase, fieldingEase, 100
-                    );
-                    if (this.first && sacrificeThrowInTime > this.first.getBaseRunningTime() + 2.5) {
-                        swing.sacrificeAdvances.push('first');
-                    }
-                    if (this.second && sacrificeThrowInTime > this.second.getBaseRunningTime()) {
-                        swing.sacrificeAdvances.push('second');
-                    }
-                    if (this.third && sacrificeThrowInTime > this.third.getBaseRunningTime() - 0.5) {
-                        swing.sacrificeAdvances.push('third');
+                    if (this.game.umpire.count.outs < 2) {
+                        var sacrificeThrowInTime = Mathinator.fielderReturnDelay(
+                            swing.travelDistance, throwingEase, fieldingEase, 100
+                        );
+                        if (this.first && sacrificeThrowInTime > this.first.getBaseRunningTime() + 2.5) {
+                            swing.sacrificeAdvances.push('first');
+                        }
+                        if (this.second && sacrificeThrowInTime > this.second.getBaseRunningTime()) {
+                            swing.sacrificeAdvances.push('second');
+                        }
+                        if (this.third && sacrificeThrowInTime > this.third.getBaseRunningTime() - 0.5) {
+                            swing.sacrificeAdvances.push('third');
+                        }
                     }
                 }
             } else {

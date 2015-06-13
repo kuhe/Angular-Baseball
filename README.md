@@ -12,12 +12,10 @@ currently hosted at [georgefu.info/y/](htttp://georgefu.info/y)
 
 todo :
 
-    バット角度
+
 
     スイングタイミング
 
     ウェブソケット
-
-    AIバッター予想
 
     送りバント
