@@ -12,17 +12,17 @@ Manager.prototype = {
         this.team.positions.pitcher = this.selectForSkill(this.team.bench, ['pitching']);
         this.team.positions.pitcher.position = 'pitcher';
         this.team.positions.pitcher.number = jerseyNumber++;
-        this.team.positions.catcher = this.selectForSkill(this.team.bench, ['defense', 'catching'], true);
+        this.team.positions.catcher = this.selectForSkill(this.team.bench, ['defense', 'catching'], 'right');
         this.team.positions.catcher.position = 'catcher';
         this.team.positions.catcher.number = jerseyNumber++;
         Iterator.each(this.team.bench, function(key, player) {
             player.number = jerseyNumber++;
         });
-        this.team.positions.short = this.selectForSkill(this.team.bench, ['defense', 'fielding'], true);
+        this.team.positions.short = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
         this.team.positions.short.position = 'short';
-        this.team.positions.second = this.selectForSkill(this.team.bench, ['defense', 'fielding'], true);
+        this.team.positions.second = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
         this.team.positions.second.position = 'second';
-        this.team.positions.third = this.selectForSkill(this.team.bench, ['defense', 'fielding'], true);
+        this.team.positions.third = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
         this.team.positions.third.position = 'third';
         this.team.positions.center = this.selectForSkill(this.team.bench, ['defense', 'speed']);
         this.team.positions.center.position = 'center';
@@ -30,7 +30,7 @@ Manager.prototype = {
         this.team.positions.left.position = 'left';
         this.team.positions.right = this.selectForSkill(this.team.bench, ['defense', 'speed']);
         this.team.positions.right.position = 'right';
-        this.team.positions.first = this.selectForSkill(this.team.bench, ['defense', 'fielding']);
+        this.team.positions.first = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'left');
         this.team.positions.first.position = 'first';
 
         this.team.lineup[3] = this.selectForSkill(this.team.positions, ['offense', 'power']);
@@ -52,8 +52,7 @@ Manager.prototype = {
         this.team.lineup[8] = this.selectForSkill(this.team.positions, ['offense', 'speed']);
         this.team.lineup[8].order = 8;
     },
-    selectForSkill : function(pool, skillset, mustBeRightHanded) {
-        mustBeRightHanded = !!mustBeRightHanded;
+    selectForSkill : function(pool, skillset, requiredThrowingHandedness) {
         if (this.team.bench.length || pool == this.team.positions) {
             var selection = this.team.bench[0];
             var rating = 0;
@@ -66,7 +65,7 @@ Manager.prototype = {
                     cursor = cursor[property];
                     property = skills.shift();
                 }
-                if (!(player.order+1) && cursor >= rating && (!mustBeRightHanded || player.throws == 'right')) {
+                if (!(player.order+1) && cursor >= rating && (!requiredThrowingHandedness || player.throws == requiredThrowingHandedness)) {
                     rating = cursor;
                     selection = player;
                     index = key;
