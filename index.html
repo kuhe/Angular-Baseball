@@ -446,6 +446,13 @@
             </li>
         </ul>
     </div>
+    <div class='block col-lg-12' ng-if='y.stage == "end"'>
+        <ul class="list-group pitch-record col-xs-12">
+            <li class='list-group-item' ng-repeat="event in y.log.record[mode()] track by $index">
+                {{event}}
+            </li>
+        </ul>
+    </div>
 </div>
 </body>
 </html>

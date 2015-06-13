@@ -87,6 +87,7 @@ Umpire.prototype = {
                             this.reachBase();
                             this.newBatter();
                         } else if (result.fieldersChoice) {
+                            result.bases = 0;
                             result.thrownOut = true;
                         }
                         if (result.thrownOut) {
@@ -208,7 +209,8 @@ Umpire.prototype = {
         var first = this.game.field.first,
             second = this.game.field.second,
             third = this.game.field.third,
-            game = this.game;
+            game = this.game,
+            swing = this.game.swingResult;
         
         if (isWalk) {
             if (first) {

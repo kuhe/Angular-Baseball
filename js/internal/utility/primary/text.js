@@ -311,10 +311,6 @@ text.contactResult = function(batter, fielder, bases, outBy, sacrificeAdvances, 
         }
         statement += stop;
     }
-    if (statement.length < 10) {
-        log(statement, arguments);
-    }
-    (sacrificeAdvances.length || out.length) && log(statement, arguments);
     return statement;
 };
 
