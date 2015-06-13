@@ -61,7 +61,7 @@ Animator.prototype = {
         if (!game.pitchInFlight.x) {
             $baseballs.addClass('hide');
         } else {
-            if (game.humanBatting() && Math.random()*100 > game.batter.skill.offense.eye) {
+            if (game.humanBatting() && Math.random()*180 > game.batter.skill.offense.eye) {
                 jQ('.baseball.break').addClass('hide');
             } else {
                 jQ('.baseball.break').removeClass('hide');
