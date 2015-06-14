@@ -165,6 +165,9 @@ html body {
   border-top: 4px solid #ffc031;
   font-family: "Noto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+.language-select {
+  z-index: 20;
+}
 .main-area {
   padding: 10px 30px !important;
 }
