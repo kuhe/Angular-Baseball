@@ -317,7 +317,6 @@ html body {
   margin: 0 auto 25px auto;
 }
 .target {
-  box-shadow: 0 0 25px 3px grey;
   margin: 0 auto;
   padding: 0;
   position: relative;
@@ -330,14 +329,28 @@ html body {
 .target.live {
   cursor: none;
 }
+@media (min-width: 600px) {
+  .target {
+    box-shadow: 0 0 25px 3px grey;
+  }
+}
 .target.pitching {
-  background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
+  background: #83694e;
+}
+@media (min-width: 600px) {
+  .target.pitching {
+    background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
+  }
 }
 .target.batting {
-  background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
+  background: #83694e;
+}
+@media (min-width: 600px) {
+  .target.batting {
+    background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
+  }
 }
 .strikezone {
-  box-shadow: 0 0 15px 9px #4b4d50;
   margin: 35px 50px;
   padding: 0;
   width: 100px;
@@ -345,11 +358,26 @@ html body {
   background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
   border: 3px solid #ccd4d1;
 }
+@media (min-width: 600px) {
+  .strikezone {
+    box-shadow: 0 0 15px 9px #4b4d50;
+  }
+}
 .strikezone.pitching {
-  background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
+  background: #828e70;
+}
+@media (min-width: 600px) {
+  .strikezone.pitching {
+    background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
+  }
 }
 .strikezone.batting {
-  background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
+  background: #828e70;
+}
+@media (min-width: 600px) {
+  .strikezone.batting {
+    background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
+  }
 }
 .indicator.pitch {
   background-color: rgba(255, 255, 255, 0.4);
