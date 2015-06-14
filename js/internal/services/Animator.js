@@ -9,8 +9,9 @@ Animator.prototype = {
     init : function() {
 
     },
-    TIME_FROM_SET : 2300,
-    TIME_FROM_WINDUP : 3600,
+    TIME_FROM_SET : 2300, //ms
+    TIME_FROM_WINDUP : 3600, //ms
+    HOLD_UP_ALLOWANCE : 0.5, // seconds
     pitchTarget : null,
     pitchBreak : null,
     updateFlightPath: function(callback) {
@@ -74,7 +75,7 @@ Animator.prototype = {
         if ($scope.y.humanBatting() && !$scope.y.humanPitching()) {
             $scope.holdUpTimeouts.push(setTimeout(function() {
                 $scope.holdUp();
-            }, (flightSpeed + 0.3) * 1000));
+            }, (flightSpeed + Animator.HOLD_UP_ALLOWANCE) * 1000));
         }
     },
     animateFieldingTrajectory: function(game) {

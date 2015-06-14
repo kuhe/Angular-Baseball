@@ -13,9 +13,10 @@
     }
 }
 .baseball {
-    -webkit-box-shadow: 0 0 6px 2px grey;
-    box-shadow: 0 0 6px 2px grey;
-    background: radial-gradient(circle at 5px 5px, #fefefa, #c8cbc2);
+    @media (min-width: 600px) {
+        box-shadow: 0 0 6px 2px grey;
+        background: radial-gradient(circle at 5px 5px, #fefefa, #c8cbc2);
+    }
     border: 4px dashed @seamColor;
 //    -webkit-animation: flight 1s infinite 0s linear; /* Chrome, Safari, Opera */
 //    animation: flight 1s infinite 0s linear;

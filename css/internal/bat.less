@@ -2,8 +2,7 @@
     &.stance-indicator {
         opacity: 0.85;
     }
-    -webkit-box-shadow: 0 0 12px 2px grey;
-    box-shadow: 0 0 12px 2px grey;
+
     padding: 10px 50px;
     margin: -10px -50px;
     border-radius: 10px;
@@ -13,13 +12,17 @@
     border-right: none;
 
     background: #eaefb5; /* Old browsers */
-    background: -moz-radial-gradient(center, ellipse cover,  #eaefb5 0%, #877d5d 100%); /* FF3.6+ */
-    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#eaefb5), color-stop(100%,#877d5d)); /* Chrome,Safari4+ */
-    background: -webkit-radial-gradient(center, ellipse cover,  #eaefb5 0%,#877d5d 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-radial-gradient(center, ellipse cover,  #eaefb5 0%,#877d5d 100%); /* Opera 12+ */
-    background: -ms-radial-gradient(center, ellipse cover,  #eaefb5 0%,#877d5d 100%); /* IE10+ */
-    background: radial-gradient(ellipse at center,  #eaefb5 0%,#877d5d 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eaefb5', endColorstr='#877d5d',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+    @media (min-width: 600px) {
+        box-shadow: 0 0 12px 2px grey;
+        background: -moz-radial-gradient(center, ellipse cover,  #eaefb5 0%, #877d5d 100%); /* FF3.6+ */
+        background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#eaefb5), color-stop(100%,#877d5d)); /* Chrome,Safari4+ */
+        background: -webkit-radial-gradient(center, ellipse cover,  #eaefb5 0%,#877d5d 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-radial-gradient(center, ellipse cover,  #eaefb5 0%,#877d5d 100%); /* Opera 12+ */
+        background: -ms-radial-gradient(center, ellipse cover,  #eaefb5 0%,#877d5d 100%); /* IE10+ */
+        background: radial-gradient(ellipse at center,  #eaefb5 0%,#877d5d 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eaefb5', endColorstr='#877d5d',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+    }
 
     &.left {
         border-bottom-right-radius: 4px;
