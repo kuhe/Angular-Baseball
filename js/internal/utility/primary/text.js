@@ -263,6 +263,8 @@ text.contactResult = function(batter, fielder, bases, outBy, sacrificeAdvances, 
                     statement += '野選('+fielder+')で出塁。' + text(out.join(text.comma())) + 'ランナーはアウト';
                     break;
                 case 'line':
+                    statement += fielder + '直';
+                    break;
                 case 'fly':
                     statement += fielder + '飛';
                     break;

@@ -152,9 +152,11 @@ html body {
     margin: 0 auto 25px auto;
 }
 
-@target: radial-gradient(circle at 100px 100px, #c9c9c6, #4b4d50);
+@target: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
 .target {
-    cursor: none;
+    &.live {
+        cursor: none;
+    }
     box-shadow: 0 0 25px 3px grey;
     margin: 0 auto;
     padding: 0;

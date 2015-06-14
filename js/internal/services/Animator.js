@@ -85,8 +85,8 @@ Animator.prototype = {
 
         var linearApproximateDragScalar = {
             distance: 1,
-            apexHeight: 0.37,
-            airTime: 0.66
+            apexHeight: 0.57,
+            airTime: 0.96
         };
 
         var angle = result.flyAngle,
@@ -98,7 +98,8 @@ Animator.prototype = {
         if (angle > 90) angle = 180 - angle;
 
         var velocity = linearApproximateDragScalar.distance * Math.sqrt(9.81 * distance / Math.sin(2*Math.PI*angle/180));
-        var apexHeight = velocity*velocity/(2*9.81) * linearApproximateDragScalar.apexHeight;
+        var velocityVerticalComponent = Math.sin(Mathinator.RADIAN * angle) * velocity;
+        var apexHeight = velocityVerticalComponent*velocityVerticalComponent/(2*9.81) * linearApproximateDragScalar.apexHeight;
         var airTime = Math.sqrt(2*apexHeight/9.81) * linearApproximateDragScalar.airTime;
 
         //log('angle', angle, 'vel', velocity, 'apex', apexHeight, 'air', airTime, 'dist', result.travelDistance);

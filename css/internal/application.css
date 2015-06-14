@@ -116,19 +116,19 @@
   border-right: none;
   background: #eaefb5;
   /* Old browsers */
-  background: -moz-radial-gradient(center, ellipse cover, #eaefb5 0%, #ccc08c 100%);
+  background: -moz-radial-gradient(center, ellipse cover, #eaefb5 0%, #877d5d 100%);
   /* FF3.6+ */
-  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #eaefb5), color-stop(100%, #ccc08c));
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #eaefb5), color-stop(100%, #877d5d));
   /* Chrome,Safari4+ */
-  background: -webkit-radial-gradient(center, ellipse cover, #eaefb5 0%, #ccc08c 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, #eaefb5 0%, #877d5d 100%);
   /* Chrome10+,Safari5.1+ */
-  background: -o-radial-gradient(center, ellipse cover, #eaefb5 0%, #ccc08c 100%);
+  background: -o-radial-gradient(center, ellipse cover, #eaefb5 0%, #877d5d 100%);
   /* Opera 12+ */
-  background: -ms-radial-gradient(center, ellipse cover, #eaefb5 0%, #ccc08c 100%);
+  background: -ms-radial-gradient(center, ellipse cover, #eaefb5 0%, #877d5d 100%);
   /* IE10+ */
-  background: radial-gradient(ellipse at center, #eaefb5 0%, #ccc08c 100%);
+  background: radial-gradient(ellipse at center, #eaefb5 0%, #877d5d 100%);
   /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eaefb5', endColorstr='#ccc08c', GradientType=1);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eaefb5', endColorstr='#877d5d', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
 }
 .indicator.swing.stance-indicator {
@@ -311,7 +311,6 @@ html body {
   margin: 0 auto 25px auto;
 }
 .target {
-  cursor: none;
   box-shadow: 0 0 25px 3px grey;
   margin: 0 auto;
   padding: 0;
@@ -319,14 +318,17 @@ html body {
   width: 200px;
   height: 200px;
   border: 1px solid #4b4d50;
-  background: radial-gradient(circle at 100px 100px, #c9c9c6, #4b4d50);
+  background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
   perspective: 100px;
 }
+.target.live {
+  cursor: none;
+}
 .target.pitching {
-  background: radial-gradient(circle at 100px 100px, #c9c9c6, #4b4d50);
+  background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
 }
 .target.batting {
-  background: radial-gradient(circle at 100px 100px, #c9c9c6, #4b4d50);
+  background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
 }
 .strikezone {
   box-shadow: 0 0 15px 9px #4b4d50;

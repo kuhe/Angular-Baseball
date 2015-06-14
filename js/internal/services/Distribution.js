@@ -76,16 +76,17 @@ Distribution.prototype = {
     },
     /**
      * @param pitch {Game.pitchInFlight}
+     * @param pitcher {Player}
      * @param x {number}
      * @param y {number}
      * @returns {object|{x: number, y: number}}
      */
-    breakEffect : function(pitch, x, y) {
+    breakEffect : function(pitch, pitcher, x, y) {
         var effect = {};
         effect.x = Math.floor(x + (pitch.breakDirection[0]
-            * ((0.5+Math.random()*pitch.break)/100)));
+            * ((0.8+Math.random()*(pitcher.pitching[pitch.name]).break/250))));
         effect.y = Math.floor(y + (pitch.breakDirection[1]
-            * ((0.5+Math.random()*pitch.break)/100))/(0.5 + y/200));
+            * ((0.8+Math.random()*(pitcher.pitching[pitch.name]).break/250/(0.5 + y/200)))));
         return effect;
     },
     /**

@@ -79,6 +79,11 @@ Mathinator.prototype = {
         var bounding = Mathinator.prototype.memory.bounding,
             radian = this.RADIAN;
 
+        if (bounding) {
+            quarter *= 4;
+            percent = Math.floor(Math.sqrt(percent/100)*100);
+        }
+
         bottom = Math.cos(splay * radian) * percent/100 * distance * 95/300;
         left = Math.sin(splay * radian) * percent/100 * distance * 95/300 + this.SPLAY_INDICATOR_LEFT;
 
@@ -142,7 +147,7 @@ Mathinator.prototype = {
             _left = breakLeft || left;
             _top = originTop + Mathinator.square(percent/100)*(_top - originTop);
             if (step == 1) {
-                _top -= 3;
+                _top -= 2;
             }
             if (step == 2) {
                 _top -= 1;

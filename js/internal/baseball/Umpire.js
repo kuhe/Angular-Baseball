@@ -350,6 +350,7 @@ Umpire.prototype = {
 
         this.game.pitcher = this.game.teams[defense].positions.pitcher;
         this.game.log.noteBatter(this.game.batter);
+        this.game.autoPitchSelect();
     },
     says : 'Play ball!',
     game : null

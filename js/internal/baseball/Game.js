@@ -184,7 +184,7 @@ Game.prototype = {
 
             if (this.pitcher.throws == 'right') this.pitchInFlight.breakDirection[0] *= -1;
 
-            var breakEffect = Distribution.breakEffect(this.pitchInFlight, this.pitchTarget.x, this.pitchTarget.y);
+            var breakEffect = Distribution.breakEffect(this.pitchInFlight, this.pitcher, this.pitchTarget.x, this.pitchTarget.y);
 
             this.pitchInFlight.x = breakEffect.x;
             this.pitchInFlight.y = breakEffect.y;
