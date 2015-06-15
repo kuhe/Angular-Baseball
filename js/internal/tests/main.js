@@ -98,9 +98,9 @@ runSeason = function(n) {
         }
     } while (player.stats.batting.pa < 704 && x--);
     logPlayer();
-    player.skill.offense.eye += 2;
-    player.skill.offense.speed -= 2;
-    player.skill.offense.power += 2;
+    player.skill.offense.eye += 1;
+    player.skill.offense.speed -= 1;
+    player.skill.offense.power += 1;
 };
 
 runSeason(2);
