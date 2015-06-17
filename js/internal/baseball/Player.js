@@ -3,10 +3,20 @@ var Player = function(team) {
     var offense = this.skill.offense;
     var defense = this.skill.defense;
     var randBetween = function(a, b, skill) {
-        if (offense[skill]) skill = offense[skill];
-        if (defense[skill]) skill = defense[skill];
-        if (isNaN(skill)) skill = 50;
-        skill = Math.sqrt(0.05 + Math.random()*0.95)*skill;
+        var total = 0,
+            count = 0;
+        skill += '';
+        if (!skill) skill = '';
+        Iterator.each(skill.split(' '), function(key, value) {
+            var skill = value;
+            if (offense[skill]) skill = offense[skill];
+            if (defense[skill]) skill = defense[skill];
+            if (isNaN(skill)) skill = 50;
+            total += skill;
+            count++;
+        });
+
+        skill = Math.sqrt(0.05 + Math.random()*0.95)*(total/(count * 0.97));
         return Math.floor((skill/100) * (b - a) + a);
     };
     // let's just say we're about X games into the season
@@ -27,21 +37,21 @@ var Player = function(team) {
             L = randBetween((GS - W), 0, this.skill.pitching);
         }
     }
-    var pa = randBetween(gamesIntoSeason*3, gamesIntoSeason*5, 'speed');
+    var pa = randBetween(gamesIntoSeason*3, gamesIntoSeason*5, 'speed eye');
     var paRemaining = pa;
-    var bb = Math.floor(randBetween(0, 18, 'power')*paRemaining/100);
+    var bb = Math.floor(randBetween(0, 18, 'power eye')*paRemaining/100);
     paRemaining -= bb;
     var ab = paRemaining;
     var so = Math.floor(randBetween(33, 2, 'eye')*paRemaining/100);
     paRemaining -= so;
-    var h = Math.floor(randBetween(185, 472, 'eye')*paRemaining/1000);
+    var h = Math.floor(randBetween(185, 472, 'eye power speed')*paRemaining/1000);
     paRemaining -= h;
 
-    var doubles = randBetween(0, h/4, 'power');
+    var doubles = randBetween(0, h/4, 'power speed');
     var triples = randBetween(0, h/12, 'speed');
-    var hr = Math.max(0, randBetween(-h/20, h/5, 'power'));
+    var hr = Math.max(0, randBetween(-h/20, h/5, 'power eye'));
     var r = randBetween(h/8, (h + bb)/3, 'speed') + hr;
-    var rbi = randBetween(h/8, (h)/2, 'power') + hr;
+    var rbi = randBetween(h/8, (h)/2, 'power eye') + hr;
     var hbp = randBetween(0, gamesIntoSeason/25);
     var sac = randBetween(0, gamesIntoSeason/5, 'eye');
 
