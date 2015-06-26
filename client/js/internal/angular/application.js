@@ -7,3 +7,5 @@ angular.module('directives', [])
 
 angular.module('controllers', [])
     .controller('IndexController', IndexController);
+
+var socket = io('ws://' + window.location.hostname + ':3000');

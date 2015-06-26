@@ -1,29 +1,33 @@
 {
   "name": "Angular-Baseball",
   "version": "1.0.0",
-  "description": "one of the top 5 bat based sports",
+  "description": "[Yakyuu-Aikoukai（Baseball Club）](htttp://georgefu.info/y) ===============",
   "main": "gulpfile.js",
   "dependencies": {
     "del": "^1.1.1",
+    "express": "^4.13.0",
     "gulp": "^3.8.10",
     "gulp-concat": "^2.4.3",
     "gulp-less": "^2.0.1",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-uglify": "^1.2.0",
-    "gulp-watch": "^4.1.0"
+    "gulp-watch": "^4.1.0",
+    "socket.io": "^1.3.5",
+    "jsdom": "^5.4.3",
+    "jade": "^1.11.0",
+    "ejs": "^2.3.1",
+    "ws": "^0.7.2",
+    "jquery": "^2.1.4"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "n/a"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/kuhe/Angular-Baseball.git"
   },
-  "keywords": [
-    "oofuri"
-  ],
-  "author": "george j. fu",
+  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/kuhe/Angular-Baseball/issues"

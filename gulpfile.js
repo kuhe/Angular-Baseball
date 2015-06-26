@@ -13,13 +13,13 @@ var less = require('gulp-less');
 gulp.task('default', function() {
     gulp.run('scripts');
     gulp.run('styles');
-    gulp.watch('js/internal/**/*.js', function() {
-        del('js/internal/application.js', function() {
+    gulp.watch('client/js/internal/**/*.js', function() {
+        del('client/js/internal/application.js', function() {
             gulp.run('scripts');
         });
     });
-    gulp.watch('css/internal/**/*.less', function() {
-        del('css/internal/application.css', function() {
+    gulp.watch('client/css/internal/**/*.less', function() {
+        del('client/css/internal/application.css', function() {
             gulp.run('styles');
         });
     });
@@ -27,22 +27,22 @@ gulp.task('default', function() {
 
 gulp.task('scripts', function() {
     gulp.src([
-        'js/internal/utility/primary/*.js',
-        'js/internal/utility/*.js',
-        'js/internal/services/*.js',
-        'js/internal/baseball/**/*.js',
-        'js/internal/angular/controllers/**/*.js',
-        'js/internal/angular/application.js'
+        'client/js/internal/utility/primary/*.js',
+        'client/js/internal/utility/*.js',
+        'client/js/internal/services/*.js',
+        'client/js/internal/baseball/**/*.js',
+        'client/js/internal/angular/controllers/**/*.js',
+        'client/js/internal/angular/application.js'
     ])
         .pipe(sourcemaps.init())
-        .pipe(concat('application.js'))
+        .pipe(concat('application.concat.js'))
         .pipe(uglify({ mangle: false }))
         .pipe(sourcemaps.write('./sourcemaps'))
-        .pipe(gulp.dest('js'))
+        .pipe(gulp.dest('client/js'))
 });
 
 gulp.task('styles', function() {
-    gulp.src('css/internal/application.less')
+    gulp.src('client/css/internal/application.less')
         .pipe(less())
-        .pipe(gulp.dest('css/internal'))
+        .pipe(gulp.dest('client/css/internal'))
 });
