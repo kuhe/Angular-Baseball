@@ -1,0 +1,24 @@
+{
+  "name": "baseball",
+  "version": "0.0.0",
+  "homepage": "N/A",
+  "authors": [
+    "George Fu george.jing.fu@gmail.com"
+  ],
+  "description": "yakyuu",
+  "moduleType": [
+    "es6"
+  ],
+  "keywords": [
+    "baseball", "yakyuu"
+  ],
+  "license": "GNU",
+  "dependencies": {
+    "angular-sanitize": "1.2.28",
+    "angular-route": "1.2.28",
+    "es5-shim": "4.0.5",
+    "html5shiv": "3.7.2",
+    "bootstrap": "3.2.0",
+    "jquery": "1.11.1"
+  }
+}

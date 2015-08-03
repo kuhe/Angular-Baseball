@@ -1,0 +1,26 @@
+.indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  padding: 13px;
+  background: white;
+  margin: -13px;
+}
+.indicator.pitch {
+  opacity: 0.65;
+}
+.baseball {
+  border: 4px dashed #ff6261;
+}
+@media (min-width: 600px) {
+  .baseball {
+    box-shadow: 0 0 6px 2px grey;
+    background: radial-gradient(circle at 5px 5px, #fefefa, #c8cbc2);
+  }
+}
+.spin {
+  -webkit-animation: spin 1s infinite 0s linear;
+  /* Chrome, Safari, Opera */
+  animation: spin 1s infinite 0s linear;
+}

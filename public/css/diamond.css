@@ -1,0 +1,83 @@
+.diamond-display {
+  background: #ffffff;
+  position: relative;
+}
+.diamond-display .splay-indicator-wrapper {
+  margin: auto;
+  width: 200px;
+  height: 100px;
+}
+.diamond-display .splay-indicator-wrapper .splay-indicator {
+  position: relative;
+  width: 0;
+  height: 0;
+  border-left: 100px solid transparent;
+  border-right: 100px solid transparent;
+  border-top: 100px solid #e5e5e5;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+}
+.diamond-display .splay-indicator-wrapper .splay-indicator .splay-indicator-ball {
+  box-shadow: 0 0 4px 2px grey;
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  color: #ffffff;
+  border: 2px dotted darkred;
+  border-radius: 50%;
+  background: white;
+}
+.diamond {
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-bottom-color: #fff7ff;
+  position: relative;
+  top: -10px;
+  margin-left: -10px;
+  margin-top: 2px;
+  z-index: 1;
+}
+.diamond:after {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 10px;
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-top-color: #fff7ff;
+}
+.diamond.filled {
+  border-bottom-color: #f7bf24;
+}
+.diamond.filled:after {
+  border-top-color: #f7bf24;
+}
+.diamond-bg {
+  width: 0;
+  height: 0;
+  border: 12px solid transparent;
+  border-bottom-color: #252525;
+  position: relative;
+  margin-left: 0;
+}
+.diamond-bg:after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 12px;
+  width: 0;
+  height: 0;
+  border: 12px solid transparent;
+  border-top-color: #252525;
+}
+.diamond-bg.third {
+  margin-top: -24px;
+  margin-left: -15px;
+}
+.diamond-bg.first {
+  margin-top: -10px;
+  margin-left: 15px;
+}
