@@ -363,6 +363,7 @@ Game.prototype = {
         e = this.tally.home.R > this.tally.away.R ? 'Home team wins!' : this.tally.home.R == this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!';
         n = this.tally.home.R > this.tally.away.R ? this.teams.home.getName() + 'の勝利' : this.tally.home.R == this.tally.away.R ? '引き分け' : this.teams.away.getName() + 'の勝利';
         this.log.note(e, n);
+        this.log.note('Reload to play again', 'リロるは次の試合へ');
     },
     stage: 'pitch', //pitch, swing
     simulateInput: function simulateInput(callback) {
