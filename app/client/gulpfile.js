@@ -24,12 +24,14 @@ var MODULAR_SCRIPT_FILES = [
 ];
 var INTERNAL_SCRIPT_FILES = [
     './scripts/application/controllers/*.js',
-    './scripts/application/controllers/directives/*.js',
+    './scripts/application/services/*.js',
+    './scripts/application/directives/*.js',
     './scripts/application/application.js'
 ];
 var BUNDLE_SCRIPT_FILES = [
     './node_modules/baseball/bundle.js',
     './scripts/application/controllers/*.js',
+    './scripts/application/services/*.js',
     './scripts/application/directives/*.js',
     './scripts/application/application.js'
 ];

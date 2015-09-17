@@ -1,4 +1,6 @@
-var app = angular.module('YakyuuAikoukai', ['directives']);
+var app = angular.module('YakyuuAikoukai', ['directives'])
+    .service('socket', SocketService)
+    .controller('IndexController', ['$scope', 'socket', IndexController]);
 
 app.config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{{');
@@ -9,6 +11,3 @@ cacheKey = Math.floor(Math.random()*1500);
 
 angular.module('directives', [])
     .directive('scoreboard', ScoreboardDirective);
-
-angular.module('controllers', [])
-    .controller('IndexController', IndexController);

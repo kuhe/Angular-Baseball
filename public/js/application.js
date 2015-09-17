@@ -2907,13 +2907,17 @@ exports.Mathinator = _baseballServicesMathinator.Mathinator;
 
 },{"baseball/Services/Animator":9,"baseball/Services/Distribution":10,"baseball/Services/Iterator":11,"baseball/Services/Mathinator":12}]},{},[19]);
 
-IndexController = function($scope) {
+IndexController = function($scope, socket) {
     var text = Baseball.util.text;
     var Game = Baseball.Game;
     var Animator = Baseball.service.Animator;
 
     window.s = $scope;
     $scope.t = text;
+
+    $scope.socket = io(window.location.hostname + ':64321');
+    $scope.socketService = socket;
+    var sock = $scope.socket;
 
     $scope.mode = function(setMode) {
         if (setMode) {
@@ -2927,6 +2931,9 @@ IndexController = function($scope) {
         Game.prototype.quickMode = !!quickMode;
         $scope.y = new Game();
         var game = $scope.y;
+        socket.game = game;
+        socket.socket = sock;
+        socket.start();
         s2.y = game;
         bindMethods();
         $('.blocking').remove();
@@ -3083,6 +3090,31 @@ IndexController = function($scope) {
 
 
 };
+var SocketService = function() {
+    var Service = function() {};
+    Service.prototype = {
+        socket : {},
+        game : {},
+        start : function() {
+            var game, socket;
+            game = this.game;
+            socket = this.socket;
+            var key = 15;
+            this.on();
+            socket.emit('register', key);
+        },
+        on : function() {
+            socket.on('register', this.register);
+        },
+        off : function() {
+            socket.on('register', function() {});
+        },
+        register: function(data) {
+            console.log(data)
+        }
+    };
+    return new Service;
+};
 ScoreboardDirective = function() {
     return {
         scope: {
@@ -3097,7 +3129,9 @@ ScoreboardDirective = function() {
         }
     };
 };
-var app = angular.module('YakyuuAikoukai', ['directives']);
+var app = angular.module('YakyuuAikoukai', ['directives'])
+    .service('socket', SocketService)
+    .controller('IndexController', ['$scope', 'socket', IndexController]);
 
 app.config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('{{');
@@ -3108,7 +3142,4 @@ cacheKey = Math.floor(Math.random()*1500);
 
 angular.module('directives', [])
     .directive('scoreboard', ScoreboardDirective);
-
-angular.module('controllers', [])
-    .controller('IndexController', IndexController);
 //# sourceMappingURL=sourcemaps/application.js.map

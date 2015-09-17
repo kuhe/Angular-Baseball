@@ -1,10 +1,14 @@
-IndexController = function($scope) {
+IndexController = function($scope, socket) {
     var text = Baseball.util.text;
     var Game = Baseball.Game;
     var Animator = Baseball.service.Animator;
 
     window.s = $scope;
     $scope.t = text;
+
+    $scope.socket = io(window.location.hostname + ':64321');
+    $scope.socketService = socket;
+    var sock = $scope.socket;
 
     $scope.mode = function(setMode) {
         if (setMode) {
@@ -18,6 +22,9 @@ IndexController = function($scope) {
         Game.prototype.quickMode = !!quickMode;
         $scope.y = new Game();
         var game = $scope.y;
+        socket.game = game;
+        socket.socket = sock;
+        socket.start();
         s2.y = game;
         bindMethods();
         $('.blocking').remove();
