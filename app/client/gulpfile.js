@@ -23,9 +23,14 @@ var MODULAR_SCRIPT_FILES = [
     './node_modules/baseball/baseball.js'
 ];
 var INTERNAL_SCRIPT_FILES = [
-    './node_modules/baseball/bundle.js',
     './scripts/application/controllers/*.js',
     './scripts/application/controllers/directives/*.js',
+    './scripts/application/application.js'
+];
+var BUNDLE_SCRIPT_FILES = [
+    './node_modules/baseball/bundle.js',
+    './scripts/application/controllers/*.js',
+    './scripts/application/directives/*.js',
     './scripts/application/application.js'
 ];
 var EXTERNAL_SCRIPT_FILES = [
@@ -58,22 +63,26 @@ gulp.task('modularScripts', function () {
     browserify({ entries: './node_modules/baseball/baseball.js' })
         .transform(babelify)
         .bundle()
-        .pipe(fs.createWriteStream('./node_modules/baseball/bundle.js'))
+        .pipe(fs.createWriteStream('./node_modules/baseball/bundle.js')).on('close', function() {
+            gulp.run('internalScripts');
+        })
         .on('error', util.log);
+    return 1;
 });
 gulp.task('internalScripts', function () {
-    gulp.src(INTERNAL_SCRIPT_FILES)
+    gulp.src(BUNDLE_SCRIPT_FILES)
         .pipe(sourcemaps.init())
         .pipe(concat('application.min.js'))
         .pipe(uglify({ mangle: false }))
         .on('error', util.log)
         .pipe(sourcemaps.write('./sourcemaps'))
         .pipe(gulp.dest(SCRIPT_DEPLOY_DIR));
-    gulp.src(INTERNAL_SCRIPT_FILES)
+    gulp.src(BUNDLE_SCRIPT_FILES)
         .pipe(sourcemaps.init())
         .pipe(concat('application.js'))
         .pipe(sourcemaps.write('./sourcemaps'))
         .pipe(gulp.dest(SCRIPT_DEPLOY_DIR));
+    return 1;
 });
 gulp.task('externalScripts', function () {
     gulp.src(EXTERNAL_SCRIPT_FILES)
@@ -85,7 +94,7 @@ gulp.task('externalScripts', function () {
 });
 
 gulp.task('build', [
-  'internalStyles', 'externalStyles', 'modularScripts', 'internalScripts', 'externalScripts'
+  'internalStyles', 'externalStyles', 'modularScripts', 'externalScripts'
 ]);
 
 gulp.task('watch', ['build'], function () {

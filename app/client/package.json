@@ -7,7 +7,16 @@
     "test": "tests"
   },
   "dependencies": {
-    "baseball": "~0.0.0"
+    "babel": "^5.8.23",
+    "babelify": "^6.3.0",
+    "browserify": "^11.1.0",
+    "gsap": "^1.18.0",
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-less": "^3.0.3",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-uglify": "^1.4.1",
+    "gulp-util": "^3.0.6"
   },
   "devDependencies": {},
   "scripts": {

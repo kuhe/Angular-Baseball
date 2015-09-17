@@ -1,5 +1,10 @@
 var app = angular.module('YakyuuAikoukai', ['directives']);
 
+app.config(function($interpolateProvider) {
+    $interpolateProvider.startSymbol('{{');
+    $interpolateProvider.endSymbol('}}');
+});
+
 cacheKey = Math.floor(Math.random()*1500);
 
 angular.module('directives', [])
@@ -7,5 +12,3 @@ angular.module('directives', [])
 
 angular.module('controllers', [])
     .controller('IndexController', IndexController);
-
-// var socket = io('ws://' + window.location.hostname + ':3000');
