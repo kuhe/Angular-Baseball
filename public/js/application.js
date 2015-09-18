@@ -329,7 +329,7 @@ var Game = function Game(m) {
 Game.prototype = {
     constructor: Game,
     gamesIntoSeason: 0,
-    humanControl: 'none', //home, away, both, none
+    humanControl: 'home', //home, away, both, none
     console: false,
     quickMode: true,
     debug: [],
@@ -502,6 +502,24 @@ Game.prototype = {
             giraffe.theSwing(x, y);
         });
     },
+    opponentConnected: true,
+    waitingCallback: function waitingCallback() {},
+    awaitPitch: function awaitPitch(callback, swingResult, half) {
+        if (this.opponentConnected) {
+            this.waitingCallback = callback;
+            this.opponentService.logSwing(swingResult, half);
+        } else {
+            this.autoPitch(callback);
+        }
+    },
+    awaitSwing: function awaitSwing(x, y, callback, pitchInFlight, half) {
+        if (this.opponentConnected) {
+            this.waitingCallback = callback;
+            this.opponentService.logPitch(pitchInFlight, half);
+        } else {
+            this.autoSwing(x, y, callback);
+        }
+    },
     thePitch: function thePitch(x, y, callback) {
         if (this.stage == 'pitch') {
             this.pitcher.fatigue++;
@@ -528,7 +546,7 @@ Game.prototype = {
             if (this.humanControl != 'none' && (this.humanControl == 'both' || this.humanBatting())) {
                 callback();
             } else {
-                this.autoSwing(x, y, callback);
+                this.awaitSwing(x, y, callback, pitchInFlight, this.half);
             }
         }
     },
@@ -588,7 +606,7 @@ Game.prototype = {
                 if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl] == this.pitcher.team)) {
                     callback();
                 } else {
-                    this.autoPitch(callback);
+                    this.awaitPitch(callback, this.swingResult, half);
                 }
             }
         }
@@ -2927,7 +2945,7 @@ IndexController = function($scope, socket) {
     };
 
     $scope.proceedToGame = function(quickMode, spectateCpu) {
-        Game.prototype.humanControl = spectateCpu ? 'none' : 'home';
+        Game.prototype.humanControl = 'both'; //  spectateCpu ? 'none' : 'home';
         Game.prototype.quickMode = !!quickMode;
         $scope.y = new Game();
         var game = $scope.y;
@@ -3092,25 +3110,41 @@ IndexController = function($scope, socket) {
 };
 var SocketService = function() {
     var Service = function() {};
+    var game, socket, nope = function() {};
     Service.prototype = {
         socket : {},
         game : {},
+        connected : false,
         start : function() {
-            var game, socket;
             game = this.game;
             socket = this.socket;
+            game.opponentService = this;
+            this.connected = socket.connected;
             var key = 15;
             this.on();
             socket.emit('register', key);
         },
         on : function() {
+            var giraffe = this;
             socket.on('register', this.register);
+            socket.on('connect reconnect', function() {
+                giraffe.connected = true;
+            });
+            socket.on('disconnect', function() {
+                giraffe.connected = false;
+            })
         },
         off : function() {
-            socket.on('register', function() {});
+            socket.on('register', nope);
         },
         register: function(data) {
             console.log(data)
+        },
+        logPitch : function(pitch, half) {
+            socket.emit(half + '_pitch', pitch);
+        },
+        logSwing : function(swing, half) {
+            socket.emit(half + '_swing', swing);
         }
     };
     return new Service;

@@ -7,5 +7,7 @@ io.on('connection', function (socket) {
         socket.emit('register', 'registered ' + key);
     });
 
-    socket.on('disconnect', function () { });
+    socket.on('disconnect', function () {
+        socket = null;
+    });
 });
