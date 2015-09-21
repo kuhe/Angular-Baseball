@@ -1,6 +1,7 @@
 var SocketService = function() {
     var Service = function() {};
-    var game, socket, NO_OPERATION = function() {};
+    var game, socket, NO_OPERATION = function() {},
+        animator = Baseball.service.Animator;
     Service.prototype = {
         socket : {},
         game : {},
@@ -24,12 +25,18 @@ var SocketService = function() {
                 giraffe.connected = false;
             });
             socket.on('pitch', function(pitch) {
-                console.log('receive', 'top_pitch', pitch);
+                console.log('receive', 'pitch', pitch);
                 game.thePitch(0, 0, NO_OPERATION, pitch);
             });
             socket.on('swing', function(swing) {
-                console.log('receive', 'top_swing', swing);
+                console.log('receive', 'swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
+                var scope = window.s;
+                animator.updateFlightPath.bind(scope)(function() {
+                    if (swing.contact) {
+                        animator.animateFieldingTrajectory(game);
+                    }
+                });
             });
             socket.on('partner_disconnect', function() {
                 game.opponentConnected = false;
@@ -49,11 +56,11 @@ var SocketService = function() {
             socket.on('register', NO_OPERATION);
         },
         emitPitch : function(pitch) {
-            console.log('emit', 'pitch');
+            console.log('emit', 'pitch', pitch);
             socket.emit('pitch', pitch);
         },
         emitSwing : function(swing) {
-            console.log('emit', 'swing');
+            console.log('emit', 'swing', swing);
             socket.emit('swing', swing);
         },
         swing : function() {

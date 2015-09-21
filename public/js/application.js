@@ -514,10 +514,13 @@ Game.prototype = {
             this.autoPitch(callback);
         }
     },
-    awaitSwing: function awaitSwing(x, y, callback, pitchInFlight) {
+    awaitSwing: function awaitSwing(x, y, callback, pitchInFlight, pitchTarget) {
         if (this.opponentConnected) {
             this.waitingCallback = callback;
-            this.opponentService.emitPitch(pitchInFlight);
+            this.opponentService.emitPitch({
+                inFlight: pitchInFlight,
+                target: pitchTarget
+            });
         } else {
             this.autoSwing(x, y, callback);
         }
@@ -525,7 +528,8 @@ Game.prototype = {
     thePitch: function thePitch(x, y, callback, override) {
         if (this.stage == 'pitch') {
             if (override) {
-                this.pitchInFlight = override;
+                this.pitchInFlight = override.inFlight;
+                this.pitchTarget = override.target;
                 callback = this.waitingCallback;
             } else {
                 this.pitcher.fatigue++;
@@ -552,7 +556,7 @@ Game.prototype = {
             if (this.humanControl != 'none' && (this.humanControl == 'both' || this.humanBatting())) {
                 callback();
             } else {
-                this.awaitSwing(x, y, callback, this.pitchInFlight);
+                this.awaitSwing(x, y, callback, this.pitchInFlight, this.pitchTarget);
             }
         }
     },
@@ -607,16 +611,24 @@ Game.prototype = {
             this.stage = 'pitch';
 
             var half = this.half;
+            var result = this.swingResult;
             this.umpire.makeCall();
+            emit = false;
             if (half != this.half) {
                 callback = this.startOpponentPitching;
+                var emit = !override;
             }
 
             if (typeof callback == 'function') {
                 if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl] == this.pitcher.team)) {
                     callback();
+                    if (emit) {
+                        if (this.opponentService && this.opponentConnected) {
+                            this.opponentService.emitSwing(result);
+                        }
+                    }
                 } else {
-                    this.awaitPitch(callback, this.swingResult);
+                    this.awaitPitch(callback, result);
                 }
             }
         }
@@ -3120,7 +3132,8 @@ IndexController = function($scope, socket) {
 };
 var SocketService = function() {
     var Service = function() {};
-    var game, socket, NO_OPERATION = function() {};
+    var game, socket, NO_OPERATION = function() {},
+        animator = Baseball.service.Animator;
     Service.prototype = {
         socket : {},
         game : {},
@@ -3144,12 +3157,18 @@ var SocketService = function() {
                 giraffe.connected = false;
             });
             socket.on('pitch', function(pitch) {
-                console.log('receive', 'top_pitch', pitch);
+                console.log('receive', 'pitch', pitch);
                 game.thePitch(0, 0, NO_OPERATION, pitch);
             });
             socket.on('swing', function(swing) {
-                console.log('receive', 'top_swing', swing);
+                console.log('receive', 'swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
+                var scope = window.s;
+                animator.updateFlightPath.bind(scope)(function() {
+                    if (swing.contact) {
+                        animator.animateFieldingTrajectory(game);
+                    }
+                });
             });
             socket.on('partner_disconnect', function() {
                 game.opponentConnected = false;
@@ -3169,11 +3188,11 @@ var SocketService = function() {
             socket.on('register', NO_OPERATION);
         },
         emitPitch : function(pitch) {
-            console.log('emit', 'pitch');
+            console.log('emit', 'pitch', pitch);
             socket.emit('pitch', pitch);
         },
         emitSwing : function(swing) {
-            console.log('emit', 'swing');
+            console.log('emit', 'swing', swing);
             socket.emit('swing', swing);
         },
         swing : function() {
