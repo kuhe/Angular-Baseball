@@ -23,21 +23,19 @@ var SocketService = function() {
             socket.on('disconnect', function() {
                 giraffe.connected = false;
             });
-            socket.on('top_pitch', function(pitch) {
+            socket.on('pitch', function(pitch) {
                 console.log('receive', 'top_pitch', pitch);
                 game.thePitch(0, 0, NO_OPERATION, pitch);
             });
-            socket.on('bottom_pitch', function(pitch) {
-                console.log('receive', 'bottom_pitch', pitch);
-                game.thePitch(0, 0, NO_OPERATION, pitch);
-            });
-            socket.on('top_swing', function(swing) {
+            socket.on('swing', function(swing) {
                 console.log('receive', 'top_swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
             });
-            socket.on('bottom_swing', function(swing) {
-                console.log('receive', 'bottom_swing', swing);
-                game.theSwing(0, 0, NO_OPERATION, swing);
+            socket.on('partner_disconnect', function() {
+                game.opponentConnected = false;
+            });
+            socket.on('partner_connect', function() {
+                game.opponentConnected = true;
             });
         },
         off : function() {
@@ -50,13 +48,13 @@ var SocketService = function() {
             }
             socket.on('register', NO_OPERATION);
         },
-        emitPitch : function(pitch, half) {
-            console.log('emit', half + '_pitch');
-            socket.emit(half + '_pitch', pitch);
+        emitPitch : function(pitch) {
+            console.log('emit', 'pitch');
+            socket.emit('pitch', pitch);
         },
-        emitSwing : function(swing, half) {
-            console.log('emit', half + '_swing');
-            socket.emit(half + '_swing', swing);
+        emitSwing : function(swing) {
+            console.log('emit', 'swing');
+            socket.emit('swing', swing);
         },
         swing : function() {
 

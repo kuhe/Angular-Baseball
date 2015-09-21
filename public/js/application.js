@@ -504,20 +504,20 @@ Game.prototype = {
             giraffe.theSwing(x, y);
         });
     },
-    opponentConnected: true,
+    opponentConnected: false,
     waitingCallback: function waitingCallback() {},
-    awaitPitch: function awaitPitch(callback, swingResult, half) {
+    awaitPitch: function awaitPitch(callback, swingResult) {
         if (this.opponentConnected) {
             this.waitingCallback = callback;
-            this.opponentService.emitSwing(swingResult, half);
+            this.opponentService.emitSwing(swingResult);
         } else {
             this.autoPitch(callback);
         }
     },
-    awaitSwing: function awaitSwing(x, y, callback, pitchInFlight, half) {
+    awaitSwing: function awaitSwing(x, y, callback, pitchInFlight) {
         if (this.opponentConnected) {
             this.waitingCallback = callback;
-            this.opponentService.emitPitch(pitchInFlight, half);
+            this.opponentService.emitPitch(pitchInFlight);
         } else {
             this.autoSwing(x, y, callback);
         }
@@ -552,7 +552,7 @@ Game.prototype = {
             if (this.humanControl != 'none' && (this.humanControl == 'both' || this.humanBatting())) {
                 callback();
             } else {
-                this.awaitSwing(x, y, callback, this.pitchInFlight, this.half);
+                this.awaitSwing(x, y, callback, this.pitchInFlight);
             }
         }
     },
@@ -616,7 +616,7 @@ Game.prototype = {
                 if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl] == this.pitcher.team)) {
                     callback();
                 } else {
-                    this.awaitPitch(callback, this.swingResult, half);
+                    this.awaitPitch(callback, this.swingResult);
                 }
             }
         }
@@ -1663,7 +1663,7 @@ Animator.prototype = {
     },
     TIME_FROM_SET: 2300, //ms
     TIME_FROM_WINDUP: 3600, //ms
-    HOLD_UP_ALLOWANCE: 0.5, // seconds
+    HOLD_UP_ALLOWANCE: 4.5, // seconds
     pitchTarget: null,
     pitchBreak: null,
     /**
@@ -3143,21 +3143,19 @@ var SocketService = function() {
             socket.on('disconnect', function() {
                 giraffe.connected = false;
             });
-            socket.on('top_pitch', function(pitch) {
+            socket.on('pitch', function(pitch) {
                 console.log('receive', 'top_pitch', pitch);
                 game.thePitch(0, 0, NO_OPERATION, pitch);
             });
-            socket.on('bottom_pitch', function(pitch) {
-                console.log('receive', 'bottom_pitch', pitch);
-                game.thePitch(0, 0, NO_OPERATION, pitch);
-            });
-            socket.on('top_swing', function(swing) {
+            socket.on('swing', function(swing) {
                 console.log('receive', 'top_swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
             });
-            socket.on('bottom_swing', function(swing) {
-                console.log('receive', 'bottom_swing', swing);
-                game.theSwing(0, 0, NO_OPERATION, swing);
+            socket.on('partner_disconnect', function() {
+                game.opponentConnected = false;
+            });
+            socket.on('partner_connect', function() {
+                game.opponentConnected = true;
             });
         },
         off : function() {
@@ -3170,13 +3168,13 @@ var SocketService = function() {
             }
             socket.on('register', NO_OPERATION);
         },
-        emitPitch : function(pitch, half) {
-            console.log('emit', half + '_pitch');
-            socket.emit(half + '_pitch', pitch);
+        emitPitch : function(pitch) {
+            console.log('emit', 'pitch');
+            socket.emit('pitch', pitch);
         },
-        emitSwing : function(swing, half) {
-            console.log('emit', half + '_swing');
-            socket.emit(half + '_swing', swing);
+        emitSwing : function(swing) {
+            console.log('emit', 'swing');
+            socket.emit('swing', swing);
         },
         swing : function() {
 
