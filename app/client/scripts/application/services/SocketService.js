@@ -1,6 +1,6 @@
 var SocketService = function() {
     var Service = function() {};
-    var game, socket, nope = function() {};
+    var game, socket, NO_OPERATION = function() {};
     Service.prototype = {
         socket : {},
         game : {},
@@ -22,19 +22,47 @@ var SocketService = function() {
             });
             socket.on('disconnect', function() {
                 giraffe.connected = false;
-            })
+            });
+            socket.on('top_pitch', function(pitch) {
+                console.log('receive', 'top_pitch', pitch);
+                game.thePitch(0, 0, NO_OPERATION, pitch);
+            });
+            socket.on('bottom_pitch', function(pitch) {
+                console.log('receive', 'bottom_pitch', pitch);
+                game.thePitch(0, 0, NO_OPERATION, pitch);
+            });
+            socket.on('top_swing', function(swing) {
+                console.log('receive', 'top_swing', swing);
+                game.theSwing(0, 0, NO_OPERATION, swing);
+            });
+            socket.on('bottom_swing', function(swing) {
+                console.log('receive', 'bottom_swing', swing);
+                game.theSwing(0, 0, NO_OPERATION, swing);
+            });
         },
         off : function() {
-            socket.on('register', nope);
+            socket.on('register', NO_OPERATION);
         },
         register: function(data) {
-            console.log(data)
+            console.log(data);
+            if (data === 'away') {
+                game.humanControl = 'away';
+            }
+            socket.on('register', NO_OPERATION);
         },
-        logPitch : function(pitch, half) {
+        emitPitch : function(pitch, half) {
+            console.log('emit', half + '_pitch');
             socket.emit(half + '_pitch', pitch);
         },
-        logSwing : function(swing, half) {
+        emitSwing : function(swing, half) {
+            console.log('emit', half + '_swing');
             socket.emit(half + '_swing', swing);
+        },
+        swing : function() {
+
+        },
+        pitch : function() {
+
         }
     };
     return new Service;

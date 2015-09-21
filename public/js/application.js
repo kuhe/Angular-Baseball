@@ -333,6 +333,8 @@ Game.prototype = {
     console: false,
     quickMode: true,
     debug: [],
+    pitcher: {}, // Player&
+    batter: {}, // Player&
     init: function init(m) {
         if (m) _baseballUtility_utils.text.mode = m;
         this.gamesIntoSeason = 1 + Math.floor(Math.random() * 142);
@@ -507,7 +509,7 @@ Game.prototype = {
     awaitPitch: function awaitPitch(callback, swingResult, half) {
         if (this.opponentConnected) {
             this.waitingCallback = callback;
-            this.opponentService.logSwing(swingResult, half);
+            this.opponentService.emitSwing(swingResult, half);
         } else {
             this.autoPitch(callback);
         }
@@ -515,38 +517,42 @@ Game.prototype = {
     awaitSwing: function awaitSwing(x, y, callback, pitchInFlight, half) {
         if (this.opponentConnected) {
             this.waitingCallback = callback;
-            this.opponentService.logPitch(pitchInFlight, half);
+            this.opponentService.emitPitch(pitchInFlight, half);
         } else {
             this.autoSwing(x, y, callback);
         }
     },
-    thePitch: function thePitch(x, y, callback) {
+    thePitch: function thePitch(x, y, callback, override) {
         if (this.stage == 'pitch') {
-            this.pitcher.fatigue++;
-            this.pitchTarget.x = x;
-            this.pitchTarget.y = y;
+            if (override) {
+                this.pitchInFlight = override;
+                callback = this.waitingCallback;
+            } else {
+                this.pitcher.fatigue++;
+                this.pitchTarget.x = x;
+                this.pitchTarget.y = y;
 
-            this.pitchInFlight.breakDirection = this.helper.pitchDefinitions[this.pitchInFlight.name].slice(0, 2);
-            this.battersEye = _baseballUtility_utils.text.getBattersEye(this);
+                this.pitchInFlight.breakDirection = this.helper.pitchDefinitions[this.pitchInFlight.name].slice(0, 2);
+                this.battersEye = _baseballUtility_utils.text.getBattersEye(this);
 
-            var control = this.pitchInFlight.control;
-            this.pitchTarget.x = _baseballServices_services.Distribution.pitchControl(this.pitchTarget.x, control);
-            this.pitchTarget.y = _baseballServices_services.Distribution.pitchControl(this.pitchTarget.y, control);
+                var control = this.pitchInFlight.control;
+                this.pitchTarget.x = _baseballServices_services.Distribution.pitchControl(this.pitchTarget.x, control);
+                this.pitchTarget.y = _baseballServices_services.Distribution.pitchControl(this.pitchTarget.y, control);
 
-            if (this.pitcher.throws == 'right') this.pitchInFlight.breakDirection[0] *= -1;
+                if (this.pitcher.throws == 'right') this.pitchInFlight.breakDirection[0] *= -1;
 
-            var breakEffect = _baseballServices_services.Distribution.breakEffect(this.pitchInFlight, this.pitcher, this.pitchTarget.x, this.pitchTarget.y);
+                var breakEffect = _baseballServices_services.Distribution.breakEffect(this.pitchInFlight, this.pitcher, this.pitchTarget.x, this.pitchTarget.y);
 
-            this.pitchInFlight.x = breakEffect.x;
-            this.pitchInFlight.y = breakEffect.y;
-
+                this.pitchInFlight.x = breakEffect.x;
+                this.pitchInFlight.y = breakEffect.y;
+            }
             this.log.notePitch(this.pitchInFlight, this.batter);
 
             this.stage = 'swing';
             if (this.humanControl != 'none' && (this.humanControl == 'both' || this.humanBatting())) {
                 callback();
             } else {
-                this.awaitSwing(x, y, callback, pitchInFlight, this.half);
+                this.awaitSwing(x, y, callback, this.pitchInFlight, this.half);
             }
         }
     },
@@ -554,45 +560,49 @@ Game.prototype = {
         e: '',
         n: ''
     },
-    theSwing: function theSwing(x, y, callback) {
+    theSwing: function theSwing(x, y, callback, override) {
         if (this.stage == 'swing') {
-            this.swingResult = {};
-            var bonus = this.batter.eye.bonus || 0,
-                eye = this.batter.skill.offense.eye + 6 * (this.umpire.count.balls + this.umpire.count.strikes) + bonus;
-
-            if (x >= 0 && x <= 200) {
-                this.batter.fatigue++;
-
-                this.swingResult.x = x - this.pitchInFlight.x;
-                this.swingResult.y = y - this.pitchInFlight.y;
-                this.swingResult.angle = this.setBatAngle();
-
-                var recalculation = _baseballServices_services.Mathinator.getAngularOffset(this.swingResult, this.swingResult.angle);
-                var precision = _baseballServices_services.Distribution.swing(eye);
-
-                this.swingResult.x = Math.abs(recalculation.x) > 20 ? recalculation.x * precision : recalculation.x;
-                this.swingResult.y = -5 + (recalculation.y < 0 ? recalculation.y * precision : recalculation.y);
-
-                //log(recalculation.y, precision);
-
-                this.swingResult.looking = false;
-                if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {
-                    this.swingResult.contact = true;
-                    this.swingResult = this.field.determineSwingContactResult(this.swingResult);
-                    // log(this.swingResult.flyAngle, Math.floor(this.swingResult.x), Math.floor(this.swingResult.y));
-                    this.debug.push(this.swingResult);
-                } else {
-                    this.swingResult.contact = false;
-                }
+            if (override) {
+                this.swingResult = override;
+                callback = this.waitingCallback;
             } else {
-                this.swingResult.strike = this.pitchInFlight.x > 50 && this.pitchInFlight.x < 150 && this.pitchInFlight.y > 35 && this.pitchInFlight.y < 165;
-                this.batter.eye.bonus = Math.max(0, eye - Math.sqrt(Math.pow(this.batter.eye.x - this.pitchInFlight.x, 2) + Math.pow(this.batter.eye.y - this.pitchInFlight.y, 2)) * 1.5);
-                this.swingResult.contact = false;
-                this.swingResult.looking = true;
-                this.batter.eye.x = this.pitchInFlight.x;
-                this.batter.eye.y = this.pitchInFlight.y;
-            }
+                this.swingResult = {};
+                var bonus = this.batter.eye.bonus || 0,
+                    eye = this.batter.skill.offense.eye + 6 * (this.umpire.count.balls + this.umpire.count.strikes) + bonus;
 
+                if (x >= 0 && x <= 200) {
+                    this.batter.fatigue++;
+
+                    this.swingResult.x = x - this.pitchInFlight.x;
+                    this.swingResult.y = y - this.pitchInFlight.y;
+                    this.swingResult.angle = this.setBatAngle();
+
+                    var recalculation = _baseballServices_services.Mathinator.getAngularOffset(this.swingResult, this.swingResult.angle);
+                    var precision = _baseballServices_services.Distribution.swing(eye);
+
+                    this.swingResult.x = Math.abs(recalculation.x) > 20 ? recalculation.x * precision : recalculation.x;
+                    this.swingResult.y = -5 + (recalculation.y < 0 ? recalculation.y * precision : recalculation.y);
+
+                    //log(recalculation.y, precision);
+
+                    this.swingResult.looking = false;
+                    if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {
+                        this.swingResult.contact = true;
+                        this.swingResult = this.field.determineSwingContactResult(this.swingResult);
+                        // log(this.swingResult.flyAngle, Math.floor(this.swingResult.x), Math.floor(this.swingResult.y));
+                        this.debug.push(this.swingResult);
+                    } else {
+                        this.swingResult.contact = false;
+                    }
+                } else {
+                    this.swingResult.strike = this.pitchInFlight.x > 50 && this.pitchInFlight.x < 150 && this.pitchInFlight.y > 35 && this.pitchInFlight.y < 165;
+                    this.batter.eye.bonus = Math.max(0, eye - Math.sqrt(Math.pow(this.batter.eye.x - this.pitchInFlight.x, 2) + Math.pow(this.batter.eye.y - this.pitchInFlight.y, 2)) * 1.5);
+                    this.swingResult.contact = false;
+                    this.swingResult.looking = true;
+                    this.batter.eye.x = this.pitchInFlight.x;
+                    this.batter.eye.y = this.pitchInFlight.y;
+                }
+            }
             this.log.noteSwing(this.swingResult);
             this.stage = 'pitch';
 
@@ -2945,7 +2955,7 @@ IndexController = function($scope, socket) {
     };
 
     $scope.proceedToGame = function(quickMode, spectateCpu) {
-        Game.prototype.humanControl = 'both'; //  spectateCpu ? 'none' : 'home';
+        Game.prototype.humanControl = spectateCpu ? 'none' : 'home';
         Game.prototype.quickMode = !!quickMode;
         $scope.y = new Game();
         var game = $scope.y;
@@ -3110,7 +3120,7 @@ IndexController = function($scope, socket) {
 };
 var SocketService = function() {
     var Service = function() {};
-    var game, socket, nope = function() {};
+    var game, socket, NO_OPERATION = function() {};
     Service.prototype = {
         socket : {},
         game : {},
@@ -3132,19 +3142,47 @@ var SocketService = function() {
             });
             socket.on('disconnect', function() {
                 giraffe.connected = false;
-            })
+            });
+            socket.on('top_pitch', function(pitch) {
+                console.log('receive', 'top_pitch', pitch);
+                game.thePitch(0, 0, NO_OPERATION, pitch);
+            });
+            socket.on('bottom_pitch', function(pitch) {
+                console.log('receive', 'bottom_pitch', pitch);
+                game.thePitch(0, 0, NO_OPERATION, pitch);
+            });
+            socket.on('top_swing', function(swing) {
+                console.log('receive', 'top_swing', swing);
+                game.theSwing(0, 0, NO_OPERATION, swing);
+            });
+            socket.on('bottom_swing', function(swing) {
+                console.log('receive', 'bottom_swing', swing);
+                game.theSwing(0, 0, NO_OPERATION, swing);
+            });
         },
         off : function() {
-            socket.on('register', nope);
+            socket.on('register', NO_OPERATION);
         },
         register: function(data) {
-            console.log(data)
+            console.log(data);
+            if (data === 'away') {
+                game.humanControl = 'away';
+            }
+            socket.on('register', NO_OPERATION);
         },
-        logPitch : function(pitch, half) {
+        emitPitch : function(pitch, half) {
+            console.log('emit', half + '_pitch');
             socket.emit(half + '_pitch', pitch);
         },
-        logSwing : function(swing, half) {
+        emitSwing : function(swing, half) {
+            console.log('emit', half + '_swing');
             socket.emit(half + '_swing', swing);
+        },
+        swing : function() {
+
+        },
+        pitch : function() {
+
         }
     };
     return new Service;
