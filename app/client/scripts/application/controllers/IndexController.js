@@ -6,10 +6,6 @@ IndexController = function($scope, socket) {
     window.s = $scope;
     $scope.t = text;
 
-    $scope.socket = io(window.location.hostname + ':64321');
-    $scope.socketService = socket;
-    var sock = $scope.socket;
-
     $scope.mode = function(setMode) {
         if (setMode) {
             text.mode = setMode;
@@ -23,7 +19,9 @@ IndexController = function($scope, socket) {
         $scope.y = new Game();
         var game = $scope.y;
         socket.game = game;
-        socket.socket = sock;
+        $scope.socket = io(window.location.hostname + ':64321');
+        $scope.socketService = socket;
+        socket.socket = $scope.socket;
         socket.start();
         s2.y = game;
         bindMethods();

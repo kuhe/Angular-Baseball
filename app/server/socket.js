@@ -10,11 +10,16 @@ io.on('connection', function (socket) {
             clients[key] = {};
         }
         var client = clients[key];
-        if (!client.home) {
+        if (!client.home && client.away) {
             client.home = socket;
             socket._key = key;
+            socket._partner = client.away;
+            client.away._partner = socket;
             socket._side = 'home';
             socket.emit('register', 'home');
+            socket._partner.emit('partner_connect');
+            socket.emit('partner_connect');
+            socket._partner.emit('opponent_taking_field');
         } else if (client.home && !client.away) {
             client.away = socket;
             socket._key = key;
@@ -24,9 +29,19 @@ io.on('connection', function (socket) {
             socket.emit('register', 'away');
             socket._partner.emit('partner_connect');
             socket.emit('partner_connect');
+            socket._partner.emit('opponent_taking_field');
+        } else if (!client.home && !client.away) {
+            client.home = socket;
+            socket._key = key;
+            socket._side = 'home';
+            socket.emit('register', 'home');
         } else {
             socket.emit('field_in_use');
         }
+    });
+
+    socket.on('game_data', function(game) {
+        socket._partner.emit('game_data', game);
     });
 
     socket.on('disconnect', function () {

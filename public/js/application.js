@@ -705,6 +705,87 @@ Game.prototype = {
             return a.foul;
         }).length);
     },
+    toData: function toData() {
+        var data = {};
+        data.half = this.half;
+        data.inning = this.inning;
+        data.tally = this.tally;
+        var giraffe = this;
+        var players = this.teams.away.lineup.concat(this.teams.home.lineup);
+        // note: bench not included
+        data.field = {
+            first: players.indexOf(this.field.first),
+            second: players.indexOf(this.field.second),
+            third: players.indexOf(this.field.third)
+        };
+        data.batter = players.indexOf(this.batter);
+        data.deck = players.indexOf(this.deck);
+        data.hole = players.indexOf(this.hole);
+        data.teams = {
+            home: {
+                name: giraffe.teams.home.name,
+                nameJ: giraffe.teams.home.nameJ
+            },
+            away: {
+                name: giraffe.teams.away.name,
+                nameJ: giraffe.teams.away.nameJ
+            }
+        };
+        data.umpire = {
+            says: giraffe.umpire.says,
+            count: {
+                strikes: giraffe.umpire.count.strikes,
+                balls: giraffe.umpire.count.balls,
+                outs: giraffe.umpire.count.outs
+            }
+        };
+        data.players = players.map(function (player) {
+            return player.serialize();
+        });
+        data.log = {
+            pitchRecord: giraffe.log.pitchRecord,
+            record: giraffe.log.record
+        };
+        data.gamesIntoSeason = this.gamesIntoSeason;
+        return data;
+    },
+    fromData: function fromData(data) {
+        this.half = data.half;
+        this.inning = data.inning;
+        this.tally = data.tally;
+        var giraffe = this;
+        var players = data.players.map(function (playerJson, index) {
+            var playerData = JSON.parse(playerJson);
+            if (index > 8) {
+                var side = 'home';
+                index = index - 9;
+            } else {
+                side = 'away';
+            }
+            var player = giraffe.teams[side].positions[playerData.position];
+            player.fromData(playerData);
+            giraffe.teams[side].lineup[index] = player;
+            player.resetStats(data.gamesIntoSeason);
+            return player;
+        });
+        this.field.first = players[data.field.first];
+        this.field.second = players[data.field.second];
+        this.field.third = players[data.field.third];
+        this.batter = players[data.batter];
+        this.deck = players[data.deck];
+        this.hole = players[data.hole];
+        this.umpire.says = data.umpire.says;
+        this.umpire.count = data.umpire.count;
+        this.teams.away.name = data.teams.away.name;
+        this.teams.away.nameJ = data.teams.away.nameJ;
+        this.teams.home.name = data.teams.home.name;
+        this.teams.home.nameJ = data.teams.home.nameJ;
+        this.log.pitchRecord = data.log.pitchRecord;
+        this.log.record = data.log.record;
+        this.log.stabilizeShortRecord();
+        this.gamesIntoSeason = data.gamesIntoSeason;
+        return this;
+    },
     startOpponentPitching: null, // late function
     pitchTarget: { x: 100, y: 100 },
     pitchInFlight: {
@@ -931,6 +1012,19 @@ Player.prototype = {
         this.surname = _baseballUtility_utils.data.surnames[surnameKey];
         this.surnameJ = _baseballUtility_utils.data.surnamesJ[surnameKey];
         this.atBats = [];
+    },
+    serialize: function serialize() {
+        var team = this.team;
+        delete this.team;
+        var data = JSON.stringify(this);
+        this.team = team;
+        return data;
+    },
+    fromData: function fromData(data) {
+        var giraffe = this;
+        _baseballServices_services.Iterator.each(data, function (key, value) {
+            giraffe[key] = value;
+        });
     },
     resetStats: function resetStats() {
         var gamesIntoSeason = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
@@ -2202,16 +2296,19 @@ Log.prototype = {
     SACRIFICE: 'SAC',
     REACHED_ON_ERROR: 'ROE',
     FIELDERS_CHOICE: 'FC',
-    note: function note(_note, noteJ) {
-        this.record.e.unshift(_note);
+    stabilizeShortRecord: function stabilizeShortRecord() {
         var rec = this.record.e.slice(0, 6);
         this.shortRecord.e = rec;
         this.stabilized.shortRecord.e = rec.concat(['', '', '', '', '', '']).slice(0, 6);
 
-        this.record.n.unshift(noteJ);
         var rec2 = this.record.n.slice(0, 6);
         this.shortRecord.n = rec2;
         this.stabilized.shortRecord.n = rec2.concat(['', '', '', '', '', '']).slice(0, 6);
+    },
+    note: function note(_note, noteJ) {
+        this.record.e.unshift(_note);
+        this.record.n.unshift(noteJ);
+        this.stabilizeShortRecord();
     },
     getBatter: function getBatter(batter) {
         var order = batter.team.nowBatting;
@@ -2955,10 +3052,6 @@ IndexController = function($scope, socket) {
     window.s = $scope;
     $scope.t = text;
 
-    $scope.socket = io(window.location.hostname + ':64321');
-    $scope.socketService = socket;
-    var sock = $scope.socket;
-
     $scope.mode = function(setMode) {
         if (setMode) {
             text.mode = setMode;
@@ -2972,7 +3065,9 @@ IndexController = function($scope, socket) {
         $scope.y = new Game();
         var game = $scope.y;
         socket.game = game;
-        socket.socket = sock;
+        $scope.socket = io(window.location.hostname + ':64321');
+        $scope.socketService = socket;
+        socket.socket = $scope.socket;
         socket.start();
         s2.y = game;
         bindMethods();
@@ -3157,11 +3252,11 @@ var SocketService = function() {
                 giraffe.connected = false;
             });
             socket.on('pitch', function(pitch) {
-                console.log('receive', 'pitch', pitch);
+                //console.log('receive', 'pitch', pitch);
                 game.thePitch(0, 0, NO_OPERATION, pitch);
             });
             socket.on('swing', function(swing) {
-                console.log('receive', 'swing', swing);
+                //console.log('receive', 'swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
                 var scope = window.s;
                 animator.updateFlightPath.bind(scope)(function() {
@@ -3171,10 +3266,20 @@ var SocketService = function() {
                 });
             });
             socket.on('partner_disconnect', function() {
+                console.log('The opponent has disconnected');
                 game.opponentConnected = false;
             });
             socket.on('partner_connect', function() {
                 game.opponentConnected = true;
+            });
+            socket.on('opponent_taking_field', function() {
+                console.log('A challenger has appeared! Sending game data.');
+                socket.emit('game_data', game.toData());
+            });
+            socket.on('game_data', function(data) {
+                game.fromData(data);
+                var scope = window.s;
+                scope.$apply();
             });
         },
         off : function() {
@@ -3188,11 +3293,11 @@ var SocketService = function() {
             socket.on('register', NO_OPERATION);
         },
         emitPitch : function(pitch) {
-            console.log('emit', 'pitch', pitch);
+            //console.log('emit', 'pitch', pitch);
             socket.emit('pitch', pitch);
         },
         emitSwing : function(swing) {
-            console.log('emit', 'swing', swing);
+            //console.log('emit', 'swing', swing);
             socket.emit('swing', swing);
         },
         swing : function() {

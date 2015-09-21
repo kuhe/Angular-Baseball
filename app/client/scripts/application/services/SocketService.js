@@ -25,11 +25,11 @@ var SocketService = function() {
                 giraffe.connected = false;
             });
             socket.on('pitch', function(pitch) {
-                console.log('receive', 'pitch', pitch);
+                //console.log('receive', 'pitch', pitch);
                 game.thePitch(0, 0, NO_OPERATION, pitch);
             });
             socket.on('swing', function(swing) {
-                console.log('receive', 'swing', swing);
+                //console.log('receive', 'swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
                 var scope = window.s;
                 animator.updateFlightPath.bind(scope)(function() {
@@ -39,10 +39,20 @@ var SocketService = function() {
                 });
             });
             socket.on('partner_disconnect', function() {
+                console.log('The opponent has disconnected');
                 game.opponentConnected = false;
             });
             socket.on('partner_connect', function() {
                 game.opponentConnected = true;
+            });
+            socket.on('opponent_taking_field', function() {
+                console.log('A challenger has appeared! Sending game data.');
+                socket.emit('game_data', game.toData());
+            });
+            socket.on('game_data', function(data) {
+                game.fromData(data);
+                var scope = window.s;
+                scope.$apply();
             });
         },
         off : function() {
@@ -56,11 +66,11 @@ var SocketService = function() {
             socket.on('register', NO_OPERATION);
         },
         emitPitch : function(pitch) {
-            console.log('emit', 'pitch', pitch);
+            //console.log('emit', 'pitch', pitch);
             socket.emit('pitch', pitch);
         },
         emitSwing : function(swing) {
-            console.log('emit', 'swing', swing);
+            //console.log('emit', 'swing', swing);
             socket.emit('swing', swing);
         },
         swing : function() {
