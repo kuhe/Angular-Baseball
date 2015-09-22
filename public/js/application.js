@@ -1771,7 +1771,7 @@ Animator.prototype = {
     },
     TIME_FROM_SET: 2300, //ms
     TIME_FROM_WINDUP: 3600, //ms
-    HOLD_UP_ALLOWANCE: 4.5, // seconds
+    HOLD_UP_ALLOWANCE: 0.75, // seconds
     pitchTarget: null,
     pitchBreak: null,
     /**
