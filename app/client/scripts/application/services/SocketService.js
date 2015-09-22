@@ -59,6 +59,9 @@ var SocketService = function() {
                 var scope = window.s;
                 scope.$apply();
             });
+            socket.on('field_in_use', function() {
+                game.opponentConnected = false;
+            });
         },
         off : function() {
             socket.on('register', NO_OPERATION);
