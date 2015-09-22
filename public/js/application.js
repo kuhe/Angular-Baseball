@@ -1025,6 +1025,8 @@ Player.prototype = {
         _baseballServices_services.Iterator.each(data, function (key, value) {
             giraffe[key] = value;
         });
+        delete this.atBatObjects;
+        this.getAtBats();
     },
     resetStats: function resetStats() {
         var gamesIntoSeason = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
@@ -1812,8 +1814,8 @@ Animator.prototype = {
             $scope.allowInput = true;
             if (typeof callback == 'function') {
                 callback();
+                $scope.$apply();
             }
-            $scope.$apply();
         }, flightSpeed * 1000);
 
         if (!game.pitchInFlight.x) {
@@ -3068,7 +3070,9 @@ IndexController = function($scope, socket) {
         $scope.socket = io(window.location.hostname + ':64321');
         $scope.socketService = socket;
         socket.socket = $scope.socket;
-        socket.start();
+        var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name;
+        socket.start(field);
+        window.location.hash = '#' + field;
         s2.y = game;
         bindMethods();
         $('.blocking').remove();
@@ -3233,12 +3237,11 @@ var SocketService = function() {
         socket : {},
         game : {},
         connected : false,
-        start : function() {
+        start : function(key) {
             game = this.game;
             socket = this.socket;
             game.opponentService = this;
             this.connected = socket.connected;
-            var key = 15;
             this.on();
             socket.emit('register', key);
         },
@@ -3254,6 +3257,8 @@ var SocketService = function() {
             socket.on('pitch', function(pitch) {
                 //console.log('receive', 'pitch', pitch);
                 game.thePitch(0, 0, NO_OPERATION, pitch);
+                var scope = window.s;
+                animator.updateFlightPath.bind(scope)();
             });
             socket.on('swing', function(swing) {
                 //console.log('receive', 'swing', swing);

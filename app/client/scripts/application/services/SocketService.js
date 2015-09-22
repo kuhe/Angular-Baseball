@@ -6,12 +6,11 @@ var SocketService = function() {
         socket : {},
         game : {},
         connected : false,
-        start : function() {
+        start : function(key) {
             game = this.game;
             socket = this.socket;
             game.opponentService = this;
             this.connected = socket.connected;
-            var key = 15;
             this.on();
             socket.emit('register', key);
         },
@@ -27,6 +26,8 @@ var SocketService = function() {
             socket.on('pitch', function(pitch) {
                 //console.log('receive', 'pitch', pitch);
                 game.thePitch(0, 0, NO_OPERATION, pitch);
+                var scope = window.s;
+                animator.updateFlightPath.bind(scope)();
             });
             socket.on('swing', function(swing) {
                 //console.log('receive', 'swing', swing);

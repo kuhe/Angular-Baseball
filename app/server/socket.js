@@ -6,6 +6,7 @@ io.on('connection', function (socket) {
     socket.on('message', function () { });
 
     socket.on('register', function(key) {
+        console.log('preparing field', key);
         if (!clients[key]) {
             clients[key] = {};
         }

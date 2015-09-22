@@ -22,7 +22,9 @@ IndexController = function($scope, socket) {
         $scope.socket = io(window.location.hostname + ':64321');
         $scope.socketService = socket;
         socket.socket = $scope.socket;
-        socket.start();
+        var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name;
+        socket.start(field);
+        window.location.hash = '#' + field;
         s2.y = game;
         bindMethods();
         $('.blocking').remove();
