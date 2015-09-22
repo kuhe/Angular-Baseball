@@ -134,7 +134,7 @@
     <div scoreboard='' game='y' text='t'></div>
     <hr>
     <div class='diamond-display row'>
-        <div class='col-md-4'>
+        <div class='col-md-4 language-select'>
             <div class='pull-right'>
                 <strong class='pointer' ng-show='mode() == "e"'>English</strong>
                 <em class='pointer' ng-click='mode("e")' ng-show='mode() != "e"'>English</em>
@@ -215,6 +215,9 @@
                         <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.eye/120+")"}'></span>
                         <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.power/120+")"}'></span>
                         <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.speed/120+")"}'></span>
+                    </div>
+                    <div class='visible-sm visible-xs'>
+                        {{ y.log.pitchRecord[mode()][0] }}
                     </div>
                     <div class="list-group-item umpire">
                         Umpire: {{y.umpire.says}}

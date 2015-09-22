@@ -1812,8 +1812,8 @@ Animator.prototype = {
             $scope.allowInput = true;
             if (typeof callback == 'function') {
                 callback();
-                $scope.$apply();
             }
+            $scope.$apply();
         }, flightSpeed * 1000);
 
         if (!game.pitchInFlight.x) {
