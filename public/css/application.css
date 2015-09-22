@@ -110,12 +110,12 @@
 .indicator.swing {
   padding: 10px 50px;
   margin: -10px -50px;
-  border-radius: 10px;
-  border-top: 1px solid #645f40;
-  border-bottom: 1px solid #645f40;
+  border-radius: 5px;
+  border-top: 1px solid #5d5b55;
+  border-bottom: 1px solid #5d5b55;
   border-left: none;
   border-right: none;
-  background: #eaefb5;
+  background: #f4f4f4;
   /* Old browsers */
 }
 .indicator.swing.stance-indicator {
@@ -124,31 +124,29 @@
 @media (min-width: 600px) {
   .indicator.swing {
     box-shadow: 0 0 12px 2px grey;
-    background: -moz-radial-gradient(center, ellipse cover, #eaefb5 0%, #877d5d 100%);
+    background: -moz-radial-gradient(center, ellipse cover, #f4f4f4 0%, #87847b 100%);
     /* FF3.6+ */
-    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #eaefb5), color-stop(100%, #877d5d));
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #f4f4f4), color-stop(100%, #87847b));
     /* Chrome,Safari4+ */
-    background: -webkit-radial-gradient(center, ellipse cover, #eaefb5 0%, #877d5d 100%);
+    background: -webkit-radial-gradient(center, ellipse cover, #f4f4f4 0%, #87847b 100%);
     /* Chrome10+,Safari5.1+ */
-    background: -o-radial-gradient(center, ellipse cover, #eaefb5 0%, #877d5d 100%);
+    background: -o-radial-gradient(center, ellipse cover, #f4f4f4 0%, #87847b 100%);
     /* Opera 12+ */
-    background: -ms-radial-gradient(center, ellipse cover, #eaefb5 0%, #877d5d 100%);
+    background: -ms-radial-gradient(center, ellipse cover, #f4f4f4 0%, #87847b 100%);
     /* IE10+ */
-    background: radial-gradient(ellipse at center, #eaefb5 0%, #877d5d 100%);
+    background: radial-gradient(ellipse at center, #f4f4f4 0%, #87847b 100%);
     /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eaefb5', endColorstr='#877d5d', GradientType=1);
-    /* IE6-9 fallback on horizontal gradient */
   }
 }
 .indicator.swing.left {
   border-bottom-right-radius: 4px;
   border-top-right-radius: 4px;
-  border-left: 1px solid #645f40;
+  border-left: 2px solid #5d5b55;
 }
 .indicator.swing.right {
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;
-  border-right: 1px solid #645f40;
+  border-right: 2px solid #5d5b55;
 }
 .target.swing .indicator.swing {
   display: none;
@@ -326,7 +324,7 @@ html body {
   width: 200px;
   height: 200px;
   border: 1px solid #4b4d50;
-  background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
+  background: radial-gradient(circle at 100px 100px, #c9c9c6, #504c4a);
   perspective: 100px;
 }
 .target.live {
@@ -338,19 +336,19 @@ html body {
   }
 }
 .target.pitching {
-  background: #83694e;
+  background: #bdb7bb;
 }
 @media (min-width: 600px) {
   .target.pitching {
-    background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
+    background: radial-gradient(circle at 100px 100px, #c9c9c6, #504c4a);
   }
 }
 .target.batting {
-  background: #83694e;
+  background: #edebed;
 }
 @media (min-width: 600px) {
   .target.batting {
-    background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
+    background: radial-gradient(circle at 100px 100px, #c9c9c6, #504c4a);
   }
 }
 .strikezone {
@@ -358,7 +356,7 @@ html body {
   padding: 0;
   width: 100px;
   height: 130px;
-  background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
+  background: radial-gradient(circle at 50px 80px, #8e8d88, #4d4d50);
   border: 3px solid #ccd4d1;
 }
 @media (min-width: 600px) {
@@ -367,19 +365,19 @@ html body {
   }
 }
 .strikezone.pitching {
-  background: #828e70;
+  background: #aea9ad;
 }
 @media (min-width: 600px) {
   .strikezone.pitching {
-    background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
+    background: radial-gradient(circle at 50px 80px, #8e8d88, #4d4d50);
   }
 }
 .strikezone.batting {
-  background: #828e70;
+  background: #c0bdc3;
 }
 @media (min-width: 600px) {
   .strikezone.batting {
-    background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
+    background: radial-gradient(circle at 50px 80px, #8e8d88, #4d4d50);
   }
 }
 .indicator.pitch {
@@ -432,8 +430,7 @@ html body {
   font-size: 14px;
   border: 2px solid lightgrey;
   margin-bottom: 10px;
-  background: #495e3c;
-  /* Old browsers */
+  background: #939890;
 }
 .scoreboard .on-base {
   font-size: 14px;
@@ -608,10 +605,10 @@ html body {
   display: block;
   background: #484848;
 }
-.pitch-selection {
-  height: 3em;
-}
 .pitch-selection .rating-block {
   margin: 0 -1px -1px;
   border-top: 1px solid black;
+}
+.pitch-selection .pitch-selection-label {
+  font-size: 80%;
 }

@@ -167,7 +167,7 @@ html body {
   width: 200px;
   height: 200px;
   border: 1px solid #4b4d50;
-  background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
+  background: radial-gradient(circle at 100px 100px, #c9c9c6, #504c4a);
   perspective: 100px;
 }
 .target.live {
@@ -179,19 +179,19 @@ html body {
   }
 }
 .target.pitching {
-  background: #83694e;
+  background: #bdb7bb;
 }
 @media (min-width: 600px) {
   .target.pitching {
-    background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
+    background: radial-gradient(circle at 100px 100px, #c9c9c6, #504c4a);
   }
 }
 .target.batting {
-  background: #83694e;
+  background: #edebed;
 }
 @media (min-width: 600px) {
   .target.batting {
-    background: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
+    background: radial-gradient(circle at 100px 100px, #c9c9c6, #504c4a);
   }
 }
 .strikezone {
@@ -199,7 +199,7 @@ html body {
   padding: 0;
   width: 100px;
   height: 130px;
-  background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
+  background: radial-gradient(circle at 50px 80px, #8e8d88, #4d4d50);
   border: 3px solid #ccd4d1;
 }
 @media (min-width: 600px) {
@@ -208,19 +208,19 @@ html body {
   }
 }
 .strikezone.pitching {
-  background: #828e70;
+  background: #aea9ad;
 }
 @media (min-width: 600px) {
   .strikezone.pitching {
-    background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
+    background: radial-gradient(circle at 50px 80px, #8e8d88, #4d4d50);
   }
 }
 .strikezone.batting {
-  background: #828e70;
+  background: #c0bdc3;
 }
 @media (min-width: 600px) {
   .strikezone.batting {
-    background: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
+    background: radial-gradient(circle at 50px 80px, #8e8d88, #4d4d50);
   }
 }
 .indicator.pitch {

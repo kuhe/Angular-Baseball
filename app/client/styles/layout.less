@@ -156,7 +156,7 @@ html body {
     margin: 0 auto 25px auto;
 }
 
-@target: radial-gradient(circle at 100px 100px, #c9c9c6, #503e2c);
+@target: radial-gradient(circle at 100px 100px, #c9c9c6, #504c4a);
 .target {
     &.live {
         cursor: none;
@@ -173,19 +173,19 @@ html body {
     background: @target;
     perspective: 100px;
     &.pitching {
-        background: #83694e;
+        background: #bdb7bb;
         @media (min-width: 600px) {
             background: @target;
         }
     }
     &.batting {
-        background: #83694e;
+        background: #edebed;
         @media (min-width: 600px) {
             background: @target;
         }
     }
 }
-@strikezone: radial-gradient(circle at 50px 80px, #828e70, #4b4d50);
+@strikezone: radial-gradient(circle at 50px 80px, #8e8d88, #4d4d50);
 .strikezone {
     @media (min-width: 600px) {
         box-shadow: 0 0 15px 9px #4b4d50;
@@ -197,13 +197,13 @@ html body {
     background: @strikezone;
     border: 3px solid #ccd4d1;
     &.pitching {
-        background: #828e70;
+        background: #aea9ad;
         @media (min-width: 600px) {
             background: @strikezone;
         }
     }
     &.batting {
-        background: #828e70;
+        background: #c0bdc3;
         @media (min-width: 600px) {
             background: @strikezone;
         }
