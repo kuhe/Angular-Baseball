@@ -176,7 +176,11 @@
                 </ul>
             </div>
             <div class='col-md-4'>
-                <div class='windup' ng-class='{winding: y.humanControl == "none" || (y.humanBatting() && !y.humanPitching())}'></div>
+                <div class='opponent-indicator' ng-show='y.opponentConnected'>
+                    <em>{{ t('Opponent connected') }}</em>
+                </div>
+                <div class='windup' ng-show='!y.opponentConnected' ng-class='{winding: y.humanControl == "none" || (y.humanBatting() && !y.humanPitching())}'>
+                </div>
                 <div class="no-swing" ng-click="indicate($event)">
                     <div class="target live {{y.stage}}" ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'>
                         <div class='indicator baseball pitch hide'></div>

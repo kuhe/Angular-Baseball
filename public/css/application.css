@@ -166,6 +166,10 @@ html body {
 .language-select {
   z-index: 5;
 }
+.opponent-indicator {
+  text-align: left;
+  opacity: 0.7;
+}
 .main-area {
   padding: 10px 30px !important;
 }

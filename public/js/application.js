@@ -2755,7 +2755,9 @@ var text = function text(phrase, override) {
             'R ': '右投',
             ' L ': '左打',
             ' R ': '右打',
-            '#': '背番号'
+            '#': '背番号',
+
+            'Opponent connected': '相手選手見参'
         },
         e: {
             empty: '-',
@@ -3273,9 +3275,13 @@ var SocketService = function() {
             socket.on('partner_disconnect', function() {
                 console.log('The opponent has disconnected');
                 game.opponentConnected = false;
+                var scope = window.s;
+                scope.$digest();
             });
             socket.on('partner_connect', function() {
                 game.opponentConnected = true;
+                var scope = window.s;
+                scope.$digest();
             });
             socket.on('opponent_taking_field', function() {
                 console.log('A challenger has appeared! Sending game data.');
