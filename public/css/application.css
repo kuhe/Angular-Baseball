@@ -426,6 +426,22 @@ html body {
 .stabilized .list-group-item {
   height: 6em;
 }
+aside.image-panel {
+  background: transparent;
+  border: 1px dotted lightgrey;
+  height: 105px;
+  width: 120px;
+  position: absolute;
+  top: 45px;
+  left: 15px;
+  float: none;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+aside.image-panel.right {
+  right: 15px;
+  left: inherit;
+}
 .scoreboard {
   /*background-image: url(../images/sb-tile.png);*/
   background-repeat: repeat;

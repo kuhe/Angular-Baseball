@@ -809,6 +809,31 @@ Game.prototype = {
         fielder: 'short',
         outs: 0
     },
+    playResult: {
+        batter: '',
+        fielder: ''
+    },
+    showPlayResultPanels: function showPlayResultPanels(batter) {
+        var batterOutcomes = {
+            H: 'batter/H',
+            SO: 'batter/SO',
+            GO: 'batter/GO',
+            LO: 'batter/LO',
+            FO: 'batter/FO'
+        };
+        var atBat = batter.atBats.slice(0).pop();
+        var fielderOutcomes = {
+            H: 'fielder/H',
+            SO: 'fielder/SO',
+            GO: 'fielder/GO',
+            LO: 'fielder/LO',
+            FO: 'fielder/FO'
+        };
+        this.playResult = {
+            batter: batterOutcomes[atBat] || 'blank',
+            fielder: fielderOutcomes[atBat] || 'blank'
+        };
+    },
     pitchSelect: function pitchSelect() {},
     field: null,
     teams: {
@@ -1654,6 +1679,7 @@ Umpire.prototype = {
         this.count.balls = this.count.strikes = 0;
         this.game.log.notePlateAppearanceResult(this.game);
         var team = this.game.half == 'bottom' ? this.game.teams.home : this.game.teams.away;
+        this.game.lastBatter = this.game.batter;
         this.game.batter = team.lineup[(team.nowBatting + 1) % 9];
         this.game.deck = team.lineup[(team.nowBatting + 2) % 9];
         this.game.hole = team.lineup[(team.nowBatting + 3) % 9];
@@ -1661,6 +1687,7 @@ Umpire.prototype = {
         if (this.count.outs < 3) {
             this.game.log.noteBatter(this.game.batter);
         }
+        this.game.showPlayResultPanels(this.game.lastBatter);
     },
     changeSides: function changeSides() {
         this.game.swingResult = {};
@@ -3226,6 +3253,12 @@ IndexController = function($scope, socket) {
                 $('.target').unbind('mousemove', showGlove);
                 glove.hide();
             }
+        });
+        $scope.$watch('y.playResult', function() {
+            $scope.imagePanel = {
+                left: 'url(./public/images/' + $scope.y.playResult.batter + '.png)',
+                right: 'url(./public/images/' + $scope.y.playResult.fielder + '.png)'
+            };
         });
     };
 

@@ -177,6 +177,12 @@ IndexController = function($scope, socket) {
                 glove.hide();
             }
         });
+        $scope.$watch('y.playResult', function() {
+            $scope.imagePanel = {
+                left: 'url(./public/images/' + $scope.y.playResult.batter + '.png)',
+                right: 'url(./public/images/' + $scope.y.playResult.fielder + '.png)'
+            };
+        });
     };
 
 
