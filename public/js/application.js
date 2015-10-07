@@ -814,24 +814,16 @@ Game.prototype = {
         fielder: ''
     },
     showPlayResultPanels: function showPlayResultPanels(batter) {
-        var batterOutcomes = {
-            H: 'batter/H',
-            SO: 'batter/SO',
-            GO: 'batter/GO',
-            LO: 'batter/LO',
-            FO: 'batter/FO'
-        };
+        var batterOutcomes = {};
         var atBat = batter.atBats.slice(0).pop();
-        var fielderOutcomes = {
-            H: 'fielder/H',
-            SO: 'fielder/SO',
-            GO: 'fielder/GO',
-            LO: 'fielder/LO',
-            FO: 'fielder/FO'
+        var fielderOutcomes = {};
+        var n = function n() {
+            var n = Math.floor(Math.random() * 3);
+            return n ? n : '';
         };
         this.playResult = {
-            batter: batterOutcomes[atBat] || 'blank',
-            fielder: fielderOutcomes[atBat] || 'blank'
+            batter: 'B_placeholder' + n() || batterOutcomes[atBat] || 'batter/' + atBat,
+            fielder: 'F_placeholder' + n() || fielderOutcomes[atBat] || 'fielder/' + atBat
         };
     },
     pitchSelect: function pitchSelect() {},
@@ -1390,32 +1382,33 @@ Umpire.prototype = {
         outs: 0
     },
     playBall: function playBall() {
-        this.game.half = 'top';
-        this.game.inning = 1;
-        this.game.batter = this.game.teams.away.lineup[0];
-        this.game.batterRunner = this.game.teams.away.lineup[0];
-        this.game.deck = this.game.teams.away.lineup[1];
-        this.game.hole = this.game.teams.away.lineup[2];
-        this.game.pitcher = this.game.teams.home.positions.pitcher;
-        var n = '一回のオモテ、' + this.game.teams.away.getName() + 'の攻撃対' + this.game.teams.home.getName() + '、ピッチャーは' + this.game.teams.home.positions.pitcher.getName() + '。',
-            e = 'Top 1, ' + this.game.teams.away.name + ' offense vs. ' + this.game.teams.home.positions.pitcher.name + ' starting for ' + this.game.teams.home.name;
-        this.game.log.note(e, n);
-        this.game.log.noteBatter(this.game.batter);
+        var game = this.game;
+        game.half = 'top';
+        game.inning = 1;
+        game.batter = game.teams.away.lineup[0];
+        game.batterRunner = game.teams.away.lineup[0];
+        game.deck = game.teams.away.lineup[1];
+        game.hole = game.teams.away.lineup[2];
+        game.pitcher = game.teams.home.positions.pitcher;
+        var n = '一回のオモテ、' + game.teams.away.getName() + 'の攻撃対' + game.teams.home.getName() + '、ピッチャーは' + game.teams.home.positions.pitcher.getName() + '。',
+            e = 'Top 1, ' + game.teams.away.name + ' offense vs. ' + game.teams.home.positions.pitcher.name + ' starting for ' + game.teams.home.name;
+        game.log.note(e, n);
+        game.log.noteBatter(game.batter);
     },
     makeCall: function makeCall() {
         this.says = '';
+        var game = this.game;
+        var result = game.swingResult;
+        var pitcher = game.pitcher;
+        var batter = game.batter;
 
-        var result = this.game.swingResult;
-        var pitcher = this.game.pitcher;
-        var batter = this.game.batter;
-
-        if (this.game.swingResult.fielder) {
-            var fielder = this.game.teams[this.game.half == 'top' ? 'home' : 'away'].positions[result.fielder];
+        if (game.swingResult.fielder) {
+            var fielder = game.teams[game.half == 'top' ? 'home' : 'away'].positions[result.fielder];
         } else {
             fielder = null;
         }
 
-        this.game.batterRunner = this.game.batter;
+        game.batterRunner = game.batter;
 
         pitcher.stats.pitching.pitches++;
         if (result.looking) {
@@ -1432,14 +1425,14 @@ Umpire.prototype = {
                     pitcher.stats.pitching.IP[1]++;
                     if (result.sacrificeAdvances.length && this.count.outs < 2) {
                         batter.stats.batting.sac++;
-                        this.game.batter.atBats.push(_baseballUtility_utils.Log.prototype.SACRIFICE);
+                        game.batter.atBats.push(_baseballUtility_utils.Log.prototype.SACRIFICE);
                         this.advanceRunners(false, null, result.sacrificeAdvances);
                     } else {
                         batter.stats.batting.ab++;
                         if (result.flyAngle < 15) {
-                            this.game.batter.atBats.push(_baseballUtility_utils.Log.prototype.LINEOUT);
+                            game.batter.atBats.push(_baseballUtility_utils.Log.prototype.LINEOUT);
                         } else {
-                            this.game.batter.atBats.push(_baseballUtility_utils.Log.prototype.FLYOUT);
+                            game.batter.atBats.push(_baseballUtility_utils.Log.prototype.FLYOUT);
                         }
                     }
                     this.count.outs++;
@@ -1456,7 +1449,7 @@ Umpire.prototype = {
                             result.bases = 0;
                             this.count.outs++;
                             pitcher.stats.pitching.IP[1]++;
-                            this.game.batter.atBats.push(_baseballUtility_utils.Log.prototype.FIELDERS_CHOICE);
+                            game.batter.atBats.push(_baseballUtility_utils.Log.prototype.FIELDERS_CHOICE);
                             this.advanceRunners(false, result.fieldersChoice);
                             this.reachBase();
                             result.outs = this.count.outs;
@@ -1468,7 +1461,7 @@ Umpire.prototype = {
                         if (result.thrownOut) {
                             this.count.outs++;
                             pitcher.stats.pitching.IP[1]++;
-                            this.game.batter.atBats.push(_baseballUtility_utils.Log.prototype.GROUNDOUT);
+                            game.batter.atBats.push(_baseballUtility_utils.Log.prototype.GROUNDOUT);
                             if (this.count.outs < 3) {
                                 this.advanceRunners(false);
                             }
@@ -1480,39 +1473,39 @@ Umpire.prototype = {
                         }
                         if (result.bases) {
                             if (!result.error) {
-                                this.game.tally[this.game.half == 'top' ? 'away' : 'home'][_baseballUtility_utils.Log.prototype.SINGLE]++;
+                                game.tally[game.half == 'top' ? 'away' : 'home'][_baseballUtility_utils.Log.prototype.SINGLE]++;
                                 pitcher.stats.pitching.H++;
                             } else {
                                 if (result.bases > 0) {
-                                    this.game.tally[this.game.half == 'top' ? 'home' : 'away'].E++;
+                                    game.tally[game.half == 'top' ? 'home' : 'away'].E++;
                                     fielder.stats.fielding.E++;
                                 }
                             }
                             var bases = result.bases;
                             switch (bases) {
                                 case 0:
-                                    this.game.batter.atBats.push(_baseballUtility_utils.Log.prototype.GROUNDOUT);
+                                    game.batter.atBats.push(_baseballUtility_utils.Log.prototype.GROUNDOUT);
                                     break;
                                 case 1:
                                     if (result.error) {
-                                        this.game.batter.atBats.push(_baseballUtility_utils.Log.prototype.REACHED_ON_ERROR);
+                                        game.batter.atBats.push(_baseballUtility_utils.Log.prototype.REACHED_ON_ERROR);
                                     } else {
-                                        this.game.batter.atBats.push(_baseballUtility_utils.Log.prototype.SINGLE);
+                                        game.batter.atBats.push(_baseballUtility_utils.Log.prototype.SINGLE);
                                         batter.stats.batting.h++;
                                     }
                                     break;
                                 case 2:
-                                    this.game.batter.atBats.push(_baseballUtility_utils.Log.prototype.DOUBLE);
+                                    game.batter.atBats.push(_baseballUtility_utils.Log.prototype.DOUBLE);
                                     batter.stats.batting.h++;
                                     batter.stats.batting['2b']++;
                                     break;
                                 case 3:
-                                    this.game.batter.atBats.push(_baseballUtility_utils.Log.prototype.TRIPLE);
+                                    game.batter.atBats.push(_baseballUtility_utils.Log.prototype.TRIPLE);
                                     batter.stats.batting.h++;
                                     batter.stats.batting['3b']++;
                                     break;
                                 case 4:
-                                    this.game.batter.atBats.push(_baseballUtility_utils.Log.prototype.HOMERUN);
+                                    game.batter.atBats.push(_baseballUtility_utils.Log.prototype.HOMERUN);
                                     pitcher.stats.pitching.HR++;
                                     batter.stats.batting.h++;
                                     batter.stats.batting.hr++;
@@ -1576,17 +1569,18 @@ Umpire.prototype = {
         }
     },
     reachBase: function reachBase() {
-        this.game.field.first = this.game.batter;
-        this.game.field.first.fatigue += 2;
+        var game = this.game;
+        game.field.first = game.batter;
+        game.field.first.fatigue += 2;
         return this;
     },
     advanceRunners: function advanceRunners(isWalk, fieldersChoice, sacrificeAdvances) {
         isWalk = !!isWalk;
-        var first = this.game.field.first,
-            second = this.game.field.second,
-            third = this.game.field.third,
-            game = this.game,
-            swing = this.game.swingResult;
+        var game = this.game;
+        var first = game.field.first,
+            second = game.field.second,
+            third = game.field.third,
+            swing = game.swingResult;
 
         if (isWalk) {
             if (first) {
@@ -1626,9 +1620,9 @@ Umpire.prototype = {
         } else {
                 if (fieldersChoice) {
                     game.field[fieldersChoice] = null;
-                    first = this.game.field.first;
-                    second = this.game.field.second;
-                    third = this.game.field.third;
+                    first = game.field.first;
+                    second = game.field.second;
+                    third = game.field.third;
                 }
                 var canAdvance = function canAdvance() {
                     return true;
@@ -1672,62 +1666,64 @@ Umpire.prototype = {
         return this;
     },
     newBatter: function newBatter() {
-        this.game.log.pitchRecord = {
+        var game = this.game;
+        game.log.pitchRecord = {
             e: [],
             n: []
         };
         this.count.balls = this.count.strikes = 0;
-        this.game.log.notePlateAppearanceResult(this.game);
-        var team = this.game.half == 'bottom' ? this.game.teams.home : this.game.teams.away;
-        this.game.lastBatter = this.game.batter;
-        this.game.batter = team.lineup[(team.nowBatting + 1) % 9];
-        this.game.deck = team.lineup[(team.nowBatting + 2) % 9];
-        this.game.hole = team.lineup[(team.nowBatting + 3) % 9];
+        game.log.notePlateAppearanceResult(game);
+        var team = game.half == 'bottom' ? game.teams.home : game.teams.away;
+        game.lastBatter = game.batter;
+        game.batter = team.lineup[(team.nowBatting + 1) % 9];
+        game.deck = team.lineup[(team.nowBatting + 2) % 9];
+        game.hole = team.lineup[(team.nowBatting + 3) % 9];
         team.nowBatting = (team.nowBatting + 1) % 9;
         if (this.count.outs < 3) {
-            this.game.log.noteBatter(this.game.batter);
+            game.log.noteBatter(game.batter);
         }
-        this.game.showPlayResultPanels(this.game.lastBatter);
+        game.showPlayResultPanels(game.lastBatter);
     },
     changeSides: function changeSides() {
-        this.game.swingResult = {};
-        this.game.swingResult.looking = true; // hide bat
-        this.game.pitchInFlight.x = null; // hide ball
-        this.game.pitchInFlight.y = null; // hide ball
-        this.game.log.pitchRecord = {
+        var game = this.game;
+        game.swingResult = {};
+        game.swingResult.looking = true; // hide bat
+        game.pitchInFlight.x = null; // hide ball
+        game.pitchInFlight.y = null; // hide ball
+        game.log.pitchRecord = {
             e: [],
             n: []
         };
         var offense, defense;
-        this.game.field.first = null;
-        this.game.field.second = null;
-        this.game.field.third = null;
-        if (this.game.half == 'top') {
-            if (this.game.inning == 9 && this.game.tally.home.R > this.game.tally.away.R) {
-                return this.game.end();
+        game.field.first = null;
+        game.field.second = null;
+        game.field.third = null;
+        if (game.half == 'top') {
+            if (game.inning == 9 && game.tally.home.R > game.tally.away.R) {
+                return game.end();
             }
-            this.game.half = 'bottom';
+            game.half = 'bottom';
         } else {
-            if (this.game.inning + 1 > 9) {
-                return this.game.end();
+            if (game.inning + 1 > 9) {
+                return game.end();
             }
-            this.game.inning++;
-            this.game.half = 'top';
+            game.inning++;
+            game.half = 'top';
         }
-        offense = this.game.half == 'top' ? 'away' : 'home';
-        defense = this.game.half == 'top' ? 'home' : 'away';
-        var n = this.game.inning + '回の' + (this.game.half == 'top' ? 'オモテ' : 'ウラ') + '、' + this.game.teams[this.game.half == 'top' ? 'away' : 'home'].getName() + 'の攻撃。',
-            e = (this.game.half == 'top' ? 'Top' : 'Bottom') + ' ' + this.game.inning;
-        this.game.log.note(e, n);
-        var team = this.game.teams[offense];
-        this.game.batter = team.lineup[team.nowBatting];
-        this.game.batterRunner = this.game.batter;
-        this.game.deck = team.lineup[(team.nowBatting + 1) % 9];
-        this.game.hole = team.lineup[(team.nowBatting + 2) % 9];
+        offense = game.half == 'top' ? 'away' : 'home';
+        defense = game.half == 'top' ? 'home' : 'away';
+        var n = game.inning + '回の' + (game.half == 'top' ? 'オモテ' : 'ウラ') + '、' + game.teams[game.half == 'top' ? 'away' : 'home'].getName() + 'の攻撃。',
+            e = (game.half == 'top' ? 'Top' : 'Bottom') + ' ' + game.inning;
+        game.log.note(e, n);
+        var team = game.teams[offense];
+        game.batter = team.lineup[team.nowBatting];
+        game.batterRunner = game.batter;
+        game.deck = team.lineup[(team.nowBatting + 1) % 9];
+        game.hole = team.lineup[(team.nowBatting + 2) % 9];
 
-        this.game.pitcher = this.game.teams[defense].positions.pitcher;
-        this.game.log.noteBatter(this.game.batter);
-        this.game.autoPitchSelect();
+        game.pitcher = game.teams[defense].positions.pitcher;
+        game.log.noteBatter(game.batter);
+        game.autoPitchSelect();
     },
     says: 'Play ball!',
     game: null
@@ -3254,7 +3250,19 @@ IndexController = function($scope, socket) {
                 glove.hide();
             }
         });
+        var aside = {
+            left: $('aside.image-panel.left'),
+            right: $('aside.image-panel.right')
+        };
         $scope.$watch('y.playResult', function() {
+            aside.left.hide();
+            aside.right.hide();
+            aside.left.fadeIn(1000, function() {
+                aside.left.fadeOut(1000);
+                aside.right.fadeIn(1000, function() {
+                    aside.right.fadeOut(1000);
+                })
+            });
             $scope.imagePanel = {
                 left: 'url(./public/images/' + $scope.y.playResult.batter + '.png)',
                 right: 'url(./public/images/' + $scope.y.playResult.fielder + '.png)'

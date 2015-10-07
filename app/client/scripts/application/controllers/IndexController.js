@@ -177,7 +177,19 @@ IndexController = function($scope, socket) {
                 glove.hide();
             }
         });
+        var aside = {
+            left: $('aside.image-panel.left'),
+            right: $('aside.image-panel.right')
+        };
         $scope.$watch('y.playResult', function() {
+            aside.left.hide();
+            aside.right.hide();
+            aside.left.fadeIn(1000, function() {
+                aside.left.fadeOut(1000);
+                aside.right.fadeIn(1000, function() {
+                    aside.right.fadeOut(1000);
+                })
+            });
             $scope.imagePanel = {
                 left: 'url(./public/images/' + $scope.y.playResult.batter + '.png)',
                 right: 'url(./public/images/' + $scope.y.playResult.fielder + '.png)'
