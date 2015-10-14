@@ -20,7 +20,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "protractor conf.js"
+    "test": "protractor conf.js",
+    "career": "cd node_modules/baseball && npm test"
   },
   "repository": {
     "type": "git",
