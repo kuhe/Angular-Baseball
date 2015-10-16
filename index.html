@@ -232,6 +232,9 @@
                         Umpire: {{y.umpire.says}}
                     </div>
                 </div>
+                <div class='chalklines'>
+                    <!--<span class='homeplate'></span>-->
+                </div>
             </div>
             <div class='col-md-4 background-color visible-lg visible-md'>
                 <ul class="list-group play-record">
@@ -266,230 +269,17 @@
     </ul>
     <hr/>
     <div class='row'>
-        <div class='pitcher-data col-sm-6' ng-show='y.half=="top"'>
-            <div class='row'>
-                <div class='col-xs-6'>
-                    <em>{{y.pitcher.throws == 'right' ? t('RHP') : t('LHP')}}</em> &raquo;
-                    <br>
-                    <strong>{{y.pitcher.getName()}}</strong>
-                    ({{'#'+y.pitcher.number}}) <span ng-if='y.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>
-                </div>
-                <div class='col-xs-6'>
-                    <em>{{abbreviatePosition('catcher')}}</em> &raquo;
-                    <br>
-                    <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
-                    ({{'#'+y.pitcher.team.positions.catcher.number}}) <span ng-if='y.pitcher.team.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
-                </div>
-                <div class='col-xs-12'>
-                    <div class='row'>
-                        <div class='col-xs-6'>
-                            {{ t('Season') }}
-                            <br>
-                            {{y.pitcher.stats.pitching.W}} - {{y.pitcher.stats.pitching.L}}, {{y.pitcher.stats.pitching.GS}} GS
-                            <br>
-                            {{y.pitcher.stats.pitching.getERA() | number:2}} ERA
-                        </div>
-                        <div class='col-xs-6'>
-                            {{ t('Game') }}
-                            <br>
-                            {{y.pitcher.stats.pitching.strikes}} - {{y.pitcher.stats.pitching.pitches}}
-                            <br>
-                            {{y.pitcher.stats.pitching.K}}K {{y.pitcher.stats.pitching.H}}H
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class='batter-data col-sm-6' ng-show='y.half=="top"'>
-            <div class='row'>
-                <div class='col-xs-6'>
-                    <div>
-                        {{ t('At Bat :') }} &raquo;
-                        <br>
-                        <strong>{{y.batter.getName()}}</strong>
-                        ({{('#')+y.batter.number}}) <span ng-if='y.batter.hero' class='glyphicon glyphicon-chevron-up'></span> -
-                        <em>{{abbreviatePosition(y.batter.position)}}{{t.comma()}}{{y.batter.bats == 'left' ? t('LHB') : t('RHB')}}</em>
-                    </div>
-                    <div class='row'>
-                        <div class='col-xs-6'>
-                            <strong>{{y.batter.stats.batting.getBA() | number:3}}</strong> {{ t('BA') }}
-                            <br>
-                            <strong>{{y.batter.stats.batting.getOBP() | number:3}}</strong> {{ t('OBP') }}
-                            <br>
-                            <strong>{{y.batter.stats.batting.getSLG() | number:3}}</strong> {{ t('SLG') }}
-                            <br>
-                            <strong>{{y.batter.stats.batting.hr}}</strong> {{ t('HR') }}
-                            <br>
-                            <strong>{{y.batter.stats.batting.rbi}}</strong> {{ t('RBI') }}
-                        </div>
-                        <div class='col-xs-6'>
-                            <div>
-                                {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.eye/120+")"}'></span>
-                            </div>
-                            <div>
-                                {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.power/120+")"}'></span>
-                            </div>
-                            <div>
-                                {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.speed/120+")"}'></span>
-                            </div>
-                            <div>
-                                {{y.batter.getAtBats().join(', ')}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class='col-xs-6'>
-                    <div>
-                        {{ t('On Deck :') }} &raquo;
-                        <br>
-                        <strong>{{y.deck.getName()}}</strong>
-                        ({{('#')+y.deck.number}}) <span ng-if='y.deck.hero' class='glyphicon glyphicon-chevron-up'></span> -
-                        {{abbreviatePosition(y.deck.position)}}{{t.comma()}}{{y.batter.bats == 'left' ? t('LHB') : t('RHB')}}
-                    </div>
-                    <div class='row'>
-                        <div class='col-xs-6'>
-                            <strong>{{y.deck.stats.batting.getBA() | number:3}}</strong> {{ t('BA') }}
-                            <br>
-                            <strong>{{y.deck.stats.batting.getOBP() | number:3}}</strong> {{ t('OBP') }}
-                            <br>
-                            <strong>{{y.deck.stats.batting.getSLG() | number:3}}</strong> {{ t('SLG') }}
-                            <br>
-                            <strong>{{y.deck.stats.batting.hr}}</strong> {{ t('HR') }}
-                            <br>
-                            <strong>{{y.deck.stats.batting.rbi}}</strong> {{ t('RBI') }}
-                        </div>
-                        <div class='col-xs-6'>
-                            <div>
-                                {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.eye/120+")"}'></span>
-                            </div>
-                            <div>
-                                {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.power/120+")"}'></span>
-                            </div>
-                            <div>
-                                {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.speed/120+")"}'></span>
-                            </div>
-                            <div>
-                                {{y.deck.getAtBats().join(', ')}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <battery battery='' class='pitcher-data col-sm-6' ng-show='y.half === "top"'>
+        </battery>
+        <batters batters='' class='batter-data col-sm-6' ng-show='y.half === "top"'>
+        </batters>
 
-        <div class='batter-data col-sm-6' ng-show='y.half=="bottom"'>
-            <div class='row'>
-                <div class='col-xs-6'>
-                    <div>
-                        {{ t('At Bat :') }} &raquo;
-                        <br>
-                        <strong>{{y.batter.getName()}}</strong>
-                        ({{('#')+y.batter.number}}) <span ng-if='y.batter.hero' class='glyphicon glyphicon-chevron-up'></span> -
-                        <em>{{abbreviatePosition(y.batter.position)}}{{t.comma()}}{{y.batter.bats == 'left' ? t('LHB') : t('RHB')}}</em>
-                    </div>
-                    <div class='row'>
-                        <div class='col-xs-6'>
-                            <strong>{{y.batter.stats.batting.getBA() | number:3}}</strong> {{ t('BA') }}
-                            <br>
-                            <strong>{{y.batter.stats.batting.getOBP() | number:3}}</strong> {{ t('OBP') }}
-                            <br>
-                            <strong>{{y.batter.stats.batting.getSLG() | number:3}}</strong> {{ t('SLG') }}
-                            <br>
-                            <strong>{{y.batter.stats.batting.hr}}</strong> {{ t('HR') }}
-                            <br>
-                            <strong>{{y.batter.stats.batting.rbi}}</strong> {{ t('RBI') }}
-                        </div>
-                        <div class='col-xs-6'>
-                            <div>
-                                {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.eye/120+")"}'></span>
-                            </div>
-                            <div>
-                                {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.power/120+")"}'></span>
-                            </div>
-                            <div>
-                                {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.speed/120+")"}'></span>
-                            </div>
-                            <div>
-                                {{y.batter.getAtBats().join(', ')}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class='col-xs-6'>
-                    <div>
-                        {{ t('On Deck :') }} &raquo;
-                        <br>
-                        <strong>{{y.deck.getName()}}</strong>
-                        ({{('#')+y.deck.number}}) <span ng-if='y.deck.hero' class='glyphicon glyphicon-chevron-up'></span> -
-                        {{abbreviatePosition(y.deck.position)}}{{t.comma()}}{{y.batter.bats == 'left' ? t('LHB') : t('RHB')}}
-                    </div>
-                    <div class='row'>
-                        <div class='col-xs-6'>
-                            <strong>{{y.deck.stats.batting.getBA() | number:3}}</strong> {{ t('BA') }}
-                            <br>
-                            <strong>{{y.deck.stats.batting.getOBP() | number:3}}</strong> {{ t('OBP') }}
-                            <br>
-                            <strong>{{y.deck.stats.batting.getSLG() | number:3}}</strong> {{ t('SLG') }}
-                            <br>
-                            <strong>{{y.deck.stats.batting.hr}}</strong> {{ t('HR') }}
-                            <br>
-                            <strong>{{y.deck.stats.batting.rbi}}</strong> {{ t('RBI') }}
-                        </div>
-                        <div class='col-xs-6'>
-                            <div>
-                                {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.eye/120+")"}'></span>
-                            </div>
-                            <div>
-                                {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.power/120+")"}'></span>
-                            </div>
-                            <div>
-                                {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.deck.skill.offense.speed/120+")"}'></span>
-                            </div>
-                            <div>
-                                {{y.deck.getAtBats().join(', ')}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class='pitcher-data col-sm-6' ng-show='y.half=="bottom"'>
-            <div class='row'>
-                <div class='col-xs-6'>
-                    <em>{{y.pitcher.throws == 'right' ? t('RHP') : t('LHP')}}</em> &raquo;
-                    <br>
-                    <strong>{{y.pitcher.getName()}}</strong>
-                    ({{'#'+y.pitcher.number}}) <span ng-if='y.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>
-                </div>
-                <div class='col-xs-6'>
-                    <em>{{abbreviatePosition('catcher')}}</em> &raquo;
-                    <br>
-                    <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
-                    ({{'#'+y.pitcher.team.positions.catcher.number}}) <span ng-if='y.pitcher.team.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
-                </div>
-                <div class='col-xs-12'>
-                    <div class='row'>
-                        <div class='col-xs-6'>
-                            {{ t('Season') }}
-                            <br>
-                            {{y.pitcher.stats.pitching.W}} - {{y.pitcher.stats.pitching.L}}, {{y.pitcher.stats.pitching.GS}} GS
-                            <br>
-                            {{y.pitcher.stats.pitching.getERA() | number:2}} ERA
-                        </div>
-                        <div class='col-xs-6'>
-                            {{ t('Game') }}
-                            <br>
-                            {{y.pitcher.stats.pitching.strikes}} - {{y.pitcher.stats.pitching.pitches}}
-                            <br>
-                            {{y.pitcher.stats.pitching.K}}K {{y.pitcher.stats.pitching.H}}H
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <batters batters='' class='batter-data col-sm-6' ng-show='y.half === "bottom"'>
+        </batters>
+        <battery battery='' class='pitcher-data col-sm-6' ng-show='y.half === "bottom"'>
+        </battery>
     </div>
     <hr/>
-
     <div class='block stabilized col-lg-12 hidden-lg hidden-md'>
         <ul class="list-group pitch-record col-xs-6">
             <li class='list-group-item' ng-repeat="event in y.log.stabilized.pitchRecord[mode()] track by $index">

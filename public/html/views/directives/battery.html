@@ -1,0 +1,33 @@
+<div class='row'>
+    <div class='col-xs-6'>
+        <em>{{y.pitcher.throws == 'right' ? t('RHP') : t('LHP')}}</em> &raquo;
+        <br>
+        <strong>{{y.pitcher.getName()}}</strong>
+        ({{'#'+y.pitcher.number}}) <span ng-if='y.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+    </div>
+    <div class='col-xs-6'>
+        <em>{{abbreviatePosition('catcher')}}</em> &raquo;
+        <br>
+        <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
+        ({{'#'+y.pitcher.team.positions.catcher.number}}) <span ng-if='y.pitcher.team.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+    </div>
+    <div class='col-xs-12'>
+        <hr/>
+        <div class='row'>
+            <div class='col-xs-6'>
+                {{ t('Season') }}
+                <br>
+                {{y.pitcher.stats.pitching.W}} - {{y.pitcher.stats.pitching.L}}, {{y.pitcher.stats.pitching.GS}} GS
+                <br>
+                {{y.pitcher.stats.pitching.getERA() | number:2}} ERA
+            </div>
+            <div class='col-xs-6'>
+                {{ t('Game') }}
+                <br>
+                {{y.pitcher.stats.pitching.strikes}} - {{y.pitcher.stats.pitching.pitches}}
+                <br>
+                {{y.pitcher.stats.pitching.K}}K {{y.pitcher.stats.pitching.H}}H
+            </div>
+        </div>
+    </div>
+</div>

@@ -170,8 +170,8 @@ html body {
   position: relative;
   width: 200px;
   height: 200px;
-  border: 1px solid #4b4d50;
-  background: radial-gradient(circle at 100px 100px, #c9c9c6, #504c4a);
+  border: 1px dashed #bcc2c9;
+  background: radial-gradient(circle at 100px 100px, #f2f2ee, #d1d1d1);
   perspective: 100px;
 }
 .target.live {
@@ -179,15 +179,15 @@ html body {
 }
 @media (min-width: 600px) {
   .target {
-    box-shadow: 0 0 25px 3px grey;
+    box-shadow: 0 0 25px 3px #bababa;
   }
 }
 .target.pitching {
-  background: #bdb7bb;
+  background: #f0e9ee;
 }
 @media (min-width: 600px) {
   .target.pitching {
-    background: radial-gradient(circle at 100px 100px, #c9c9c6, #504c4a);
+    background: radial-gradient(circle at 100px 100px, #f2f2ee, #d1d1d1);
   }
 }
 .target.batting {
@@ -195,7 +195,7 @@ html body {
 }
 @media (min-width: 600px) {
   .target.batting {
-    background: radial-gradient(circle at 100px 100px, #c9c9c6, #504c4a);
+    background: radial-gradient(circle at 100px 100px, #f2f2ee, #d1d1d1);
   }
 }
 .strikezone {
@@ -208,7 +208,7 @@ html body {
 }
 @media (min-width: 600px) {
   .strikezone {
-    box-shadow: 0 0 15px 9px #4b4d50;
+    box-shadow: 0 0 10px 6px rgba(105, 108, 112, 0.79);
   }
 }
 .strikezone.pitching {
@@ -268,4 +268,13 @@ html body {
 }
 .stabilized .list-group-item {
   height: 6em;
+}
+.one-line .col-xs-6 {
+  margin-right: -40px;
+}
+.one-line .col-xs-6:last-child {
+  margin-left: 40px;
+}
+.one-line .col-xs-6 .prevent-break {
+  margin-right: -40px;
 }

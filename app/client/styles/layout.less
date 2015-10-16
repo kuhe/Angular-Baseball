@@ -161,24 +161,24 @@ html body {
     margin: 0 auto 25px auto;
 }
 
-@target: radial-gradient(circle at 100px 100px, #c9c9c6, #504c4a);
+@target: radial-gradient(circle at 100px 100px, #f2f2ee, #d1d1d1);
 .target {
     &.live {
         cursor: none;
     }
     @media (min-width: 600px) {
-        box-shadow: 0 0 25px 3px grey;
+        box-shadow: 0 0 25px 3px #bababa;
     }
     margin: 0 auto;
     padding: 0;
     position: relative;
     width: 200px;
     height: 200px;
-    border: 1px solid #4b4d50;
+    border: 1px dashed #bcc2c9;
     background: @target;
     perspective: 100px;
     &.pitching {
-        background: #bdb7bb;
+        background: #f0e9ee;
         @media (min-width: 600px) {
             background: @target;
         }
@@ -193,7 +193,7 @@ html body {
 @strikezone: radial-gradient(circle at 50px 80px, #8e8d88, #4d4d50);
 .strikezone {
     @media (min-width: 600px) {
-        box-shadow: 0 0 15px 9px #4b4d50;
+        box-shadow: 0 0 10px 6px rgba(105, 108, 112, 0.79);
     }
     margin: 35px 50px;
     padding: 0;
@@ -264,4 +264,14 @@ html body {
 
 .stabilized .list-group-item {
     height: 6em;
+}
+
+.one-line .col-xs-6 {
+    margin-right: -40px;
+    &:last-child {
+        margin-left: 40px;
+    }
+    .prevent-break {
+        margin-right: -40px;
+    }
 }

@@ -1,0 +1,43 @@
+<div class='row'>
+    <div class='col-xs-6' ng-repeat='batter in [y.batter, y.deck]'>
+        <div>
+            {{ t('At Bat :') }} &raquo;
+            <br>
+            <strong>{{batter.getName()}}</strong>
+            ({{('#')+batter.number}}) <span ng-if='batter.hero' class='glyphicon glyphicon-chevron-up'></span> -
+            <em>{{abbreviatePosition(batter.position)}}{{t.comma()}}{{batter.bats == 'left' ? t('LHB') : t('RHB')}}</em>
+        </div>
+        <hr/>
+        <div class='row one-line'>
+            <div class='col-xs-6'>
+                <div class='prevent-break'>
+                    <strong>{{batter.stats.batting.getBA() | number:3}}</strong> {{ t('BA') }}
+                    <br>
+                    <strong>{{batter.stats.batting.getOBP() | number:3}}</strong> {{ t('OBP') }}
+                    <br>
+                    <strong>{{batter.stats.batting.getSLG() | number:3}}</strong> {{ t('SLG') }}
+                    <hr>
+                    <strong>{{batter.stats.batting.hr}}</strong> {{ t('HR') }}
+                </div>
+            </div>
+            <div class='col-xs-6'>
+                <div class='prevent-break'>
+                    <div>
+                        {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ batter.skill.offense.eye/120+")"}'></span>
+                    </div>
+                    <div>
+                        {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ batter.skill.offense.power/120+")"}'></span>
+                    </div>
+                    <div>
+                        {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ batter.skill.offense.speed/120+")"}'></span>
+                    </div>
+                    <div>
+                        {{batter.getAtBats().join(', ')}}
+                    </div>
+                    <hr>
+                    <strong>{{batter.stats.batting.rbi}}</strong> {{ t('RBI') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

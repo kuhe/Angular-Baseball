@@ -2784,7 +2784,7 @@ var text = function text(phrase, override) {
         },
         e: {
             empty: '-',
-            'Season': 'Career'
+            'Season': 'Season'
         }
     })[override ? override : text.mode][phrase];
     return string ? string : phrase;
@@ -3364,6 +3364,34 @@ var SocketService = function() {
     };
     return new Service;
 };
+BattersDirective = function() {
+    return {
+        //scope: {
+        //    game: '=',
+        //    text: '='
+        //},
+        templateUrl: 'public/html/views/directives/batters.html?cache='+cacheKey,
+        transclude : true,
+        //link: function(scope) {
+        //    scope.t = scope.text;
+        //    scope.y = scope.game;
+        //}
+    };
+};
+BatteryDirective = function() {
+    return {
+        //scope: {
+        //    game: '=',
+        //    text: '='
+        //},
+        templateUrl: 'public/html/views/directives/battery.html?cache='+cacheKey,
+        transclude : true,
+        //link: function(scope) {
+        //    scope.t = scope.text;
+        //    scope.y = scope.game;
+        //}
+    };
+};
 ScoreboardDirective = function() {
     return {
         scope: {
@@ -3390,5 +3418,7 @@ app.config(function($interpolateProvider) {
 cacheKey = Math.floor(Math.random()*1500);
 
 angular.module('directives', [])
-    .directive('scoreboard', ScoreboardDirective);
+    .directive('scoreboard', ScoreboardDirective)
+    .directive('batters', BattersDirective)
+    .directive('battery', BatteryDirective);
 //# sourceMappingURL=sourcemaps/application.js.map

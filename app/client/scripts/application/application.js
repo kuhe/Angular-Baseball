@@ -10,4 +10,6 @@ app.config(function($interpolateProvider) {
 cacheKey = Math.floor(Math.random()*1500);
 
 angular.module('directives', [])
-    .directive('scoreboard', ScoreboardDirective);
+    .directive('scoreboard', ScoreboardDirective)
+    .directive('batters', BattersDirective)
+    .directive('battery', BatteryDirective);
