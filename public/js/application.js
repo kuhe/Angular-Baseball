@@ -1998,8 +1998,8 @@ Distribution.prototype = {
      */
     breakEffect: function breakEffect(pitch, pitcher, x, y) {
         var effect = {};
-        effect.x = Math.floor(x + pitch.breakDirection[0] * (0.8 + Math.random() * pitcher.pitching[pitch.name]['break'] / 250));
-        effect.y = Math.floor(y + pitch.breakDirection[1] * (0.8 + Math.random() * pitcher.pitching[pitch.name]['break'] / 250 / (0.5 + y / 200)));
+        effect.x = Math.floor(x + pitch.breakDirection[0] * (0.55 + 1.5 * Math.random() * pitcher.pitching[pitch.name]['break'] / 250));
+        effect.y = Math.floor(y + pitch.breakDirection[1] * (0.55 + 1.5 * Math.random() * pitcher.pitching[pitch.name]['break'] / 250 / (0.5 + y / 200)));
         return effect;
     },
     /**
