@@ -539,7 +539,7 @@ Game.prototype = {
                 this.pitchInFlight.breakDirection = this.helper.pitchDefinitions[this.pitchInFlight.name].slice(0, 2);
                 this.battersEye = _baseballUtility_utils.text.getBattersEye(this);
 
-                var control = this.pitchInFlight.control;
+                var control = Math.floor(this.pitchInFlight.control - this.pitcher.fatigue / 2);
                 this.pitchTarget.x = _baseballServices_services.Distribution.pitchControl(this.pitchTarget.x, control);
                 this.pitchTarget.y = _baseballServices_services.Distribution.pitchControl(this.pitchTarget.y, control);
 
@@ -704,6 +704,12 @@ Game.prototype = {
         log('fouls', this.debug.filter(function (a) {
             return a.foul;
         }).length);
+        log('fatigue, home vs away');
+        var teams = this.teams;
+        _baseballServices_services.Iterator.each(this.teams.home.positions, function (key, value) {
+            var position = key;
+            log(key, teams.home.positions[position].fatigue, teams.away.positions[position].fatigue);
+        });
     },
     toData: function toData() {
         var data = {};
@@ -1987,7 +1993,8 @@ Distribution.prototype = {
      * @returns {number}
      */
     pitchControl: function pitchControl(target, control) {
-        return Math.min(199.9, Math.max(0.1, target + (50 - Math.random() * 100) / (1 + control / 100)));
+        var effect = (50 - Math.random() * 100) / (1 + control / 100);
+        return Math.min(199.9, Math.max(0.1, target + effect));
     },
     /**
      * @param pitch {Game.pitchInFlight}
@@ -2768,6 +2775,7 @@ var text = function text(phrase, override) {
             'Run Fast Simulation': 'シミュレーションを試合終了まで行う',
             'Play Ball!': 'プレーボール',
             'Spectate the CPU': 'CPU観戦',
+            'Play from the 7th': '７回からプレーする',
 
             'Throws/Bats': ' ',
             'LHP': '左投',
@@ -3088,16 +3096,16 @@ IndexController = function($scope, socket) {
 
     $scope.proceedToGame = function(quickMode, spectateCpu) {
         Game.prototype.humanControl = spectateCpu ? 'none' : 'home';
-        Game.prototype.quickMode = !!quickMode;
+        Game.prototype.quickMode = !!quickMode && quickMode !== 7;
         $scope.y = new Game();
         var game = $scope.y;
         socket.game = game;
         $scope.socket = io(window.location.hostname + ':64321');
         $scope.socketService = socket;
         socket.socket = $scope.socket;
-        var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name;
+        var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random()*47);
         socket.start(field);
-        window.location.hash = '#' + field + Math.ceil(Math.random()*47);
+        window.location.hash = '#' + field;
         s2.y = game;
         bindMethods();
         $('.blocking').remove();
@@ -3122,6 +3130,20 @@ IndexController = function($scope, socket) {
                     $scope.updateFlightPath(callback);
                 });
             }, scalar*(game.field.hasRunnersOn() ? Animator.TIME_FROM_SET + 2000 : Animator.TIME_FROM_WINDUP + 2000));
+        }
+        if (quickMode === 7 && spectateCpu === undefined) {
+            Game.prototype.quickMode = true;
+            do {
+                game.simulateInput(function(callback) {
+                    typeof callback == 'function' && callback();
+                });
+            } while (game.stage != 'end' && game.inning != 7);
+            log('sim halted in 7th');
+            game.debugOut();
+            Game.prototype.quickMode = false;
+            game.simulateInput(function(callback) {
+                $scope.updateFlightPath(callback);
+            });
         }
         if (game.humanControl == 'away') {
             game.simulateInput(function(callback) {

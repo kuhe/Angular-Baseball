@@ -450,6 +450,9 @@ aside.image-panel.right {
   right: 15px;
   left: inherit;
 }
+#override td {
+  padding: 4px;
+}
 .scoreboard {
   /*background-image: url(../images/sb-tile.png);*/
   background-repeat: repeat;

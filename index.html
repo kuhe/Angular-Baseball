@@ -40,7 +40,7 @@
         }
     </style>
 </head>
-<body class='blue'>
+<body class='blue' id='override'>
 <div class='container' ng-app='YakyuuAikoukai' ng-controller='IndexController'>
     <div class='blocking instructions'>
         <section class='row'>
@@ -127,6 +127,9 @@
                 </button>
                 <button ng-click='proceedToGame(true, true); $event.stopPropagation()' class='btn pointer'>
                     {{ t('Run Fast Simulation') }} &raquo;
+                </button>
+                <button ng-click='proceedToGame(7); $event.stopPropagation()' class='btn pointer'>
+                    {{ t('Play from the 7th') }} &raquo;
                 </button>
             </div>
         </section>

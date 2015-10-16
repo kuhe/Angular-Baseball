@@ -1,5 +1,5 @@
 <div class='row'>
-    <div class='col-xs-6' ng-repeat='batter in [y.batter, y.deck]'>
+    <div class='col-xs-6' ng-repeat='batter in [y.batter, y.deck] track by $index'>
         <div>
             {{ batter === y.batter ? t('At Bat') : t('On Deck') }} &raquo;
             <br>
@@ -32,12 +32,12 @@
                     <div>
                         {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ batter.skill.offense.speed/120+")"}'></span>
                     </div>
-                    <div>
-                        {{batter.getAtBats().join(', ')}}
-                    </div>
                     <hr>
                     <strong>{{batter.stats.batting.rbi}}</strong> {{ t('RBI') }}
                 </div>
+            </div>
+            <div class='col-xs-12'>
+                {{batter.getAtBats().join(', ')}}
             </div>
         </div>
     </div>
