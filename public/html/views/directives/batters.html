@@ -1,10 +1,11 @@
 <div class='row'>
     <div class='col-xs-6' ng-repeat='batter in [y.batter, y.deck]'>
         <div>
-            {{ t('At Bat :') }} &raquo;
+            {{ batter === y.batter ? t('At Bat') : t('On Deck') }} &raquo;
             <br>
             <strong>{{batter.getName()}}</strong>
-            ({{('#')+batter.number}}) <span ng-if='batter.hero' class='glyphicon glyphicon-chevron-up'></span> -
+            ({{('#')+batter.number}}) <span ng-if='batter.hero' class='glyphicon glyphicon-chevron-up'></span>
+            <br/>
             <em>{{abbreviatePosition(batter.position)}}{{t.comma()}}{{batter.bats == 'left' ? t('LHB') : t('RHB')}}</em>
         </div>
         <hr/>
