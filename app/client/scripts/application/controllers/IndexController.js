@@ -24,7 +24,7 @@ IndexController = function($scope, socket) {
         socket.socket = $scope.socket;
         var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name;
         socket.start(field);
-        window.location.hash = '#' + field;
+        window.location.hash = '#' + field + Math.ceil(Math.random()*47);
         s2.y = game;
         bindMethods();
         $('.blocking').remove();
@@ -181,20 +181,20 @@ IndexController = function($scope, socket) {
             left: $('aside.image-panel.left'),
             right: $('aside.image-panel.right')
         };
-        $scope.$watch('y.playResult', function() {
-            aside.left.hide();
-            aside.right.hide();
-            aside.left.fadeIn(1000, function() {
-                aside.left.fadeOut(1000);
-                aside.right.fadeIn(1000, function() {
-                    aside.right.fadeOut(1000);
-                })
-            });
-            $scope.imagePanel = {
-                left: 'url(./public/images/' + $scope.y.playResult.batter + '.png)',
-                right: 'url(./public/images/' + $scope.y.playResult.fielder + '.png)'
-            };
-        });
+        //$scope.$watch('y.playResult', function() {
+        //    aside.left.hide();
+        //    aside.right.hide();
+        //    aside.left.fadeIn(1000, function() {
+        //        aside.left.fadeOut(1000);
+        //        aside.right.fadeIn(1000, function() {
+        //            aside.right.fadeOut(1000);
+        //        })
+        //    });
+        //    $scope.imagePanel = {
+        //        left: 'url(./public/images/' + $scope.y.playResult.batter + '.png)',
+        //        right: 'url(./public/images/' + $scope.y.playResult.fielder + '.png)'
+        //    };
+        //});
     };
 
 
