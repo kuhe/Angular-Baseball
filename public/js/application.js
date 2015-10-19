@@ -132,7 +132,7 @@ Field.prototype = {
                     swing.caught = true;
                     if (this.game.umpire.count.outs < 2) {
                         var sacrificeThrowInTime = _baseballServices_services.Mathinator.fielderReturnDelay(swing.travelDistance, throwingEase, fieldingEase, 100);
-                        if (this.first && sacrificeThrowInTime > this.first.getBaseRunningTime() + 2.5) {
+                        if (this.first && sacrificeThrowInTime > this.first.getBaseRunningTime() + 4.5) {
                             swing.sacrificeAdvances.push('first');
                         }
                         if (this.second && sacrificeThrowInTime > this.second.getBaseRunningTime()) {
@@ -175,6 +175,7 @@ Field.prototype = {
                     if (this.first && this.second && fieldingReturnDelay < this.second.getBaseRunningTime() + 0.6) swing.fieldersChoice = 'second';
                     if (this.third && fieldingReturnDelay < this.third.getBaseRunningTime()) swing.fieldersChoice = 'third';
                     if (swing.fieldersChoice) swing.bases = 1;
+                    // todo double play here
                 }
                 swing.thrownOut = swing.bases == 0;
                 if (swing.thrownOut) {
