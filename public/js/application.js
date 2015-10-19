@@ -1512,6 +1512,7 @@ Umpire.prototype = {
                 this.count.balls++;
             }
         } else {
+            pitcher.stats.pitching.strikes++;
             if (result.contact) {
                 if (result.caught) {
                     batter.stats.batting.pa++;
@@ -1533,7 +1534,6 @@ Umpire.prototype = {
                 } else {
                     if (result.foul) {
                         this.count.strikes++;
-                        pitcher.stats.pitching.strikes++;
                         if (this.count.strikes > 2) this.count.strikes = 2;
                     } else {
                         batter.stats.batting.pa++;
@@ -1633,7 +1633,6 @@ Umpire.prototype = {
                     }
                 }
             } else {
-                pitcher.stats.pitching.strikes++;
                 this.count.strikes++;
             }
         }
