@@ -357,21 +357,23 @@ Game.prototype = {
         return _baseballUtility_utils.text.mode == 'n' ? this.inning + (this.half == 'top' ? 'オモテ' : 'ウラ') : this.half.toUpperCase() + ' ' + this.inning;
     },
     humanBatting: function humanBatting() {
-        if (this.humanControl == 'none') return false;
+        var humanControl = this.humanControl;
+        if (humanControl == 'none') return false;
         switch (this.half) {
             case 'top':
-                return this.humanControl == 'both' || this.humanControl == 'away';
+                return humanControl == 'both' || humanControl == 'away';
             case 'bottom':
-                return this.humanControl == 'both' || this.humanControl == 'home';
+                return humanControl == 'both' || humanControl == 'home';
         }
     },
     humanPitching: function humanPitching() {
-        if (this.humanControl == 'none') return false;
+        var humanControl = this.humanControl;
+        if (humanControl == 'none') return false;
         switch (this.half) {
             case 'top':
-                return this.humanControl == 'both' || this.humanControl == 'home';
+                return humanControl == 'both' || humanControl == 'home';
             case 'bottom':
-                return this.humanControl == 'both' || this.humanControl == 'away';
+                return humanControl == 'both' || humanControl == 'away';
         }
     },
     end: function end() {
@@ -391,13 +393,15 @@ Game.prototype = {
     },
     stage: 'pitch', //pitch, swing
     simulateInput: function simulateInput(callback) {
-        if (this.stage == 'end') {
+        var stage = this.stage,
+            pitchTarget = this.pitchTarget;
+        if (stage == 'end') {
             return;
         }
-        if (this.stage == 'pitch') {
+        if (stage == 'pitch') {
             this.autoPitch(callback);
-        } else if (this.stage == 'swing') {
-            if (typeof this.pitchTarget != 'object') {
+        } else if (stage == 'swing') {
+            if (typeof pitchTarget != 'object') {
                 this.pitchTarget = { x: 100, y: 100 };
             }
             this.autoSwing(this.pitchTarget.x, this.pitchTarget.y, callback);
@@ -438,9 +442,10 @@ Game.prototype = {
         }
     },
     autoPitchSelect: function autoPitchSelect() {
-        var pitchName = this.helper.selectRandomPitch();
+        var pitchName = this.helper.selectRandomPitch(),
+            select = this.helper.selectRandomPitch;
         while (!this.pitcher.pitching.hasOwnProperty(pitchName)) {
-            pitchName = this.helper.selectRandomPitch();
+            pitchName = select();
         }
         var pitch = this.pitcher.pitching[pitchName];
         pitch.name = pitchName;
@@ -634,14 +639,16 @@ Game.prototype = {
         }
     },
     setBatAngle: function setBatAngle(x, y) {
-        var giraffe = this;
+        var giraffe = this,
+            pitchInFlight = this.pitchInFlight,
+            swingResult = this.swingResult;
         var origin = {
             x: giraffe.batter.bats == 'right' ? -10 : 210,
             y: 160
         };
         var swing = {
-            x: x ? x : giraffe.pitchInFlight.x + this.swingResult.x,
-            y: y ? y : giraffe.pitchInFlight.y + this.swingResult.y
+            x: x ? x : pitchInFlight.x + swingResult.x,
+            y: y ? y : pitchInFlight.y + swingResult.y
         };
         return _baseballServices_services.Mathinator.battingAngle(origin, swing);
     },
