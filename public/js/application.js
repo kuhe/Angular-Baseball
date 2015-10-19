@@ -3099,12 +3099,14 @@ IndexController = function($scope, socket) {
         Game.prototype.quickMode = !!quickMode && quickMode !== 7;
         $scope.y = new Game();
         var game = $scope.y;
-        socket.game = game;
-        $scope.socket = io(window.location.hostname + ':64321');
-        $scope.socketService = socket;
-        socket.socket = $scope.socket;
         var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random()*47);
-        socket.start(field);
+        if (typeof io !== 'undefined') {
+            socket.game = game;
+            $scope.socket = io(window.location.hostname + ':64321');
+            $scope.socketService = socket;
+            socket.socket = $scope.socket;
+            socket.start(field);
+        }
         window.location.hash = '#' + field;
         s2.y = game;
         bindMethods();
