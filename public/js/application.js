@@ -180,35 +180,57 @@ Field.prototype = {
                     // double play
                     var outs = game.umpire.count.outs;
                     if (swing.fieldersChoice) {
+                        outs++;
                         swing.bases = 1;
-                        if (this.forcePlaySituation()) {
+                        var fielders = fielder.team.positions;
+                        var force = this.forcePlaySituation();
+                        if (force) {
                             var additionalOuts = [];
-                            var throwingDelay = 2.0;
-                            if (third && fieldingReturnDelay + throwingDelay < second.getBaseRunningTime() && outs < 3) {
+                            var throwingDelay = fieldingReturnDelay;
+                            if (third && force === 'third' && _baseballServices_services.Mathinator.infieldThrowDelay(fielders.catcher) + throwingDelay < second.getBaseRunningTime() && outs < 3) {
+                                throwingDelay += _baseballServices_services.Mathinator.infieldThrowDelay(fielders.catcher);
+                                fielders.catcher.fatigue += 4;
                                 additionalOuts.push('second');
-                                throwingDelay += 2.0;
                                 outs++;
+                                force = 'second';
                             }
-                            if (second && fieldingReturnDelay + throwingDelay < first.getBaseRunningTime() && outs < 3) {
+                            if (second && force === 'second' && _baseballServices_services.Mathinator.infieldThrowDelay(fielders.third) + throwingDelay < first.getBaseRunningTime() && outs < 3) {
+                                throwingDelay += _baseballServices_services.Mathinator.infieldThrowDelay(fielders.third);
+                                fielders.third.fatigue += 4;
                                 additionalOuts.push('first');
-                                throwingDelay += 2.0;
                                 outs++;
+                                force = 'first';
                             }
-                            if (first && fieldingReturnDelay + throwingDelay < game.batter.getBaseRunningTime() && outs < 3) {
+                            if (first && force === 'first' && _baseballServices_services.Mathinator.infieldThrowDelay(fielders.second) + throwingDelay < game.batter.getBaseRunningTime() && outs < 3) {
+                                throwingDelay += _baseballServices_services.Mathinator.infieldThrowDelay(fielders.second);
+                                fielders.second.fatigue += 4;
                                 additionalOuts.push('batter');
                                 swing.bases = 0;
-                                throwingDelay += 2.0;
+                                // todo (or shortstop)
                                 outs++;
+                            }
+                            if (outs - game.umpire.count.outs === 2) {
+                                swing.doublePlay = true;
                             }
                             if (additionalOuts.length) {
                                 swing.additionalOuts = additionalOuts;
+                                swing.firstOut = swing.fieldersChoice;
+                                if (additionalOuts.indexOf('batter') > -1) {
+                                    delete swing.fieldersChoice;
+                                }
                             }
                         }
-                        console.log('DP?', this.forcePlaySituation(), 'throwingDelay', throwingDelay, 'fielding delay', fieldingReturnDelay, 'runner', game.batter.getBaseRunningTime());
-                        if (typeof additionalOuts !== 'undefined') {
-                            console.log('omg dp', additionalOuts);
+                        //console.log('DP?', !!this.forcePlaySituation(), 'throwingDelay', throwingDelay,
+                        //    'fielding delay', fieldingReturnDelay, 'runner', game.batter.getBaseRunningTime());
+                        //if (typeof additionalOuts !== 'undefined' && additionalOuts.length) {
+                        //    console.log('omg dp', additionalOuts);
+                        //}
+                    } else {
+                            delete swing.additionalOuts;
+                            delete swing.firstOut;
+                            delete swing.doublePlay;
+                            delete swing.fieldersChoice;
                         }
-                    }
                 }
                 swing.thrownOut = swing.bases == 0;
                 if (swing.thrownOut) {
@@ -231,7 +253,7 @@ Field.prototype = {
         var first = this.first,
             second = this.second,
             third = this.third;
-        return !!(first || first && second || first && second && third);
+        return first && second && third && 'third' || first && second && 'second' || first && 'first';
     },
     //printRunnerNames : function() {
     //    return [this.first ? this.first.getName() : '', this.second ? this.second.getName() : '', this.third ? this.third.getname() : ''];
@@ -708,15 +730,16 @@ Game.prototype = {
         log('grounders thrown out', this.debug.filter(function (a) {
             return !a.caught && !a.foul && a.flyAngle < -5 && a.thrownOut;
         }).length);
-        log('weak fly hits (thrown out)', this.debug.filter(function (a) {
+        log('weak air hits (thrown out)', this.debug.filter(function (a) {
             return !a.caught && !a.foul && a.flyAngle > 0 && a.thrownOut;
         }).length);
-        log('good fly hits (not caught)', this.debug.filter(function (a) {
+        log('good air hits (not caught)', this.debug.filter(function (a) {
             return !a.caught && !a.foul && a.flyAngle > 0 && !a.thrownOut;
         }).length);
 
         var PO = {};
         this.debug.map(function (a) {
+            if (!a.fielder) return;
             if (!PO[a.fielder]) {
                 PO[a.fielder] = 0;
             }
@@ -729,25 +752,37 @@ Game.prototype = {
         var hitters = this.teams.away.lineup.concat(this.teams.home.lineup);
         var atBats = [];
         hitters.map(function (a) {
-            atBats = atBats.concat(a.atBats);
+            atBats = atBats.concat(a.getAtBats().map(function (ab) {
+                return ab.text;
+            }));
         });
 
         var LO = atBats.filter(function (ab) {
             return ab == 'LO';
         }).length;
-        log('line outs', LO);
         var FO = atBats.filter(function (ab) {
             return ab == 'FO';
         }).length;
-        log('fly outs', FO);
         var GO = atBats.filter(function (ab) {
             return ab == 'GO';
         }).length;
-        log('groundouts', GO);
+        var GIDP = atBats.filter(function (ab) {
+            return ab == '(IDP)';
+        }).length;
         var SO = atBats.filter(function (ab) {
             return ab == 'SO';
         }).length;
-        log('strikeouts', SO);
+        var BB = atBats.filter(function (ab) {
+            return ab == 'BB';
+        }).length;
+        var SAC = atBats.filter(function (ab) {
+            return ab == 'SAC';
+        }).length;
+        var FC = atBats.filter(function (ab) {
+            return ab == 'FC';
+        }).length;
+        log('line outs', LO, 'fly outs', FO, 'groundouts', GO, 'strikeouts', SO, 'sacrifices', SAC, 'FC', FC, 'gidp', GIDP);
+        log('BB', BB);
         log('fouls', this.debug.filter(function (a) {
             return a.foul;
         }).length);
@@ -760,6 +795,8 @@ Game.prototype = {
             fatigue.away[position] = teams.away.positions[position].fatigue;
         });
         console.table(fatigue);
+        console.table(this.scoreboard);
+        console.table(this.tally);
     },
     toData: function toData() {
         var data = {};
@@ -1501,12 +1538,21 @@ Umpire.prototype = {
                     } else {
                         batter.stats.batting.pa++;
                         batter.stats.batting.ab++;
+                        if (result.firstOut) {
+                            result.additionalOuts.map(function (runner) {
+                                if (runner !== 'batter') {
+                                    game.field[runner] = null;
+                                }
+                            });
+                            this.count.outs += result.additionalOuts.length;
+                        }
                         if (result.fieldersChoice && this.count.outs < 2) {
                             result.bases = 0;
                             this.count.outs++;
                             pitcher.stats.pitching.IP[1]++;
                             game.batter.atBats.push(_baseballUtility_utils.Log.prototype.FIELDERS_CHOICE);
                             this.advanceRunners(false, result.fieldersChoice);
+                            result.doublePlay && game.batter.atBats.push(_baseballUtility_utils.Log.prototype.GIDP);
                             this.reachBase();
                             result.outs = this.count.outs;
                             this.newBatter();
@@ -1518,6 +1564,7 @@ Umpire.prototype = {
                             this.count.outs++;
                             pitcher.stats.pitching.IP[1]++;
                             game.batter.atBats.push(_baseballUtility_utils.Log.prototype.GROUNDOUT);
+                            result.doublePlay && game.batter.atBats.push(_baseballUtility_utils.Log.prototype.GIDP);
                             if (this.count.outs < 3) {
                                 this.advanceRunners(false);
                             }
@@ -2308,6 +2355,15 @@ Mathinator.prototype = {
          + 1 - (0.2 + fielding * 0.8) + 9 * (distance / 310) * Math.min(intercept - 120, 0) / -240; // gather time
     },
     /**
+     * @param player {Player}
+     * @returns {number} ~2.0
+     */
+    infieldThrowDelay: function infieldThrowDelay(player) {
+        var fielding = player.skill.defense.fielding,
+            throwing = player.skill.defense.throwing;
+        return 3.5 - (fielding + throwing) / 200;
+    },
+    /**
      * @param speed {number} 0-100
      * @returns {number} seconds
      */
@@ -2378,6 +2434,8 @@ Log.prototype = {
     SACRIFICE: 'SAC',
     REACHED_ON_ERROR: 'ROE',
     FIELDERS_CHOICE: 'FC',
+    GIDP: '(IDP)',
+    GITP: '(ITP)',
     stabilizeShortRecord: function stabilizeShortRecord() {
         var rec = this.record.e.slice(0, 6);
         this.shortRecord.e = rec;
@@ -2586,6 +2644,12 @@ Log.prototype = {
                                             }
                                             break;
                                     }
+                                }
+                                if (r.firstOut) {
+                                    out = out.concat(r.additionalOuts.filter(function (runner) {
+                                        return runner !== 'batter';
+                                    }));
+                                    out.doublePlay = r.doublePlay;
                                 }
                                 if (r.fieldersChoice) {
                                     out.push(r.fieldersChoice);
@@ -2926,15 +2990,14 @@ text.namePitch = function (pitch) {
 text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances, out) {
     var statement = '';
     var infield = ['left', 'center', 'right'].indexOf(fielder) < 0;
+    var doublePlay = out.doublePlay;
     if (text.mode == 'e') {
         statement += batter;
         if (outBy) {
             switch (outBy) {
                 case 'fieldersChoice':
-                    var plural = out.length > 1;
-                    var runner = plural ? 'Runners' : 'Runner';
-                    var is = plural ? 'are' : 'is';
-                    statement += ' reached on a fielder\'s choice by ' + text.fielderShortName(fielder) + '. ' + runner + ' from ' + text(out.join(text.comma())) + ' ' + is + ' out';
+                    play = out.length === 2 ? 'double play' : '';
+                    statement += ' reached on a fielder\'s choice ' + play + ' by ' + text.fielderShortName(fielder);
                     break;
                 case 'line':
                     statement += ' lined out to ' + text.fielderShortName(fielder);
@@ -2949,11 +3012,19 @@ text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances,
                     statement += ' popped out to ' + text.fielderShortName(fielder);
                     break;
                 case 'ground':
-                    statement += ' grounded into a force out by ' + text.fielderShortName(fielder);
+                    var play = doublePlay ? 'into a double play by' : 'out to';
+                    statement += ' grounded ' + play + ' ' + text.fielderShortName(fielder);
                     break;
                 case 'thrown':
-                    statement += ' was thrown out by ' + text.fielderShortName(fielder);
+                    play = doublePlay ? ' on a double play' : '';
+                    statement += ' was thrown out by ' + text.fielderShortName(fielder) + play;
                     break;
+            }
+            if (out.length) {
+                var plural = out.length > 1;
+                var runner = plural ? 'Runners' : 'Runner';
+                var is = plural ? 'are' : 'is';
+                statement += '. ' + runner + ' from ' + text(out.join(text.comma())) + ' ' + is + ' out';
             }
         } else {
             switch (bases) {
@@ -2994,7 +3065,7 @@ text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances,
             fielder = text.fielderShortName(fielder);
             switch (outBy) {
                 case 'fieldersChoice':
-                    statement += '野選(' + fielder + ')で出塁。' + text(out.join(text.comma())) + 'ランナーはアウト';
+                    statement += '野選(' + fielder + ')で出塁';
                     break;
                 case 'line':
                     statement += fielder + '直';
@@ -3014,6 +3085,14 @@ text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances,
                 case 'thrown':
                     statement += fielder + 'ゴロ';
                     break;
+            }
+            if (out.length) {
+                statement += '。' + out.map(function (runner) {
+                    return text(runner);
+                }).join(text.comma()) + 'ランナーはアウト';
+            }
+            if (doublePlay) {
+                statement += '。ゲッツー';
             }
         } else {
             fielder = text.fielderShortName(fielder);
