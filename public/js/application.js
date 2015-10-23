@@ -1985,7 +1985,7 @@ Animator.prototype = {
         var velocity = linearApproximateDragScalar.distance * Math.sqrt(9.81 * distance / Math.sin(2 * Math.PI * angle / 180));
         var velocityVerticalComponent = Math.sin(_baseballServices_services.Mathinator.RADIAN * angle) * velocity;
         var apexHeight = velocityVerticalComponent * velocityVerticalComponent / (2 * 9.81) * linearApproximateDragScalar.apexHeight;
-        var airTime = Math.sqrt(2 * apexHeight / 9.81) * linearApproximateDragScalar.airTime;
+        var airTime = 2 * Math.sqrt(2 * apexHeight / 9.81) * linearApproximateDragScalar.airTime; // 2x freefall equation
 
         //log('angle', angle, 'vel', velocity, 'apex', apexHeight, 'air', airTime, 'dist', result.travelDistance);
         var quarter = airTime / 4;
@@ -1997,7 +1997,7 @@ Animator.prototype = {
         TweenMax.to(ball, quarter, transitions[3]);
         TweenMax.to(ball, quarter, transitions[4]);
 
-        ball = $('.baseball.break');
+        ball = $('.baseball.break').show();
         var time = quarter / 2;
         transitions = [mathinator.transitionalCatcherPerspectiveTrajectory(0, time, 0, apexHeight, scalar * distance, result.splay, game.pitchInFlight), mathinator.transitionalCatcherPerspectiveTrajectory(12.5, time, 0), mathinator.transitionalCatcherPerspectiveTrajectory(25, time, 1), mathinator.transitionalCatcherPerspectiveTrajectory(37.5, time, 2), mathinator.transitionalCatcherPerspectiveTrajectory(50, time, 3), mathinator.transitionalCatcherPerspectiveTrajectory(62.5, time, 4), mathinator.transitionalCatcherPerspectiveTrajectory(75, time, 5), mathinator.transitionalCatcherPerspectiveTrajectory(87.5, time, 6), mathinator.transitionalCatcherPerspectiveTrajectory(100, time, 7)];
         TweenMax.set(ball, transitions[0]);
@@ -2326,11 +2326,11 @@ Mathinator.prototype = {
         var height = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 1.2) * apexHeight,
             currentDistance = distance * percent / 100;
 
-        var projection = (500 - currentDistance) / 500; // reduction of dimensions due to distance
+        var projection = Math.pow((500 - currentDistance) / 500, 2); // reduction of dimensions due to distance
 
         top = 200 - origin.y - height * 20 * projection;
         left = origin.x + Math.sin(splay * radian) * (currentDistance * 8) * projection;
-        padding = Math.sqrt((350 - currentDistance) / 350) * 12;
+        padding = 12 * projection;
         borderWidth = Math.max(Math.min(padding / 3, 4), 0);
 
         top = Math.max(Math.min(top, 500), -10000);
