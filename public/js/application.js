@@ -1997,6 +1997,19 @@ Animator.prototype = {
         TweenMax.to(ball, quarter, transitions[3]);
         TweenMax.to(ball, quarter, transitions[4]);
 
+        ball = $('.baseball.break');
+        var time = quarter / 2;
+        transitions = [mathinator.transitionalCatcherPerspectiveTrajectory(0, time, 0, apexHeight, scalar * distance, result.splay, game.pitchInFlight), mathinator.transitionalCatcherPerspectiveTrajectory(12.5, time, 0), mathinator.transitionalCatcherPerspectiveTrajectory(25, time, 1), mathinator.transitionalCatcherPerspectiveTrajectory(37.5, time, 2), mathinator.transitionalCatcherPerspectiveTrajectory(50, time, 3), mathinator.transitionalCatcherPerspectiveTrajectory(62.5, time, 4), mathinator.transitionalCatcherPerspectiveTrajectory(75, time, 5), mathinator.transitionalCatcherPerspectiveTrajectory(87.5, time, 6), mathinator.transitionalCatcherPerspectiveTrajectory(100, time, 7)];
+        TweenMax.set(ball, transitions[0]);
+        TweenMax.to(ball, time, transitions[1]);
+        TweenMax.to(ball, time, transitions[2]);
+        TweenMax.to(ball, time, transitions[3]);
+        TweenMax.to(ball, time, transitions[4]);
+        TweenMax.to(ball, time, transitions[5]);
+        TweenMax.to(ball, time, transitions[6]);
+        TweenMax.to(ball, time, transitions[7]);
+        TweenMax.to(ball, time, transitions[8]);
+
         return game.swingResult;
     }
 };
@@ -2275,6 +2288,59 @@ Mathinator.prototype = {
         padding = Math.max(Math.min(padding, 12), 0);
         return {
             bottom: bottom,
+            left: left,
+            padding: padding,
+            borderWidth: borderWidth,
+            delay: quarter * step,
+            ease: bounding ? Power4.easeOut : Linear.easeNone
+        };
+    },
+    /**
+     * @param percent {number} 0-100
+     * @param quarter {number} seconds
+     * @param step {number} 0 and up
+     * @param [givenApexHeight] feet
+     * @param [givenDistance] in feet
+     * @param [givenSplayAngle] where 0 is up the middle and 90 is right foul
+     * @param [givenOrigin] Object with x, y -- pitchInFlight
+     * @returns {{top: number, left: number, padding: number, borderWidth: number, delay: number, ease: (r.easeOut|*)}}
+     */
+    transitionalCatcherPerspectiveTrajectory: function transitionalCatcherPerspectiveTrajectory(percent, quarter, step, givenApexHeight, givenDistance, givenSplayAngle, givenOrigin) {
+        var memory = Mathinator.prototype.memory;
+        if (givenApexHeight) memory.apexHeight = givenApexHeight;
+        if (givenDistance) memory.distance = givenDistance;
+        if (givenSplayAngle) memory.splay = givenSplayAngle;
+        if (givenOrigin) memory.origin = givenOrigin;
+        var apexHeight = memory.apexHeight,
+            distance = memory.distance,
+            splay = memory.splay,
+            origin = memory.origin;
+        var top, left, padding, borderWidth;
+        var bounding = Mathinator.prototype.memory.bounding,
+            radian = this.RADIAN;
+
+        if (bounding) {
+            percent = Math.floor(Math.sqrt(percent / 100) * 100);
+        }
+
+        var height = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 1.2) * apexHeight,
+            currentDistance = distance * percent / 100;
+
+        var projection = (500 - currentDistance) / 500; // reduction of dimensions due to distance
+
+        top = 200 - origin.y - height * 20 * projection;
+        left = origin.x + Math.sin(splay * radian) * (currentDistance * 8) * projection;
+        padding = Math.sqrt((350 - currentDistance) / 350) * 12;
+        borderWidth = Math.max(Math.min(padding / 3, 4), 0);
+
+        top = Math.max(Math.min(top, 500), -10000);
+        left = Math.max(Math.min(left, 10000), -10000);
+        padding = Math.max(Math.min(padding, 24), 1);
+
+        //console.log('height', height|0, apexHeight|0, projection, 'left/pad/border', left|0, padding|0, borderWidth|0, 'top', top);
+
+        return {
+            top: top,
             left: left,
             padding: padding,
             borderWidth: borderWidth,
