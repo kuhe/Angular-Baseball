@@ -1985,7 +1985,7 @@ Animator.prototype = {
         var velocity = linearApproximateDragScalar.distance * Math.sqrt(9.81 * distance / Math.sin(2 * Math.PI * angle / 180));
         var velocityVerticalComponent = Math.sin(_baseballServices_services.Mathinator.RADIAN * angle) * velocity;
         var apexHeight = velocityVerticalComponent * velocityVerticalComponent / (2 * 9.81) * linearApproximateDragScalar.apexHeight;
-        var airTime = 2 * Math.sqrt(2 * apexHeight / 9.81) * linearApproximateDragScalar.airTime; // 2x freefall equation
+        var airTime = 1.5 * Math.sqrt(2 * apexHeight / 9.81) * linearApproximateDragScalar.airTime; // 2x freefall equation
 
         //log('angle', angle, 'vel', velocity, 'apex', apexHeight, 'air', airTime, 'dist', result.travelDistance);
         var quarter = airTime / 4;
@@ -1999,7 +1999,7 @@ Animator.prototype = {
 
         ball = $('.baseball.break').show();
         var time = quarter / 2;
-        transitions = [mathinator.transitionalCatcherPerspectiveTrajectory(0, time, 0, apexHeight, scalar * distance, result.splay, game.pitchInFlight), mathinator.transitionalCatcherPerspectiveTrajectory(12.5, time, 0), mathinator.transitionalCatcherPerspectiveTrajectory(25, time, 1), mathinator.transitionalCatcherPerspectiveTrajectory(37.5, time, 2), mathinator.transitionalCatcherPerspectiveTrajectory(50, time, 3), mathinator.transitionalCatcherPerspectiveTrajectory(62.5, time, 4), mathinator.transitionalCatcherPerspectiveTrajectory(75, time, 5), mathinator.transitionalCatcherPerspectiveTrajectory(87.5, time, 6), mathinator.transitionalCatcherPerspectiveTrajectory(100, time, 7)];
+        transitions = [mathinator.transitionalCatcherPerspectiveTrajectory(0, time, 0, apexHeight, scalar * distance, result.splay, game.pitchInFlight), mathinator.transitionalCatcherPerspectiveTrajectory(12.5, time * 0.75, 0), mathinator.transitionalCatcherPerspectiveTrajectory(25, time * 0.80, 1), mathinator.transitionalCatcherPerspectiveTrajectory(37.5, time * 0.85, 2), mathinator.transitionalCatcherPerspectiveTrajectory(50, time * 0.90, 3), mathinator.transitionalCatcherPerspectiveTrajectory(62.5, time * 0.95, 4), mathinator.transitionalCatcherPerspectiveTrajectory(75, time, 5), mathinator.transitionalCatcherPerspectiveTrajectory(87.5, time, 6), mathinator.transitionalCatcherPerspectiveTrajectory(100, time, 7)];
         TweenMax.set(ball, transitions[0]);
         TweenMax.to(ball, time, transitions[1]);
         TweenMax.to(ball, time, transitions[2]);
