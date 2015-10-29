@@ -74,6 +74,18 @@ IndexController = function($scope, socket) {
         if (game.humanControl == 'home') {
 
         }
+        if (!quickMode || quickMode === 7) {
+            game.timeOfDay.h = '00';
+            var delay = 100,
+                interval = 150;
+            while (delay < (game.startTime.h - game.timeOfDay.h) * interval) {
+                setTimeout(function() {
+                    game.timeOfDay.h = ('00' + (parseInt(game.timeOfDay.h) + 1)).slice(-2);
+                    $scope.$apply();
+                }, delay);
+                delay += interval;
+            }
+        }
     };
 
     var bindMethods = function() {

@@ -398,7 +398,14 @@ Game.prototype = {
     pitcher: {}, // Player&
     batter: {}, // Player&
     init: function init(m) {
-        this.startTime = this.timeOfDay = ('00' + (Math.random() * 8 + 12 | 0)).slice(-2);
+        this.startTime = {
+            h: ('00' + (Math.random() * 8 + 10 | 0)).slice(-2),
+            m: ('00' + (Math.random() * 60 | 0)).slice(-2)
+        };
+        this.timeOfDay = {
+            h: this.startTime.h,
+            m: this.startTime.m
+        };
         if (m) _baseballUtility_utils.text.mode = m;
         this.gamesIntoSeason = 1 + Math.floor(Math.random() * 142);
         this.field = new _baseballModelField.Field(this);
@@ -414,6 +421,13 @@ Game.prototype = {
         this.umpire = new _baseballModelUmpire.Umpire(this);
         if (this.humanPitching()) {
             this.stage = 'pitch';
+        }
+    },
+    passMinutes: function passMinutes(minutes) {
+        this.timeOfDay.m = ('00' + (parseInt(this.timeOfDay.m) + parseInt(minutes))).slice(-2);
+        if (parseInt(this.timeOfDay.m) >= 60) {
+            this.timeOfDay.m = ('00' + parseInt(this.timeOfDay.m) % 60).slice(-2);
+            this.timeOfDay.h = ('00' + (parseInt(this.timeOfDay.h) + 1) % 24).slice(-2);
         }
     },
     getInning: function getInning() {
@@ -1515,6 +1529,7 @@ Umpire.prototype = {
         } else {
             pitcher.stats.pitching.strikes++;
             if (result.contact) {
+                game.passMinutes(1);
                 if (result.caught) {
                     batter.stats.batting.pa++;
                     pitcher.stats.pitching.IP[1]++;
@@ -1770,6 +1785,7 @@ Umpire.prototype = {
     },
     newBatter: function newBatter() {
         var game = this.game;
+        game.passMinutes(2);
         game.log.pitchRecord = {
             e: [],
             n: []
@@ -1789,6 +1805,7 @@ Umpire.prototype = {
     },
     changeSides: function changeSides() {
         var game = this.game;
+        game.passMinutes(5);
         game.swingResult = {};
         game.swingResult.looking = true; // hide bat
         game.pitchInFlight.x = null; // hide ball
@@ -1811,7 +1828,6 @@ Umpire.prototype = {
                 return game.end();
             }
             game.inning++;
-            game.timeOfDay = ('00' + (game.startTime + game.inning / 2 | 0)).slice(-2);
             game.half = 'top';
         }
         offense = game.half == 'top' ? 'away' : 'home';
@@ -3350,6 +3366,18 @@ IndexController = function($scope, socket) {
         }
         if (game.humanControl == 'home') {
 
+        }
+        if (!quickMode || quickMode === 7) {
+            game.timeOfDay.h = '00';
+            var delay = 100,
+                interval = 150;
+            while (delay < (game.startTime.h - game.timeOfDay.h) * interval) {
+                setTimeout(function() {
+                    game.timeOfDay.h = ('00' + (parseInt(game.timeOfDay.h) + 1)).slice(-2);
+                    $scope.$apply();
+                }, delay);
+                delay += interval;
+            }
         }
     };
 
