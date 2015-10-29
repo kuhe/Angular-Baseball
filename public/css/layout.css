@@ -157,12 +157,11 @@ html body {
 }
 .no-swing {
   padding: 0;
-  border: 2px dashed grey;
-  border-left: 50px solid rgba(243, 255, 245, 0.48);
-  border-right: 50px solid rgba(243, 255, 244, 0.48);
-  background: white;
+  border-top: 2px dashed grey;
+  border-bottom: 2px dashed grey;
+  background: transparent;
   min-width: 300px;
-  margin: 0 auto 25px auto;
+  margin: 0 -10px 25px -10px;
 }
 .target {
   margin: 0 auto;
@@ -171,7 +170,7 @@ html body {
   width: 200px;
   height: 200px;
   border: 1px dashed #bcc2c9;
-  background: radial-gradient(circle at 100px 100px, #f2f2ee, #d1d1d1);
+  background: radial-gradient(circle at 100px 100px, rgba(240, 240, 237, 0.5), rgba(209, 209, 209, 0.5));
   perspective: 100px;
 }
 .target.live {
@@ -183,19 +182,19 @@ html body {
   }
 }
 .target.pitching {
-  background: #f0e9ee;
+  background: rgba(240, 233, 238, 0.5);
 }
 @media (min-width: 600px) {
   .target.pitching {
-    background: radial-gradient(circle at 100px 100px, #f2f2ee, #d1d1d1);
+    background: radial-gradient(circle at 100px 100px, rgba(240, 240, 237, 0.5), rgba(209, 209, 209, 0.5));
   }
 }
 .target.batting {
-  background: #edebed;
+  background: rgba(237, 235, 237, 0.5);
 }
 @media (min-width: 600px) {
   .target.batting {
-    background: radial-gradient(circle at 100px 100px, #f2f2ee, #d1d1d1);
+    background: radial-gradient(circle at 100px 100px, rgba(240, 240, 237, 0.5), rgba(209, 209, 209, 0.5));
   }
 }
 .strikezone {
@@ -203,7 +202,7 @@ html body {
   padding: 0;
   width: 100px;
   height: 130px;
-  background: radial-gradient(circle at 50px 80px, #8e8d88, #4d4d50);
+  background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.5), rgba(77, 77, 80, 0.5));
   border: 3px solid #ccd4d1;
 }
 @media (min-width: 600px) {
@@ -212,19 +211,19 @@ html body {
   }
 }
 .strikezone.pitching {
-  background: #aea9ad;
+  background: rgba(174, 169, 173, 0.5);
 }
 @media (min-width: 600px) {
   .strikezone.pitching {
-    background: radial-gradient(circle at 50px 80px, #8e8d88, #4d4d50);
+    background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.5), rgba(77, 77, 80, 0.5));
   }
 }
 .strikezone.batting {
-  background: #c0bdc3;
+  background: rgba(192, 189, 195, 0.5);
 }
 @media (min-width: 600px) {
   .strikezone.batting {
-    background: radial-gradient(circle at 50px 80px, #8e8d88, #4d4d50);
+    background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.5), rgba(77, 77, 80, 0.5));
   }
 }
 .indicator.pitch {

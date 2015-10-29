@@ -398,6 +398,7 @@ Game.prototype = {
     pitcher: {}, // Player&
     batter: {}, // Player&
     init: function init(m) {
+        this.startTime = this.timeOfDay = ('00' + (Math.random() * 8 + 12 | 0)).slice(-2);
         if (m) _baseballUtility_utils.text.mode = m;
         this.gamesIntoSeason = 1 + Math.floor(Math.random() * 142);
         this.field = new _baseballModelField.Field(this);
@@ -1810,6 +1811,7 @@ Umpire.prototype = {
                 return game.end();
             }
             game.inning++;
+            game.timeOfDay = ('00' + (game.startTime + game.inning / 2 | 0)).slice(-2);
             game.half = 'top';
         }
         offense = game.half == 'top' ? 'away' : 'home';
@@ -3610,6 +3612,20 @@ BatteryDirective = function() {
         //}
     };
 };
+FieldDirective = function() {
+    return {
+        //scope: {
+        //    game: '=',
+        //    text: '='
+        //},
+        templateUrl: 'public/html/views/directives/field.html?cache='+cacheKey,
+        transclude : true,
+        //link: function(scope) {
+        //    scope.t = scope.text;
+        //    scope.y = scope.game;
+        //}
+    };
+};
 ScoreboardDirective = function() {
     return {
         scope: {
@@ -3638,5 +3654,6 @@ cacheKey = Math.floor(Math.random()*1500);
 angular.module('directives', [])
     .directive('scoreboard', ScoreboardDirective)
     .directive('batters', BattersDirective)
-    .directive('battery', BatteryDirective);
+    .directive('battery', BatteryDirective)
+    .directive('field', FieldDirective);
 //# sourceMappingURL=sourcemaps/application.js.map

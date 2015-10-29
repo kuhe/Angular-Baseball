@@ -1,0 +1,125 @@
+.main-area {
+
+    .background-color {
+        background-color: transparent;
+    }
+    .list-group-item {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    field {
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin-top: -35px;
+    }
+
+    /* Gradients http://codepen.io/zessx/pen/rDEAl/ */
+    .sky-gradient-00, .sky-gradient-24 { background: #00000c; }
+    @circle: ellipse 1000px 300px at 41% -50px, #1e528e 0%;
+    .sky-gradient-01 { background: radial-gradient(@circle, #020111 85%,#191621 100%); }
+    .sky-gradient-02 { background: radial-gradient(@circle, #020111 60%,#20202c 100%); }
+    .sky-gradient-03 { background: radial-gradient(@circle, #020111 10%,#3a3a52 100%); }
+    .sky-gradient-04 { background: radial-gradient(@circle, #20202c 00%,#515175 100%); }
+    .sky-gradient-05 { background: radial-gradient(@circle, #40405c 00%,#6f71aa 80%,#8a76ab 100%); }
+    .sky-gradient-06 { background: radial-gradient(@circle, #4a4969 00%,#7072ab 50%,#cd82a0 100%); }
+    .sky-gradient-07 { background: radial-gradient(@circle, #757abf 00%,#8583be 60%,#eab0d1 100%); }
+    .sky-gradient-08 { background: radial-gradient(@circle, #82addb 00%,#ebb2b1 100%); }
+    .sky-gradient-09 { background: radial-gradient(@circle, #94c5f8 01%,#a6e6ff 70%,#b1b5ea 100%); }
+    .sky-gradient-10 { background: radial-gradient(@circle, #b7eaff 00%,#94dfff 100%); }
+    .sky-gradient-11 { background: radial-gradient(@circle, #9be2fe 00%,#67d1fb 100%); }
+    .sky-gradient-12 { background: radial-gradient(@circle, #90dffe 00%,#38a3d1 100%); }
+    .sky-gradient-13 { background: radial-gradient(@circle, #57c1eb 00%,#246fa8 100%); }
+    .sky-gradient-14 { background: radial-gradient(@circle, #2d91c2 00%,#1e528e 100%); }
+    .sky-gradient-15 { background: radial-gradient(@circle, #2473ab 00%,#1e528e 70%,#5b7983 100%); }
+    .sky-gradient-16 { background: radial-gradient(@circle, #1e528e 00%,#265889 50%,#9da671 100%); }
+    .sky-gradient-17 { background: radial-gradient(@circle, #1e528e 00%,#728a7c 50%,#e9ce5d 100%); }
+    .sky-gradient-18 { background: radial-gradient(@circle, #154277 00%,#576e71 30%,#e1c45e 70%,#b26339 100%); }
+    .sky-gradient-19 { background: radial-gradient(@circle, #163C52 00%,#4F4F47 30%,#C5752D 60%,#B7490F 80%, #2F1107 100%); }
+    .sky-gradient-20 { background: radial-gradient(@circle, #071B26 00%,#071B26 30%,#8A3B12 80%,#240E03 100%); }
+    .sky-gradient-21 { background: radial-gradient(@circle, #010A10 30%,#59230B 80%,#2F1107 100%); }
+    .sky-gradient-22 { background: radial-gradient(@circle, #090401 50%,#4B1D06 100%); }
+    .sky-gradient-23 { background: radial-gradient(@circle, #00000c 80%,#150800 100%); }
+
+    .grass-gradient-00, .grass-gradient-24 { background-color: rgba(50, 40, 40, 1); }
+    .grass-gradient-01 { background-color: rgba(50, 50, 40, 1); }
+    .grass-gradient-02 { background-color: rgba(50, 60, 40, 1); }
+    .grass-gradient-03 { background-color: rgba(50, 70, 40, 1); }
+    .grass-gradient-04 { background-color: rgba(50, 80, 40, 1); }
+    .grass-gradient-05 { background-color: rgba(50, 85, 40, 1); }
+    .grass-gradient-06 { background-color: rgba(50, 90, 40, 1); }
+    .grass-gradient-07 { background-color: rgba(50, 100, 40, 1); }
+    .grass-gradient-08 { background-color: rgba(50, 110, 40, 1); }
+    .grass-gradient-09 { background-color: rgba(50, 140, 40, 1); }
+    .grass-gradient-10 { background-color: rgba(50, 160, 40, 1); }
+    .grass-gradient-11 { background-color: rgba(50, 180, 40, 1); }
+    .grass-gradient-12 { background-color: rgba(50, 200, 40, 1); }
+    .grass-gradient-13 { background-color: rgba(50, 180, 40, 1); }
+    .grass-gradient-14 { background-color: rgba(50, 170, 40, 1); }
+    .grass-gradient-15 { background-color: rgba(50, 160, 40, 1); }
+    .grass-gradient-16 { background-color: rgba(50, 150, 40, 1); }
+    .grass-gradient-17 { background-color: rgba(50, 140, 40, 1); }
+    .grass-gradient-18 { background-color: rgba(50, 120, 40, 1); }
+    .grass-gradient-19 { background-color: rgba(50, 110, 40, 1); }
+    .grass-gradient-20 { background-color: rgba(50, 75, 40, 1); }
+    .grass-gradient-21 { background-color: rgba(50, 60, 40, 1); }
+    .grass-gradient-22 { background-color: rgba(50, 50, 40, 1); }
+    .grass-gradient-23 { background-color: rgba(50, 50, 40, 1); }
+    
+    
+    .field {
+        &.bw {
+            display: none;
+        }
+        text-align: center;
+        perspective: 500px;
+        overflow: hidden;
+        @viewHeight: 300px;
+        width: 100%;
+        position: absolute;
+        height: @viewHeight;
+        top: 5px;
+        left: 0;
+        right: 0;
+        z-index: -10;
+        > * {
+            position: absolute;
+            margin: auto;
+            width: 200%;
+            left: -50%;
+            right: -50%;
+        }
+        @skyHeight: 150px;
+        .sky {
+            height: @skyHeight;
+            transform: rotateX(-0deg);
+        }
+        .grass {
+            top: -100px;
+            height: 600px;
+            transform: rotateX(80deg);
+            background-size: 90px 90px;
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
+                transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
+                transparent 75%, transparent);
+        }
+        .dirt {
+            bottom: 0;
+            height: 100px;
+            background: sandybrown;
+            left: 0; right: 0;
+            width: 400px;
+            transform: rotateX(80deg);
+        }
+        .plate {
+
+        }
+        .chalk {
+            background: white;
+            .third-base-line {}
+            .rhb-box {}
+            .lhb-box {}
+            .first-base-line {}
+        }
+    }
+}
