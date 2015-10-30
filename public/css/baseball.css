@@ -8,7 +8,9 @@
   margin: -13px;
 }
 .indicator.pitch {
-  opacity: 0.65;
+  opacity: 0.25;
+  border-width: 3px;
+  padding: 10px;
 }
 .baseball {
   border: 4px dashed #ff6261;

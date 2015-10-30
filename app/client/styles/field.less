@@ -1,10 +1,10 @@
 .main-area {
 
     .background-color {
-        background-color: transparent;
+        background-color: rgba(255,255,255, 0.0);
     }
     .list-group-item {
-        background-color: rgba(255, 255, 255, 0.5);
+        background-color: rgba(255, 255, 255, 0.75);
     }
 
     field {
@@ -50,17 +50,17 @@
     .grass-gradient-06 { background-color: rgba(50, 90, 40, 1); }
     .grass-gradient-07 { background-color: rgba(50, 100, 40, 1); }
     .grass-gradient-08 { background-color: rgba(50, 110, 40, 1); }
-    .grass-gradient-09 { background-color: rgba(50, 140, 40, 1); }
-    .grass-gradient-10 { background-color: rgba(50, 160, 40, 1); }
-    .grass-gradient-11 { background-color: rgba(50, 180, 40, 1); }
-    .grass-gradient-12 { background-color: rgba(50, 200, 40, 1); }
-    .grass-gradient-13 { background-color: rgba(50, 180, 40, 1); }
-    .grass-gradient-14 { background-color: rgba(50, 170, 40, 1); }
-    .grass-gradient-15 { background-color: rgba(50, 160, 40, 1); }
-    .grass-gradient-16 { background-color: rgba(50, 150, 40, 1); }
-    .grass-gradient-17 { background-color: rgba(50, 140, 40, 1); }
-    .grass-gradient-18 { background-color: rgba(50, 120, 40, 1); }
-    .grass-gradient-19 { background-color: rgba(50, 110, 40, 1); }
+    .grass-gradient-09 { background-color: rgba(50, 120, 40, 1); }
+    .grass-gradient-10 { background-color: rgba(50, 130, 40, 1); }
+    .grass-gradient-11 { background-color: rgba(50, 140, 40, 1); }
+    .grass-gradient-12 { background-color: rgba(50, 150, 40, 1); }
+    .grass-gradient-13 { background-color: rgba(50, 140, 40, 1); }
+    .grass-gradient-14 { background-color: rgba(50, 130, 40, 1); }
+    .grass-gradient-15 { background-color: rgba(50, 120, 40, 1); }
+    .grass-gradient-16 { background-color: rgba(50, 110, 40, 1); }
+    .grass-gradient-17 { background-color: rgba(50, 100, 40, 1); }
+    .grass-gradient-18 { background-color: rgba(50, 90, 40, 1); }
+    .grass-gradient-19 { background-color: rgba(50, 80, 40, 1); }
     .grass-gradient-20 { background-color: rgba(50, 75, 40, 1); }
     .grass-gradient-21 { background-color: rgba(50, 60, 40, 1); }
     .grass-gradient-22 { background-color: rgba(50, 50, 40, 1); }
@@ -89,14 +89,23 @@
             left: -50%;
             right: -50%;
         }
+        .batters-eye {
+            background: white;
+            height: 300px;
+            width: 55%;
+            min-width: 220px;
+            top: 0;
+        }
         @skyHeight: 150px;
         .sky {
             height: @skyHeight;
             transform: rotateX(-0deg);
+            z-index: -8;
         }
         .grass {
-            top: -100px;
-            height: 600px;
+            z-index: -10;
+            top: -280px;
+            height: 900px;
             transform: rotateX(80deg);
             background-size: 90px 90px;
             background-image: linear-gradient(45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
@@ -104,22 +113,55 @@
                 transparent 75%, transparent);
         }
         .dirt {
-            bottom: 0;
-            height: 100px;
-            background: sandybrown;
+            bottom: -130px;
+            height: 300px;
+            background: #d09f5f;
             left: 0; right: 0;
             width: 400px;
             transform: rotateX(80deg);
+            z-index: -5;
         }
         .plate {
 
         }
-        .chalk {
+        .third-base-line, .first-base-line, .rhb-box, .lhb-box, .dirt {
+            display: none;
+        }
+        .third-base-line {
+            height: 12px;
+            transform: rotateX(80deg) rotateY(0deg) rotateZ(45deg);
+            top: 295px;
+            width: 2400px;
             background: white;
-            .third-base-line {}
-            .rhb-box {}
-            .lhb-box {}
-            .first-base-line {}
+            z-index: -9;
+        }
+        .rhb-box {
+            border: 10px solid white;
+            background: transparent;
+            width: 100px;
+            height: 400px;
+            transform: rotateX(80deg);
+            top: 105px;
+            right: -500px;
+            z-index: -4;
+        }
+        .lhb-box {
+            border: 10px solid white;
+            background: transparent;
+            width: 100px;
+            height: 400px;
+            transform: rotateX(80deg);
+            top: 105px;
+            left: -500px;
+            z-index: -4;
+        }
+        .first-base-line {
+            height: 12px;
+            transform: rotateX(80deg) rotateY(0deg) rotateZ(-45deg);
+            top: 295px;
+            width: 2400px;
+            background: white;
+            z-index: -9;
         }
     }
 }

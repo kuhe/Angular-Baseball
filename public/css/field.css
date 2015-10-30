@@ -2,10 +2,10 @@
   /* Gradients http://codepen.io/zessx/pen/rDEAl/ */
 }
 .main-area .background-color {
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0);
 }
 .main-area .list-group-item {
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.75);
 }
 .main-area field {
   position: absolute;
@@ -72,16 +72,16 @@
   background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #154277 0%, #576e71 30%, #e1c45e 70%, #b26339 100%);
 }
 .main-area .sky-gradient-19 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #163c52 0%, #4f4f47 30%, #c5752d 60%, #b7490f 80%, #2f1107 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #163C52 0%, #4F4F47 30%, #C5752D 60%, #B7490F 80%, #2F1107 100%);
 }
 .main-area .sky-gradient-20 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #071b26 0%, #071b26 30%, #8a3b12 80%, #240e03 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #071B26 0%, #071B26 30%, #8A3B12 80%, #240E03 100%);
 }
 .main-area .sky-gradient-21 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #010a10 30%, #59230b 80%, #2f1107 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #010A10 30%, #59230B 80%, #2F1107 100%);
 }
 .main-area .sky-gradient-22 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #090401 50%, #4b1d06 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #090401 50%, #4B1D06 100%);
 }
 .main-area .sky-gradient-23 {
   background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #00000c 80%, #150800 100%);
@@ -115,37 +115,37 @@
   background-color: #326e28;
 }
 .main-area .grass-gradient-09 {
-  background-color: #328c28;
-}
-.main-area .grass-gradient-10 {
-  background-color: #32a028;
-}
-.main-area .grass-gradient-11 {
-  background-color: #32b428;
-}
-.main-area .grass-gradient-12 {
-  background-color: #32c828;
-}
-.main-area .grass-gradient-13 {
-  background-color: #32b428;
-}
-.main-area .grass-gradient-14 {
-  background-color: #32aa28;
-}
-.main-area .grass-gradient-15 {
-  background-color: #32a028;
-}
-.main-area .grass-gradient-16 {
-  background-color: #329628;
-}
-.main-area .grass-gradient-17 {
-  background-color: #328c28;
-}
-.main-area .grass-gradient-18 {
   background-color: #327828;
 }
-.main-area .grass-gradient-19 {
+.main-area .grass-gradient-10 {
+  background-color: #328228;
+}
+.main-area .grass-gradient-11 {
+  background-color: #328c28;
+}
+.main-area .grass-gradient-12 {
+  background-color: #329628;
+}
+.main-area .grass-gradient-13 {
+  background-color: #328c28;
+}
+.main-area .grass-gradient-14 {
+  background-color: #328228;
+}
+.main-area .grass-gradient-15 {
+  background-color: #327828;
+}
+.main-area .grass-gradient-16 {
   background-color: #326e28;
+}
+.main-area .grass-gradient-17 {
+  background-color: #326428;
+}
+.main-area .grass-gradient-18 {
+  background-color: #325a28;
+}
+.main-area .grass-gradient-19 {
+  background-color: #325028;
 }
 .main-area .grass-gradient-20 {
   background-color: #324b28;
@@ -181,26 +181,76 @@
   left: -50%;
   right: -50%;
 }
+.main-area .field .batters-eye {
+  background: white;
+  height: 300px;
+  width: 55%;
+  min-width: 220px;
+  top: 0;
+}
 .main-area .field .sky {
   height: 150px;
   transform: rotateX(0deg);
+  z-index: -8;
 }
 .main-area .field .grass {
-  top: -100px;
-  height: 600px;
+  z-index: -10;
+  top: -280px;
+  height: 900px;
   transform: rotateX(80deg);
   background-size: 90px 90px;
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
 }
 .main-area .field .dirt {
-  bottom: 0;
-  height: 100px;
-  background: sandybrown;
+  bottom: -130px;
+  height: 300px;
+  background: #d09f5f;
   left: 0;
   right: 0;
   width: 400px;
   transform: rotateX(80deg);
+  z-index: -5;
 }
-.main-area .field .chalk {
+.main-area .field .third-base-line,
+.main-area .field .first-base-line,
+.main-area .field .rhb-box,
+.main-area .field .lhb-box,
+.main-area .field .dirt {
+  display: none;
+}
+.main-area .field .third-base-line {
+  height: 12px;
+  transform: rotateX(80deg) rotateY(0deg) rotateZ(45deg);
+  top: 295px;
+  width: 2400px;
   background: white;
+  z-index: -9;
+}
+.main-area .field .rhb-box {
+  border: 10px solid white;
+  background: transparent;
+  width: 100px;
+  height: 400px;
+  transform: rotateX(80deg);
+  top: 105px;
+  right: -500px;
+  z-index: -4;
+}
+.main-area .field .lhb-box {
+  border: 10px solid white;
+  background: transparent;
+  width: 100px;
+  height: 400px;
+  transform: rotateX(80deg);
+  top: 105px;
+  left: -500px;
+  z-index: -4;
+}
+.main-area .field .first-base-line {
+  height: 12px;
+  transform: rotateX(80deg) rotateY(0deg) rotateZ(-45deg);
+  top: 295px;
+  width: 2400px;
+  background: white;
+  z-index: -9;
 }

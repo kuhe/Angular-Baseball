@@ -538,7 +538,6 @@ Game.prototype = {
                 var windup = $('.windup');
                 windup.css('width', '100%');
             }
-            this.autoPitchSelect();
             var pitch = _baseballServices_services.Distribution.pitchLocation(),
                 x = pitch.x,
                 y = pitch.y;
@@ -589,11 +588,14 @@ Game.prototype = {
     opponentConnected: false,
     waitingCallback: function waitingCallback() {},
     awaitPitch: function awaitPitch(callback, swingResult) {
+        var giraffe = this;
         if (this.opponentConnected) {
             this.waitingCallback = callback;
             this.opponentService.emitSwing(swingResult);
         } else {
-            this.autoPitch(callback);
+            setTimeout(function () {
+                giraffe.autoPitch(callback);
+            }, 4000);
         }
     },
     awaitSwing: function awaitSwing(x, y, callback, pitchInFlight, pitchTarget) {
@@ -700,6 +702,8 @@ Game.prototype = {
                 callback = this.startOpponentPitching;
                 var emit = !override;
             }
+
+            this.autoPitchSelect();
 
             if (typeof callback == 'function') {
                 if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl] == this.pitcher.team)) {
@@ -1924,6 +1928,7 @@ Animator.prototype = {
     updateFlightPath: function updateFlightPath(callback) {
         if (Animator.console) return;
         var TweenMax = Animator.loadTweenMax();
+        TweenMax.killAll();
         var $scope = this,
             game = $scope.y,
             top = 200 - game.pitchTarget.y,
@@ -1938,9 +1943,10 @@ Animator.prototype = {
             henka = this.pitchBreak = $('.main-area .target .baseball.break'),
             quarter = flightSpeed / 4;
 
-        var pitchTransition = _baseballServices_services.Mathinator.pitchTransition(top, left, originTop, originLeft, quarter);
+        var pitchTransition = _baseballServices_services.Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 12, 4),
+            targetTransition = _baseballServices_services.Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 10, 3);
 
-        var transitions = [pitchTransition(0, 0), pitchTransition(10, 0), pitchTransition(30, 1), pitchTransition(50, 2), pitchTransition(100, 3), pitchTransition(100, 3, breakTop, breakLeft)];
+        var transitions = [pitchTransition(0, 0), pitchTransition(10, 0), pitchTransition(30, 1), pitchTransition(50, 2), targetTransition(100, 3), pitchTransition(100, 3, breakTop, breakLeft)];
 
         //var horizontalBreak = (60 - Math.abs(game.pitchTarget.x - game.pitchInFlight.x))/10;
         //$('.baseball').addClass('spin');
@@ -2015,7 +2021,7 @@ Animator.prototype = {
         TweenMax.to(ball, quarter, transitions[3]);
         TweenMax.to(ball, quarter, transitions[4]);
 
-        ball = $('.baseball.break').show();
+        ball = $('.indicator.baseball.break').removeClass('hide').show();
         var time = quarter / 2;
         transitions = [mathinator.transitionalCatcherPerspectiveTrajectory(0, time, 0, apexHeight, scalar * distance, result.splay, game.pitchInFlight), mathinator.transitionalCatcherPerspectiveTrajectory(12.5, time * 0.75, 0), mathinator.transitionalCatcherPerspectiveTrajectory(25, time * 0.80, 1), mathinator.transitionalCatcherPerspectiveTrajectory(37.5, time * 0.85, 2), mathinator.transitionalCatcherPerspectiveTrajectory(50, time * 0.90, 3), mathinator.transitionalCatcherPerspectiveTrajectory(62.5, time * 0.95, 4), mathinator.transitionalCatcherPerspectiveTrajectory(75, time, 5), mathinator.transitionalCatcherPerspectiveTrajectory(87.5, time, 6), mathinator.transitionalCatcherPerspectiveTrajectory(100, time, 7)];
         TweenMax.set(ball, transitions[0]);
@@ -2027,6 +2033,11 @@ Animator.prototype = {
         TweenMax.to(ball, time, transitions[6]);
         TweenMax.to(ball, time, transitions[7]);
         TweenMax.to(ball, time, transitions[8]);
+
+        setTimeout(function () {
+            // hack
+            $('.indicator.baseball.break').removeClass('hide').show();
+        }, 50);
 
         return game.swingResult;
     }
@@ -2346,9 +2357,9 @@ Mathinator.prototype = {
 
         var projection = Math.pow((500 - currentDistance) / 500, 2); // reduction of dimensions due to distance
 
-        top = 200 - origin.y - height * 20 * projection;
+        top = 200 - origin.y - height * 20 * projection + percent / 100 * (origin.y - 85) * projection;
         left = origin.x + Math.sin(splay * radian) * (currentDistance * 8) * projection;
-        padding = 12 * projection;
+        padding = 12 * projection * projection;
         borderWidth = Math.max(Math.min(padding / 3, 4), 0);
 
         top = Math.max(Math.min(top, 500), -10000);
@@ -2390,9 +2401,11 @@ Mathinator.prototype = {
      * @param originLeft {number} 0-200
      * @param originTop {number} 0-200
      * @param quarter {number} seconds
+     * @param maxPadding {number} px padding at full size
+     * @param maxBorderWidth {number} px border width at full size
      * @returns {Function}
      */
-    pitchTransition: function pitchTransition(top, left, originTop, originLeft, quarter) {
+    pitchTransition: function pitchTransition(top, left, originTop, originLeft, quarter, maxPadding, maxBorderWidth) {
         /**
          * @param percent {number} 0-100
          * @param step {number} 0 and up
@@ -2412,8 +2425,8 @@ Mathinator.prototype = {
                 _top -= 1;
             }
             _left = originLeft + Mathinator.square(percent / 100) * (_left - originLeft);
-            var padding = Math.max(Mathinator.square(percent / 100) * 12, 1),
-                borderWidth = Math.max(Mathinator.square(percent / 100) * 4, 1);
+            var padding = Math.max(Mathinator.square(percent / 100) * maxPadding, 1),
+                borderWidth = Math.max(Mathinator.square(percent / 100) * maxBorderWidth, 1);
             return {
                 top: _top,
                 left: _left,

@@ -91,7 +91,9 @@
   margin: -13px;
 }
 .indicator.pitch {
-  opacity: 0.65;
+  opacity: 0.25;
+  border-width: 3px;
+  padding: 10px;
 }
 .baseball {
   border: 4px dashed #ff6261;
@@ -111,11 +113,11 @@
   padding: 10px 50px;
   margin: -10px -50px;
   border-radius: 5px;
-  border-top: 1px solid #5d5b55;
-  border-bottom: 1px solid #5d5b55;
+  border-top: 1px solid #4f4f32;
+  border-bottom: 1px solid #4f4f32;
   border-left: none;
   border-right: none;
-  background: #f4f4f4;
+  background: #eeee9f;
   /* Old browsers */
 }
 .indicator.swing.stance-indicator {
@@ -123,30 +125,30 @@
 }
 @media (min-width: 600px) {
   .indicator.swing {
-    box-shadow: 0 0 12px 2px grey;
-    background: -moz-radial-gradient(center, ellipse cover, #f4f4f4 0%, #87847b 100%);
+    box-shadow: 0 0 6px 2px grey;
+    background: -moz-radial-gradient(center, ellipse cover, #eeee9f 0%, #817c5c 100%);
     /* FF3.6+ */
-    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #f4f4f4), color-stop(100%, #87847b));
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #eeee9f), color-stop(100%, #817c5c));
     /* Chrome,Safari4+ */
-    background: -webkit-radial-gradient(center, ellipse cover, #f4f4f4 0%, #87847b 100%);
+    background: -webkit-radial-gradient(center, ellipse cover, #eeee9f 0%, #817c5c 100%);
     /* Chrome10+,Safari5.1+ */
-    background: -o-radial-gradient(center, ellipse cover, #f4f4f4 0%, #87847b 100%);
+    background: -o-radial-gradient(center, ellipse cover, #eeee9f 0%, #817c5c 100%);
     /* Opera 12+ */
-    background: -ms-radial-gradient(center, ellipse cover, #f4f4f4 0%, #87847b 100%);
+    background: -ms-radial-gradient(center, ellipse cover, #eeee9f 0%, #817c5c 100%);
     /* IE10+ */
-    background: radial-gradient(ellipse at center, #f4f4f4 0%, #87847b 100%);
+    background: radial-gradient(ellipse at center, #eeee9f 0%, #817c5c 100%);
     /* W3C */
   }
 }
 .indicator.swing.left {
   border-bottom-right-radius: 4px;
   border-top-right-radius: 4px;
-  border-left: 2px solid #5d5b55;
+  border-left: 2px solid #4f4f32;
 }
 .indicator.swing.right {
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;
-  border-right: 2px solid #5d5b55;
+  border-right: 2px solid #4f4f32;
 }
 .target.swing .indicator.swing {
   display: none;
@@ -321,67 +323,43 @@ html body {
   margin: 0 -10px 25px -10px;
 }
 .target {
+  box-shadow: 0 0 24px 6px rgba(55, 55, 55, 0.6);
   margin: 0 auto;
   padding: 0;
   position: relative;
   width: 200px;
   height: 200px;
   border: 1px dashed #bcc2c9;
-  background: radial-gradient(circle at 100px 100px, rgba(240, 240, 237, 0.5), rgba(209, 209, 209, 0.5));
+  background: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, 0.6), rgba(166, 166, 166, 0.6));
   perspective: 100px;
 }
 .target.live {
   cursor: none;
 }
-@media (min-width: 600px) {
-  .target {
-    box-shadow: 0 0 25px 3px #bababa;
-  }
-}
 .target.pitching {
-  background: rgba(240, 233, 238, 0.5);
-}
-@media (min-width: 600px) {
-  .target.pitching {
-    background: radial-gradient(circle at 100px 100px, rgba(240, 240, 237, 0.5), rgba(209, 209, 209, 0.5));
-  }
+  background: rgba(240, 233, 238, 0.6);
+  background: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, 0.6), rgba(166, 166, 166, 0.6));
 }
 .target.batting {
-  background: rgba(237, 235, 237, 0.5);
-}
-@media (min-width: 600px) {
-  .target.batting {
-    background: radial-gradient(circle at 100px 100px, rgba(240, 240, 237, 0.5), rgba(209, 209, 209, 0.5));
-  }
+  background: rgba(237, 235, 237, 0.6);
+  background: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, 0.6), rgba(166, 166, 166, 0.6));
 }
 .strikezone {
+  box-shadow: 0 0 5px 3px rgba(105, 108, 112, 0.49);
   margin: 35px 50px;
   padding: 0;
   width: 100px;
   height: 130px;
-  background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.5), rgba(77, 77, 80, 0.5));
+  background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.9), rgba(77, 77, 80, 0.9));
   border: 3px solid #ccd4d1;
 }
-@media (min-width: 600px) {
-  .strikezone {
-    box-shadow: 0 0 10px 6px rgba(105, 108, 112, 0.79);
-  }
-}
 .strikezone.pitching {
-  background: rgba(174, 169, 173, 0.5);
-}
-@media (min-width: 600px) {
-  .strikezone.pitching {
-    background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.5), rgba(77, 77, 80, 0.5));
-  }
+  background: rgba(174, 169, 173, 0.6);
+  background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.9), rgba(77, 77, 80, 0.9));
 }
 .strikezone.batting {
-  background: rgba(192, 189, 195, 0.5);
-}
-@media (min-width: 600px) {
-  .strikezone.batting {
-    background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.5), rgba(77, 77, 80, 0.5));
-  }
+  background: rgba(192, 189, 195, 0.6);
+  background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.9), rgba(77, 77, 80, 0.9));
 }
 .indicator.pitch {
   background-color: rgba(255, 255, 255, 0.4);
@@ -657,10 +635,10 @@ aside.image-panel.right {
   /* Gradients http://codepen.io/zessx/pen/rDEAl/ */
 }
 .main-area .background-color {
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0);
 }
 .main-area .list-group-item {
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.75);
 }
 .main-area field {
   position: absolute;
@@ -727,16 +705,16 @@ aside.image-panel.right {
   background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #154277 0%, #576e71 30%, #e1c45e 70%, #b26339 100%);
 }
 .main-area .sky-gradient-19 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #163c52 0%, #4f4f47 30%, #c5752d 60%, #b7490f 80%, #2f1107 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #163C52 0%, #4F4F47 30%, #C5752D 60%, #B7490F 80%, #2F1107 100%);
 }
 .main-area .sky-gradient-20 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #071b26 0%, #071b26 30%, #8a3b12 80%, #240e03 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #071B26 0%, #071B26 30%, #8A3B12 80%, #240E03 100%);
 }
 .main-area .sky-gradient-21 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #010a10 30%, #59230b 80%, #2f1107 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #010A10 30%, #59230B 80%, #2F1107 100%);
 }
 .main-area .sky-gradient-22 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #090401 50%, #4b1d06 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #090401 50%, #4B1D06 100%);
 }
 .main-area .sky-gradient-23 {
   background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #00000c 80%, #150800 100%);
@@ -770,37 +748,37 @@ aside.image-panel.right {
   background-color: #326e28;
 }
 .main-area .grass-gradient-09 {
-  background-color: #328c28;
-}
-.main-area .grass-gradient-10 {
-  background-color: #32a028;
-}
-.main-area .grass-gradient-11 {
-  background-color: #32b428;
-}
-.main-area .grass-gradient-12 {
-  background-color: #32c828;
-}
-.main-area .grass-gradient-13 {
-  background-color: #32b428;
-}
-.main-area .grass-gradient-14 {
-  background-color: #32aa28;
-}
-.main-area .grass-gradient-15 {
-  background-color: #32a028;
-}
-.main-area .grass-gradient-16 {
-  background-color: #329628;
-}
-.main-area .grass-gradient-17 {
-  background-color: #328c28;
-}
-.main-area .grass-gradient-18 {
   background-color: #327828;
 }
-.main-area .grass-gradient-19 {
+.main-area .grass-gradient-10 {
+  background-color: #328228;
+}
+.main-area .grass-gradient-11 {
+  background-color: #328c28;
+}
+.main-area .grass-gradient-12 {
+  background-color: #329628;
+}
+.main-area .grass-gradient-13 {
+  background-color: #328c28;
+}
+.main-area .grass-gradient-14 {
+  background-color: #328228;
+}
+.main-area .grass-gradient-15 {
+  background-color: #327828;
+}
+.main-area .grass-gradient-16 {
   background-color: #326e28;
+}
+.main-area .grass-gradient-17 {
+  background-color: #326428;
+}
+.main-area .grass-gradient-18 {
+  background-color: #325a28;
+}
+.main-area .grass-gradient-19 {
+  background-color: #325028;
 }
 .main-area .grass-gradient-20 {
   background-color: #324b28;
@@ -836,28 +814,78 @@ aside.image-panel.right {
   left: -50%;
   right: -50%;
 }
+.main-area .field .batters-eye {
+  background: white;
+  height: 300px;
+  width: 55%;
+  min-width: 220px;
+  top: 0;
+}
 .main-area .field .sky {
   height: 150px;
   transform: rotateX(0deg);
+  z-index: -8;
 }
 .main-area .field .grass {
-  top: -100px;
-  height: 600px;
+  z-index: -10;
+  top: -280px;
+  height: 900px;
   transform: rotateX(80deg);
   background-size: 90px 90px;
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
 }
 .main-area .field .dirt {
-  bottom: 0;
-  height: 100px;
-  background: sandybrown;
+  bottom: -130px;
+  height: 300px;
+  background: #d09f5f;
   left: 0;
   right: 0;
   width: 400px;
   transform: rotateX(80deg);
+  z-index: -5;
 }
-.main-area .field .chalk {
+.main-area .field .third-base-line,
+.main-area .field .first-base-line,
+.main-area .field .rhb-box,
+.main-area .field .lhb-box,
+.main-area .field .dirt {
+  display: none;
+}
+.main-area .field .third-base-line {
+  height: 12px;
+  transform: rotateX(80deg) rotateY(0deg) rotateZ(45deg);
+  top: 295px;
+  width: 2400px;
   background: white;
+  z-index: -9;
+}
+.main-area .field .rhb-box {
+  border: 10px solid white;
+  background: transparent;
+  width: 100px;
+  height: 400px;
+  transform: rotateX(80deg);
+  top: 105px;
+  right: -500px;
+  z-index: -4;
+}
+.main-area .field .lhb-box {
+  border: 10px solid white;
+  background: transparent;
+  width: 100px;
+  height: 400px;
+  transform: rotateX(80deg);
+  top: 105px;
+  left: -500px;
+  z-index: -4;
+}
+.main-area .field .first-base-line {
+  height: 12px;
+  transform: rotateX(80deg) rotateY(0deg) rotateZ(-45deg);
+  top: 295px;
+  width: 2400px;
+  background: white;
+  z-index: -9;
 }
 .rating-block {
   margin: 0 6px -1px;
@@ -875,7 +903,8 @@ aside.image-panel.right {
 }
 .windup.winding {
   display: block;
-  background: #484848;
+  background: #f1f1f1;
+  border: 1px solid #3d3d3d;
 }
 .pitch-selection .rating-block {
   margin: 0 -1px -1px;
