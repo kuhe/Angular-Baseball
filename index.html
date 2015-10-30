@@ -230,11 +230,17 @@
                 </div>
                 <div class='centered'>
                     <div class='batter-stats' ng-class='{"lefty": y.batter.bats == "left", "righty": y.batter.bats == "right"}'>
-                        <span ng-show='y.batter.bats==="left"'>{{ t('LHB') }}</span>
+                        <span ng-show='y.batter.bats==="left"'>
+                            <span ng-if="y.batter.hero" class="glyphicon glyphicon-chevron-up"></span>
+                            {{ t('LHB') }}
+                        </span>
                         <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.eye/120+")"}'></span>
                         <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.power/120+")"}'></span>
                         <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.speed/120+")"}'></span>
-                        <span ng-show='y.batter.bats==="right"'>{{ t('RHB') }}</span>
+                        <span ng-show='y.batter.bats==="right"'>
+                            {{ t('RHB') }}
+                            <span ng-if="y.batter.hero" class="glyphicon glyphicon-chevron-up"></span>
+                        </span>
                     </div>
                     <div class='visible-sm visible-xs'>
                         {{ y.log.pitchRecord[mode()][0] }}
@@ -263,10 +269,10 @@
     </div>
     <hr>
     <ul class='centered list-inline pitch-selection'>
-        <li class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
-            <span ng-click="y.humanPitching() && selectPitch(name)">
-                <strong ng-show='y.pitchInFlight.name == name'>{{ t(name) }}</strong>
-                <em ng-show='y.pitchInFlight.name != name'>{{ t(name) }}</em>
+        <li class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching' ng-click="y.humanPitching() && selectPitch(name)">
+            <span>
+                <strong style='text-decoration: underline;' ng-show='y.pitchInFlight.name === name'>{{ t(name) }}</strong>
+                <em ng-show='y.pitchInFlight.name !== name'>{{ t(name) }}</em>
                 <br>
                 <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.control/120+")"}'></span>
                 <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.velocity/120+")"}'></span>

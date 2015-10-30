@@ -422,6 +422,7 @@ Game.prototype = {
         if (this.humanPitching()) {
             this.stage = 'pitch';
         }
+        this.autoPitchSelect();
     },
     passMinutes: function passMinutes(minutes) {
         this.timeOfDay.m = ('00' + (parseInt(this.timeOfDay.m) + parseInt(minutes))).slice(-2);
@@ -519,11 +520,8 @@ Game.prototype = {
         }
     },
     autoPitchSelect: function autoPitchSelect() {
-        var pitchName = this.helper.selectRandomPitch(),
-            select = this.helper.selectRandomPitch;
-        while (!this.pitcher.pitching.hasOwnProperty(pitchName)) {
-            pitchName = select();
-        }
+        var pitchNames = Object.keys(this.pitcher.pitching);
+        var pitchName = pitchNames[Math.random() * pitchNames.length | 0];
         var pitch = this.pitcher.pitching[pitchName];
         pitch.name = pitchName;
         this.pitchInFlight = pitch;
@@ -532,6 +530,7 @@ Game.prototype = {
         var pitcher = this.pitcher,
             giraffe = this;
         if (this.stage == 'pitch') {
+            this.autoPitchSelect();
             pitcher.windingUp = true;
             if (!this.console) {
                 $('.baseball').addClass('hide');
@@ -702,8 +701,6 @@ Game.prototype = {
                 callback = this.startOpponentPitching;
                 var emit = !override;
             }
-
-            this.autoPitchSelect();
 
             if (typeof callback == 'function') {
                 if (this.humanControl != 'none' && (this.humanControl == 'both' || this.teams[this.humanControl] == this.pitcher.team)) {
