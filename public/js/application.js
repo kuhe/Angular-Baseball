@@ -2542,6 +2542,16 @@ Log.prototype = {
         this.record.e.unshift(_note);
         this.record.n.unshift(noteJ);
         this.stabilizeShortRecord();
+        var giraffe = this;
+        this.async(function () {
+            if (!giraffe.game.console && !giraffe.game.quickMode) {
+                if (_baseballUtilityText.text.mode === 'n') {
+                    console.log(noteJ);
+                } else {
+                    console.log(_note);
+                }
+            }
+        });
     },
     getBatter: function getBatter(batter) {
         var order = batter.team.nowBatting;
@@ -2636,6 +2646,18 @@ Log.prototype = {
         this.stabilized.pitchRecord.n.pop();
         _baseballUtilityText.text.mode = m;
     },
+    broadcastCount: function broadcastCount(justOuts) {
+        if (!this.game.umpire) return '';
+        var count = this.game.umpire.count;
+        var outs = count.outs + (count.outs == 1 ? (0, _baseballUtilityText.text)(' out') : (0, _baseballUtilityText.text)(' outs'));
+        if (justOuts) {
+            return outs;
+        }
+        return count.strikes + '-' + count.balls + ', ' + outs;
+    },
+    broadcastScore: function broadcastScore() {
+        return this.game.teams.away.getName() + ' ' + this.game.tally.away.R + ', ' + this.game.teams.home.getName() + ' ' + this.game.tally.home.R;
+    },
     getSwing: function getSwing(swingResult) {
         var result = '';
         if (swingResult.looking) {
@@ -2668,16 +2690,33 @@ Log.prototype = {
     noteSwing: function noteSwing(swingResult) {
         var m = _baseballUtilityText.text.mode,
             record,
-            recordJ;
+            recordJ,
+            pitchRecord = this.pitchRecord,
+            stabilized = this.stabilized.pitchRecord;
         _baseballUtilityText.text.mode = 'e';
         record = this.getSwing(swingResult);
-        this.pitchRecord.e[0] += record;
-        this.stabilized.pitchRecord.e[0] += record;
+        pitchRecord.e[0] += record;
+        stabilized.e[0] += record;
         _baseballUtilityText.text.mode = 'n';
         recordJ = this.getSwing(swingResult);
-        this.pitchRecord.n[0] += recordJ;
-        this.stabilized.pitchRecord.n[0] += recordJ;
+        pitchRecord.n[0] += recordJ;
+        stabilized.n[0] += recordJ;
         _baseballUtilityText.text.mode = m;
+        recordJ = stabilized.n[0];
+        record = stabilized.e[0];
+        var giraffe = this;
+        record.indexOf('Previous') !== 0 && this.async(function () {
+            if (!giraffe.game.console && !giraffe.game.quickMode) {
+                if (_baseballUtilityText.text.mode === 'n') {
+                    console.log(recordJ, giraffe.broadcastCount());
+                } else {
+                    console.log(record, giraffe.broadcastCount());
+                }
+            }
+        });
+    },
+    async: function async(fn) {
+        setTimeout(fn, 500);
     },
     getPlateAppearanceResult: function getPlateAppearanceResult(game) {
         var r = game.swingResult;
@@ -2777,6 +2816,16 @@ Log.prototype = {
         this.pitchRecord.n = [(0, _baseballUtilityText.text)('Previous: ') + recordJ];
         this.stabilized.pitchRecord.n = [(0, _baseballUtilityText.text)('Previous: ') + recordJ, '', '', '', '', ''];
         _baseballUtilityText.text.mode = m;
+        var giraffe = this;
+        this.async(function () {
+            if (!giraffe.game.console && !giraffe.game.quickMode) {
+                if (_baseballUtilityText.text.mode === 'n') {
+                    console.log(recordJ, giraffe.broadcastCount(true), giraffe.broadcastScore());
+                } else {
+                    console.log(record, giraffe.broadcastCount(true), giraffe.broadcastScore());
+                }
+            }
+        });
     },
     pointer: 0,
     stabilized: {
@@ -2930,6 +2979,8 @@ var text = function text(phrase, override) {
             'Fouled off.': 'ファウル。',
             'In play.': 'インプレー。',
             'Swinging strike.': '空振り。',
+            ' outs': 'アウト',
+            ' out': 'アウト',
             '4-seam': 'ストレート',
             '2-seam': 'シュート',
             'slider': 'スライダー',
