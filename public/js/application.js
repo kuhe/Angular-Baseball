@@ -2678,11 +2678,11 @@ Log.prototype = {
 
         switch (runnerCount) {
             case 0:
-                return (0, _baseballUtilityText.text)('bases empty') + _baseballUtilityText.text.stop();
+                return (0, _baseballUtilityText.text)('Bases empty') + _baseballUtilityText.text.stop();
             case 1:
-                return (0, _baseballUtilityText.text)('runner on') + ': ' + runners.join(_baseballUtilityText.text.comma()) + _baseballUtilityText.text.stop();
+                return (0, _baseballUtilityText.text)('Runner on') + ': ' + runners.join(_baseballUtilityText.text.comma()) + _baseballUtilityText.text.stop();
             default:
-                return (0, _baseballUtilityText.text)('runners on') + ': ' + runners.join(_baseballUtilityText.text.comma()) + _baseballUtilityText.text.stop();
+                return (0, _baseballUtilityText.text)('Runners on') + ': ' + runners.join(_baseballUtilityText.text.comma()) + _baseballUtilityText.text.stop();
         }
     },
     getSwing: function getSwing(swingResult) {
@@ -3063,9 +3063,9 @@ var text = function text(phrase, override) {
             'first': 'ファースト',
             'second': 'セカンド',
             'third': 'サード',
-            'runner on': 'ランナー',
-            'runners on': 'ランナー',
-            'bases empty': 'ランナーなし',
+            'Runner on': 'ランナー',
+            'Runners on': 'ランナー',
+            'Bases empty': 'ランナーなし',
             'base': '塁',
 
             'Select Language:': '言語',
