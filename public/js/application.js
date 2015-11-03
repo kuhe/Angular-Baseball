@@ -2751,7 +2751,7 @@ Log.prototype = {
         });
     },
     async: function async(fn) {
-        setTimeout(fn, 500);
+        setTimeout(fn, 100);
     },
     getPlateAppearanceResult: function getPlateAppearanceResult(game) {
         var r = game.swingResult;
