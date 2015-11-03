@@ -2649,14 +2649,41 @@ Log.prototype = {
     broadcastCount: function broadcastCount(justOuts) {
         if (!this.game.umpire) return '';
         var count = this.game.umpire.count;
-        var outs = count.outs + (count.outs == 1 ? (0, _baseballUtilityText.text)(' out') : (0, _baseballUtilityText.text)(' outs'));
-        if (justOuts) {
-            return outs;
+        if (this.lastOuts == 2 && count.outs == 0) {
+            outs = 3 + (0, _baseballUtilityText.text)(' outs');
+        } else {
+            var outs = count.outs + (count.outs == 1 ? (0, _baseballUtilityText.text)(' out') : (0, _baseballUtilityText.text)(' outs'));
         }
-        return count.strikes + '-' + count.balls + ', ' + outs;
+        this.lastOuts = count.outs;
+        if (justOuts) {
+            return outs + _baseballUtilityText.text.stop();
+        }
+        return count.strikes + '-' + count.balls + ', ' + outs + _baseballUtilityText.text.stop();
     },
     broadcastScore: function broadcastScore() {
-        return this.game.teams.away.getName() + ' ' + this.game.tally.away.R + ', ' + this.game.teams.home.getName() + ' ' + this.game.tally.home.R;
+        return this.game.teams.away.getName() + ' ' + this.game.tally.away.R + ', ' + this.game.teams.home.getName() + ' ' + this.game.tally.home.R + _baseballUtilityText.text.stop();
+    },
+    broadcastRunners: function broadcastRunners() {
+        var field = this.game.field;
+        var runners = [field.first && (0, _baseballUtilityText.text)('first') || '', field.second && (0, _baseballUtilityText.text)('second') || '', field.third && (0, _baseballUtilityText.text)('third') || ''].filter(function (x) {
+            return x;
+        });
+
+        var runnerCount = 0;
+        runners.map(function (runner) {
+            if (runner) {
+                runnerCount++;
+            }
+        });
+
+        switch (runnerCount) {
+            case 0:
+                return (0, _baseballUtilityText.text)('bases empty') + _baseballUtilityText.text.stop();
+            case 1:
+                return (0, _baseballUtilityText.text)('runner on') + ': ' + runners.join(_baseballUtilityText.text.comma()) + _baseballUtilityText.text.stop();
+            default:
+                return (0, _baseballUtilityText.text)('runners on') + ': ' + runners.join(_baseballUtilityText.text.comma()) + _baseballUtilityText.text.stop();
+        }
     },
     getSwing: function getSwing(swingResult) {
         var result = '';
@@ -2707,10 +2734,18 @@ Log.prototype = {
         var giraffe = this;
         record.indexOf('Previous') !== 0 && this.async(function () {
             if (!giraffe.game.console && !giraffe.game.quickMode) {
-                if (_baseballUtilityText.text.mode === 'n') {
-                    console.log(recordJ, giraffe.broadcastCount());
+                if (record.indexOf('In play') > -1) {
+                    if (_baseballUtilityText.text.mode === 'n') {
+                        console.log(recordJ);
+                    } else {
+                        console.log(record);
+                    }
                 } else {
-                    console.log(record, giraffe.broadcastCount());
+                    if (_baseballUtilityText.text.mode === 'n') {
+                        console.log(giraffe.broadcastCount(), recordJ);
+                    } else {
+                        console.log(giraffe.broadcastCount(), record);
+                    }
                 }
             }
         });
@@ -2820,9 +2855,9 @@ Log.prototype = {
         this.async(function () {
             if (!giraffe.game.console && !giraffe.game.quickMode) {
                 if (_baseballUtilityText.text.mode === 'n') {
-                    console.log(recordJ, giraffe.broadcastCount(true), giraffe.broadcastScore());
+                    console.log(recordJ, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners());
                 } else {
-                    console.log(record, giraffe.broadcastCount(true), giraffe.broadcastScore());
+                    console.log(record, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners());
                 }
             }
         });
@@ -2955,7 +2990,7 @@ var text = function text(phrase, override) {
             ' 7th': '7番',
             ' 8th': '8番',
             ' 9th': '9番',
-            'Now batting': '次のバッター、',
+            'Now batting': '次のバッター',
             'way outside': '相当外角',
             'outside': '外角',
             'inside': '内角',
@@ -3028,6 +3063,10 @@ var text = function text(phrase, override) {
             'first': 'ファースト',
             'second': 'セカンド',
             'third': 'サード',
+            'runner on': 'ランナー',
+            'runners on': 'ランナー',
+            'bases empty': 'ランナーなし',
+            'base': '塁',
 
             'Select Language:': '言語',
             'Run Fast Simulation': 'シミュレーションを試合終了まで行う',
@@ -3327,6 +3366,7 @@ Baseball.service.Animator = _baseballServices_services.Animator;
 
 Baseball.util = {};
 Baseball.util.text = _baseballUtility_utils.text;
+Baseball.util.Log = _baseballUtility_utils.Log;
 
 exports.Baseball = Baseball;
 
