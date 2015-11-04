@@ -561,12 +561,12 @@ Game.prototype = {
         var x = _baseballServices_services.Distribution.centralizedNumber(),
             y = _baseballServices_services.Distribution.centralizedNumber();
         if (100 * Math.random() < eye) {
-            convergence = 1.35 * 5 * eye / 100;
+            convergence = 1.35 * 4.2 * eye / 100;
             convergenceSum = 1 + convergence;
             deceptiveX = this.pitchInFlight.x;
             deceptiveY = this.pitchInFlight.y;
         } else {
-            convergence = 1.35 * 2 * eye / 100;
+            convergence = 1.35 * 0.5 * eye / 100;
             convergenceSum = 1 + convergence;
         }
         x = (deceptiveX * convergence + x) / convergenceSum;
