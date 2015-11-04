@@ -2122,7 +2122,6 @@ Distribution.prototype = {
             /** avg Swing rate of 65% - 8% for laughs */
             swingLikelihood = (57 + (2 * swingLikelihood + eye) / 3) / 2;
         }
-        console.log(swingLikelihood - 35 + 2 * (umpire.count.balls + 8 * umpire.count.strikes));
         return swingLikelihood - 35 + 2 * (umpire.count.balls + 8 * umpire.count.strikes);
     },
     /**
