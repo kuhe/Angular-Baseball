@@ -10,7 +10,8 @@ var fs = require('fs');
 var util = require('gulp-util');
 
 var INTERNAL_STYLE_FILES = [
-    './styles/**/*.less'
+    './styles/**/*.less',
+    './styles/application.less'
 ];
 var EXTERNAL_STYLE_FILES = [
     './bower_components/bootstrap/dist/css/bootstrap.min.css'
@@ -51,7 +52,7 @@ var STYLE_DEPLOY_DIR = '../../public/css';
 var SCRIPT_DEPLOY_DIR = '../../public/js';
 
 gulp.task('internalStyles', function () {
-    gulp.src(INTERNAL_STYLE_FILES)
+    gulp.src(INTERNAL_STYLE_FILES[1])
         .pipe(less({
             'indent spaces': 4
         }))

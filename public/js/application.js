@@ -2572,14 +2572,11 @@ Log.prototype = {
         this.record.e.unshift(_note);
         this.record.n.unshift(noteJ);
         this.stabilizeShortRecord();
-        var giraffe = this;
         this.async(function () {
-            if (!giraffe.game.console && !giraffe.game.quickMode) {
-                if (_baseballUtilityText.text.mode === 'n') {
-                    console.log(noteJ);
-                } else {
-                    console.log(_note);
-                }
+            if (_baseballUtilityText.text.mode === 'n') {
+                console.log(noteJ);
+            } else {
+                console.log(_note);
             }
         });
     },
@@ -2763,25 +2760,25 @@ Log.prototype = {
         record = stabilized.e[0];
         var giraffe = this;
         record.indexOf('Previous') !== 0 && this.async(function () {
-            if (!giraffe.game.console && !giraffe.game.quickMode) {
-                if (record.indexOf('In play') > -1 && record.indexOf('struck out') > -1) {
-                    if (_baseballUtilityText.text.mode === 'n') {
-                        console.log(recordJ);
-                    } else {
-                        console.log(record);
-                    }
+            if (record.indexOf('In play') > -1 && record.indexOf('struck out') > -1) {
+                if (_baseballUtilityText.text.mode === 'n') {
+                    console.log(recordJ);
                 } else {
-                    if (_baseballUtilityText.text.mode === 'n') {
-                        console.log(giraffe.broadcastCount(), recordJ);
-                    } else {
-                        console.log(giraffe.broadcastCount(), record);
-                    }
+                    console.log(record);
+                }
+            } else {
+                if (_baseballUtilityText.text.mode === 'n') {
+                    console.log(giraffe.broadcastCount(), recordJ);
+                } else {
+                    console.log(giraffe.broadcastCount(), record);
                 }
             }
         });
     },
     async: function async(fn) {
-        setTimeout(fn, 100);
+        if (!this.game.console && !this.game.quickMode) {
+            setTimeout(fn, 100);
+        }
     },
     getPlateAppearanceResult: function getPlateAppearanceResult(game) {
         var r = game.swingResult;
@@ -2868,27 +2865,35 @@ Log.prototype = {
     },
     notePlateAppearanceResult: function notePlateAppearanceResult(game) {
         var m = _baseballUtilityText.text.mode,
-            record,
-            recordJ;
+            prevJ = (0, _baseballUtilityText.text)('Previous: ', 'n'),
+            prev = (0, _baseballUtilityText.text)('Previous: ', 'e');
+
+        var statement,
+            record = this.record,
+            pitchRecord = this.pitchRecord,
+            stabilized = this.stabilized.pitchRecord;
+
         _baseballUtilityText.text.mode = 'e';
-        record = this.getPlateAppearanceResult(game);
-        this.record.e.unshift(record);
-        this.pitchRecord.e = [(0, _baseballUtilityText.text)('Previous: ') + record];
-        this.stabilized.pitchRecord.e = [(0, _baseballUtilityText.text)('Previous: ') + record, '', '', '', '', ''];
+        var result = this.getPlateAppearanceResult(game);
+        record.e.unshift(result);
+        statement = prev + result;
+        pitchRecord.e = [statement];
+        stabilized.e = [statement, '', '', '', '', ''];
+
         _baseballUtilityText.text.mode = 'n';
-        recordJ = this.getPlateAppearanceResult(game);
-        this.record.n.unshift(recordJ);
-        this.pitchRecord.n = [(0, _baseballUtilityText.text)('Previous: ') + recordJ];
-        this.stabilized.pitchRecord.n = [(0, _baseballUtilityText.text)('Previous: ') + recordJ, '', '', '', '', ''];
+        var resultJ = this.getPlateAppearanceResult(game);
+        record.n.unshift(resultJ);
+        statement = prevJ + resultJ;
+        pitchRecord.n = [statement];
+        stabilized.n = [statement, '', '', '', '', ''];
+
         _baseballUtilityText.text.mode = m;
         var giraffe = this;
         this.async(function () {
-            if (!giraffe.game.console && !giraffe.game.quickMode) {
-                if (_baseballUtilityText.text.mode === 'n') {
-                    console.log(recordJ, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners());
-                } else {
-                    console.log(record, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners());
-                }
+            if (_baseballUtilityText.text.mode === 'n') {
+                console.log(resultJ, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners());
+            } else {
+                console.log(result, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners());
             }
         });
     },
@@ -3459,13 +3464,15 @@ IndexController = function($scope, socket) {
         $('.blocking').remove();
         if (game.humanControl == 'none' && game.quickMode) {
             var n = 0;
-            Animator.console = true;N
+            Animator.console = true;
+            game.console = true;
             do {
                 n++;
                 game.simulateInput(function(callback) {
                     typeof callback == 'function' && callback();
                 });
             } while (game.stage != 'end' && n < 500);
+            Animator.console = game.console = false;
             log('sim ended');
             game.debugOut();
         } else if (game.humanControl == 'none') {

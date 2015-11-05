@@ -32,13 +32,15 @@ IndexController = function($scope, socket) {
         $('.blocking').remove();
         if (game.humanControl == 'none' && game.quickMode) {
             var n = 0;
-            Animator.console = true;N
+            Animator.console = true;
+            game.console = true;
             do {
                 n++;
                 game.simulateInput(function(callback) {
                     typeof callback == 'function' && callback();
                 });
             } while (game.stage != 'end' && n < 500);
+            Animator.console = game.console = false;
             log('sim ended');
             game.debugOut();
         } else if (game.humanControl == 'none') {
