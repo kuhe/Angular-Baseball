@@ -247,7 +247,9 @@ Field.prototype = {
             }
         }
         this.game.swingResult = swing;
-        return _baseballServices_services.Animator.animateFieldingTrajectory(this.game);
+        if (!_baseballServices_services.Animator.console) {
+            _baseballServices_services.Animator.animateFieldingTrajectory(this.game);
+        }
     },
     forcePlaySituation: function forcePlaySituation() {
         var first = this.first,
@@ -675,7 +677,7 @@ Game.prototype = {
                     this.swingResult.looking = false;
                     if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {
                         this.swingResult.contact = true;
-                        this.swingResult = this.field.determineSwingContactResult(this.swingResult);
+                        this.field.determineSwingContactResult(this.swingResult);
                         // log(this.swingResult.flyAngle, Math.floor(this.swingResult.x), Math.floor(this.swingResult.y));
                         this.debug.push(this.swingResult);
                     } else {
@@ -1982,8 +1984,8 @@ Animator.prototype = {
         }
     },
     animateFieldingTrajectory: function animateFieldingTrajectory(game) {
-        this.init();
         if (Animator.console) return game.swingResult;
+        this.init();
         var TweenMax = Animator.loadTweenMax();
         var ball = $('.splay-indicator-ball');
         TweenMax.killAll();
@@ -3457,6 +3459,7 @@ IndexController = function($scope, socket) {
         $('.blocking').remove();
         if (game.humanControl == 'none' && game.quickMode) {
             var n = 0;
+            Animator.console = true;N
             do {
                 n++;
                 game.simulateInput(function(callback) {

@@ -32,6 +32,7 @@ IndexController = function($scope, socket) {
         $('.blocking').remove();
         if (game.humanControl == 'none' && game.quickMode) {
             var n = 0;
+            Animator.console = true;N
             do {
                 n++;
                 game.simulateInput(function(callback) {
