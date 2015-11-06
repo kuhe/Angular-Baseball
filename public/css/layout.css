@@ -193,6 +193,7 @@ html body {
   height: 130px;
   background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.9), rgba(77, 77, 80, 0.9));
   border: 3px solid #ccd4d1;
+  text-align: center;
 }
 .strikezone.pitching {
   background: rgba(174, 169, 173, 0.6);
@@ -251,4 +252,14 @@ html body {
 }
 .one-line .col-xs-6 .prevent-break {
   margin-right: -40px;
+}
+.strikezone-message {
+  border-radius: 1px;
+  background: white;
+  color: darkred;
+  font-weight: bold;
+  padding: 40px 10px;
+  font-size: 16px;
+  display: inline-block;
+  margin: auto;
 }

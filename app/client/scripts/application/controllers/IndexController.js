@@ -75,7 +75,7 @@ IndexController = function($scope, socket) {
             });
         }
         if (game.humanControl == 'home') {
-
+            $scope.showMessage = true;
         }
         if (!quickMode || quickMode === 7) {
             game.timeOfDay.h = '00';
@@ -172,6 +172,7 @@ IndexController = function($scope, socket) {
             while ($scope.holdUpTimeouts.length) {
                 clearTimeout($scope.holdUpTimeouts.shift());
             }
+            $scope.showMessage = false;
             game.receiveInput(relativeOffset.x, relativeOffset.y, function(callback) {
                 $scope.updateFlightPath(callback);
             });

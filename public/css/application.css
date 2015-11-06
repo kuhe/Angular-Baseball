@@ -352,6 +352,7 @@ html body {
   height: 130px;
   background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.9), rgba(77, 77, 80, 0.9));
   border: 3px solid #ccd4d1;
+  text-align: center;
 }
 .strikezone.pitching {
   background: rgba(174, 169, 173, 0.6);
@@ -410,6 +411,16 @@ html body {
 }
 .one-line .col-xs-6 .prevent-break {
   margin-right: -40px;
+}
+.strikezone-message {
+  border-radius: 1px;
+  background: white;
+  color: darkred;
+  font-weight: bold;
+  padding: 40px 10px;
+  font-size: 16px;
+  display: inline-block;
+  margin: auto;
 }
 aside.image-panel {
   background: transparent;
@@ -704,16 +715,16 @@ aside.image-panel.right {
   background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #154277 0%, #576e71 30%, #e1c45e 70%, #b26339 100%);
 }
 .main-area .sky-gradient-19 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #163C52 0%, #4F4F47 30%, #C5752D 60%, #B7490F 80%, #2F1107 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #163c52 0%, #4f4f47 30%, #c5752d 60%, #b7490f 80%, #2f1107 100%);
 }
 .main-area .sky-gradient-20 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #071B26 0%, #071B26 30%, #8A3B12 80%, #240E03 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #071b26 0%, #071b26 30%, #8a3b12 80%, #240e03 100%);
 }
 .main-area .sky-gradient-21 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #010A10 30%, #59230B 80%, #2F1107 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #010a10 30%, #59230b 80%, #2f1107 100%);
 }
 .main-area .sky-gradient-22 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #090401 50%, #4B1D06 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #090401 50%, #4b1d06 100%);
 }
 .main-area .sky-gradient-23 {
   background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #00000c 80%, #150800 100%);

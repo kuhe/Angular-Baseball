@@ -3120,7 +3120,8 @@ var text = function text(phrase, override) {
             ' R ': '右打',
             '#': '背番号',
 
-            'Opponent connected': '相手選手見参'
+            'Opponent connected': '相手選手見参',
+            'Click Here': 'ここにクリック'
         },
         e: {
             empty: '-',
@@ -3507,7 +3508,7 @@ IndexController = function($scope, socket) {
             });
         }
         if (game.humanControl == 'home') {
-
+            $scope.showMessage = true;
         }
         if (!quickMode || quickMode === 7) {
             game.timeOfDay.h = '00';
@@ -3604,6 +3605,7 @@ IndexController = function($scope, socket) {
             while ($scope.holdUpTimeouts.length) {
                 clearTimeout($scope.holdUpTimeouts.shift());
             }
+            $scope.showMessage = false;
             game.receiveInput(relativeOffset.x, relativeOffset.y, function(callback) {
                 $scope.updateFlightPath(callback);
             });

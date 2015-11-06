@@ -199,7 +199,7 @@
                     <div class="target live {{y.stage}}" ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'>
                         <div class='indicator baseball pitch hide'></div>
                         <div class='indicator baseball break hide'></div>
-                        <div class='indicator swing'
+                        <div class='indicator swing player'
                              ng-style='{
                                     top: 200-y.pitchInFlight.y-y.swingResult.y + "px",
                                     left: y.pitchInFlight.x + y.swingResult.x + "px",
@@ -211,7 +211,7 @@
                                  hide: y.humanBatting() || y.swingResult.looking
                              }'>
                         </div>
-                        <div class='indicator swing stance-indicator'
+                        <div class='indicator swing stance-indicator opponent'
                              ng-class='{
                                 left: y.batter.bats == "left",
                                 right: y.batter.bats == "right",
@@ -225,7 +225,11 @@
                                 hide: !y.humanPitching()
                              }'>
                         </div>
-                        <div class='strikezone' ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'></div>
+                        <div class='strikezone' ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'>
+                            <span class='strikezone-message' ng-show='showMessage'>
+                                {{ t('Click Here') }}
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class='centered'>
