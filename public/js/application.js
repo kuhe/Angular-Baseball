@@ -1117,7 +1117,7 @@ var _baseballModel_models = require('baseball/Model/_models');
 
 var Player = function Player(team) {
     this.init(team);
-    this.resetStats(this.team.game.gamesIntoSeason);
+    this.resetStats(this.team.game && this.team.game.gamesIntoSeason || 0);
 };
 
 Player.prototype = {
@@ -1448,13 +1448,15 @@ Team.prototype = {
             center: null,
             right: null
         };
-        this.game = game;
-        for (var j = 0; j < 20; j++) {
-            this.bench.push(new _baseballModelPlayer.Player(this));
-        }
-        if (this.bench.length == 20) {
-            this.manager = new _baseballModelManager.Manager(this);
-            this.manager.makeLineup();
+        this.manager = new _baseballModelManager.Manager(this);
+        if (game !== 'no init') {
+            this.game = game;
+            for (var j = 0; j < 20; j++) {
+                this.bench.push(new _baseballModelPlayer.Player(this));
+            }
+            if (this.bench.length == 20) {
+                this.manager.makeLineup();
+            }
         }
     },
     pickName: function pickName() {
@@ -2582,9 +2584,7 @@ var _baseballModelPlayer = require('baseball/Model/Player');
 
 var _baseballTeamsTrainer = require('baseball/Teams/Trainer');
 
-var game = new _baseballModel_models.Game();
-game.gamesIntoSeason = 0;
-var samurai = new _baseballModel_models.Team(game);
+var samurai = new _baseballModel_models.Team('no init');
 samurai.name = 'Japan';
 samurai.nameJ = '日本';
 
@@ -2727,7 +2727,25 @@ var Log = function Log() {
 Log.prototype = {
     game: 'instance of Game',
     init: function init() {
+        this.stabilized = {
+            pitchRecord: {
+                e: ['', '', '', '', '', ''],
+                n: ['', '', '', '', '', '']
+            },
+            shortRecord: {
+                e: ['', '', '', '', '', ''],
+                n: ['', '', '', '', '', '']
+            }
+        };
         this.pitchRecord = {
+            e: [],
+            n: []
+        };
+        this.shortRecord = {
+            e: [],
+            n: []
+        };
+        this.record = {
             e: [],
             n: []
         };
