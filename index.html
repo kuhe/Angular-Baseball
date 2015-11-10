@@ -49,6 +49,7 @@
                 <span>
                     {{ t('Select Language:') }} &nbsp;
                 </span>
+                <hr>
                 <button class='btn pointer' ng-click='mode("e"); $event.stopPropagation()'>
                     English
                 </button>
@@ -119,7 +120,7 @@
         </div>
         <section class='row options'>
             <div class='col-md-12'>
-                <button ng-click="proceedToGame(); $event.stopPropagation()" class='btn pointer'>
+                <button ng-click="proceedToGame(); $event.stopPropagation()" class='btn play-ball pointer'>
                     {{ t('Play Ball!') }}
                 </button>
                 <button ng-click="proceedToGame(false, true); $event.stopPropagation()" class='btn pointer'>
@@ -140,11 +141,13 @@
     <div class='diamond-display row'>
         <div class='col-md-4 language-select'>
             <div class='pull-right'>
-                <strong class='pointer' ng-show='mode() == "e"'>English</strong>
-                <em class='pointer' ng-click='mode("e")' ng-show='mode() != "e"'>English</em>
+                <button class='btn small' ng-click='mode("e")' ng-class='{disabled: mode() != "e"}'>
+                    <strong class='pointer' >English</strong>
+                </button>
                 <br>
-                <strong class='pointer' ng-show='mode() == "n"'>日本語</strong>
-                <em class='pointer' ng-click='mode("n")' ng-show='mode() != "n"'>日本語</em>
+                <button class='btn small' ng-click='mode("n")' ng-class='{disabled: mode() != "n"}'>
+                    <strong class='pointer'>日本語</strong>
+                </button>
                 <br/>
                 <br/>
                 <p>
@@ -238,9 +241,10 @@
                             <span ng-if="y.batter.hero" class="glyphicon glyphicon-chevron-up"></span>
                             {{ t('LHB') }}
                         </span>
-                        <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.eye/120+")"}'></span>
-                        <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.power/120+")"}'></span>
-                        <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ y.batter.skill.offense.speed/120+")"}'></span>
+                        <rating-block rating-block='' rating='y.batter.skill.offense.eye'></rating-block>
+                        <rating-block rating-block='' rating='y.batter.skill.offense.power'></rating-block>
+                        <rating-block rating-block='' rating='y.batter.skill.offense.speed'></rating-block>
+                        <rating-block rating-block='' rating='y.batter.skill.offense.speed'></rating-block>
                         <span ng-show='y.batter.bats==="right"'>
                             {{ t('RHB') }}
                             <span ng-if="y.batter.hero" class="glyphicon glyphicon-chevron-up"></span>
@@ -278,9 +282,9 @@
                 <strong style='text-decoration: underline;' ng-show='y.pitchInFlight.name === name'>{{ t(name) }}</strong>
                 <em ng-show='y.pitchInFlight.name !== name'>{{ t(name) }}</em>
                 <br>
-                <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.control/120+")"}'></span>
-                <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.velocity/120+")"}'></span>
-                <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ pitch.break/120+")"}'></span>
+                <rating-block rating-block='' rating='pitch.control'></rating-block>
+                <rating-block rating-block='' rating='pitch.velocity'></rating-block>
+                <rating-block rating-block='' rating='pitch.break'></rating-block>
             </span>
         </li>
         <br class='visible-xs'/>
@@ -322,7 +326,7 @@
             </li>
             <li class='list-group-item pointer' ng-repeat="(order, player) in team.lineup track by $index"
                 ng-click='player.team.expanded = player.team.expanded == player ? null : player'>
-                {{abbreviatePosition(player.position)}}<span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.defense.fielding/120+")"}'></span> &raquo;
+                {{abbreviatePosition(player.position)}}<rating-block rating-block='' rating='player.skill.defense.fielding'></rating-block> &raquo;
                 <strong>{{player.getName()}}</strong> ({{'#'+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
                 <span class='pull-right'>
                     <span class='at-bat' ng-repeat='atBat in player.getAtBats() track by $index'>
@@ -352,13 +356,13 @@
                         <li class='col-md-1'>{{ t('SO') }} <br> {{ stats.so }}</li>
                     </ul>
                     <span>
-                        {{ t('Eye :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.offense.eye/120+")"}'></span>
+                        {{ t('Eye :') }} <rating-block rating-block='' rating='player.skill.offense.eye'></rating-block>
                     </span>
                     <span>
-                        {{ t('Power :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.offense.power/120+")"}'></span>
+                        {{ t('Power :') }} <rating-block rating-block='' rating='player.skill.offense.power'></rating-block>
                     </span>
                     <span>
-                        {{ t('Speed :') }} <span class='rating-block' ng-style='{backgroundColor: "rgba(0,0,0,"+ player.skill.offense.speed/120+")"}'></span>
+                        {{ t('Speed :') }} <rating-block rating-block='' rating='player.skill.offense.speed'></rating-block>
                     </span>
                 </section>
             </li>
@@ -377,6 +381,9 @@
             {{ t('Play against Team Japan') }}
         </button>
     </div>
+    <aside class='mousehover' ng-show='message'>
+        {{ message }}
+    </aside>
 </div>
 </body>
 </html>

@@ -165,6 +165,36 @@ html body {
   border-top: 4px solid #ffc031;
   font-family: "Noto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+button.btn {
+  margin: 10px;
+  background: #2a2a2a;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  border-top: 0;
+  border-bottom: 0;
+  border-left: 3px solid white;
+  border-right: 3px solid white;
+  cursor: pointer;
+  padding: 5px 5px 8px;
+}
+button.btn.small {
+  font-size: 11px;
+}
+button.btn::before,
+button.btn::after {
+  color: white;
+  content: "|";
+}
+button.btn:focus,
+button.btn:active,
+button.btn:hover {
+  color: white;
+}
+button.btn.disabled {
+  pointer-events: auto;
+  cursor: auto;
+}
 .language-select {
   z-index: 5;
 }
@@ -903,6 +933,12 @@ aside.image-panel.right {
   display: inline-block;
   border-top-left-radius: 8px;
   border-bottom-right-radius: 8px;
+}
+.mousehover {
+  position: fixed;
+  border: 1px dotted #444444;
+  padding: 5px;
+  display: inline-block;
 }
 .centered {
   text-align: center;

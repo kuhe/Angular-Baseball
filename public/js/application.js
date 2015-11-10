@@ -4005,6 +4005,17 @@ FieldDirective = function() {
         //}
     };
 };
+RatingBlockDirective = function() {
+    return {
+        scope: {
+            rating: '='
+        },
+        transclude: true,
+        templateUrl: 'public/html/views/directives/ratingBlock.html?cache='+cacheKey,
+        link: function(scope) {
+        }
+    };
+};
 ScoreboardDirective = function() {
     return {
         scope: {
@@ -4034,5 +4045,6 @@ angular.module('directives', [])
     .directive('scoreboard', ScoreboardDirective)
     .directive('batters', BattersDirective)
     .directive('battery', BatteryDirective)
-    .directive('field', FieldDirective);
+    .directive('field', FieldDirective)
+    .directive('ratingBlock', RatingBlockDirective);
 //# sourceMappingURL=sourcemaps/application.js.map

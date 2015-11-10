@@ -10,6 +10,36 @@ html body {
 .container {
 }
 
+button.btn {
+    margin: 10px;
+    background: #2a2a2a;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    border-top: 0;
+    border-bottom: 0;
+    border-left: 3px solid white;
+    border-right: 3px solid white;
+    cursor: pointer;
+    padding: 5px 5px 8px;
+    &.play-ball {
+    }
+    &.small {
+        font-size: 11px;
+    }
+    &::before, &::after {
+        color: white;
+        content: "|";
+    }
+    &:focus, &:active, &:hover {
+        color: white;
+    }
+    &.disabled {
+        pointer-events: auto;
+        cursor: auto;
+    }
+}
+
 .language-select {
     z-index: 5;
 }

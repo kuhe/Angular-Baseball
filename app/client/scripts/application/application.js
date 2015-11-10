@@ -13,4 +13,5 @@ angular.module('directives', [])
     .directive('scoreboard', ScoreboardDirective)
     .directive('batters', BattersDirective)
     .directive('battery', BatteryDirective)
-    .directive('field', FieldDirective);
+    .directive('field', FieldDirective)
+    .directive('ratingBlock', RatingBlockDirective);
