@@ -20,6 +20,7 @@ var MODULAR_SCRIPT_FILES = [
     './node_modules/baseball/Services/**/*.js',
     './node_modules/baseball/Utility/**/*.js',
     './node_modules/baseball/Model/**/*.js',
+    './node_modules/baseball/Teams/**/*.js',
     './node_modules/baseball/namespace.js',
     './node_modules/baseball/baseball.js'
 ];

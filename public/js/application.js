@@ -45,7 +45,7 @@ AtBat.prototype.RBI_INDICATOR = '+';
 
 exports.AtBat = AtBat;
 
-},{"baseball/Utility/Log":14}],2:[function(require,module,exports){
+},{"baseball/Utility/Log":17}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1000,7 +1000,7 @@ Game.prototype = {
 
 exports.Game = Game;
 
-},{"baseball/Model/Field":2,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":13,"baseball/Utility/Log":14,"baseball/Utility/_utils":15}],4:[function(require,module,exports){
+},{"baseball/Model/Field":2,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":13,"baseball/Utility/Log":17,"baseball/Utility/_utils":18}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1022,12 +1022,18 @@ Manager.prototype = {
         var jerseyNumber = 1;
         this.team.positions.pitcher = this.selectForSkill(this.team.bench, ['pitching']);
         this.team.positions.pitcher.position = 'pitcher';
-        this.team.positions.pitcher.number = jerseyNumber++;
+        if (!this.team.positions.pitcher.number) {
+            this.team.positions.pitcher.number = jerseyNumber++;
+        }
         this.team.positions.catcher = this.selectForSkill(this.team.bench, ['defense', 'catching'], 'right');
         this.team.positions.catcher.position = 'catcher';
-        this.team.positions.catcher.number = jerseyNumber++;
+        if (!this.team.positions.catcher.number) {
+            this.team.positions.catcher.number = jerseyNumber++;
+        }
         _baseballServices_services.Iterator.each(this.team.bench, function (key, player) {
-            player.number = jerseyNumber++;
+            if (!player.number) {
+                player.number = jerseyNumber++;
+            }
         });
         this.team.positions.short = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
         this.team.positions.short.position = 'short';
@@ -1134,12 +1140,16 @@ Player.prototype = {
         this.name = _baseballUtility_utils.data.surnames[surnameKey] + ' ' + _baseballUtility_utils.data.names[nameKey];
         var jSurname = _baseballUtility_utils.data.surnamesJ[surnameKey],
             jGivenName = _baseballUtility_utils.data.namesJ[nameKey];
-        if (jSurname.length == 1 && jGivenName.length <= 2) jSurname += '・';
-        if (jGivenName.length == 1 && jSurname.indexOf('・') < 0) jSurname += '・';
-        this.nameJ = jSurname + jGivenName;
+        this.spaceName(jSurname, jGivenName);
         this.surname = _baseballUtility_utils.data.surnames[surnameKey];
         this.surnameJ = _baseballUtility_utils.data.surnamesJ[surnameKey];
         this.atBats = [];
+    },
+    spaceName: function spaceName(jSurname, jGivenName) {
+        if (jSurname.length == 1 && jGivenName.length <= 2) jSurname += '・';
+        if (jGivenName.length == 1 && jSurname.indexOf('・') < 0) jSurname += '・';
+        this.nameJ = jSurname + jGivenName;
+        this.surnameJ = jSurname;
     },
     serialize: function serialize() {
         var team = this.team;
@@ -1296,7 +1306,7 @@ Player.prototype = {
     getBaseRunningTime: function getBaseRunningTime() {
         return _baseballServices_services.Mathinator.baseRunningTime(this.skill.offense.speed);
     },
-    randomizeSkills: function randomizeSkills(hero) {
+    randomizeSkills: function randomizeSkills(hero, allPitches) {
         this.hero = hero;
         var giraffe = this;
         var randValue = function randValue(isPitching) {
@@ -1329,30 +1339,30 @@ Player.prototype = {
             'break': randValue(true),
             control: randValue(true)
         };
-        if (Math.random() < 0.17) {
+        if (Math.random() < 0.17 || allPitches) {
             // can pitch!
-            if (Math.random() > 0.6) {
+            if (Math.random() > 0.6 || allPitches) {
                 this.pitching['2-seam'] = {
                     velocity: randValue(true),
                     'break': randValue(true),
                     control: randValue(true)
                 };
             }
-            if (Math.random() < 0.18) {
+            if (Math.random() < 0.18 || allPitches) {
                 this.pitching.fork = {
                     velocity: randValue(true),
                     'break': randValue(true),
                     control: randValue(true)
                 };
             }
-            if (Math.random() > 0.77) {
+            if (Math.random() > 0.77 || allPitches) {
                 this.pitching.cutter = {
                     velocity: randValue(true),
                     'break': randValue(true),
                     control: randValue(true)
                 };
             }
-            if (Math.random() < 0.21) {
+            if (Math.random() < 0.21 || allPitches) {
                 this.pitching.sinker = {
                     velocity: randValue(true),
                     'break': randValue(true),
@@ -1360,7 +1370,7 @@ Player.prototype = {
                 };
             }
 
-            if (Math.random() < 0.4) {
+            if (Math.random() < 0.4 || allPitches) {
                 this.pitching.curve = {
                     velocity: randValue(true),
                     'break': randValue(true),
@@ -1368,7 +1378,7 @@ Player.prototype = {
                 };
             }
 
-            if (Math.random() < 0.9) {
+            if (Math.random() < 0.9 || allPitches) {
                 this.pitching.change = {
                     velocity: randValue(true),
                     'break': randValue(true),
@@ -1403,7 +1413,7 @@ Player.prototype = {
 
 exports.Player = Player;
 
-},{"baseball/Model/_models":8,"baseball/Services/_services":13,"baseball/Utility/_utils":15}],6:[function(require,module,exports){
+},{"baseball/Model/_models":8,"baseball/Services/_services":13,"baseball/Utility/_utils":18}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1466,7 +1476,7 @@ Team.prototype = {
 
 exports.Team = Team;
 
-},{"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Utility/_utils":15}],7:[function(require,module,exports){
+},{"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Utility/_utils":18}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1854,7 +1864,7 @@ Umpire.prototype = {
 
 exports.Umpire = Umpire;
 
-},{"baseball/Model/Player":5,"baseball/Utility/_utils":15}],8:[function(require,module,exports){
+},{"baseball/Model/Player":5,"baseball/Utility/_utils":18}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2050,7 +2060,7 @@ for (var fn in Animator.prototype) {
 
 exports.Animator = Animator;
 
-},{"baseball/services/_services":21}],10:[function(require,module,exports){
+},{"baseball/services/_services":24}],10:[function(require,module,exports){
 /**
  * For Probability!
  * @constructor
@@ -2530,6 +2540,184 @@ Object.defineProperty(exports, '__esModule', {
     value: true
 });
 
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _TeamJapan = require('./TeamJapan');
+
+var Provider = (function () {
+    function Provider() {
+        _classCallCheck(this, Provider);
+    }
+
+    _createClass(Provider, [{
+        key: 'assignTeam',
+        value: function assignTeam(game, team, side) {
+            var special = this.teams[team];
+            special.game = game;
+            game.teams[side] = special;
+        }
+    }]);
+
+    return Provider;
+})();
+
+Provider.prototype.teams = {
+    TeamJapan: _TeamJapan.samurai
+};
+
+exports.Provider = Provider;
+
+},{"./TeamJapan":15}],15:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+
+var _baseballModel_models = require('baseball/Model/_models');
+
+var _baseballModelPlayer = require('baseball/Model/Player');
+
+var _baseballTeamsTrainer = require('baseball/Teams/Trainer');
+
+var game = new _baseballModel_models.Game();
+game.gamesIntoSeason = 0;
+var samurai = new _baseballModel_models.Team(game);
+samurai.name = 'Japan';
+samurai.nameJ = '日本';
+
+var darvish = new _baseballModelPlayer.Player(samurai),
+    johjima = new _baseballModelPlayer.Player(samurai),
+    ogasawara = new _baseballModelPlayer.Player(samurai),
+    nishioka = new _baseballModelPlayer.Player(samurai),
+    kawasaki = new _baseballModelPlayer.Player(samurai),
+    murata = new _baseballModelPlayer.Player(samurai),
+    matsui = new _baseballModelPlayer.Player(samurai),
+    ichiro = new _baseballModelPlayer.Player(samurai),
+    inaba = new _baseballModelPlayer.Player(samurai);
+
+var matsuzaka = new _baseballModelPlayer.Player(samurai),
+    fukudome = new _baseballModelPlayer.Player(samurai),
+    aoki = new _baseballModelPlayer.Player(samurai),
+    abe = new _baseballModelPlayer.Player(samurai),
+    iwamura = new _baseballModelPlayer.Player(samurai);
+
+var coach = new _baseballTeamsTrainer.Trainer();
+
+coach.makePlayer(darvish, 'Yu', 'Darvish', 'ダルビッシュ', '有', 150, { eye: 80, power: 80, speed: 80 }, { catching: 50, fielding: 70, throwing: 100, speed: 80 }, 'right', 'right', 11);
+
+coach.makePlayer(johjima, 'Kenji', 'Johjima', '城島', '健司', 60, { eye: 90, power: 88, speed: 70 }, { catching: 140, fielding: 95, throwing: 88, speed: 94 }, 'right', 'right', 2);
+
+coach.makePlayer(ogasawara, 'Michihiro', 'Ogasawara', '小笠原', '道大', 150, { eye: 96, power: 115, speed: 90 }, { catching: 50, fielding: 96, throwing: 85, speed: 70 }, 'left', 'right', 36);
+
+coach.makePlayer(nishioka, 'Tsuyoshi', 'Nishioka', '西岡', '剛', 150, { eye: 88, power: 75, speed: 92 }, { catching: 90, fielding: 88, throwing: 88, speed: 90 }, 'right', 'right', 7);
+
+coach.makePlayer(kawasaki, 'Munenori', 'Kawasaki', '川崎', '宗則', 150, { eye: 95, power: 75, speed: 92 }, { catching: 90, fielding: 98, throwing: 90, speed: 110 }, 'left', 'right', 52);
+
+coach.makePlayer(murata, 'Shuichi', 'Murata', '村田', '修一', 150, { eye: 82, power: 110, speed: 60 }, { catching: 80, fielding: 80, throwing: 90, speed: 90 }, 'right', 'right', 25);
+
+coach.makePlayer(matsui, 'Hideki', 'Matsui', '秀樹', '松井', 75, { eye: 104, power: 130, speed: 68 }, { catching: 40, fielding: 85, throwing: 70, speed: 60 }, 'left', 'right', 55);
+
+coach.makePlayer(ichiro, 'Ichiro', 'Suzuki', 'イチロー', '', 115, { eye: 115, power: 98, speed: 99 }, { catching: 80, fielding: 110, throwing: 135, speed: 120 }, 'left', 'right', 51);
+
+coach.makePlayer(inaba, 'Atsunori', 'Inaba', '稲葉', '篤紀', 150, { eye: 92, power: 95, speed: 75 }, { catching: 50, fielding: 95, throwing: 95, speed: 90 }, 'right', 'right', 41);
+
+samurai.bench = [darvish, johjima, ogasawara, nishioka, kawasaki, murata, matsui, ichiro, inaba, matsuzaka, fukudome, aoki, abe, iwamura];
+samurai.manager.makeLineup();
+samurai.positions = {
+    pitcher: darvish,
+    catcher: johjima,
+
+    first: ogasawara,
+    second: nishioka,
+    short: kawasaki,
+    third: murata,
+
+    left: matsui,
+    center: ichiro,
+    right: inaba
+};
+
+for (var position in samurai.positions) {
+    if (samurai.positions.hasOwnProperty(position)) {
+        samurai.positions[position].position = position;
+    }
+}
+
+samurai.lineup = [ichiro, kawasaki, inaba, matsui, ogasawara, johjima, murata, nishioka, darvish];
+
+samurai.lineup.map(function (player, order) {
+    player.order = order;
+});
+
+exports.samurai = samurai;
+
+},{"baseball/Model/Player":5,"baseball/Model/_models":8,"baseball/Teams/Trainer":16}],16:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _baseballServicesIterator = require('baseball/Services/Iterator');
+
+var Trainer = (function () {
+    function Trainer() {
+        _classCallCheck(this, Trainer);
+    }
+
+    _createClass(Trainer, [{
+        key: 'makePlayer',
+        value: function makePlayer(player, name, surname, surnameJ, nameJ, pitching, offense, defense, bats, throws, number) {
+            player.hero = true;
+
+            if ('rights' && 0) {
+                surnameJ = '代表';
+                nameJ = '選手';
+                name = 'TEAM';
+                surname = 'JPN';
+            }
+
+            player.name = name + ' ' + surname;
+            player.nameJ = surnameJ + nameJ;
+            player.surname = surname;
+            player.surnameJ = surnameJ;
+
+            player.spaceName(surnameJ, nameJ);
+            player.randomizeSkills(true, true);
+            player.skill.offense = offense;
+            player.skill.defense = defense;
+            player.skill.pitching = pitching;
+            player.bats = bats;
+            player.throws = throws;
+            player.number = number;
+            _baseballServicesIterator.Iterator.each(player.pitching, function (key, value) {
+                player.pitching[key].velocity += pitching / 5 | 0;
+                player.pitching[key]['break'] += pitching / 5 | 0;
+                player.pitching[key].control += pitching / 5 | 0;
+            });
+            player.resetStats(0);
+        }
+    }]);
+
+    return Trainer;
+})();
+
+exports.Trainer = Trainer;
+
+},{"baseball/Services/Iterator":11}],17:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+
 var _baseballUtilityText = require('baseball/Utility/text');
 
 var Log = function Log() {
@@ -2937,7 +3125,7 @@ Log.prototype = {
 
 exports.Log = Log;
 
-},{"baseball/Utility/text":18}],15:[function(require,module,exports){
+},{"baseball/Utility/text":21}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2957,7 +3145,7 @@ exports.helper = _baseballUtilityHelper.helper;
 exports.Log = _baseballUtilityLog.Log;
 exports.text = _baseballUtilityText.text;
 
-},{"baseball/Utility/Log":14,"baseball/Utility/data":16,"baseball/Utility/helper":17,"baseball/Utility/text":18}],16:[function(require,module,exports){
+},{"baseball/Utility/Log":17,"baseball/Utility/data":19,"baseball/Utility/helper":20,"baseball/Utility/text":21}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2979,7 +3167,7 @@ var data = {
 
 exports.data = data;
 
-},{}],17:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3005,7 +3193,7 @@ var helper = {
 
 exports.helper = helper;
 
-},{}],18:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3121,7 +3309,8 @@ var text = function text(phrase, override) {
             '#': '背番号',
 
             'Opponent connected': '相手選手見参',
-            'Click Here': 'ここにクリック'
+            'Click Here': 'ここにクリック',
+            'Play against Team Japan': '日本代表挑戦'
         },
         e: {
             empty: '-',
@@ -3350,7 +3539,7 @@ text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances,
 
 exports.text = text;
 
-},{}],19:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3365,7 +3554,7 @@ if (typeof window == 'object') {
 
 exports.Baseball = _baseballNamespace.Baseball;
 
-},{"baseball/namespace":20}],20:[function(require,module,exports){
+},{"baseball/namespace":23}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3390,6 +3579,8 @@ var _baseballUtility_utils = require('baseball/Utility/_utils');
 
 var _baseballServices_services = require('baseball/Services/_services');
 
+var _baseballTeamsProvider = require('baseball/Teams/Provider');
+
 var Baseball = {};
 
 Baseball.model = {};
@@ -3407,9 +3598,12 @@ Baseball.util = {};
 Baseball.util.text = _baseballUtility_utils.text;
 Baseball.util.Log = _baseballUtility_utils.Log;
 
+Baseball.teams = {};
+Baseball.teams.Provider = _baseballTeamsProvider.Provider;
+
 exports.Baseball = Baseball;
 
-},{"baseball/Model/AtBat":1,"baseball/Model/Field":2,"baseball/Model/Game":3,"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":13,"baseball/Utility/_utils":15}],21:[function(require,module,exports){
+},{"baseball/Model/AtBat":1,"baseball/Model/Field":2,"baseball/Model/Game":3,"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":13,"baseball/Teams/Provider":14,"baseball/Utility/_utils":18}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3429,7 +3623,7 @@ exports.Distribution = _baseballServicesDistribution.Distribution;
 exports.Iterator = _baseballServicesIterator.Iterator;
 exports.Mathinator = _baseballServicesMathinator.Mathinator;
 
-},{"baseball/Services/Animator":9,"baseball/Services/Distribution":10,"baseball/Services/Iterator":11,"baseball/Services/Mathinator":12}]},{},[19]);
+},{"baseball/Services/Animator":9,"baseball/Services/Distribution":10,"baseball/Services/Iterator":11,"baseball/Services/Mathinator":12}]},{},[22]);
 
 IndexController = function($scope, socket) {
     var text = Baseball.util.text;
@@ -3444,6 +3638,19 @@ IndexController = function($scope, socket) {
             text.mode = setMode;
         }
         return text.mode;
+    };
+
+    $scope.teamJapan = function() {
+        var provider = new Baseball.teams.Provider;
+        provider.assignTeam($scope.y, 'TeamJapan', 'away');
+        var game = $scope.y;
+        if (game.half === 'top') {
+            game.batter = game.teams.away.lineup[game.batter.order];
+            game.deck = game.teams.away.lineup[(game.batter.order + 1) % 9];
+            game.hole = game.teams.away.lineup[(game.batter.order + 2) % 9];
+        } else {
+            game.pitcher = game.teams.away.positions.pitcher;
+        }
     };
 
     $scope.proceedToGame = function(quickMode, spectateCpu) {

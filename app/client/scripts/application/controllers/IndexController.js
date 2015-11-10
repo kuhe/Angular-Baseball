@@ -13,6 +13,19 @@ IndexController = function($scope, socket) {
         return text.mode;
     };
 
+    $scope.teamJapan = function() {
+        var provider = new Baseball.teams.Provider;
+        provider.assignTeam($scope.y, 'TeamJapan', 'away');
+        var game = $scope.y;
+        if (game.half === 'top') {
+            game.batter = game.teams.away.lineup[game.batter.order];
+            game.deck = game.teams.away.lineup[(game.batter.order + 1) % 9];
+            game.hole = game.teams.away.lineup[(game.batter.order + 2) % 9];
+        } else {
+            game.pitcher = game.teams.away.positions.pitcher;
+        }
+    };
+
     $scope.proceedToGame = function(quickMode, spectateCpu) {
         Game.prototype.humanControl = spectateCpu ? 'none' : 'home';
         Game.prototype.quickMode = !!quickMode && quickMode !== 7;
