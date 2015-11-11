@@ -1211,7 +1211,7 @@ Player.prototype = {
         var ab = paRemaining;
         var so = Math.floor(randBetween(25, 2, 'eye') * paRemaining / 100);
         paRemaining -= so;
-        var h = Math.floor(randBetween(185, 472, 'eye power speed') * paRemaining / 1000);
+        var h = Math.floor(randBetween(185, 372, 'eye power speed') * paRemaining / 1000);
         paRemaining -= h;
 
         var doubles = randBetween(0, h / 4, 'power speed');
@@ -2610,19 +2610,19 @@ coach.makePlayer(darvish, 'Yu', 'Darvish', 'ダルビッシュ', '有', 150, { e
 
 coach.makePlayer(johjima, 'Kenji', 'Johjima', '城島', '健司', 60, { eye: 90, power: 88, speed: 70 }, { catching: 140, fielding: 95, throwing: 88, speed: 94 }, 'right', 'right', 2);
 
-coach.makePlayer(ogasawara, 'Michihiro', 'Ogasawara', '小笠原', '道大', 150, { eye: 96, power: 115, speed: 90 }, { catching: 50, fielding: 96, throwing: 85, speed: 70 }, 'left', 'right', 36);
+coach.makePlayer(ogasawara, 'Michihiro', 'Ogasawara', '小笠原', '道大', 80, { eye: 96, power: 115, speed: 90 }, { catching: 50, fielding: 96, throwing: 85, speed: 70 }, 'left', 'right', 36);
 
-coach.makePlayer(nishioka, 'Tsuyoshi', 'Nishioka', '西岡', '剛', 150, { eye: 88, power: 75, speed: 92 }, { catching: 90, fielding: 88, throwing: 88, speed: 90 }, 'right', 'right', 7);
+coach.makePlayer(nishioka, 'Tsuyoshi', 'Nishioka', '西岡', '剛', 80, { eye: 88, power: 75, speed: 92 }, { catching: 90, fielding: 88, throwing: 88, speed: 90 }, 'right', 'right', 7);
 
-coach.makePlayer(kawasaki, 'Munenori', 'Kawasaki', '川崎', '宗則', 150, { eye: 95, power: 75, speed: 92 }, { catching: 90, fielding: 98, throwing: 90, speed: 110 }, 'left', 'right', 52);
+coach.makePlayer(kawasaki, 'Munenori', 'Kawasaki', '川崎', '宗則', 80, { eye: 95, power: 75, speed: 92 }, { catching: 90, fielding: 98, throwing: 90, speed: 110 }, 'left', 'right', 52);
 
-coach.makePlayer(murata, 'Shuichi', 'Murata', '村田', '修一', 150, { eye: 82, power: 110, speed: 60 }, { catching: 80, fielding: 80, throwing: 90, speed: 90 }, 'right', 'right', 25);
+coach.makePlayer(murata, 'Shuichi', 'Murata', '村田', '修一', 80, { eye: 82, power: 110, speed: 60 }, { catching: 80, fielding: 80, throwing: 90, speed: 90 }, 'right', 'right', 25);
 
 coach.makePlayer(matsui, 'Hideki', 'Matsui', '秀樹', '松井', 75, { eye: 104, power: 130, speed: 68 }, { catching: 40, fielding: 85, throwing: 70, speed: 60 }, 'left', 'right', 55);
 
-coach.makePlayer(ichiro, 'Ichiro', 'Suzuki', 'イチロー', '', 115, { eye: 115, power: 98, speed: 99 }, { catching: 80, fielding: 110, throwing: 135, speed: 120 }, 'left', 'right', 51);
+coach.makePlayer(ichiro, 'Ichiro', 'Suzuki', 'イチロー', '', 115, { eye: 115, power: 48, speed: 99 }, { catching: 80, fielding: 110, throwing: 135, speed: 120 }, 'left', 'right', 51);
 
-coach.makePlayer(inaba, 'Atsunori', 'Inaba', '稲葉', '篤紀', 150, { eye: 92, power: 95, speed: 75 }, { catching: 50, fielding: 95, throwing: 95, speed: 90 }, 'right', 'right', 41);
+coach.makePlayer(inaba, 'Atsunori', 'Inaba', '稲葉', '篤紀', 80, { eye: 92, power: 95, speed: 75 }, { catching: 50, fielding: 95, throwing: 95, speed: 90 }, 'right', 'right', 41);
 
 samurai.bench = [darvish, johjima, ogasawara, nishioka, kawasaki, murata, matsui, ichiro, inaba, matsuzaka, fukudome, aoki, abe, iwamura];
 samurai.manager.makeLineup();
