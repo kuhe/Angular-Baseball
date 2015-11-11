@@ -379,6 +379,13 @@
         <button ng-click='teamJapan()'>
             {{ t('Play against Team Japan') }}
         </button>
+        <hr>
+        <p ng-show='mode() === "e"'>
+            Clicking here will substitute the opposing team (away) with fist tier representatives from Japan.
+        </p>
+        <p ng-show='mode() === "n"'>
+            向こうのチームはベンチがすごいかも。
+        </p>
     </div>
     <aside class='mousehover' ng-show='message'>
         {{ message }}

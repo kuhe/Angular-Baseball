@@ -1147,7 +1147,7 @@ Player.prototype = {
     },
     spaceName: function spaceName(jSurname, jGivenName) {
         if (jSurname.length == 1 && jGivenName.length <= 2) jSurname += '・';
-        if (jGivenName.length == 1 && jSurname.indexOf('・') < 0) jSurname += '・';
+        if (jGivenName.length == 1 && jSurname.indexOf('・') < 0 && jSurname.length <= 2) jSurname += '・';
         this.nameJ = jSurname + jGivenName;
         this.surnameJ = jSurname;
     },
