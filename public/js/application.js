@@ -263,16 +263,17 @@ Field.prototype = {
     /**
      * @param splayAngle
      * @param landingDistance
-     * @returns {string|bool}
+     * @returns {string|boolean}
      */
     findFielder: function findFielder(splayAngle, landingDistance) {
-        if (Math.abs(90 - splayAngle) > 50) return false;
+        var angle = splayAngle - 90; // 0 is up the middle, clockwise increasing
+        if (Math.abs(angle) > 50) return false; // foul
         if (landingDistance < 10 && landingDistance > -20) {
             return 'catcher';
-        } else if (landingDistance >= 10 && landingDistance < 66 && Math.abs(90 - splayAngle) < 5) {
+        } else if (landingDistance >= 10 && landingDistance < 66 && Math.abs(angle) < 5) {
             return 'pitcher';
         }
-        if (landingDistance > 20 && landingDistance + Math.abs(90 - splayAngle) / 90 * 37 < 155) {
+        if (landingDistance > 20 && landingDistance + Math.abs(angle) / 90 * 37 < 155) {
             if (splayAngle < 45 + 23) {
                 return 'third';
             } else if (splayAngle < 45 + 23 + 23) {
@@ -562,15 +563,22 @@ Game.prototype = {
 
         var x = _baseballServices_services.Distribution.centralizedNumber(),
             y = _baseballServices_services.Distribution.centralizedNumber();
+
         if (100 * Math.random() < eye) {
-            convergence = 1.35 * 4.2 * eye / 100;
-            convergenceSum = 1 + convergence;
+            // identified the break
             deceptiveX = this.pitchInFlight.x;
             deceptiveY = this.pitchInFlight.y;
+        }
+
+        if (100 * Math.random() < eye) {
+            // identified the location
+            convergence = 1.35 * 4.2 * eye / 100;
+            convergenceSum = 1 + convergence;
         } else {
             convergence = 1.35 * 0.5 * eye / 100;
             convergenceSum = 1 + convergence;
         }
+
         x = (deceptiveX * convergence + x) / convergenceSum;
         y = (deceptiveY * convergence + y) / convergenceSum;
 
@@ -1254,6 +1262,9 @@ Player.prototype = {
             batting: {
                 getBA: function getBA() {
                     return this.h / Math.max(1, this.ab);
+                },
+                getBABIP: function getBABIP() {
+                    return (this.h - this.hr) / (this.ab - this.so - this.hr + this.sac);
                 },
                 ba: null,
                 getOBP: function getOBP() {
