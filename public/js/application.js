@@ -91,7 +91,6 @@ Field.prototype = {
          * for a hard foul left, 180 is a foul right. Depending on the angle of the bat,
          * a y-axis displacement which would otherwise pop or ground the ball can instead
          * increase the left/right effect.
-         * @type {number}
          */
         var angles = _baseballServices_services.Mathinator.getSplayAndFlyAngle(x, y, swing.angle);
         var eye = this.game.batter.skill.offense.eye;
