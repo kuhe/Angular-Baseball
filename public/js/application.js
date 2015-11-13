@@ -93,12 +93,14 @@ Field.prototype = {
          * increase the left/right effect.
          * @type {number}
          */
-        var splayAngle = 90 - 1.5 * x + swing.angle * y / 35;
-        var flyAngle = -3 * y - swing.angle * y / 35;
+        var angles = _baseballServices_services.Mathinator.getSplayAndFlyAngle(x, y, swing.angle);
+        var eye = this.game.batter.skill.offense.eye;
+        var splayAngle = angles.splay + (Math.random() - 0.5) * 90 * (200 / (200 + eye));
+        var flyAngle = angles.fly;
         var power = this.game.batter.skill.offense.power + (this.game.batter.eye.bonus || 0) / 5;
         var landingDistance = _baseballServices_services.Distribution.landingDistance(power, flyAngle);
-        if (flyAngle < 0 && landingDistance > 120) {
-            landingDistance = (landingDistance - 120) / 4 + 120;
+        if (flyAngle < 0 && landingDistance > 95) {
+            landingDistance = (landingDistance - 95) / 4 + 95;
         }
         var game = this.game;
 
@@ -121,7 +123,7 @@ Field.prototype = {
                 throwingEase = fielder.skill.defense.throwing / 100;
             //reach the batted ball?
             swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle, landingDistance]);
-            var interceptRating = fielder.skill.defense.speed + flyAngle - swing.fielderTravel * 1.65;
+            var interceptRating = fielder.skill.defense.speed * 1.5 + flyAngle * 2.2 - swing.fielderTravel * 1.65 - 20;
             if (interceptRating > 0 && flyAngle > 0) {
                 //caught cleanly?
                 if (_baseballServices_services.Distribution.error(fielder)) {
@@ -160,12 +162,13 @@ Field.prototype = {
 
                 if (swing.outfielder) {
                     swing.bases = 1;
+                    baseRunningTime *= 0.95;
                     fieldingReturnDelay -= baseRunningTime;
-                    var difficulty = 1.8;
+                    eye = game.batter.skill.offense.eye / 400;
 
-                    while (fieldingReturnDelay > baseRunningTime + difficulty && swing.bases < 3) {
+                    while (fieldingReturnDelay > baseRunningTime && swing.bases < 3 && Math.random() < 0.25 + eye) {
+                        baseRunningTime *= 0.95;
                         swing.bases++;
-                        difficulty = -1.3;
                         fieldingReturnDelay -= baseRunningTime;
                     }
                 } else {
@@ -270,23 +273,24 @@ Field.prototype = {
         if (Math.abs(angle) > 50) return false; // foul
         if (landingDistance < 10 && landingDistance > -20) {
             return 'catcher';
-        } else if (landingDistance >= 10 && landingDistance < 66 && Math.abs(angle) < 5) {
+        } else if (landingDistance >= 10 && landingDistance < 55 && Math.abs(angle) < 5) {
             return 'pitcher';
         }
-        if (landingDistance > 20 && landingDistance + Math.abs(angle) / 90 * 37 < 155) {
-            if (splayAngle < 45 + 23) {
+        if (landingDistance > 20 && landingDistance < 145 - Math.abs(angle) / 90 * 50) {
+            if (angle < -20) {
                 return 'third';
-            } else if (splayAngle < 45 + 23 + 23) {
+            } else if (angle < 5) {
                 return 'short';
-            } else if (splayAngle < 45 + 23 + 23 + 23) {
+            } else if (angle < 30) {
                 return 'second';
             } else {
+                // first has reduced arc to receive the throw
                 return 'first';
             }
-        } else if (landingDistance > 90 && landingDistance < 310) {
-            if (splayAngle < 45 + 28) {
+        } else if (landingDistance < 310) {
+            if (angle < -15) {
                 return 'left';
-            } else if (splayAngle < 45 + 28 + 34) {
+            } else if (angle < 16) {
                 return 'center';
             } else {
                 return 'right';
@@ -583,7 +587,7 @@ Game.prototype = {
         y = (deceptiveY * convergence + y) / convergenceSum;
 
         this.swingResult.x = _baseballServices_services.Distribution.cpuSwing(x, this.pitchInFlight.x, eye);
-        this.swingResult.y = _baseballServices_services.Distribution.cpuSwing(y, this.pitchInFlight.y, eye);
+        this.swingResult.y = _baseballServices_services.Distribution.cpuSwing(y, this.pitchInFlight.y, eye * 0.75);
 
         var swingProbability = _baseballServices_services.Distribution.swingLikelihood(eye, x, y, this.umpire);
         if (swingProbability < 100 * Math.random()) {
@@ -677,8 +681,8 @@ Game.prototype = {
                     var recalculation = _baseballServices_services.Mathinator.getAngularOffset(this.swingResult, this.swingResult.angle);
                     var precision = _baseballServices_services.Distribution.swing(eye);
 
-                    this.swingResult.x = Math.abs(recalculation.x) > 20 ? recalculation.x * precision : recalculation.x;
-                    this.swingResult.y = -5 + (recalculation.y < 0 ? recalculation.y * precision : recalculation.y);
+                    this.swingResult.x = recalculation.x * precision;
+                    this.swingResult.y = -5 + recalculation.y * precision;
 
                     //log(recalculation.y, precision);
 
@@ -2179,7 +2183,7 @@ Distribution.prototype = {
      * @returns {number} 0-200
      */
     cpuSwing: function cpuSwing(target, actual, eye) {
-        eye = Math.max(eye, 100);
+        eye = Math.max(eye, 100); // higher eye would overcompensate here
         return 100 + (target - 100) * (0.5 + Math.random() * eye / 200) - actual;
     },
     /**
@@ -2514,7 +2518,23 @@ Mathinator.prototype = {
      * @returns {number} seconds
      */
     baseRunningTime: function baseRunningTime(speed) {
-        return 6.0 - speed / 100 * 2.2;
+        return 7.0 - speed / 100 * 4.1;
+    },
+    /**
+     * @param x {Number} bat offset
+     * @param y {Number} bat offset
+     * @param angle {Number} batting angle where 0 is horizontal, RHB clockwise increasing
+     * {
+     *   splay: 0-180 where 90 is up the middle,
+     *   fly: 0, flat, to 90, vertical pop up
+     * }
+     * @returns {{splay: number, fly: number}}
+     */
+    getSplayAndFlyAngle: function getSplayAndFlyAngle(x, y, angle) {
+        return {
+            splay: 90 - 2.5 * x - angle / 20 * y,
+            fly: -3 * y - angle / 35 * y
+        };
     }
 };
 
