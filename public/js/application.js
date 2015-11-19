@@ -1939,8 +1939,8 @@ Animator.prototype = {
 
             $('.webgl-container').get(0).appendChild(renderer.domElement);
 
-            var geometry = new THREE.BoxGeometry(1, 1, 1);
-            var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            var geometry = new THREE.SphereGeometry(2, 32, 32);
+            var material = new THREE.MeshBasicMaterial({ color: 'grey' });
             var cube = new THREE.Mesh(geometry, material);
             scene.add(cube);
 
@@ -1948,8 +1948,8 @@ Animator.prototype = {
 
             var loop = function loop() {
                 requestAnimationFrame(loop);
-                cube.rotation.x += 0.1;
-                cube.rotation.y += 0.1;
+                cube.rotation.x += Math.random() * 0.1;
+                cube.rotation.y += Math.random() * 0.1;
                 renderer.render(scene, camera);
             };
             loop();
