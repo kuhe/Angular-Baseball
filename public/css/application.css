@@ -671,7 +671,19 @@ aside.image-panel.right {
   top: 55px;
   width: 0;
 }
+.webgl-container {
+  width: 100%;
+  display: block;
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  height: 300px;
+  z-index: -10;
+  overflow: visible;
+}
 .main-area {
+  position: relative;
   /* Gradients http://codepen.io/zessx/pen/rDEAl/ */
 }
 .main-area .background-color {

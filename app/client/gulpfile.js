@@ -46,7 +46,8 @@ var EXTERNAL_SCRIPT_FILES = [
     './bower_components/angular/angular.js',
     './bower_components/angular-sanitize/angular-sanitize.js',
     './bower_components/angular-route/angular-route.js',
-    './bower_components/gsap/src/uncompressed/TweenMax.js'
+    './bower_components/gsap/src/uncompressed/TweenMax.js',
+    './bower_components/three.js/three.min.js'
 ];
 
 var STYLE_DEPLOY_DIR = '../../public/css';

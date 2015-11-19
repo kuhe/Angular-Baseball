@@ -1927,7 +1927,36 @@ Animator.prototype = {
     constructor: Animator,
     console: false,
     TweenMax: {},
+    THREE: {},
     init: function init() {},
+    loadThree: function loadThree() {
+        if (this.THREE === Animator.prototype.THREE && typeof window === 'object' && window.THREE) {
+            var THREE = this.THREE = window.THREE;
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera(75, window.innerWidth / 300, 0.1, 1000);
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, 300);
+
+            $('.webgl-container').get(0).appendChild(renderer.domElement);
+
+            var geometry = new THREE.BoxGeometry(1, 1, 1);
+            var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            var cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+
+            camera.position.z = 5;
+
+            var loop = function loop() {
+                requestAnimationFrame(loop);
+                cube.rotation.x += 0.1;
+                cube.rotation.y += 0.1;
+                renderer.render(scene, camera);
+            };
+            loop();
+            return this.THREE;
+        }
+        return undefined;
+    },
     loadTweenMax: function loadTweenMax() {
         if (this.console || typeof window !== 'object') {
             Animator.TweenMax = {
