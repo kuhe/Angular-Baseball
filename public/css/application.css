@@ -170,7 +170,7 @@ button.btn {
   background: #2a2a2a;
   color: white;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 16px;
   border-top: 0;
   border-bottom: 0;
   border-left: 3px solid white;
@@ -364,6 +364,7 @@ button.btn.disabled {
   perspective: 100px;
 }
 .target.live {
+  z-index: 8;
   cursor: none;
 }
 .target.pitching {
@@ -401,7 +402,7 @@ button.btn.disabled {
 .blocking {
   position: absolute;
   width: 100%;
-  height: 200%;
+  height: 250%;
   z-index: 11;
   left: 0;
   top: 0;
@@ -678,8 +679,10 @@ aside.image-panel.right {
   top: -20px;
   left: 0;
   right: 0;
-  height: 300px;
-  z-index: -10;
+  height: 1100px;
+  margin-top: -220px;
+  z-index: 5;
+  background: transparent;
   overflow: visible;
 }
 .main-area {

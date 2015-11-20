@@ -1924,6 +1924,8 @@ var _meshBall = require('./mesh/Ball');
 
 var _sceneLighting = require('./scene/lighting');
 
+var VERTICAL_CORRECTION = 0;
+
 var Loop = (function () {
     function Loop() {
         _classCallCheck(this, Loop);
@@ -1953,6 +1955,7 @@ var Loop = (function () {
                 _sceneLighting.lighting.addTo(scene);
 
                 camera.position.z = 5;
+                camera.position.y += VERTICAL_CORRECTION;
                 this.loop();
             }
         }
@@ -1973,13 +1976,10 @@ var Loop = (function () {
             element.innerHTML = '';
             var THREE = this.THREE;
             var renderer = new THREE.WebGLRenderer({ alpha: true });
-            renderer.setSize(window.innerWidth, 300);
+            setSize(renderer);
             //renderer.setClearColor(0xffffff, 0);
 
             element.appendChild(renderer.domElement);
-            element.style.zIndex = 15;
-            element.style.border = '1px solid black';
-            element.style.background = 'transparent';
 
             this.renderer = renderer;
             return renderer;
@@ -1989,7 +1989,7 @@ var Loop = (function () {
         value: function onResize() {
             this.camera.aspect = Loop.prototype.getAspect();
             this.camera.updateProjectionMatrix();
-            this.renderer.setSize(window.innerWidth, 300);
+            setSize(this.renderer);
         }
     }, {
         key: 'test',
@@ -2007,9 +2007,17 @@ var Loop = (function () {
     return Loop;
 })();
 
+var HEIGHT = 700;
+var setSize = function setSize(renderer) {
+    var element = document.getElementsByClassName('webgl-container')[0];
+    var width = element.offsetWidth;
+    renderer.setSize(width, HEIGHT);
+};
+
 Loop.prototype.THREE = {};
 Loop.prototype.getAspect = function () {
-    return window.innerWidth / 300;
+    var element = document.getElementsByClassName('webgl-container')[0];
+    return element.offsetWidth / HEIGHT;
 };
 Loop.prototype.constructors = {
     Ball: _meshBall.Ball
@@ -2104,6 +2112,7 @@ var Ball = (function (_AbstractMesh) {
             trajectory = loop;
         }
         this.trajectory = trajectory ? trajectory : [];
+        this.breakingTrajectory = [];
         this.getMesh();
         if (loop instanceof _Loop.Loop) {
             this.join();
@@ -2162,6 +2171,95 @@ var Ball = (function (_AbstractMesh) {
             this.rotation = this.RP60thOfASecond * 360 * Math.PI / 180;
         }
     }, {
+        key: 'exportPositionTo',
+        value: function exportPositionTo(mesh) {
+            mesh.position.x = this.mesh.position.x;
+            mesh.position.y = this.mesh.position.y;
+            mesh.position.z = this.mesh.position.z;
+        }
+    }, {
+        key: 'derivePitchingTrajectory',
+        value: function derivePitchingTrajectory(game) {
+            var top = 200 - game.pitchTarget.y,
+                left = game.pitchTarget.x,
+                breakTop = 200 - game.pitchInFlight.y,
+                breakLeft = game.pitchInFlight.x,
+                flightTime = _baseballServicesMathinator.Mathinator.getFlightTime(game.pitchInFlight.velocity);
+
+            var scale = 2.8 / 100;
+            var origin = {
+                x: (game.pitcher.throws == 'left' ? 20 : -20) * scale,
+                y: 50 * scale,
+                z: -60.5 // mound distance
+            };
+            this.mesh.position.x = origin.x;
+            this.mesh.position.y = origin.y;
+            this.mesh.position.z = origin.z;
+
+            var terminus = {
+                x: (left - 100) * scale,
+                y: (100 - top) * scale,
+                z: 0
+            };
+            var breakingTerminus = {
+                x: (breakLeft - 100) * scale,
+                y: (100 - breakTop) * scale,
+                z: 0
+            };
+
+            var lastPosition = {
+                x: origin.x, y: origin.y, z: origin.z
+            },
+                lastBreakingPosition = {
+                x: origin.x, y: origin.y, z: origin.z
+            };
+
+            var frames = [],
+                breakingFrames = [],
+                frameCount = flightTime * 60 | 0,
+                counter = frameCount | 0,
+                frame = 0;
+
+            while (counter--) {
+                var progress = ++frame / frameCount;
+
+                var position = {
+                    x: origin.x + (terminus.x - origin.x) * progress,
+                    y: origin.y + (terminus.y - origin.y) * progress,
+                    z: origin.z + (terminus.z - origin.z) * progress
+                };
+                if (progress > 0.7) {
+                    var breakingPosition = {
+                        x: origin.x + (breakingTerminus.x - origin.x) * progress,
+                        y: origin.y + (breakingTerminus.y - origin.y) * progress,
+                        z: origin.z + (breakingTerminus.z - origin.z) * progress
+                    };
+                } else {
+                    breakingPosition = position;
+                }
+                var increment = {
+                    x: position.x - lastPosition.x,
+                    y: position.y - lastPosition.y,
+                    z: position.z - lastPosition.z
+                };
+                var breakingIncrement = {
+                    x: breakingPosition.x - lastBreakingPosition.x,
+                    y: breakingPosition.y - lastBreakingPosition.y,
+                    z: breakingPosition.z - lastBreakingPosition.z
+                };
+
+                lastPosition = position;
+                lastBreakingPosition = breakingPosition;
+
+                breakingFrames.push(breakingIncrement);
+                frames.push(increment);
+            }
+
+            this.breakingTrajectory = breakingFrames;
+            this.trajectory = frames;
+            return frames;
+        }
+    }, {
         key: 'deriveTrajectory',
         value: function deriveTrajectory(result, pitch) {
             var dragScalarApproximation = {
@@ -2186,11 +2284,17 @@ var Ball = (function (_AbstractMesh) {
             // in seconds
             var airTime = 1.5 * Math.sqrt(2 * apexHeight / 9.81) * dragScalarApproximation.airTime; // 2x freefall equation
 
+            var scale = 2.8 / 100;
+
             var origin = {
-                x: result.x,
-                y: 0,
+                x: pitch.x + result.x - 100,
+                y: pitch.y + result.y - 100,
                 z: 0
             };
+
+            this.mesh.position.x = origin.x * scale;
+            this.mesh.position.y = origin.y * scale;
+            this.mesh.position.z = origin.z;
 
             var extrema = {
                 x: Math.sin(splay / 180 * Math.PI) * distance,
@@ -2264,6 +2368,7 @@ var _baseballRenderLoop = require('baseball/Render/Loop');
 
 var Animator = function Animator() {
     this.init();
+    throw new Error('No need to instantiate Animator');
 };
 Animator.TweenMax = {};
 Animator.prototype = {
@@ -2295,16 +2400,23 @@ Animator.prototype = {
     HOLD_UP_ALLOWANCE: 0.75, // seconds
     pitchTarget: null,
     pitchBreak: null,
+    renderingMode: 'webgl',
     /**
-     * this is called from the scope context
+     * this is called with $scope context binding
      * @param callback
      */
     updateFlightPath: function updateFlightPath(callback) {
         if (Animator.console) return;
+
+        if (Animator.renderingMode === 'webgl') {
+            return Animator.renderFlightPath(callback, this);
+        }
+        return Animator.tweenFlightPath(callback, this);
+    },
+    tweenFlightPath: function tweenFlightPath(callback, $scope) {
         var TweenMax = Animator.loadTweenMax();
         TweenMax.killAll();
-        var $scope = this,
-            game = $scope.y,
+        var game = $scope.y,
             top = 200 - game.pitchTarget.y,
             left = game.pitchTarget.x,
             breakTop = 200 - game.pitchInFlight.y,
@@ -2321,10 +2433,6 @@ Animator.prototype = {
             targetTransition = _baseballServices_services.Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 10, 3);
 
         var transitions = [pitchTransition(0, 0), pitchTransition(10, 0), pitchTransition(30, 1), pitchTransition(50, 2), targetTransition(100, 3), pitchTransition(100, 3, breakTop, breakLeft)];
-
-        //var horizontalBreak = (60 - Math.abs(game.pitchTarget.x - game.pitchInFlight.x))/10;
-        //$('.baseball').addClass('spin');
-        //$('.baseball').css('animation', 'spin '+horizontalBreak+'s 5 0s linear');
 
         TweenMax.set([pitch, henka], transitions[0]);
         TweenMax.to([pitch, henka], quarter, transitions[1]);
@@ -2352,7 +2460,42 @@ Animator.prototype = {
             $('.baseball.pitch').removeClass('hide');
         }
 
-        if ($scope.y.humanBatting() && !$scope.y.humanPitching()) {
+        if (game.humanBatting() && !game.humanPitching()) {
+            $scope.holdUpTimeouts.push(setTimeout(function () {
+                $scope.holdUp();
+            }, (flightSpeed + Animator.HOLD_UP_ALLOWANCE) * 1000));
+        }
+    },
+    renderFlightPath: function renderFlightPath(callback, $scope) {
+        var TweenMax = Animator.loadTweenMax();
+        TweenMax.killAll();
+        var game = $scope.y,
+            flightSpeed = _baseballServices_services.Mathinator.getFlightTime(game.pitchInFlight.velocity);
+
+        if (!this.loop) {
+            this.beginRender();
+        }
+        var ball = new this.loop.constructors.Ball();
+        var breakingBall = new this.loop.constructors.Ball();
+        Animator._ball = ball;
+        ball.derivePitchingTrajectory(game);
+        breakingBall.trajectory = ball.breakingTrajectory;
+        ball.exportPositionTo(breakingBall.mesh);
+        ball.join(this.loop);
+        breakingBall.join(this.loop);
+
+        $scope.lastTimeout = setTimeout(function () {
+            $scope.allowInput = true;
+            if (typeof callback === 'function') {
+                callback();
+                $scope.$apply();
+            }
+        }, flightSpeed * 1000);
+
+        var $baseballs = $('.baseball');
+        $baseballs.addClass('hide');
+
+        if (game.humanBatting() && !game.humanPitching()) {
             $scope.holdUpTimeouts.push(setTimeout(function () {
                 $scope.holdUp();
             }, (flightSpeed + Animator.HOLD_UP_ALLOWANCE) * 1000));
@@ -2360,7 +2503,13 @@ Animator.prototype = {
     },
     animateFieldingTrajectory: function animateFieldingTrajectory(game) {
         if (Animator.console) return game.swingResult;
-        this.init();
+
+        if (this.renderingMode === 'webgl') {
+            return Animator.renderFieldingTrajectory(game);
+        }
+        return this.tweenFieldingTrajectory(game);
+    },
+    tweenFieldingTrajectory: function tweenFieldingTrajectory(game) {
         var TweenMax = Animator.loadTweenMax();
         var ball = $('.splay-indicator-ball');
         TweenMax.killAll();
@@ -2416,13 +2565,11 @@ Animator.prototype = {
         return game.swingResult;
     },
     renderFieldingTrajectory: function renderFieldingTrajectory(game) {
-        if (Animator.console) return game.swingResult;
-
         if (!this.loop) {
             this.beginRender();
         }
 
-        var ball = new this.loop.constructors.Ball();
+        var ball = Animator._ball || new this.loop.constructors.Ball();
         ball.deriveTrajectory(game.swingResult, game.pitchInFlight);
         ball.join(this.loop);
 
@@ -2896,6 +3043,13 @@ Mathinator.prototype = {
             splay: 90 - 2.5 * x - angle / 20 * y,
             fly: -3 * y - angle / 35 * y
         };
+    },
+    /**
+     * @param velocityRating {Number} 0-100
+     * @returns {number}
+     */
+    getFlightTime: function getFlightTime(velocityRating) {
+        return 1.3 - 0.6 * (velocityRating + 300) / 400;
     }
 };
 
@@ -4145,8 +4299,7 @@ IndexController = function($scope, socket) {
         var game = $scope.y;
         $scope.holdUpTimeouts = [];
         $scope.expandScoreboard = false;
-        var animator = new Animator();
-        $scope.updateFlightPath = animator.updateFlightPath.bind($scope);
+        $scope.updateFlightPath = Animator.updateFlightPath.bind($scope);
 
         // avoid scope cycles, any other easy way?
         var bat = $('.target .swing.stance-indicator');

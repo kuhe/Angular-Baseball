@@ -108,8 +108,7 @@ IndexController = function($scope, socket) {
         var game = $scope.y;
         $scope.holdUpTimeouts = [];
         $scope.expandScoreboard = false;
-        var animator = new Animator();
-        $scope.updateFlightPath = animator.updateFlightPath.bind($scope);
+        $scope.updateFlightPath = Animator.updateFlightPath.bind($scope);
 
         // avoid scope cycles, any other easy way?
         var bat = $('.target .swing.stance-indicator');

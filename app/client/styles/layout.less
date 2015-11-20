@@ -15,7 +15,7 @@ button.btn {
     background: #2a2a2a;
     color: white;
     font-weight: bold;
-    font-size: 20px;
+    font-size: 16px;
     border-top: 0;
     border-bottom: 0;
     border-left: 3px solid white;
@@ -197,6 +197,7 @@ button.btn {
 @target: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, @alpha), rgba(166, 166, 166, @alpha));
 .target {
     &.live {
+        z-index: 8;
         cursor: none;
     }
     box-shadow: 0 0 24px 6px rgba(55, 55, 55, @alpha);
@@ -252,7 +253,7 @@ button.btn {
 .blocking {
     position: absolute;
     width: 100%;
-    height: 200%;
+    height: 250%;
     z-index: 11;
     left: 0;
     top: 0;
