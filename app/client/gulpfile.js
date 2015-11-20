@@ -9,6 +9,8 @@ var browserify = require('browserify'),
 var fs = require('fs');
 var util = require('gulp-util');
 
+var name = 'baseball';
+
 var INTERNAL_STYLE_FILES = [
     './styles/**/*.less',
     './styles/application.less'
@@ -17,12 +19,8 @@ var EXTERNAL_STYLE_FILES = [
     './bower_components/bootstrap/dist/css/bootstrap.min.css'
 ];
 var MODULAR_SCRIPT_FILES = [
-    './node_modules/baseball/Services/**/*.js',
-    './node_modules/baseball/Utility/**/*.js',
-    './node_modules/baseball/Model/**/*.js',
-    './node_modules/baseball/Teams/**/*.js',
-    './node_modules/baseball/namespace.js',
-    './node_modules/baseball/baseball.js'
+    './node_modules/'+name+'/**/*.js',
+    '!./node_modules/'+name+'/bundle.js'
 ];
 var INTERNAL_SCRIPT_FILES = [
     './scripts/application/controllers/*.js',
@@ -31,7 +29,7 @@ var INTERNAL_SCRIPT_FILES = [
     './scripts/application/application.js'
 ];
 var BUNDLE_SCRIPT_FILES = [
-    './node_modules/baseball/bundle.js',
+    './node_modules/'+name+'/bundle.js',
     './scripts/application/controllers/*.js',
     './scripts/application/services/*.js',
     './scripts/application/directives/*.js',
@@ -65,10 +63,10 @@ gulp.task('externalStyles', function () {
         .pipe(gulp.dest(STYLE_DEPLOY_DIR));
 });
 gulp.task('modularScripts', function () {
-    browserify({ entries: './node_modules/baseball/baseball.js' })
+    browserify({ entries: './node_modules/'+name+'/'+name+'.js' })
         .transform(babelify)
         .bundle()
-        .pipe(fs.createWriteStream('./node_modules/baseball/bundle.js')).on('close', function() {
+        .pipe(fs.createWriteStream('./node_modules/'+name+'/bundle.js')).on('close', function() {
             gulp.run('internalScripts');
         })
         .on('error', util.log);
