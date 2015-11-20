@@ -1948,7 +1948,7 @@ var Loop = (function () {
 
                 var THREE = this.THREE;
                 var scene = this.scene = new THREE.Scene();
-                var camera = this.camera = new THREE.PerspectiveCamera(75, this.getAspect(), 0.1, 1000);
+                var camera = this.camera = new THREE.PerspectiveCamera(75, this.getAspect(), 0.1, 500);
                 this.attach();
                 _sceneLighting.lighting.addTo(scene);
 
@@ -1993,15 +1993,13 @@ var Loop = (function () {
         }
     }, {
         key: 'test',
-        value: function test() {
-            var n = 60 * 0.6;
-            var trajectory = [];
-            while (n--) {
-                trajectory.push({
-                    x: 0, y: 0, z: 0
-                });
-            }
-            var ball = new _meshBall.Ball(trajectory);
+        value: function test(d, s, f) {
+            var ball = new _meshBall.Ball();
+            ball.deriveTrajectory({
+                travelDistance: d,
+                splay: s,
+                flyAngle: f
+            });
             ball.join(this);
         }
     }]);
@@ -2012,6 +2010,9 @@ var Loop = (function () {
 Loop.prototype.THREE = {};
 Loop.prototype.getAspect = function () {
     return window.innerWidth / 300;
+};
+Loop.prototype.constructors = {
+    Ball: _meshBall.Ball
 };
 
 exports.Loop = Loop;
@@ -2090,6 +2091,8 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
+var _baseballServicesMathinator = require('baseball/Services/Mathinator');
+
 var Ball = (function (_AbstractMesh) {
     _inherits(Ball, _AbstractMesh);
 
@@ -2158,6 +2161,68 @@ var Ball = (function (_AbstractMesh) {
             this.RP60thOfASecond = this.RPS / 60;
             this.rotation = this.RP60thOfASecond * 360 * Math.PI / 180;
         }
+    }, {
+        key: 'deriveTrajectory',
+        value: function deriveTrajectory(result, pitch) {
+            var dragScalarApproximation = {
+                distance: 1,
+                apexHeight: 0.57,
+                airTime: 0.96
+            };
+
+            var flyAngle = result.flyAngle,
+                distance = Math.abs(result.travelDistance),
+                scalar = result.travelDistance < 0 ? -1 : 1,
+                splay = result.splay; // 0 is up the middle
+
+            flyAngle = 1 + Math.abs(flyAngle); // todo why plus 1?
+            if (flyAngle > 90) flyAngle = 180 - flyAngle;
+
+            // velocity in m/s, I think
+            var velocity = dragScalarApproximation.distance * Math.sqrt(9.81 * distance / Math.sin(2 * Math.PI * flyAngle / 180));
+            var velocityVerticalComponent = Math.sin(_baseballServicesMathinator.Mathinator.RADIAN * flyAngle) * velocity;
+            // in feet
+            var apexHeight = velocityVerticalComponent * velocityVerticalComponent / (2 * 9.81) * dragScalarApproximation.apexHeight;
+            // in seconds
+            var airTime = 1.5 * Math.sqrt(2 * apexHeight / 9.81) * dragScalarApproximation.airTime; // 2x freefall equation
+
+            var origin = {
+                x: result.x,
+                y: 0,
+                z: 0
+            };
+
+            var extrema = {
+                x: Math.sin(splay / 180 * Math.PI) * distance,
+                y: apexHeight,
+                z: -Math.cos(splay / 180 * Math.PI) * distance
+            };
+
+            var frames = [],
+                frameCount = airTime * 60 | 0,
+                counter = frameCount,
+                frame = 0;
+
+            var lastHeight = 0;
+
+            while (counter--) {
+                var progress = ++frame / frameCount,
+                    percent = progress * 100;
+
+                // this equation is approximate
+                var y = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 1.2) * apexHeight;
+
+                frames.push({
+                    x: extrema.x / frameCount,
+                    y: lastHeight - y, // this is inverted compared to positive Z space
+                    z: extrema.z / frameCount
+                });
+
+                lastHeight = y;
+            }
+            this.trajectory = frames;
+            return frames;
+        }
     }]);
 
     return Ball;
@@ -2171,7 +2236,7 @@ Ball.prototype.rotation = 1000 / 60 / 60 * 360 * Math.PI / 180; // in radians pe
 
 exports.Ball = Ball;
 
-},{"../Loop":9,"./AbstractMesh":10}],12:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10,"baseball/Services/Mathinator":16}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2195,7 +2260,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _baseballServices_services = require('baseball/services/_services');
 
-var _baseballRenderLoopJs = require('baseball/Render/Loop.js');
+var _baseballRenderLoop = require('baseball/Render/Loop');
 
 var Animator = function Animator() {
     this.init();
@@ -2208,8 +2273,9 @@ Animator.prototype = {
     TweenMax: {},
     THREE: {},
     init: function init() {},
-    render: function render() {
-        return new _baseballRenderLoopJs.Loop();
+    beginRender: function beginRender() {
+        this.loop = new _baseballRenderLoop.Loop();
+        return this.loop;
     },
     loadTweenMax: function loadTweenMax() {
         if (this.console || typeof window !== 'object') {
@@ -2348,6 +2414,19 @@ Animator.prototype = {
         }, 50);
 
         return game.swingResult;
+    },
+    renderFieldingTrajectory: function renderFieldingTrajectory(game) {
+        if (Animator.console) return game.swingResult;
+
+        if (!this.loop) {
+            this.beginRender();
+        }
+
+        var ball = new this.loop.constructors.Ball();
+        ball.deriveTrajectory(game.swingResult, game.pitchInFlight);
+        ball.join(this.loop);
+
+        return game.swingResult;
     }
 };
 
@@ -2359,7 +2438,7 @@ for (var fn in Animator.prototype) {
 
 exports.Animator = Animator;
 
-},{"baseball/Render/Loop.js":9,"baseball/services/_services":28}],14:[function(require,module,exports){
+},{"baseball/Render/Loop":9,"baseball/services/_services":28}],14:[function(require,module,exports){
 /**
  * For Probability!
  * @constructor
