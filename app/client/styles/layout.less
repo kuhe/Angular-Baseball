@@ -41,7 +41,8 @@ button.btn {
 }
 
 .language-select {
-    z-index: 5;
+    z-index: 7;
+    background: transparent;
 }
 
 .opponent-indicator {
@@ -190,6 +191,7 @@ button.btn {
     background: transparent;
     min-width: 300px;
     margin: 0 -10px 25px -10px;
+    position: relative;
 }
 
 @alpha: 0.6;
@@ -197,7 +199,7 @@ button.btn {
 @target: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, @alpha), rgba(166, 166, 166, @alpha));
 .target {
     &.live {
-        z-index: 8;
+        z-index: 4;
         cursor: none;
     }
     box-shadow: 0 0 24px 6px rgba(55, 55, 55, @alpha);
@@ -300,8 +302,8 @@ button.btn {
 
 .strikezone-message {
     border-radius: 1px;
-    background: white;
-    color: darkred;
+    background: #5d0e10;
+    color: #ffffff;
     font-weight: bold;
     padding: 40px 10px;
     font-size: 16px;

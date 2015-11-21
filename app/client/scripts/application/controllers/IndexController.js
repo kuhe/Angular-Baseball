@@ -207,17 +207,17 @@ IndexController = function($scope, socket) {
         };
         $scope.$watch('y.humanBatting()', function() {
             if ($scope.y.humanBatting()) {
-                $('.target').mousemove(showBat);
+                $('.input-area').mousemove(showBat);
             } else {
-                $('.target').unbind('mousemove', showBat);
+                $('.input-area').unbind('mousemove', showBat);
                 bat.hide();
             }
         });
         $scope.$watch('y.humanPitching()', function() {
             if ($scope.y.humanPitching()) {
-                $('.target').mousemove(showGlove);
+                $('.input-area').mousemove(showGlove);
             } else {
-                $('.target').unbind('mousemove', showGlove);
+                $('.input-area').unbind('mousemove', showGlove);
                 glove.hide();
             }
         });

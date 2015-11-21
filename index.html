@@ -199,7 +199,10 @@
                 </div>
                 <div class='windup' ng-show='!y.opponentConnected' ng-class='{winding: y.humanControl == "none" || (y.humanBatting() && !y.humanPitching())}'>
                 </div>
-                <div class="no-swing" ng-click="indicate($event)">
+                <div class="no-swing">
+                    <div class='input-area' ng-click='indicate($event)'>
+
+                    </div>
                     <div class="target live {{y.stage}}" ng-class='{batting: y.humanBatting(), pitching: y.humanPitching()}'>
                         <div class='indicator baseball pitch hide'></div>
                         <div class='indicator baseball break hide'></div>

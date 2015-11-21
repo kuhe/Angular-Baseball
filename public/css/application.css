@@ -196,7 +196,8 @@ button.btn.disabled {
   cursor: auto;
 }
 .language-select {
-  z-index: 5;
+  z-index: 7;
+  background: transparent;
 }
 .opponent-indicator {
   text-align: left;
@@ -351,6 +352,7 @@ button.btn.disabled {
   background: transparent;
   min-width: 300px;
   margin: 0 -10px 25px -10px;
+  position: relative;
 }
 .target {
   box-shadow: 0 0 24px 6px rgba(55, 55, 55, 0.6);
@@ -364,7 +366,7 @@ button.btn.disabled {
   perspective: 100px;
 }
 .target.live {
-  z-index: 8;
+  z-index: 4;
   cursor: none;
 }
 .target.pitching {
@@ -445,8 +447,8 @@ button.btn.disabled {
 }
 .strikezone-message {
   border-radius: 1px;
-  background: white;
-  color: darkred;
+  background: #5d0e10;
+  color: #ffffff;
   font-weight: bold;
   padding: 40px 10px;
   font-size: 16px;
@@ -679,11 +681,22 @@ aside.image-panel.right {
   top: -20px;
   left: 0;
   right: 0;
-  height: 1100px;
+  height: 510px;
   margin-top: -220px;
-  z-index: 5;
+  z-index: 6;
   background: transparent;
-  overflow: visible;
+  overflow: hidden;
+}
+.input-area {
+  cursor: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 7;
 }
 .main-area {
   position: relative;
@@ -760,16 +773,16 @@ aside.image-panel.right {
   background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #154277 0%, #576e71 30%, #e1c45e 70%, #b26339 100%);
 }
 .main-area .sky-gradient-19 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #163c52 0%, #4f4f47 30%, #c5752d 60%, #b7490f 80%, #2f1107 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #163C52 0%, #4F4F47 30%, #C5752D 60%, #B7490F 80%, #2F1107 100%);
 }
 .main-area .sky-gradient-20 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #071b26 0%, #071b26 30%, #8a3b12 80%, #240e03 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #071B26 0%, #071B26 30%, #8A3B12 80%, #240E03 100%);
 }
 .main-area .sky-gradient-21 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #010a10 30%, #59230b 80%, #2f1107 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #010A10 30%, #59230B 80%, #2F1107 100%);
 }
 .main-area .sky-gradient-22 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #090401 50%, #4b1d06 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #090401 50%, #4B1D06 100%);
 }
 .main-area .sky-gradient-23 {
   background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #00000c 80%, #150800 100%);

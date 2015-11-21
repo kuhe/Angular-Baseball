@@ -2089,7 +2089,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2141,7 +2141,7 @@ var Ball = (function (_AbstractMesh) {
     }, {
         key: 'animate',
         value: function animate() {
-            var frame = this.trajectory.pop(),
+            var frame = this.trajectory.shift(),
                 pos = this.mesh.position;
 
             if (frame) {
@@ -2149,8 +2149,9 @@ var Ball = (function (_AbstractMesh) {
                 pos.y += frame.y;
                 pos.z += frame.z;
             }
-            this.rotate();
-
+            if (frame.x + frame.y + frame.z !== 0) {
+                this.rotate();
+            }
             if (!this.trajectory.length) {
                 this.detach();
             }
@@ -2255,6 +2256,12 @@ var Ball = (function (_AbstractMesh) {
                 frames.push(increment);
             }
 
+            var pause = 60;
+            while (pause--) {
+                breakingFrames.push({ x: 0, y: 0, z: 0 });
+                frames.push({ x: 0, y: 0, z: 0 });
+            }
+
             this.breakingTrajectory = breakingFrames;
             this.trajectory = frames;
             return frames;
@@ -2318,7 +2325,7 @@ var Ball = (function (_AbstractMesh) {
 
                 frames.push({
                     x: extrema.x / frameCount,
-                    y: lastHeight - y, // this is inverted compared to positive Z space
+                    y: y - lastHeight,
                     z: extrema.z / frameCount
                 });
 
@@ -2476,13 +2483,13 @@ Animator.prototype = {
             this.beginRender();
         }
         var ball = new this.loop.constructors.Ball();
-        var breakingBall = new this.loop.constructors.Ball();
+        //var breakingBall = new this.loop.constructors.Ball();
         Animator._ball = ball;
         ball.derivePitchingTrajectory(game);
-        breakingBall.trajectory = ball.breakingTrajectory;
-        ball.exportPositionTo(breakingBall.mesh);
+        ball.trajectory = ball.breakingTrajectory;
+        //ball.exportPositionTo(breakingBall.mesh);
         ball.join(this.loop);
-        breakingBall.join(this.loop);
+        //breakingBall.join(this.loop);
 
         $scope.lastTimeout = setTimeout(function () {
             $scope.allowInput = true;
@@ -2505,11 +2512,12 @@ Animator.prototype = {
         if (Animator.console) return game.swingResult;
 
         if (this.renderingMode === 'webgl') {
+            this.tweenFieldingTrajectory(game, true);
             return Animator.renderFieldingTrajectory(game);
         }
         return this.tweenFieldingTrajectory(game);
     },
-    tweenFieldingTrajectory: function tweenFieldingTrajectory(game) {
+    tweenFieldingTrajectory: function tweenFieldingTrajectory(game, splayOnly) {
         var TweenMax = Animator.loadTweenMax();
         var ball = $('.splay-indicator-ball');
         TweenMax.killAll();
@@ -2544,23 +2552,25 @@ Animator.prototype = {
         TweenMax.to(ball, quarter, transitions[3]);
         TweenMax.to(ball, quarter, transitions[4]);
 
-        ball = $('.indicator.baseball.break').removeClass('hide').show();
-        var time = quarter / 2;
-        transitions = [mathinator.transitionalCatcherPerspectiveTrajectory(0, time, 0, apexHeight, scalar * distance, result.splay, game.pitchInFlight), mathinator.transitionalCatcherPerspectiveTrajectory(12.5, time * 0.75, 0), mathinator.transitionalCatcherPerspectiveTrajectory(25, time * 0.80, 1), mathinator.transitionalCatcherPerspectiveTrajectory(37.5, time * 0.85, 2), mathinator.transitionalCatcherPerspectiveTrajectory(50, time * 0.90, 3), mathinator.transitionalCatcherPerspectiveTrajectory(62.5, time * 0.95, 4), mathinator.transitionalCatcherPerspectiveTrajectory(75, time, 5), mathinator.transitionalCatcherPerspectiveTrajectory(87.5, time, 6), mathinator.transitionalCatcherPerspectiveTrajectory(100, time, 7)];
-        TweenMax.set(ball, transitions[0]);
-        TweenMax.to(ball, time, transitions[1]);
-        TweenMax.to(ball, time, transitions[2]);
-        TweenMax.to(ball, time, transitions[3]);
-        TweenMax.to(ball, time, transitions[4]);
-        TweenMax.to(ball, time, transitions[5]);
-        TweenMax.to(ball, time, transitions[6]);
-        TweenMax.to(ball, time, transitions[7]);
-        TweenMax.to(ball, time, transitions[8]);
+        if (!splayOnly) {
+            ball = $('.indicator.baseball.break').removeClass('hide').show();
+            var time = quarter / 2;
+            transitions = [mathinator.transitionalCatcherPerspectiveTrajectory(0, time, 0, apexHeight, scalar * distance, result.splay, game.pitchInFlight), mathinator.transitionalCatcherPerspectiveTrajectory(12.5, time * 0.75, 0), mathinator.transitionalCatcherPerspectiveTrajectory(25, time * 0.80, 1), mathinator.transitionalCatcherPerspectiveTrajectory(37.5, time * 0.85, 2), mathinator.transitionalCatcherPerspectiveTrajectory(50, time * 0.90, 3), mathinator.transitionalCatcherPerspectiveTrajectory(62.5, time * 0.95, 4), mathinator.transitionalCatcherPerspectiveTrajectory(75, time, 5), mathinator.transitionalCatcherPerspectiveTrajectory(87.5, time, 6), mathinator.transitionalCatcherPerspectiveTrajectory(100, time, 7)];
+            TweenMax.set(ball, transitions[0]);
+            TweenMax.to(ball, time, transitions[1]);
+            TweenMax.to(ball, time, transitions[2]);
+            TweenMax.to(ball, time, transitions[3]);
+            TweenMax.to(ball, time, transitions[4]);
+            TweenMax.to(ball, time, transitions[5]);
+            TweenMax.to(ball, time, transitions[6]);
+            TweenMax.to(ball, time, transitions[7]);
+            TweenMax.to(ball, time, transitions[8]);
 
-        setTimeout(function () {
-            // hack
-            $('.indicator.baseball.break').removeClass('hide').show();
-        }, 50);
+            setTimeout(function () {
+                // hack
+                $('.indicator.baseball.break').removeClass('hide').show();
+            }, 50);
+        }
 
         return game.swingResult;
     },
@@ -4398,17 +4408,17 @@ IndexController = function($scope, socket) {
         };
         $scope.$watch('y.humanBatting()', function() {
             if ($scope.y.humanBatting()) {
-                $('.target').mousemove(showBat);
+                $('.input-area').mousemove(showBat);
             } else {
-                $('.target').unbind('mousemove', showBat);
+                $('.input-area').unbind('mousemove', showBat);
                 bat.hide();
             }
         });
         $scope.$watch('y.humanPitching()', function() {
             if ($scope.y.humanPitching()) {
-                $('.target').mousemove(showGlove);
+                $('.input-area').mousemove(showGlove);
             } else {
-                $('.target').unbind('mousemove', showGlove);
+                $('.input-area').unbind('mousemove', showGlove);
                 glove.hide();
             }
         });

@@ -16,7 +16,8 @@
     "gulp-less": "^3.0.3",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-uglify": "^1.4.1",
-    "gulp-util": "^3.0.6"
+    "gulp-util": "^3.0.6",
+    "babel-core": "^6.2.1"
   },
   "devDependencies": {},
   "scripts": {
