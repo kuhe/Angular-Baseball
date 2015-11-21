@@ -20,6 +20,7 @@ var EXTERNAL_STYLE_FILES = [
 ];
 var MODULAR_SCRIPT_FILES = [
     './node_modules/'+name+'/**/*.js',
+    '!./node_modules/'+name+'/node_modules/**/*.js',
     '!./node_modules/'+name+'/bundle.js'
 ];
 var INTERNAL_SCRIPT_FILES = [
@@ -67,7 +68,7 @@ gulp.task('modularScripts', function () {
         .transform(babelify)
         .bundle()
         .pipe(fs.createWriteStream('./node_modules/'+name+'/bundle.js')).on('close', function() {
-            gulp.run('internalScripts');
+            gulp.start('internalScripts');
         })
         .on('error', util.log);
     return 1;

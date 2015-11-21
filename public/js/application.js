@@ -2230,10 +2230,18 @@ var Ball = (function (_AbstractMesh) {
                     z: origin.z + (terminus.z - origin.z) * progress
                 };
                 if (progress > 0.7) {
-                    var breakingPosition = {
+                    var breakingInfluencePosition = {
                         x: origin.x + (breakingTerminus.x - origin.x) * progress,
                         y: origin.y + (breakingTerminus.y - origin.y) * progress,
                         z: origin.z + (breakingTerminus.z - origin.z) * progress
+                    };
+                    var momentumScalar = (1 - progress) / 0.3,
+                        breakingScalar = 1 - momentumScalar,
+                        scalarSum = momentumScalar + breakingScalar;
+                    var breakingPosition = {
+                        x: (position.x * momentumScalar + breakingInfluencePosition.x * breakingScalar) / scalarSum,
+                        y: (position.y * momentumScalar + breakingInfluencePosition.y * breakingScalar) / scalarSum,
+                        z: (position.z * momentumScalar + breakingInfluencePosition.z * breakingScalar) / scalarSum
                     };
                 } else {
                     breakingPosition = position;
@@ -2512,10 +2520,10 @@ Animator.prototype = {
         if (Animator.console) return game.swingResult;
 
         if (this.renderingMode === 'webgl') {
-            this.tweenFieldingTrajectory(game, true);
+            Animator.tweenFieldingTrajectory(game, true);
             return Animator.renderFieldingTrajectory(game);
         }
-        return this.tweenFieldingTrajectory(game);
+        return Animator.tweenFieldingTrajectory(game);
     },
     tweenFieldingTrajectory: function tweenFieldingTrajectory(game, splayOnly) {
         var TweenMax = Animator.loadTweenMax();
