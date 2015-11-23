@@ -194,7 +194,7 @@ button.btn {
     position: relative;
 }
 
-@alpha: 0.6;
+@alpha: 0.2;
 
 @target: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, @alpha), rgba(166, 166, 166, @alpha));
 .target {
@@ -220,7 +220,7 @@ button.btn {
         background: @target;
     }
 }
-@strikezone: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, @alpha + 0.3), rgba(77, 77, 80, @alpha + 0.3));
+@strikezone: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, @alpha), rgba(77, 77, 80, @alpha));
 .strikezone {
     box-shadow: 0 0 5px 3px rgba(105, 108, 112, 0.49);
     margin: 35px 50px;
@@ -256,6 +256,7 @@ button.btn {
     position: absolute;
     width: 100%;
     height: 250%;
+    min-height: 800px;
     z-index: 11;
     left: 0;
     top: 0;

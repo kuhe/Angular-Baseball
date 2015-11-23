@@ -355,14 +355,14 @@ button.btn.disabled {
   position: relative;
 }
 .target {
-  box-shadow: 0 0 24px 6px rgba(55, 55, 55, 0.6);
+  box-shadow: 0 0 24px 6px rgba(55, 55, 55, 0.2);
   margin: 0 auto;
   padding: 0;
   position: relative;
   width: 200px;
   height: 200px;
   border: 1px dashed #bcc2c9;
-  background: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, 0.6), rgba(166, 166, 166, 0.6));
+  background: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, 0.2), rgba(166, 166, 166, 0.2));
   perspective: 100px;
 }
 .target.live {
@@ -370,12 +370,12 @@ button.btn.disabled {
   cursor: none;
 }
 .target.pitching {
-  background: rgba(240, 233, 238, 0.6);
-  background: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, 0.6), rgba(166, 166, 166, 0.6));
+  background: rgba(240, 233, 238, 0.2);
+  background: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, 0.2), rgba(166, 166, 166, 0.2));
 }
 .target.batting {
-  background: rgba(237, 235, 237, 0.6);
-  background: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, 0.6), rgba(166, 166, 166, 0.6));
+  background: rgba(237, 235, 237, 0.2);
+  background: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, 0.2), rgba(166, 166, 166, 0.2));
 }
 .strikezone {
   box-shadow: 0 0 5px 3px rgba(105, 108, 112, 0.49);
@@ -383,17 +383,17 @@ button.btn.disabled {
   padding: 0;
   width: 100px;
   height: 130px;
-  background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.9), rgba(77, 77, 80, 0.9));
+  background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.2), rgba(77, 77, 80, 0.2));
   border: 3px solid #ccd4d1;
   text-align: center;
 }
 .strikezone.pitching {
-  background: rgba(174, 169, 173, 0.6);
-  background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.9), rgba(77, 77, 80, 0.9));
+  background: rgba(174, 169, 173, 0.2);
+  background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.2), rgba(77, 77, 80, 0.2));
 }
 .strikezone.batting {
-  background: rgba(192, 189, 195, 0.6);
-  background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.9), rgba(77, 77, 80, 0.9));
+  background: rgba(192, 189, 195, 0.2);
+  background: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, 0.2), rgba(77, 77, 80, 0.2));
 }
 .indicator.pitch {
   background-color: rgba(255, 255, 255, 0.4);
@@ -405,6 +405,7 @@ button.btn.disabled {
   position: absolute;
   width: 100%;
   height: 250%;
+  min-height: 800px;
   z-index: 11;
   left: 0;
   top: 0;
@@ -686,6 +687,20 @@ aside.image-panel.right {
   z-index: 6;
   background: transparent;
   overflow: hidden;
+}
+.webgl-bg-container {
+  width: 100%;
+  display: block;
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  height: 510px;
+  margin-top: -220px;
+  z-index: 6;
+  background: transparent;
+  overflow: hidden;
+  z-index: 0;
 }
 .input-area {
   cursor: none;
