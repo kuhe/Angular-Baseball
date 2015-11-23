@@ -2191,21 +2191,22 @@ var Ball = (function (_AbstractMesh) {
             var scale = 2.8 / 100;
             var origin = {
                 x: (game.pitcher.throws == 'left' ? 20 : -20) * scale,
-                y: 50 * scale,
+                y: 100 * scale,
                 z: -60.5 // mound distance
             };
             this.mesh.position.x = origin.x;
             this.mesh.position.y = origin.y;
             this.mesh.position.z = origin.z;
 
+            var ARC_APPROXIMATION_Y_ADDITIVE = 50;
             var terminus = {
                 x: (left - 100) * scale,
-                y: (100 - top) * scale,
+                y: (100 - top + ARC_APPROXIMATION_Y_ADDITIVE) * scale,
                 z: 0
             };
             var breakingTerminus = {
                 x: (breakLeft - 100) * scale,
-                y: (100 - breakTop) * scale,
+                y: (100 - breakTop - ARC_APPROXIMATION_Y_ADDITIVE) * scale,
                 z: 0
             };
 
@@ -2230,23 +2231,20 @@ var Ball = (function (_AbstractMesh) {
                     y: origin.y + (terminus.y - origin.y) * progress,
                     z: origin.z + (terminus.z - origin.z) * progress
                 };
-                if (progress > 0.7) {
-                    var breakingInfluencePosition = {
-                        x: origin.x + (breakingTerminus.x - origin.x) * progress,
-                        y: origin.y + (breakingTerminus.y - origin.y) * progress,
-                        z: origin.z + (breakingTerminus.z - origin.z) * progress
-                    };
-                    var momentumScalar = (1 - progress) / 0.3,
-                        breakingScalar = 1 - momentumScalar,
-                        scalarSum = momentumScalar + breakingScalar;
-                    var breakingPosition = {
-                        x: (position.x * momentumScalar + breakingInfluencePosition.x * breakingScalar) / scalarSum,
-                        y: (position.y * momentumScalar + breakingInfluencePosition.y * breakingScalar) / scalarSum,
-                        z: (position.z * momentumScalar + breakingInfluencePosition.z * breakingScalar) / scalarSum
-                    };
-                } else {
-                    breakingPosition = position;
-                }
+                var breakingInfluencePosition = {
+                    x: origin.x + (breakingTerminus.x - origin.x) * progress,
+                    y: origin.y + (breakingTerminus.y - origin.y) * progress,
+                    z: origin.z + (breakingTerminus.z - origin.z) * progress
+                };
+                var momentumScalar = Math.pow(1 - progress, 0.58),
+                    // approximation of arc, meaningless constant
+                breakingScalar = 1 - momentumScalar,
+                    scalarSum = momentumScalar + breakingScalar;
+                var breakingPosition = {
+                    x: (position.x * momentumScalar + breakingInfluencePosition.x * breakingScalar) / scalarSum,
+                    y: (position.y * momentumScalar + breakingInfluencePosition.y * breakingScalar) / scalarSum,
+                    z: (position.z * momentumScalar + breakingInfluencePosition.z * breakingScalar) / scalarSum
+                };
                 var increment = {
                     x: position.x - lastPosition.x,
                     y: position.y - lastPosition.y,
