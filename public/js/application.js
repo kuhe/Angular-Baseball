@@ -45,7 +45,7 @@ AtBat.prototype.RBI_INDICATOR = '+';
 
 exports.AtBat = AtBat;
 
-},{"baseball/Utility/Log":23}],2:[function(require,module,exports){
+},{"baseball/Utility/Log":24}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -371,7 +371,7 @@ Field.prototype = {
 
 exports.Field = Field;
 
-},{"baseball/Model/Player":5,"baseball/Services/_services":19}],3:[function(require,module,exports){
+},{"baseball/Model/Player":5,"baseball/Services/_services":20}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1012,7 +1012,7 @@ Game.prototype = {
 
 exports.Game = Game;
 
-},{"baseball/Model/Field":2,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":19,"baseball/Utility/Log":23,"baseball/Utility/_utils":24}],4:[function(require,module,exports){
+},{"baseball/Model/Field":2,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":20,"baseball/Utility/Log":24,"baseball/Utility/_utils":25}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1114,7 +1114,7 @@ Manager.prototype = {
 
 exports.Manager = Manager;
 
-},{"baseball/Services/_services":19}],5:[function(require,module,exports){
+},{"baseball/Services/_services":20}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1428,7 +1428,7 @@ Player.prototype = {
 
 exports.Player = Player;
 
-},{"baseball/Model/_models":8,"baseball/Services/_services":19,"baseball/Utility/_utils":24}],6:[function(require,module,exports){
+},{"baseball/Model/_models":8,"baseball/Services/_services":20,"baseball/Utility/_utils":25}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1493,7 +1493,7 @@ Team.prototype = {
 
 exports.Team = Team;
 
-},{"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Utility/_utils":24}],7:[function(require,module,exports){
+},{"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Utility/_utils":25}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1882,7 +1882,7 @@ Umpire.prototype = {
 
 exports.Umpire = Umpire;
 
-},{"baseball/Model/Player":5,"baseball/Utility/_utils":24}],8:[function(require,module,exports){
+},{"baseball/Model/Player":5,"baseball/Utility/_utils":25}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1926,6 +1926,8 @@ var _meshBall = require('./mesh/Ball');
 
 var _meshMound = require('./mesh/Mound');
 
+var _meshBase = require('./mesh/Base');
+
 var _meshField = require('./mesh/Field');
 
 var _sceneLighting = require('./scene/lighting');
@@ -1957,7 +1959,7 @@ var Loop = (function () {
 
                 var THREE = this.THREE;
                 var scene = this.scene = new THREE.Scene();
-                var camera = this.camera = new THREE.PerspectiveCamera(75, this.getAspect(), 0.1, 500);
+                var camera = this.camera = new THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 500);
                 this.attach();
                 _sceneLighting.lighting.addTo(scene);
 
@@ -1971,6 +1973,11 @@ var Loop = (function () {
         value: function addStaticMeshes() {
             new _meshField.Field().join(this);
             new _meshMound.Mound().join(this);
+
+            new _meshBase.Base(this, 'first');
+            new _meshBase.Base(this, 'second');
+            new _meshBase.Base(this, 'third');
+            new _meshBase.Base(this, 'home');
         }
     }, {
         key: 'getThree',
@@ -2000,7 +2007,9 @@ var Loop = (function () {
     }, {
         key: 'onResize',
         value: function onResize() {
-            this.camera.aspect = Loop.prototype.getAspect();
+            var element = document.getElementsByClassName(this.elementClass)[0];
+            this.camera.aspect = this.getAspect();
+            this.camera.fov = 90 - 30 * (element.offsetWidth / 1000);
             this.camera.updateProjectionMatrix();
             this.setSize(this.renderer);
         }
@@ -2043,7 +2052,7 @@ Loop.prototype.constructors = {
 
 exports.Loop = Loop;
 
-},{"./mesh/Ball":11,"./mesh/Field":12,"./mesh/Mound":13,"./scene/lighting":14}],10:[function(require,module,exports){
+},{"./mesh/Ball":11,"./mesh/Base":12,"./mesh/Field":13,"./mesh/Mound":14,"./scene/lighting":15}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2095,6 +2104,8 @@ var AbstractMesh = (function () {
 
     return AbstractMesh;
 })();
+
+AbstractMesh.WORLD_BASE_Y = -10;
 
 exports.AbstractMesh = AbstractMesh;
 
@@ -2371,7 +2382,88 @@ Ball.prototype.rotation = 1000 / 60 / 60 * 360 * Math.PI / 180; // in radians pe
 
 exports.Ball = Ball;
 
-},{"../Loop":9,"./AbstractMesh":10,"baseball/Services/Mathinator":18}],12:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10,"baseball/Services/Mathinator":19}],12:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _AbstractMesh2 = require('./AbstractMesh');
+
+var _Loop = require('../Loop');
+
+var Base = (function (_AbstractMesh) {
+    _inherits(Base, _AbstractMesh);
+
+    function Base(loop, base) {
+        _classCallCheck(this, Base);
+
+        _get(Object.getPrototypeOf(Base.prototype), 'constructor', this).call(this);
+        this.base = base;
+        this.getMesh();
+        if (loop instanceof _Loop.Loop) {
+            this.join(loop);
+        }
+    }
+
+    _createClass(Base, [{
+        key: 'getMesh',
+        value: function getMesh() {
+            var planeMaterial = new THREE.MeshLambertMaterial({
+                color: 0x000000
+            });
+
+            var plane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2, 8, 8), planeMaterial);
+
+            plane.rotation.x = -90 / 180 * Math.PI;
+            plane.rotation.y = 0;
+            plane.rotation.z = 45 / 180 * Math.PI;
+
+            switch (this.base) {
+                case 'first':
+                    plane.position.x = 64;
+                    plane.position.z = -64;
+                    break;
+                case 'second':
+                    plane.position.x = 0;
+                    plane.position.z = -121;
+                    break;
+                case 'third':
+                    plane.position.x = -64;
+                    plane.position.z = -64;
+                    break;
+                case 'home':
+                    plane.position.x = 0;
+                    plane.position.z = 0;
+
+                    plane.rotation.z = 0;
+            }
+            plane.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y + 0.5;
+            plane.position.z -= 18;
+
+            this.mesh = plane;
+            return this.mesh;
+        }
+    }, {
+        key: 'animate',
+        value: function animate() {}
+    }]);
+
+    return Base;
+})(_AbstractMesh2.AbstractMesh);
+
+exports.Base = Base;
+
+},{"../Loop":9,"./AbstractMesh":10}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2417,7 +2509,7 @@ var Field = (function (_AbstractMesh) {
             plane.rotation.z = 45 / 180 * Math.PI;
 
             plane.position.x = 0;
-            plane.position.y = -6;
+            plane.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y;
             plane.position.z = -170;
 
             this.mesh = plane;
@@ -2433,7 +2525,7 @@ var Field = (function (_AbstractMesh) {
 
 exports.Field = Field;
 
-},{"../Loop":9,"./AbstractMesh":10}],13:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2479,7 +2571,7 @@ var Mound = (function (_AbstractMesh) {
             plane.rotation.z = 45 / 180 * Math.PI;
 
             plane.position.x = 0;
-            plane.position.y = -5.1;
+            plane.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y + 0.9;
             plane.position.z = -60.5;
 
             this.mesh = plane;
@@ -2495,7 +2587,7 @@ var Mound = (function (_AbstractMesh) {
 
 exports.Mound = Mound;
 
-},{"../Loop":9,"./AbstractMesh":10}],14:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2513,7 +2605,7 @@ var lighting = {
 
 exports.lighting = lighting;
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2753,7 +2845,7 @@ for (var fn in Animator.prototype) {
 
 exports.Animator = Animator;
 
-},{"baseball/Render/Loop":9,"baseball/services/_services":30}],16:[function(require,module,exports){
+},{"baseball/Render/Loop":9,"baseball/services/_services":31}],17:[function(require,module,exports){
 /**
  * For Probability!
  * @constructor
@@ -2906,7 +2998,7 @@ Distribution.main = function () {
 
 exports.Distribution = Distribution;
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2940,7 +3032,7 @@ for (var fn in Iterator.prototype) {
 
 exports.Iterator = Iterator;
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /**
  * For Math!
  * @constructor
@@ -3229,7 +3321,7 @@ for (var fn in Mathinator.prototype) {
 
 exports.Mathinator = Mathinator;
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3249,7 +3341,7 @@ exports.Distribution = _baseballServicesDistribution.Distribution;
 exports.Iterator = _baseballServicesIterator.Iterator;
 exports.Mathinator = _baseballServicesMathinator.Mathinator;
 
-},{"baseball/Services/Animator":15,"baseball/Services/Distribution":16,"baseball/Services/Iterator":17,"baseball/Services/Mathinator":18}],20:[function(require,module,exports){
+},{"baseball/Services/Animator":16,"baseball/Services/Distribution":17,"baseball/Services/Iterator":18,"baseball/Services/Mathinator":19}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3285,7 +3377,7 @@ Provider.prototype.teams = {
 
 exports.Provider = Provider;
 
-},{"./TeamJapan":21}],21:[function(require,module,exports){
+},{"./TeamJapan":22}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3368,7 +3460,7 @@ samurai.lineup.map(function (player, order) {
 
 exports.samurai = samurai;
 
-},{"baseball/Model/Player":5,"baseball/Model/_models":8,"baseball/Teams/Trainer":22}],22:[function(require,module,exports){
+},{"baseball/Model/Player":5,"baseball/Model/_models":8,"baseball/Teams/Trainer":23}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3425,7 +3517,7 @@ var Trainer = (function () {
 
 exports.Trainer = Trainer;
 
-},{"baseball/Services/Iterator":17}],23:[function(require,module,exports){
+},{"baseball/Services/Iterator":18}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3857,7 +3949,7 @@ Log.prototype = {
 
 exports.Log = Log;
 
-},{"baseball/Utility/text":27}],24:[function(require,module,exports){
+},{"baseball/Utility/text":28}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3877,7 +3969,7 @@ exports.helper = _baseballUtilityHelper.helper;
 exports.Log = _baseballUtilityLog.Log;
 exports.text = _baseballUtilityText.text;
 
-},{"baseball/Utility/Log":23,"baseball/Utility/data":25,"baseball/Utility/helper":26,"baseball/Utility/text":27}],25:[function(require,module,exports){
+},{"baseball/Utility/Log":24,"baseball/Utility/data":26,"baseball/Utility/helper":27,"baseball/Utility/text":28}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3899,7 +3991,7 @@ var data = {
 
 exports.data = data;
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3925,7 +4017,7 @@ var helper = {
 
 exports.helper = helper;
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4271,7 +4363,7 @@ text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances,
 
 exports.text = text;
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4286,7 +4378,7 @@ if (typeof window == 'object') {
 
 exports.Baseball = _baseballNamespace.Baseball;
 
-},{"baseball/namespace":29}],29:[function(require,module,exports){
+},{"baseball/namespace":30}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4335,7 +4427,7 @@ Baseball.teams.Provider = _baseballTeamsProvider.Provider;
 
 exports.Baseball = Baseball;
 
-},{"baseball/Model/AtBat":1,"baseball/Model/Field":2,"baseball/Model/Game":3,"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":19,"baseball/Teams/Provider":20,"baseball/Utility/_utils":24}],30:[function(require,module,exports){
+},{"baseball/Model/AtBat":1,"baseball/Model/Field":2,"baseball/Model/Game":3,"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":20,"baseball/Teams/Provider":21,"baseball/Utility/_utils":25}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4355,7 +4447,7 @@ exports.Distribution = _baseballServicesDistribution.Distribution;
 exports.Iterator = _baseballServicesIterator.Iterator;
 exports.Mathinator = _baseballServicesMathinator.Mathinator;
 
-},{"baseball/Services/Animator":15,"baseball/Services/Distribution":16,"baseball/Services/Iterator":17,"baseball/Services/Mathinator":18}]},{},[28]);
+},{"baseball/Services/Animator":16,"baseball/Services/Distribution":17,"baseball/Services/Iterator":18,"baseball/Services/Mathinator":19}]},{},[29]);
 
 IndexController = function($scope, socket) {
     var text = Baseball.util.text;
