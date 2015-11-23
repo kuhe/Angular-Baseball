@@ -161,7 +161,7 @@ IndexController = function($scope, socket) {
         };
         $scope.allowInput = true;
         $scope.holdUp = function() {
-            $('.no-swing').click();
+            $('.input-area').click();
             $scope.$apply();
         };
         game.startOpponentPitching = function(callback) {

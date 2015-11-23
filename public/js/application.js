@@ -1584,6 +1584,7 @@ Umpire.prototype = {
                         batter.stats.batting.pa++;
                         batter.stats.batting.ab++;
                         if (result.firstOut) {
+                            game.field[result.firstOut] = null;
                             result.additionalOuts.map(function (runner) {
                                 if (runner !== 'batter') {
                                     game.field[runner] = null;
@@ -2512,6 +2513,7 @@ Animator.prototype = {
 
         if (game.humanBatting() && !game.humanPitching()) {
             $scope.holdUpTimeouts.push(setTimeout(function () {
+                console.log('holding up');
                 $scope.holdUp();
             }, (flightSpeed + Animator.HOLD_UP_ALLOWANCE) * 1000));
         }
@@ -4370,7 +4372,7 @@ IndexController = function($scope, socket) {
         };
         $scope.allowInput = true;
         $scope.holdUp = function() {
-            $('.no-swing').click();
+            $('.input-area').click();
             $scope.$apply();
         };
         game.startOpponentPitching = function(callback) {
