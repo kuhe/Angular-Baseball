@@ -113,11 +113,11 @@
   padding: 10px 50px;
   margin: -10px -50px;
   border-radius: 5px;
-  border-top: 1px solid #4f4f32;
-  border-bottom: 1px solid #4f4f32;
+  border-top: 1px solid rgba(34, 30, 31, 0.78);
+  border-bottom: 1px solid rgba(34, 30, 31, 0.78);
   border-left: none;
   border-right: none;
-  background: #eeee9f;
+  background: rgba(237, 237, 237, 0.5);
   /* Old browsers */
 }
 .indicator.swing.stance-indicator {
@@ -126,29 +126,29 @@
 @media (min-width: 600px) {
   .indicator.swing {
     box-shadow: 0 0 6px 2px grey;
-    background: -moz-radial-gradient(center, ellipse cover, #eeee9f 0%, #817c5c 100%);
+    background: -moz-radial-gradient(center, ellipse cover, rgba(237, 237, 237, 0.5) 0%, rgba(17, 22, 28, 0.64) 100%);
     /* FF3.6+ */
-    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #eeee9f), color-stop(100%, #817c5c));
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(237, 237, 237, 0.5)), color-stop(100%, rgba(17, 22, 28, 0.64)));
     /* Chrome,Safari4+ */
-    background: -webkit-radial-gradient(center, ellipse cover, #eeee9f 0%, #817c5c 100%);
+    background: -webkit-radial-gradient(center, ellipse cover, rgba(237, 237, 237, 0.5) 0%, rgba(17, 22, 28, 0.64) 100%);
     /* Chrome10+,Safari5.1+ */
-    background: -o-radial-gradient(center, ellipse cover, #eeee9f 0%, #817c5c 100%);
+    background: -o-radial-gradient(center, ellipse cover, rgba(237, 237, 237, 0.5) 0%, rgba(17, 22, 28, 0.64) 100%);
     /* Opera 12+ */
-    background: -ms-radial-gradient(center, ellipse cover, #eeee9f 0%, #817c5c 100%);
+    background: -ms-radial-gradient(center, ellipse cover, rgba(237, 237, 237, 0.5) 0%, rgba(17, 22, 28, 0.64) 100%);
     /* IE10+ */
-    background: radial-gradient(ellipse at center, #eeee9f 0%, #817c5c 100%);
+    background: radial-gradient(ellipse at center, rgba(237, 237, 237, 0.5) 0%, rgba(17, 22, 28, 0.64) 100%);
     /* W3C */
   }
 }
 .indicator.swing.left {
   border-bottom-right-radius: 4px;
   border-top-right-radius: 4px;
-  border-left: 2px solid #4f4f32;
+  border-left: 2px solid rgba(34, 30, 31, 0.78);
 }
 .indicator.swing.right {
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;
-  border-right: 2px solid #4f4f32;
+  border-right: 2px solid rgba(34, 30, 31, 0.78);
 }
 .target.swing .indicator.swing {
   display: none;
@@ -788,92 +788,19 @@ aside.image-panel.right {
   background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #154277 0%, #576e71 30%, #e1c45e 70%, #b26339 100%);
 }
 .main-area .sky-gradient-19 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #163c52 0%, #4f4f47 30%, #c5752d 60%, #b7490f 80%, #2f1107 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #163C52 0%, #4F4F47 30%, #C5752D 60%, #B7490F 80%, #2F1107 100%);
 }
 .main-area .sky-gradient-20 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #071b26 0%, #071b26 30%, #8a3b12 80%, #240e03 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #071B26 0%, #071B26 30%, #8A3B12 80%, #240E03 100%);
 }
 .main-area .sky-gradient-21 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #010a10 30%, #59230b 80%, #2f1107 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #010A10 30%, #59230B 80%, #2F1107 100%);
 }
 .main-area .sky-gradient-22 {
-  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #090401 50%, #4b1d06 100%);
+  background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #090401 50%, #4B1D06 100%);
 }
 .main-area .sky-gradient-23 {
   background: radial-gradient(ellipse 1000px 300px at 41% -50px, #1e528e 0%, #00000c 80%, #150800 100%);
-}
-.main-area .grass-gradient-00,
-.main-area .grass-gradient-24 {
-  background-color: #322828;
-}
-.main-area .grass-gradient-01 {
-  background-color: #323228;
-}
-.main-area .grass-gradient-02 {
-  background-color: #323c28;
-}
-.main-area .grass-gradient-03 {
-  background-color: #324628;
-}
-.main-area .grass-gradient-04 {
-  background-color: #325028;
-}
-.main-area .grass-gradient-05 {
-  background-color: #325528;
-}
-.main-area .grass-gradient-06 {
-  background-color: #325a28;
-}
-.main-area .grass-gradient-07 {
-  background-color: #326428;
-}
-.main-area .grass-gradient-08 {
-  background-color: #326e28;
-}
-.main-area .grass-gradient-09 {
-  background-color: #327828;
-}
-.main-area .grass-gradient-10 {
-  background-color: #328228;
-}
-.main-area .grass-gradient-11 {
-  background-color: #328c28;
-}
-.main-area .grass-gradient-12 {
-  background-color: #329628;
-}
-.main-area .grass-gradient-13 {
-  background-color: #328c28;
-}
-.main-area .grass-gradient-14 {
-  background-color: #328228;
-}
-.main-area .grass-gradient-15 {
-  background-color: #327828;
-}
-.main-area .grass-gradient-16 {
-  background-color: #326e28;
-}
-.main-area .grass-gradient-17 {
-  background-color: #326428;
-}
-.main-area .grass-gradient-18 {
-  background-color: #325a28;
-}
-.main-area .grass-gradient-19 {
-  background-color: #325028;
-}
-.main-area .grass-gradient-20 {
-  background-color: #324b28;
-}
-.main-area .grass-gradient-21 {
-  background-color: #323c28;
-}
-.main-area .grass-gradient-22 {
-  background-color: #323228;
-}
-.main-area .grass-gradient-23 {
-  background-color: #323228;
 }
 .main-area .field {
   text-align: center;
@@ -881,7 +808,7 @@ aside.image-panel.right {
   overflow: hidden;
   width: 100%;
   position: absolute;
-  height: 300px;
+  height: 290px;
   top: 5px;
   left: 0;
   right: 0;
@@ -900,22 +827,14 @@ aside.image-panel.right {
 .main-area .field .batters-eye {
   background: white;
   height: 300px;
-  width: 95%;
-  min-width: 220px;
+  width: 0;
+  min-width: 0;
   top: 0;
 }
 .main-area .field .sky {
-  height: 150px;
+  height: 290px;
   transform: rotateX(0deg);
   z-index: -8;
-}
-.main-area .field .grass {
-  z-index: -10;
-  top: -280px;
-  height: 900px;
-  transform: rotateX(80deg);
-  background-size: 90px 90px;
-  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
 }
 .main-area .field .dirt {
   bottom: -130px;

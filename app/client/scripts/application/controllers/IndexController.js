@@ -96,7 +96,7 @@ IndexController = function($scope, socket) {
                 interval = 150;
             while (delay < (game.startTime.h - game.timeOfDay.h) * interval) {
                 setTimeout(function() {
-                    game.timeOfDay.h = ('00' + (parseInt(game.timeOfDay.h) + 1)).slice(-2);
+                    game.passMinutes(60);
                     $scope.$apply();
                 }, delay);
                 delay += interval;

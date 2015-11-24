@@ -254,12 +254,6 @@
                             <span ng-if="y.batter.hero" class="glyphicon glyphicon-chevron-up"></span>
                         </span>
                     </div>
-                    <div class='visible-sm visible-xs'>
-                        {{ y.log.pitchRecord[mode()][0] }}
-                    </div>
-                    <div class="list-group-item umpire">
-                        Umpire: {{y.umpire.says}}
-                    </div>
                 </div>
                 <div class='chalklines'>
                     <!--<span class='homeplate'></span>-->
@@ -278,6 +272,13 @@
                 </ul>
             </div>
         </div>
+    </div>
+    <hr>
+    <div class='visible-sm visible-xs centered'>
+        {{ y.log.pitchRecord[mode()][0] }}
+    </div>
+    <div class="umpire centered">
+        Umpire: {{y.umpire.says}}
     </div>
     <hr>
     <ul class='centered list-inline pitch-selection'>

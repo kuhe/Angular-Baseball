@@ -42,30 +42,30 @@
     .sky-gradient-22 { background: radial-gradient(@circle, #090401 50%,#4B1D06 100%); }
     .sky-gradient-23 { background: radial-gradient(@circle, #00000c 80%,#150800 100%); }
 
-    .grass-gradient-00, .grass-gradient-24 { background-color: rgba(50, 40, 40, 1); }
-    .grass-gradient-01 { background-color: rgba(50, 50, 40, 1); }
-    .grass-gradient-02 { background-color: rgba(50, 60, 40, 1); }
-    .grass-gradient-03 { background-color: rgba(50, 70, 40, 1); }
-    .grass-gradient-04 { background-color: rgba(50, 80, 40, 1); }
-    .grass-gradient-05 { background-color: rgba(50, 85, 40, 1); }
-    .grass-gradient-06 { background-color: rgba(50, 90, 40, 1); }
-    .grass-gradient-07 { background-color: rgba(50, 100, 40, 1); }
-    .grass-gradient-08 { background-color: rgba(50, 110, 40, 1); }
-    .grass-gradient-09 { background-color: rgba(50, 120, 40, 1); }
-    .grass-gradient-10 { background-color: rgba(50, 130, 40, 1); }
-    .grass-gradient-11 { background-color: rgba(50, 140, 40, 1); }
-    .grass-gradient-12 { background-color: rgba(50, 150, 40, 1); }
-    .grass-gradient-13 { background-color: rgba(50, 140, 40, 1); }
-    .grass-gradient-14 { background-color: rgba(50, 130, 40, 1); }
-    .grass-gradient-15 { background-color: rgba(50, 120, 40, 1); }
-    .grass-gradient-16 { background-color: rgba(50, 110, 40, 1); }
-    .grass-gradient-17 { background-color: rgba(50, 100, 40, 1); }
-    .grass-gradient-18 { background-color: rgba(50, 90, 40, 1); }
-    .grass-gradient-19 { background-color: rgba(50, 80, 40, 1); }
-    .grass-gradient-20 { background-color: rgba(50, 75, 40, 1); }
-    .grass-gradient-21 { background-color: rgba(50, 60, 40, 1); }
-    .grass-gradient-22 { background-color: rgba(50, 50, 40, 1); }
-    .grass-gradient-23 { background-color: rgba(50, 50, 40, 1); }
+//    .grass-gradient-00, .grass-gradient-24 { background-color: rgba(50, 40, 40, 1); }
+//    .grass-gradient-01 { background-color: rgba(50, 50, 40, 1); }
+//    .grass-gradient-02 { background-color: rgba(50, 60, 40, 1); }
+//    .grass-gradient-03 { background-color: rgba(50, 70, 40, 1); }
+//    .grass-gradient-04 { background-color: rgba(50, 80, 40, 1); }
+//    .grass-gradient-05 { background-color: rgba(50, 85, 40, 1); }
+//    .grass-gradient-06 { background-color: rgba(50, 90, 40, 1); }
+//    .grass-gradient-07 { background-color: rgba(50, 100, 40, 1); }
+//    .grass-gradient-08 { background-color: rgba(50, 110, 40, 1); }
+//    .grass-gradient-09 { background-color: rgba(50, 120, 40, 1); }
+//    .grass-gradient-10 { background-color: rgba(50, 130, 40, 1); }
+//    .grass-gradient-11 { background-color: rgba(50, 140, 40, 1); }
+//    .grass-gradient-12 { background-color: rgba(50, 150, 40, 1); }
+//    .grass-gradient-13 { background-color: rgba(50, 140, 40, 1); }
+//    .grass-gradient-14 { background-color: rgba(50, 130, 40, 1); }
+//    .grass-gradient-15 { background-color: rgba(50, 120, 40, 1); }
+//    .grass-gradient-16 { background-color: rgba(50, 110, 40, 1); }
+//    .grass-gradient-17 { background-color: rgba(50, 100, 40, 1); }
+//    .grass-gradient-18 { background-color: rgba(50, 90, 40, 1); }
+//    .grass-gradient-19 { background-color: rgba(50, 80, 40, 1); }
+//    .grass-gradient-20 { background-color: rgba(50, 75, 40, 1); }
+//    .grass-gradient-21 { background-color: rgba(50, 60, 40, 1); }
+//    .grass-gradient-22 { background-color: rgba(50, 50, 40, 1); }
+//    .grass-gradient-23 { background-color: rgba(50, 50, 40, 1); }
     
     
     .field {
@@ -75,7 +75,7 @@
         text-align: center;
         perspective: 500px;
         overflow: hidden;
-        @viewHeight: 300px;
+        @viewHeight: 290px;
         width: 100%;
         position: absolute;
         height: @viewHeight;
@@ -93,26 +93,26 @@
         .batters-eye {
             background: white;
             height: 300px;
-            width: 95%;
-            min-width: 220px;
+            width: 0;
+            min-width: 0;
             top: 0;
         }
-        @skyHeight: 150px;
+        @skyHeight: @viewHeight;
         .sky {
             height: @skyHeight;
             transform: rotateX(-0deg);
             z-index: -8;
         }
-        .grass {
-            z-index: -10;
-            top: -280px;
-            height: 900px;
-            transform: rotateX(80deg);
-            background-size: 90px 90px;
-            background-image: linear-gradient(45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
-                transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
-                transparent 75%, transparent);
-        }
+//        .grass {
+//            z-index: -10;
+//            top: -280px;
+//            height: 900px;
+//            transform: rotateX(80deg);
+//            background-size: 90px 90px;
+//            background-image: linear-gradient(45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
+//                transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
+//                transparent 75%, transparent);
+//        }
         .dirt {
             bottom: -130px;
             height: 300px;
