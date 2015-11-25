@@ -45,7 +45,7 @@ AtBat.prototype.RBI_INDICATOR = '+';
 
 exports.AtBat = AtBat;
 
-},{"baseball/Utility/Log":28}],2:[function(require,module,exports){
+},{"baseball/Utility/Log":29}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -371,7 +371,7 @@ Field.prototype = {
 
 exports.Field = Field;
 
-},{"baseball/Model/Player":5,"baseball/Services/_services":24}],3:[function(require,module,exports){
+},{"baseball/Model/Player":5,"baseball/Services/_services":25}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1013,7 +1013,7 @@ Game.prototype = {
 
 exports.Game = Game;
 
-},{"baseball/Model/Field":2,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":24,"baseball/Utility/Log":28,"baseball/Utility/_utils":29}],4:[function(require,module,exports){
+},{"baseball/Model/Field":2,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":25,"baseball/Utility/Log":29,"baseball/Utility/_utils":30}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1115,7 +1115,7 @@ Manager.prototype = {
 
 exports.Manager = Manager;
 
-},{"baseball/Services/_services":24}],5:[function(require,module,exports){
+},{"baseball/Services/_services":25}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1429,7 +1429,7 @@ Player.prototype = {
 
 exports.Player = Player;
 
-},{"baseball/Model/_models":8,"baseball/Services/_services":24,"baseball/Utility/_utils":29}],6:[function(require,module,exports){
+},{"baseball/Model/_models":8,"baseball/Services/_services":25,"baseball/Utility/_utils":30}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1494,7 +1494,7 @@ Team.prototype = {
 
 exports.Team = Team;
 
-},{"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Utility/_utils":29}],7:[function(require,module,exports){
+},{"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Utility/_utils":30}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1883,7 +1883,7 @@ Umpire.prototype = {
 
 exports.Umpire = Umpire;
 
-},{"baseball/Model/Player":5,"baseball/Utility/_utils":29}],8:[function(require,module,exports){
+},{"baseball/Model/Player":5,"baseball/Utility/_utils":30}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1933,13 +1933,19 @@ var _meshField = require('./mesh/Field');
 
 var _meshGrass = require('./mesh/Grass');
 
+var _meshHomeDirt = require('./mesh/HomeDirt');
+
 var _meshBattersEye = require('./mesh/BattersEye');
 
 var _meshWall = require('./mesh/Wall');
 
 var _sceneLighting = require('./scene/lighting');
 
-var VERTICAL_CORRECTION = 0;
+var VERTICAL_CORRECTION = -2;
+var INITIAL_CAMERA_DISTANCE = 8;
+if (typeof THREE !== 'undefined') {
+    var AHEAD = new THREE.Vector3(0, VERTICAL_CORRECTION, -1000);
+}
 
 var Loop = (function () {
     function Loop(elementClass) {
@@ -1954,6 +1960,7 @@ var Loop = (function () {
         key: 'loop',
         value: function loop() {
             requestAnimationFrame(this.loop.bind(this));
+            this.panToward(this.target);
             this.objects.map(function (i) {
                 return i.animate();
             });
@@ -1967,6 +1974,10 @@ var Loop = (function () {
             if (this.getThree()) {
 
                 var THREE = this.THREE;
+
+                this.target = new THREE.Vector3(0, 0, -60.5);
+                this._target = new THREE.Vector3(0, 0, -60.5);
+
                 var scene = this.scene = new THREE.Scene();
                 var camera = this.camera = new THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 500);
                 this.attach();
@@ -1982,6 +1993,7 @@ var Loop = (function () {
         value: function addStaticMeshes() {
             new _meshField.Field().join(this);
             new _meshMound.Mound().join(this);
+            new _meshHomeDirt.HomeDirt().join(this);
             new _meshGrass.Grass().join(this);
             new _meshGrass.Grass(this, true);
             new _meshBattersEye.BattersEye().join(this);
@@ -2061,9 +2073,31 @@ var Loop = (function () {
             return element.offsetWidth / HEIGHT;
         }
     }, {
+        key: 'panToward',
+        value: function panToward(vector) {
+            var maxIncrement = this.panSpeed;
+            this.forAllLoops(function (loop) {
+                var target = loop._target;
+                target.x = target.x + Math.max(Math.min((vector.x - target.x) / 100, maxIncrement), -maxIncrement);
+                target.y = target.y + Math.max(Math.min((vector.y - target.y) / 100, maxIncrement), -maxIncrement);
+                target.z = target.z + Math.max(Math.min((vector.z - target.z) / 100, maxIncrement), -maxIncrement);
+                loop.camera.lookAt(target);
+            });
+        }
+    }, {
+        key: 'setLookTarget',
+        value: function setLookTarget(vector, panSpeed) {
+            this.panSpeed = panSpeed || 0.08;
+            this.forAllLoops(function (loop) {
+                loop.panning = vector !== AHEAD;
+                loop.target = vector;
+            });
+        }
+    }, {
         key: 'resetCamera',
         value: function resetCamera() {
-            this.moveCamera(0, VERTICAL_CORRECTION, 6);
+            this.moveCamera(0, VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE);
+            this.setLookTarget(AHEAD, 0.3);
         }
     }, {
         key: 'moveCamera',
@@ -2102,6 +2136,7 @@ var Loop = (function () {
 })();
 
 var HEIGHT = 700;
+Loop.VERTICAL_CORRECTION = VERTICAL_CORRECTION;
 Loop.prototype.THREE = {};
 Loop.prototype.constructors = {
     Ball: _meshBall.Ball,
@@ -2111,7 +2146,7 @@ Loop.prototype.constructors = {
 
 exports.Loop = Loop;
 
-},{"./mesh/Ball":11,"./mesh/Base":12,"./mesh/BattersEye":13,"./mesh/Field":14,"./mesh/Grass":15,"./mesh/Mound":17,"./mesh/Wall":18,"./scene/lighting":19}],10:[function(require,module,exports){
+},{"./mesh/Ball":11,"./mesh/Base":12,"./mesh/BattersEye":13,"./mesh/Field":14,"./mesh/Grass":15,"./mesh/HomeDirt":16,"./mesh/Mound":18,"./mesh/Wall":19,"./scene/lighting":20}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2191,6 +2226,8 @@ var _baseballServicesMathinator = require('baseball/Services/Mathinator');
 
 var _Indicator = require('./Indicator');
 
+var SCALE = 2.4 / 100;
+
 var Ball = (function (_AbstractMesh) {
     _inherits(Ball, _AbstractMesh);
 
@@ -2244,14 +2281,12 @@ var Ball = (function (_AbstractMesh) {
                 this.spawnIndicator();
             }
             var giraffe = this;
-            this.loop.forAllLoops(function (loop) {
-                loop.camera.lookAt(giraffe.mesh.position);
-            });
             if (frame.x + frame.y + frame.z !== 0) {
                 this.rotate();
             }
             if (!this.trajectory.length) {
                 this.detach();
+                this.loop.resetCamera();
             }
         }
     }, {
@@ -2298,25 +2333,25 @@ var Ball = (function (_AbstractMesh) {
                 breakLeft = game.pitchInFlight.x,
                 flightTime = _baseballServicesMathinator.Mathinator.getFlightTime(game.pitchInFlight.velocity);
 
-            var scale = 2.8 / 100;
+            var scale = SCALE;
             var origin = {
-                x: (game.pitcher.throws == 'left' ? 20 : -20) * scale,
-                y: 100 * scale,
+                x: game.pitcher.throws == 'left' ? 3 : -3,
+                y: _AbstractMesh2.AbstractMesh.WORLD_BASE_Y + 6,
                 z: -60.5 // mound distance
             };
             this.mesh.position.x = origin.x;
             this.mesh.position.y = origin.y;
             this.mesh.position.z = origin.z;
 
-            var ARC_APPROXIMATION_Y_ADDITIVE = 50;
+            var ARC_APPROXIMATION_Y_ADDITIVE = 38; // made up number
             var terminus = {
                 x: (left - 100) * scale,
-                y: (100 - top + ARC_APPROXIMATION_Y_ADDITIVE) * scale,
+                y: (100 - top + ARC_APPROXIMATION_Y_ADDITIVE) * scale + _Loop.Loop.VERTICAL_CORRECTION,
                 z: 0
             };
             var breakingTerminus = {
                 x: (breakLeft - 100) * scale,
-                y: (100 - breakTop - ARC_APPROXIMATION_Y_ADDITIVE) * scale,
+                y: (100 - breakTop - ARC_APPROXIMATION_Y_ADDITIVE) * scale + _Loop.Loop.VERTICAL_CORRECTION,
                 z: 0
             };
 
@@ -2408,7 +2443,7 @@ var Ball = (function (_AbstractMesh) {
             // in seconds
             var airTime = 1.5 * Math.sqrt(2 * apexHeight / 9.81) * dragScalarApproximation.airTime; // 2x freefall equation
 
-            var scale = 2.8 / 100;
+            var scale = SCALE;
 
             var origin = {
                 x: pitch.x + result.x - 100,
@@ -2464,7 +2499,7 @@ Ball.prototype.rotation = 1000 / 60 / 60 * 360 * Math.PI / 180; // in radians pe
 
 exports.Ball = Ball;
 
-},{"../Loop":9,"./AbstractMesh":10,"./Indicator":16,"baseball/Services/Mathinator":23}],12:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10,"./Indicator":17,"baseball/Services/Mathinator":24}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2701,7 +2736,7 @@ var Grass = (function (_AbstractMesh) {
         key: 'getMesh',
         value: function getMesh() {
             var material = new THREE.MeshLambertMaterial({
-                color: 0x70934A
+                color: this.infield ? 0x70934A : 0x476532
             });
 
             var mesh = new THREE.Mesh(new THREE.PlaneGeometry(this.infield ? 80 : 8000, this.infield ? 80 : 8000, 16, 16), material);
@@ -2738,6 +2773,68 @@ var Grass = (function (_AbstractMesh) {
 exports.Grass = Grass;
 
 },{"../Loop":9,"./AbstractMesh":10}],16:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _AbstractMesh2 = require('./AbstractMesh');
+
+var _Loop = require('../Loop');
+
+var HomeDirt = (function (_AbstractMesh) {
+    _inherits(HomeDirt, _AbstractMesh);
+
+    function HomeDirt(loop) {
+        _classCallCheck(this, HomeDirt);
+
+        _get(Object.getPrototypeOf(HomeDirt.prototype), 'constructor', this).call(this);
+        this.getMesh();
+        if (loop instanceof _Loop.Loop) {
+            this.join(loop);
+        }
+    }
+
+    _createClass(HomeDirt, [{
+        key: 'getMesh',
+        value: function getMesh() {
+            var material = new THREE.MeshLambertMaterial({
+                color: 0xDCB096
+            });
+
+            var mesh = new THREE.Mesh(new THREE.PlaneGeometry(8, 8, 16, 16), material);
+
+            mesh.rotation.x = -90 / 180 * Math.PI;
+            mesh.rotation.y = 0;
+            mesh.rotation.z = 45 / 180 * Math.PI;
+
+            mesh.position.x = 0;
+            mesh.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y;
+            mesh.position.z = -18;
+
+            this.mesh = mesh;
+            return this.mesh;
+        }
+    }, {
+        key: 'animate',
+        value: function animate() {}
+    }]);
+
+    return HomeDirt;
+})(_AbstractMesh2.AbstractMesh);
+
+exports.HomeDirt = HomeDirt;
+
+},{"../Loop":9,"./AbstractMesh":10}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2801,7 +2898,7 @@ var Indicator = (function (_AbstractMesh) {
 
 exports.Indicator = Indicator;
 
-},{"../Loop":9,"./AbstractMesh":10}],17:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2863,7 +2960,7 @@ var Mound = (function (_AbstractMesh) {
 
 exports.Mound = Mound;
 
-},{"../Loop":9,"./AbstractMesh":10}],18:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2929,7 +3026,7 @@ var Wall = (function (_AbstractMesh) {
 
 exports.Wall = Wall;
 
-},{"../Loop":9,"./AbstractMesh":10}],19:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2953,7 +3050,7 @@ var lighting = {
 
 exports.lighting = lighting;
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3034,7 +3131,7 @@ Animator.prototype = {
         if (Animator.console) return;
 
         if (Animator.renderingMode === 'webgl') {
-            return Animator.renderFlightPath(callback, this);
+            Animator.renderFlightPath(callback, this);
         }
         return Animator.tweenFlightPath(callback, this);
     },
@@ -3227,6 +3324,8 @@ Animator.prototype = {
         ball.deriveTrajectory(game.swingResult, game.pitchInFlight);
         ball.join(this.loop);
 
+        this.loop.setLookTarget(ball.mesh.position, 0.08);
+
         return game.swingResult;
     }
 };
@@ -3239,7 +3338,7 @@ for (var fn in Animator.prototype) {
 
 exports.Animator = Animator;
 
-},{"baseball/Render/Loop":9,"baseball/services/_services":35}],21:[function(require,module,exports){
+},{"baseball/Render/Loop":9,"baseball/services/_services":36}],22:[function(require,module,exports){
 /**
  * For Probability!
  * @constructor
@@ -3392,7 +3491,7 @@ Distribution.main = function () {
 
 exports.Distribution = Distribution;
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3426,7 +3525,7 @@ for (var fn in Iterator.prototype) {
 
 exports.Iterator = Iterator;
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /**
  * For Math!
  * @constructor
@@ -3715,7 +3814,7 @@ for (var fn in Mathinator.prototype) {
 
 exports.Mathinator = Mathinator;
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3735,7 +3834,7 @@ exports.Distribution = _baseballServicesDistribution.Distribution;
 exports.Iterator = _baseballServicesIterator.Iterator;
 exports.Mathinator = _baseballServicesMathinator.Mathinator;
 
-},{"baseball/Services/Animator":20,"baseball/Services/Distribution":21,"baseball/Services/Iterator":22,"baseball/Services/Mathinator":23}],25:[function(require,module,exports){
+},{"baseball/Services/Animator":21,"baseball/Services/Distribution":22,"baseball/Services/Iterator":23,"baseball/Services/Mathinator":24}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3771,7 +3870,7 @@ Provider.prototype.teams = {
 
 exports.Provider = Provider;
 
-},{"./TeamJapan":26}],26:[function(require,module,exports){
+},{"./TeamJapan":27}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3854,7 +3953,7 @@ samurai.lineup.map(function (player, order) {
 
 exports.samurai = samurai;
 
-},{"baseball/Model/Player":5,"baseball/Model/_models":8,"baseball/Teams/Trainer":27}],27:[function(require,module,exports){
+},{"baseball/Model/Player":5,"baseball/Model/_models":8,"baseball/Teams/Trainer":28}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3911,7 +4010,7 @@ var Trainer = (function () {
 
 exports.Trainer = Trainer;
 
-},{"baseball/Services/Iterator":22}],28:[function(require,module,exports){
+},{"baseball/Services/Iterator":23}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4343,7 +4442,7 @@ Log.prototype = {
 
 exports.Log = Log;
 
-},{"baseball/Utility/text":32}],29:[function(require,module,exports){
+},{"baseball/Utility/text":33}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4363,7 +4462,7 @@ exports.helper = _baseballUtilityHelper.helper;
 exports.Log = _baseballUtilityLog.Log;
 exports.text = _baseballUtilityText.text;
 
-},{"baseball/Utility/Log":28,"baseball/Utility/data":30,"baseball/Utility/helper":31,"baseball/Utility/text":32}],30:[function(require,module,exports){
+},{"baseball/Utility/Log":29,"baseball/Utility/data":31,"baseball/Utility/helper":32,"baseball/Utility/text":33}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4385,7 +4484,7 @@ var data = {
 
 exports.data = data;
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4411,7 +4510,7 @@ var helper = {
 
 exports.helper = helper;
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4757,7 +4856,7 @@ text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances,
 
 exports.text = text;
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4772,7 +4871,7 @@ if (typeof window == 'object') {
 
 exports.Baseball = _baseballNamespace.Baseball;
 
-},{"baseball/namespace":34}],34:[function(require,module,exports){
+},{"baseball/namespace":35}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4821,7 +4920,7 @@ Baseball.teams.Provider = _baseballTeamsProvider.Provider;
 
 exports.Baseball = Baseball;
 
-},{"baseball/Model/AtBat":1,"baseball/Model/Field":2,"baseball/Model/Game":3,"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":24,"baseball/Teams/Provider":25,"baseball/Utility/_utils":29}],35:[function(require,module,exports){
+},{"baseball/Model/AtBat":1,"baseball/Model/Field":2,"baseball/Model/Game":3,"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":25,"baseball/Teams/Provider":26,"baseball/Utility/_utils":30}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4841,7 +4940,7 @@ exports.Distribution = _baseballServicesDistribution.Distribution;
 exports.Iterator = _baseballServicesIterator.Iterator;
 exports.Mathinator = _baseballServicesMathinator.Mathinator;
 
-},{"baseball/Services/Animator":20,"baseball/Services/Distribution":21,"baseball/Services/Iterator":22,"baseball/Services/Mathinator":23}]},{},[33]);
+},{"baseball/Services/Animator":21,"baseball/Services/Distribution":22,"baseball/Services/Iterator":23,"baseball/Services/Mathinator":24}]},{},[34]);
 
 IndexController = function($scope, socket) {
     var text = Baseball.util.text;

@@ -194,7 +194,7 @@ button.btn {
     position: relative;
 }
 
-@alpha: 0.2;
+@alpha: 0.1;
 
 @target: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, @alpha), rgba(166, 166, 166, @alpha));
 .target {
@@ -219,16 +219,19 @@ button.btn {
         background: rgba(237, 235, 237, @alpha);
         background: @target;
     }
+    &.panning {
+        opacity: 0.1;
+    }
 }
 @strikezone: radial-gradient(circle at 50px 80px, rgba(142, 141, 136, @alpha), rgba(77, 77, 80, @alpha));
 .strikezone {
-    box-shadow: 0 0 5px 3px rgba(105, 108, 112, 0.49);
+    box-shadow: 0 0 5px 3px rgba(105, 108, 112, @alpha);
     margin: 35px 50px;
     padding: 0;
     width: 100px;
     height: 130px;
     background: @strikezone;
-    border: 3px solid #ccd4d1;
+    border: 3px solid rgba(222, 222, 222, 5 * @alpha);
     text-align: center;
     &.pitching {
         background: rgba(174, 169, 173, @alpha);
