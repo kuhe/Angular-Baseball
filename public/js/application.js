@@ -1975,12 +1975,21 @@ var _meshWall = require('./mesh/Wall');
 
 var _sceneLighting = require('./scene/lighting');
 
+/**
+ * the constants should be tuned so that the camera coincides with the DOM's strike zone overlay
+ * @type {number}
+ */
 var VERTICAL_CORRECTION = -0.2;
 var INITIAL_CAMERA_DISTANCE = 8;
+
 if (typeof THREE !== 'undefined') {
     var AHEAD = new THREE.Vector3(0, VERTICAL_CORRECTION, -60.5);
     var INITIAL_POSITION = new THREE.Vector3(0, VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE);
 }
+
+/**
+ * manager for the rendering loop
+ */
 
 var Loop = (function () {
     function Loop(elementClass) {
@@ -1990,6 +1999,10 @@ var Loop = (function () {
         this.main();
         window.loop = this;
     }
+
+    /**
+     * individual objects<AbstractMesh> can attach and detach to the manager to be rendered
+     */
 
     _createClass(Loop, [{
         key: 'loop',
@@ -2003,6 +2016,10 @@ var Loop = (function () {
             //this.breathe();
             this.renderer.render(this.scene, this.camera);
         }
+
+        /**
+         * initialize lights, camera, action
+         */
     }, {
         key: 'main',
         value: function main() {
@@ -2012,10 +2029,10 @@ var Loop = (function () {
                 var THREE = this.THREE;
 
                 var scene = this.scene = new THREE.Scene();
-                var camera = this.camera = new THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 500);
                 this.attach();
                 this.lighting = _sceneLighting.lighting;
                 _sceneLighting.lighting.addTo(scene);
+                var camera = this.camera = new THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 500);
 
                 this.target = new THREE.Vector3(0, 0, -60.5);
                 this._target = new THREE.Vector3(0, 0, -60.5);
@@ -2025,6 +2042,10 @@ var Loop = (function () {
                 this.loop();
             }
         }
+
+        /**
+         * used by the background layer
+         */
     }, {
         key: 'addStaticMeshes',
         value: function addStaticMeshes() {
@@ -2045,6 +2066,10 @@ var Loop = (function () {
             new _meshBase.Base(this, 'third');
             new _meshBase.Base(this, 'home');
         }
+
+        /**
+         * experimental camera bobbing
+         */
     }, {
         key: 'breathe',
         value: function breathe() {
@@ -2070,6 +2095,11 @@ var Loop = (function () {
             }
             return false;
         }
+
+        /**
+         * attach to the DOM
+         * @returns {THREE.WebGLRenderer}
+         */
     }, {
         key: 'attach',
         value: function attach() {
@@ -2087,6 +2117,10 @@ var Loop = (function () {
             this.renderer = renderer;
             return renderer;
         }
+
+        /**
+         * higher FOV on lower view widths
+         */
     }, {
         key: 'onResize',
         value: function onResize() {
@@ -2109,6 +2143,11 @@ var Loop = (function () {
             var element = document.getElementsByClassName(this.elementClass)[0];
             return element.offsetWidth / HEIGHT;
         }
+
+        /**
+         * incrementally pan toward the vector given
+         * @param vector
+         */
     }, {
         key: 'panToward',
         value: function panToward(vector) {
@@ -2121,6 +2160,11 @@ var Loop = (function () {
                 loop.camera.lookAt(target);
             });
         }
+
+        /**
+         * incrementally move the camera to the vector
+         * @param vector
+         */
     }, {
         key: 'moveToward',
         value: function moveToward(vector) {
@@ -2132,6 +2176,12 @@ var Loop = (function () {
                 position.z += Math.max(Math.min(vector.z - position.z, maxIncrement), -maxIncrement);
             });
         }
+
+        /**
+         * setting a target will cause the camera to pan toward it using the pan method above
+         * @param vector
+         * @param panSpeed
+         */
     }, {
         key: 'setLookTarget',
         value: function setLookTarget(vector, panSpeed) {
@@ -2141,6 +2191,12 @@ var Loop = (function () {
                 loop.target = vector;
             });
         }
+
+        /**
+         * setting a target will cause the camera to move toward it using the incremental method above
+         * @param vector
+         * @param moveSpeed
+         */
     }, {
         key: 'setMoveTarget',
         value: function setMoveTarget(vector, moveSpeed) {
@@ -2167,6 +2223,11 @@ var Loop = (function () {
                 loop.camera.position.z = z;
             });
         }
+
+        /**
+         * execute the function on all loops
+         * @param fn {Function}
+         */
     }, {
         key: 'forAllLoops',
         value: function forAllLoops(fn) {
@@ -2180,14 +2241,17 @@ var Loop = (function () {
         }
     }, {
         key: 'test',
-        value: function test(d, s, f) {
+        value: function test() {
             var ball = new _meshBall.Ball();
-            ball.deriveTrajectory({
-                travelDistance: d,
-                splay: s,
-                flyAngle: f
-            });
+            window.Ball = _meshBall.Ball;
+            window.ball = ball;
+            ball.setType('4-seam');
+            //with (ball.mesh.rotation) {x=0,y=0,z=0}; ball.rotation = {x:0.00, y:0.00};
+            ball.animate = function () {
+                ball.rotate();
+            };
             ball.join(this);
+            // Baseball.service.Animator.loop.test();
         }
     }]);
 
@@ -2218,13 +2282,36 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var _Loop = require('../Loop');
 
+/**
+ * Each class should adhere to this pattern.
+ * When a scene object has been positioned correctly and its trajectory set,
+ * it should use ::join to attach itself to the scene.
+ *
+ * While attached, the animate method will be called on each frame.
+ * Typically the animate method can run through the trajectory queue and then
+ * detach itself. @see Ball
+ *
+ * For static meshes the animate method will do nothing, leaving the mesh permanently attached.
+ */
+
 var AbstractMesh = (function () {
     function AbstractMesh() {
         _classCallCheck(this, AbstractMesh);
     }
 
+    /**
+     * since we are using (0, 0, 0) vector for the center of the strike zone, the actual ground level will be offset
+     * downward
+     * @type {number}
+     */
+
     _createClass(AbstractMesh, [{
         key: 'attach',
+
+        /**
+         * attach and detach should be used to maintain the correct object list
+         * todo use the built in object list of the scene object
+         */
         value: function attach() {
             var objects = this.loop.objects;
             if (objects.indexOf(this) === -1) {
@@ -2271,7 +2358,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2285,12 +2372,27 @@ var _baseballServicesMathinator = require('baseball/Services/Mathinator');
 
 var _Indicator = require('./Indicator');
 
+var _baseballUtilityHelper = require('baseball/Utility/helper');
+
+/**
+ * on the DOM the pitch zone is 200x200 pixels
+ * here we scale the strike zone to 4.2 units (feet)
+ * for display purposes. It is only approximately related to actual pitch zone dimensions.
+ * @type {number}
+ */
 var SCALE = 2.1 / 100;
 
 var Ball = (function (_AbstractMesh) {
     _inherits(Ball, _AbstractMesh);
 
-    function Ball(loop, trajectory, rpm) {
+    /**
+     *
+     * @param loop
+     * @param trajectory {Array<Vector3>} incremental vectors applied each frame
+     * e.g. for 1 second of flight time there should be 60 incremental vectors
+     */
+
+    function Ball(loop, trajectory) {
         _classCallCheck(this, Ball);
 
         _get(Object.getPrototypeOf(Ball.prototype), 'constructor', this).call(this);
@@ -2304,7 +2406,7 @@ var Ball = (function (_AbstractMesh) {
         if (loop instanceof _Loop.Loop) {
             this.join(loop);
         }
-        this.setRotation(rpm || this.DEFAULT_RPM);
+        this.setType('4-seam', 1);
     }
 
     _createClass(Ball, [{
@@ -2325,6 +2427,11 @@ var Ball = (function (_AbstractMesh) {
             this.mesh = new THREE.Mesh(geometry, material);
             return this.mesh;
         }
+
+        /**
+         * Leave an indicator when crossing the home plate front plane,
+         * and rotate while moving (default 1000 RPM)
+         */
     }, {
         key: 'animate',
         value: function animate() {
@@ -2339,7 +2446,6 @@ var Ball = (function (_AbstractMesh) {
             if (pos.z > -5 && !this.hasIndicator) {
                 this.spawnIndicator();
             }
-            var giraffe = this;
             if (frame.x + frame.y + frame.z !== 0) {
                 this.rotate();
             }
@@ -2349,19 +2455,44 @@ var Ball = (function (_AbstractMesh) {
             }
         }
     }, {
+        key: 'setType',
+        value: function setType(type, handednessScalar) {
+            var rpm = _baseballUtilityHelper.helper.pitchDefinitions[type][4];
+            var rotationAngle = _baseballUtilityHelper.helper.pitchDefinitions[type][3];
+            this.setRotation(rpm, rotationAngle * (handednessScalar || 1));
+        }
+    }, {
         key: 'rotate',
         value: function rotate() {
             var rotation = this.rotation;
-            this.mesh.rotation.x += rotation;
-            this.mesh.rotation.y += rotation;
+            var meshRotation = this.mesh.rotation;
+            meshRotation.x += rotation.x;
+            meshRotation.y += rotation.y;
         }
     }, {
         key: 'setRotation',
-        value: function setRotation(rpm) {
+        value: function setRotation(rpm, rotationAngle) {
             this.RPM = rpm;
             this.RPS = this.RPM / 60;
-            this.RP60thOfASecond = this.RPS / 60;
-            this.rotation = this.RP60thOfASecond * 360 * Math.PI / 180;
+            var rotationalIncrement = this.RP60thOfASecond = this.RPS / 60;
+
+            // calculate rotational components
+            // +x is CCW along x axis increasing
+            // +y is CW along y axis increasing
+            // +z (unused) is CW along z axis increasing
+
+            // 0   --> x:1 y:0
+            // 45  --> x:+ y:+
+            // 90  --> x:0 y:1
+            // 180 --> x:-1 y:0
+
+            var xComponent = rotationalIncrement * Math.cos(rotationAngle / 180 * Math.PI);
+            var yComponent = rotationalIncrement * Math.sin(rotationAngle / 180 * Math.PI);
+
+            this.rotation = {
+                x: xComponent * 360 * Math.PI / 180,
+                y: yComponent * 360 * Math.PI / 180
+            };
         }
     }, {
         key: 'exportPositionTo',
@@ -2386,6 +2517,7 @@ var Ball = (function (_AbstractMesh) {
     }, {
         key: 'derivePitchingTrajectory',
         value: function derivePitchingTrajectory(game) {
+            this.setType(game.pitchInFlight.name, game.pitcher.throws === 'right' ? 1 : -1);
             var top = 200 - game.pitchTarget.y,
                 left = game.pitchTarget.x,
                 breakTop = 200 - game.pitchInFlight.y,
@@ -2554,11 +2686,14 @@ Ball.prototype.DEFAULT_RPM = 1000;
 Ball.prototype.RPM = 1000;
 Ball.prototype.RPS = 1000 / 60;
 Ball.prototype.RP60thOfASecond = 1000 / 60 / 60;
-Ball.prototype.rotation = 1000 / 60 / 60 * 360 * Math.PI / 180; // in radians per 60th of a second
+Ball.prototype.rotation = {
+    x: Ball.prototype.RP60thOfASecond * 360 * Math.PI / 180, // in radians per 60th of a second
+    y: Ball.prototype.RP60thOfASecond * 360 * Math.PI / 180
+};
 
 exports.Ball = Ball;
 
-},{"../Loop":9,"./AbstractMesh":10,"./Indicator":17,"baseball/Services/Mathinator":24}],12:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10,"./Indicator":17,"baseball/Services/Mathinator":24,"baseball/Utility/helper":32}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2567,7 +2702,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2648,7 +2783,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2705,7 +2840,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2767,7 +2902,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2840,7 +2975,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2902,7 +3037,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2966,7 +3101,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3028,7 +3163,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -4567,17 +4702,26 @@ Object.defineProperty(exports, '__esModule', {
     value: true
 });
 var helper = {
+    /**
+     * rotation angle from 0 to 360 where 180 is a fastball's backspin and 90 is a slider's, 0 for curveball
+     * in the direction (CW for righty), CCW for lefty.
+     *
+     * x movement, y movement, speed ratio, rotation angle, RPM from RHP perspective where left is smaller X
+     */
     pitchDefinitions: {
-        '4-seam': [0, 0, 1], //x movement, y movement, speed ratio
-        '2-seam': [20, -20, 0.90],
-        'cutter': [-25, -20, 0.95],
-        'sinker': [-15, -30, 0.95],
+        // fastball, kinda
+        '4-seam': [0, 0, 1, 180, 1000],
+        '2-seam': [20, -20, 0.90, -45, 1200],
+        'cutter': [-25, -20, 0.95, 75, 1200],
+        'sinker': [15, -30, 0.95, -45, 1500],
 
-        'slider': [-50, -35, 0.9],
-        'fork': [0, -70, 0.87],
-        'curve': [0, -90, 0.82],
+        // breaking ball
+        'slider': [-50, -35, 0.9, 80, 2000],
+        'fork': [0, -70, 0.87, 20, 500],
+        'curve': [0, -110, 0.82, 10, 2500],
 
-        'change': [0, -10, 0.88]
+        // change-up
+        'change': [0, -10, 0.88, -15, 1000]
     },
     selectRandomPitch: function selectRandomPitch() {
         return ['4-seam', '2-seam', 'cutter', 'sinker', 'slider', 'fork', 'curve', 'change'][Math.floor(Math.random() * 8)];
