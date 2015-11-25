@@ -1941,10 +1941,11 @@ var _meshWall = require('./mesh/Wall');
 
 var _sceneLighting = require('./scene/lighting');
 
-var VERTICAL_CORRECTION = -2;
+var VERTICAL_CORRECTION = -0.2;
 var INITIAL_CAMERA_DISTANCE = 8;
 if (typeof THREE !== 'undefined') {
-    var AHEAD = new THREE.Vector3(0, VERTICAL_CORRECTION, -1000);
+    var AHEAD = new THREE.Vector3(0, VERTICAL_CORRECTION, -60.5);
+    var INITIAL_POSITION = new THREE.Vector3(0, VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE);
 }
 
 var Loop = (function () {
@@ -1961,6 +1962,7 @@ var Loop = (function () {
         value: function loop() {
             requestAnimationFrame(this.loop.bind(this));
             this.panToward(this.target);
+            this.moveToward(this.moveTarget);
             this.objects.map(function (i) {
                 return i.animate();
             });
@@ -1975,14 +1977,15 @@ var Loop = (function () {
 
                 var THREE = this.THREE;
 
-                this.target = new THREE.Vector3(0, 0, -60.5);
-                this._target = new THREE.Vector3(0, 0, -60.5);
-
                 var scene = this.scene = new THREE.Scene();
                 var camera = this.camera = new THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 500);
                 this.attach();
                 this.lighting = _sceneLighting.lighting;
                 _sceneLighting.lighting.addTo(scene);
+
+                this.target = new THREE.Vector3(0, 0, -60.5);
+                this._target = new THREE.Vector3(0, 0, -60.5);
+                this.moveTarget = camera.position;
 
                 this.resetCamera();
                 this.loop();
@@ -2085,23 +2088,45 @@ var Loop = (function () {
             });
         }
     }, {
+        key: 'moveToward',
+        value: function moveToward(vector) {
+            var maxIncrement = this.moveSpeed;
+            this.forAllLoops(function (loop) {
+                var position = loop.camera.position;
+                position.x += Math.max(Math.min(vector.x - position.x, maxIncrement), -maxIncrement);
+                position.y += Math.max(Math.min(vector.y - position.y, maxIncrement), -maxIncrement);
+                position.z += Math.max(Math.min(vector.z - position.z, maxIncrement), -maxIncrement);
+            });
+        }
+    }, {
         key: 'setLookTarget',
         value: function setLookTarget(vector, panSpeed) {
-            this.panSpeed = panSpeed || 0.08;
             this.forAllLoops(function (loop) {
+                loop.panSpeed = panSpeed || 0.9;
                 loop.panning = vector !== AHEAD;
                 loop.target = vector;
             });
         }
     }, {
+        key: 'setMoveTarget',
+        value: function setMoveTarget(vector, moveSpeed) {
+            this.forAllLoops(function (loop) {
+                loop.moveSpeed = moveSpeed || 0.7;
+                loop.moveTarget = vector;
+            });
+        }
+    }, {
         key: 'resetCamera',
         value: function resetCamera() {
-            this.moveCamera(0, VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE);
-            this.setLookTarget(AHEAD, 0.3);
+            this.setLookTarget(AHEAD, 0.9);
+            this.setMoveTarget(INITIAL_POSITION, 0.5);
         }
     }, {
         key: 'moveCamera',
         value: function moveCamera(x, y, z) {
+            if (typeof x === 'object') {
+                return this.moveCamera(x.x, x.y, x.z);
+            }
             this.forAllLoops(function (loop) {
                 loop.camera.position.x = x;
                 loop.camera.position.y = y;
@@ -2226,7 +2251,7 @@ var _baseballServicesMathinator = require('baseball/Services/Mathinator');
 
 var _Indicator = require('./Indicator');
 
-var SCALE = 2.4 / 100;
+var SCALE = 2.1 / 100;
 
 var Ball = (function (_AbstractMesh) {
     _inherits(Ball, _AbstractMesh);
@@ -2335,7 +2360,7 @@ var Ball = (function (_AbstractMesh) {
 
             var scale = SCALE;
             var origin = {
-                x: game.pitcher.throws == 'left' ? 3 : -3,
+                x: game.pitcher.throws == 'left' ? 1.5 : -1.5,
                 y: _AbstractMesh2.AbstractMesh.WORLD_BASE_Y + 6,
                 z: -60.5 // mound distance
             };
@@ -2346,12 +2371,12 @@ var Ball = (function (_AbstractMesh) {
             var ARC_APPROXIMATION_Y_ADDITIVE = 38; // made up number
             var terminus = {
                 x: (left - 100) * scale,
-                y: (100 - top + ARC_APPROXIMATION_Y_ADDITIVE) * scale + _Loop.Loop.VERTICAL_CORRECTION,
+                y: (100 - top + 1.5 * ARC_APPROXIMATION_Y_ADDITIVE) * scale + _Loop.Loop.VERTICAL_CORRECTION,
                 z: 0
             };
             var breakingTerminus = {
                 x: (breakLeft - 100) * scale,
-                y: (100 - breakTop - ARC_APPROXIMATION_Y_ADDITIVE) * scale + _Loop.Loop.VERTICAL_CORRECTION,
+                y: (100 - breakTop - 0.5 * ARC_APPROXIMATION_Y_ADDITIVE) * scale + _Loop.Loop.VERTICAL_CORRECTION,
                 z: 0
             };
 
@@ -3131,7 +3156,7 @@ Animator.prototype = {
         if (Animator.console) return;
 
         if (Animator.renderingMode === 'webgl') {
-            Animator.renderFlightPath(callback, this);
+            return Animator.renderFlightPath(callback, this);
         }
         return Animator.tweenFlightPath(callback, this);
     },
@@ -3208,13 +3233,10 @@ Animator.prototype = {
             this.beginRender();
         }
         var ball = new this.loop.constructors.Ball();
-        //var breakingBall = new this.loop.constructors.Ball();
         Animator._ball = ball;
         ball.derivePitchingTrajectory(game);
         ball.trajectory = ball.breakingTrajectory;
-        //ball.exportPositionTo(breakingBall.mesh);
         ball.join(this.loop);
-        //breakingBall.join(this.loop);
 
         $scope.lastTimeout = setTimeout(function () {
             $scope.allowInput = true;
@@ -3324,7 +3346,16 @@ Animator.prototype = {
         ball.deriveTrajectory(game.swingResult, game.pitchInFlight);
         ball.join(this.loop);
 
-        this.loop.setLookTarget(ball.mesh.position, 0.08);
+        this.loop.setLookTarget(ball.mesh.position, 0.5);
+        if (Math.random() < 0.15 && game.swingResult.travelDistance > 90 || Math.random() < 0.35 && game.swingResult.travelDistance > 250) {
+            var scale = 1;
+            if (Math.random() > 0.5) {
+                scale = -1;
+            }
+            this.loop.setMoveTarget({
+                x: scale * 80, y: 2 + Math.random() * 24, z: -70
+            }, 0.3);
+        }
 
         return game.swingResult;
     }

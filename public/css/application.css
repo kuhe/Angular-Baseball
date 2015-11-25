@@ -206,8 +206,17 @@ button.btn.disabled {
 .main-area {
   padding: 10px 30px !important;
 }
+.main-area .list-group-item {
+  color: white;
+  line-height: 14px;
+  padding: 5px 10px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.15);
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
 .main-area .list-group-item strong {
-  font-size: 120%;
+  font-size: 140%;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 .main-area .pitch-record {
   text-align: right;
@@ -217,11 +226,6 @@ button.btn.disabled {
 }
 .main-area * {
   font-size: 12px;
-}
-.main-area .list-group-item {
-  line-height: 14px;
-  padding: 5px 10px;
-  border: none;
 }
 .grey {
   /*background-image: url(../images/sb-tile-grey.png);*/
@@ -722,9 +726,6 @@ aside.image-panel.right {
 }
 .main-area .background-color {
   background-color: rgba(255, 255, 255, 0);
-}
-.main-area .list-group-item {
-  background-color: rgba(255, 255, 255, 0.75);
 }
 .main-area field {
   position: absolute;

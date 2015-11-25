@@ -52,9 +52,25 @@ button.btn {
 
 .main-area {
     padding: 10px 30px !important;
-    .list-group-item strong {
-        font-size: 120%;
+    .list-group-item {
+        color: white;
+        line-height: 14px;
+        padding: 5px 10px;
+        border: none;
+        background-color: rgba(255, 255, 255, 0.15);
+        text-shadow: -1px -1px 0 #000,
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
+            1px 1px 0 #000;
+        strong {
+            font-size: 140%;
+            text-shadow: -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000;
+        }
     }
+
     .pitch-record {
         text-align: right;
     }
@@ -64,11 +80,6 @@ button.btn {
 }
 .main-area * {
     font-size: 12px;
-}
-.main-area .list-group-item {
-    line-height: 14px;
-    padding: 5px 10px;
-    border: none;
 }
 
 .grey {
