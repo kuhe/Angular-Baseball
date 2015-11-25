@@ -86,15 +86,16 @@ Field.prototype = {
     determineSwingContactResult: function determineSwingContactResult(swing) {
         var x = swing.x,
             y = swing.y;
+        var eye = this.game.batter.skill.offense.eye;
         /**
          * The initial splay angle is 90 degrees for hitting up the middle and 0
          * for a hard foul left, 180 is a foul right. Depending on the angle of the bat,
          * a y-axis displacement which would otherwise pop or ground the ball can instead
          * increase the left/right effect.
          */
-        var angles = _baseballServices_services.Mathinator.getSplayAndFlyAngle(x, y, swing.angle);
-        var eye = this.game.batter.skill.offense.eye;
-        var splayAngle = angles.splay + (Math.random() - 0.5) * 90 * (200 / (200 + eye));
+        var angles = _baseballServices_services.Mathinator.getSplayAndFlyAngle(x, y, swing.angle, eye);
+        var splayAngle = angles.splay;
+
         var flyAngle = angles.fly;
         var power = this.game.batter.skill.offense.power + (this.game.batter.eye.bonus || 0) / 5;
         var landingDistance = _baseballServices_services.Distribution.landingDistance(power, flyAngle);
@@ -103,15 +104,18 @@ Field.prototype = {
         }
         var game = this.game;
 
-        if (Math.abs(90 - splayAngle) > 50) swing.foul = true;
-        swing.fielder = this.findFielder(splayAngle, landingDistance);
+        if (Math.abs(splayAngle) > 50) swing.foul = true;
+        swing.fielder = this.findFielder(splayAngle, landingDistance, power, flyAngle);
+        if (['first', 'second', 'short', 'third'].indexOf(swing.fielder) > -1) {
+            landingDistance = Math.min(landingDistance, 110); // stopped by infielder
+        }
         swing.travelDistance = landingDistance;
         swing.flyAngle = flyAngle;
         /**
          * the splay for the result is adjusted to 0 being up the middle and negatives being left field
          * @type {number}
          */
-        swing.splay = splayAngle - 90;
+        swing.splay = splayAngle;
         swing.sacrificeAdvances = [];
 
         if (swing.fielder) {
@@ -121,9 +125,9 @@ Field.prototype = {
             var fieldingEase = fielder.skill.defense.fielding / 100,
                 throwingEase = fielder.skill.defense.throwing / 100;
             //reach the batted ball?
-            swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle, landingDistance]);
-            var interceptRating = fielder.skill.defense.speed * 1.5 + flyAngle * 2.2 - swing.fielderTravel * 1.65 - 20;
-            if (interceptRating > 0 && flyAngle > 0) {
+            swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle + 90, landingDistance]);
+            var interceptRating = fielder.skill.defense.speed * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.55 - 15;
+            if (interceptRating > 0 && flyAngle > 4) {
                 //caught cleanly?
                 if (_baseballServices_services.Distribution.error(fielder)) {
                     //error
@@ -241,7 +245,7 @@ Field.prototype = {
                 }
             }
         } else {
-            if (Math.abs(90 - splayAngle) < 45 && landingDistance > 300) {
+            if (Math.abs(splayAngle) < 45 && landingDistance > 300) {
                 swing.bases = 4;
             } else {
                 swing.foul = true;
@@ -263,40 +267,70 @@ Field.prototype = {
     //    return [this.first ? this.first.getName() : '', this.second ? this.second.getName() : '', this.third ? this.third.getname() : ''];
     //},
     /**
-     * @param splayAngle
-     * @param landingDistance
+     * @param splayAngle {Number} 0 to 180, apparently
+     * @param landingDistance {Number} in feet, up to 310 or so
+     * @param power {Number} 0-100
+     * @param flyAngle {Number} roughly -15 to 90
      * @returns {string|boolean}
      */
-    findFielder: function findFielder(splayAngle, landingDistance) {
-        var angle = splayAngle - 90; // 0 is up the middle, clockwise increasing
+    findFielder: function findFielder(splayAngle, landingDistance, power, flyAngle) {
+        var angle = splayAngle; // 0 is up the middle, clockwise increasing
+
+        var fielder;
+
         if (Math.abs(angle) > 50) return false; // foul
         if (landingDistance < 10 && landingDistance > -20) {
             return 'catcher';
-        } else if (landingDistance >= 10 && landingDistance < 55 && Math.abs(angle) < 5) {
+        } else if (landingDistance >= 10 && landingDistance < 45 && Math.abs(angle) < 5) {
             return 'pitcher';
         }
-        if (landingDistance > 20 && landingDistance < 145 - Math.abs(angle) / 90 * 50) {
+
+        var infield = landingDistance < 145 - Math.abs(angle) / 90 * 50;
+        if (flyAngle < 12) {
+            // 7 degrees straight would fly over the infielder, but add some for arc
+            var horizontalVelocity = Math.cos(flyAngle / 180 * Math.PI) * (85 + power / 100 * 10); // mph toward infielder
+            if (flyAngle < 0) horizontalVelocity *= 0.5; // velocity loss on bounce
+            var fielderLateralReachDegrees = 1 + 22.5 * (100 - horizontalVelocity) / 100; // up to 90/4 = 22.5
             if (angle < -20) {
-                return 'third';
+                fielder = 'third';
             } else if (angle < 5) {
-                return 'short';
+                fielder = 'short';
             } else if (angle < 30) {
-                return 'second';
+                fielder = 'second';
             } else {
                 // first has reduced arc to receive the throw
-                return 'first';
+                fielder = 'first';
+            }
+            var fielderArcPosition = this.positions[fielder][0] - 90;
+            // a good infielder can field a hard hit grounder even with a high terminal distance
+            infield = Math.abs(angle - fielderArcPosition) < fielderLateralReachDegrees;
+        }
+
+        // ball in the air to infielder
+        if (infield && landingDistance > 15) {
+            if (angle < -20) {
+                fielder = 'third';
+            } else if (angle < 5) {
+                fielder = 'short';
+            } else if (angle < 30) {
+                fielder = 'second';
+            } else {
+                // first has reduced arc to receive the throw
+                fielder = 'first';
             }
         } else if (landingDistance < 310) {
+            // past the infield or fly ball to outfielder
             if (angle < -15) {
-                return 'left';
+                fielder = 'left';
             } else if (angle < 16) {
-                return 'center';
+                fielder = 'center';
             } else {
-                return 'right';
+                fielder = 'right';
             }
         } else {
-            return false;
+            fielder = false;
         }
+        return fielder;
     },
     positions: {
         pitcher: [90, 66],
@@ -577,10 +611,10 @@ Game.prototype = {
 
         if (100 * Math.random() < eye) {
             // identified the location
-            convergence = 1.35 * 4.2 * eye / 100;
+            convergence = eye / 25;
             convergenceSum = 1 + convergence;
         } else {
-            convergence = 1.35 * 0.5 * eye / 100;
+            convergence = eye / 100;
             convergenceSum = 1 + convergence;
         }
 
@@ -2237,7 +2271,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2533,7 +2567,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2614,7 +2648,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2671,7 +2705,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2733,7 +2767,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2806,7 +2840,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2868,7 +2902,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2932,7 +2966,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2994,7 +3028,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3127,6 +3161,7 @@ Animator.prototype = {
      * @param level {Number} 0 to 1
      */
     setLuminosity: function setLuminosity(level) {
+        if (this.console) return;
         this.loop.lighting.setLuminosity(level);
         this.background.lighting.setLuminosity(level);
     },
@@ -3437,12 +3472,13 @@ Distribution.prototype = {
         var swingLikelihood = (200 - Math.abs(100 - x) - Math.abs(100 - y)) / 2;
         if (x < 60 || x > 140 || y < 50 || y > 150) {
             // ball
-            /** 138 based on avg O-Swing of 30% + 8% for fun */
+            /** 138 based on avg O-Swing of 30% + 8% for fun, decreased by better eye */
             swingLikelihood = (swingLikelihood + 138 - eye) / 2 - 15 * umpire.count.balls;
         } else {
-            /** avg Swing rate of 65% - 8% for laughs */
+            /** avg Swing rate of 65% - 8% for laughs, increased by better eye */
             swingLikelihood = (57 + (2 * swingLikelihood + eye) / 3) / 2;
         }
+        // higher late in the count
         return swingLikelihood - 35 + 2 * (umpire.count.balls + 8 * umpire.count.strikes);
     },
     /**
@@ -3475,7 +3511,7 @@ Distribution.prototype = {
      * @returns {number} 0-200
      */
     cpuSwing: function cpuSwing(target, actual, eye) {
-        eye = Math.max(eye, 100); // higher eye would overcompensate here
+        eye = Math.min(eye, 100); // higher eye would overcompensate here
         return 100 + (target - 100) * (0.5 + Math.random() * eye / 200) - actual;
     },
     /**
@@ -3792,9 +3828,11 @@ Mathinator.prototype = {
      * @returns {number} seconds
      */
     fielderReturnDelay: function fielderReturnDelay(distance, throwing, fielding, intercept) {
-        return distance / 90 // bip distance
-         + distance / 90 / (0.5 + throwing / 2) // throwing distance
-         + 1 - (0.2 + fielding * 0.8) + 9 * (distance / 310) * Math.min(intercept - 120, 0) / -240; // gather time
+        return distance / 90 // bip distance (up to 3s+)
+         + 5 * (distance / 310) // worst case time to reach the ball,
+         * Math.min(intercept - 120, 0) / -240 // a good intercept rating will cut the base down to 0
+         + 1 - (0.2 + fielding * 0.8) // gather time (up to 0.8s)
+         + distance / 90 / (0.5 + throwing / 2); // throwing distance (up to 2s)
     },
     /**
      * @param player {Player}
@@ -3817,14 +3855,21 @@ Mathinator.prototype = {
      * @param y {Number} bat offset
      * @param angle {Number} batting angle where 0 is horizontal, RHB clockwise increasing
      * {
-     *   splay: 0-180 where 90 is up the middle,
+     *   splay: -90 to 90 where 0 is up the middle,
      *   fly: 0, flat, to 90, vertical pop up
      * }
+     * @param eye {Number} 0 - 100 skill rating
      * @returns {{splay: number, fly: number}}
      */
-    getSplayAndFlyAngle: function getSplayAndFlyAngle(x, y, angle) {
+    getSplayAndFlyAngle: function getSplayAndFlyAngle(x, y, angle, eye) {
+
+        var splay = -2.5 * x - angle / 20 * y;
+        var direction = splay > 0 ? 1 : -1;
+        // additional timing splay
+        splay += direction * Math.random() * 45 * (100 / (50 + eye));
+
         return {
-            splay: 90 - 2.5 * x - angle / 20 * y,
+            splay: splay,
             fly: -3 * y - angle / 35 * y
         };
     },
