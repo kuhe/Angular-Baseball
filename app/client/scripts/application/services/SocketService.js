@@ -13,6 +13,9 @@ var SocketService = function() {
             this.connected = socket.connected;
             this.on();
             socket.emit('register', key);
+            socket.on('connect_failed reconnect_failed', function() {
+                console.log('connection unavailable');
+            });
         },
         on : function() {
             var giraffe = this;

@@ -34,7 +34,9 @@ IndexController = function($scope, socket) {
         var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random()*47);
         if (typeof io !== 'undefined') {
             socket.game = game;
-            $scope.socket = io(window.location.hostname + ':64321');
+            $scope.socket = io(window.location.hostname + ':64321', {
+                reconnection: false
+            });
             $scope.socketService = socket;
             socket.socket = $scope.socket;
             socket.start(field);

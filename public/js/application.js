@@ -587,6 +587,9 @@ Game.prototype = {
             if (this.quickMode) {
                 this.thePitch(x, y, callback);
             } else {
+                if (!_baseballServices_services.Animator.console) {
+                    _baseballServices_services.Animator.loop.resetCamera();
+                }
                 windup.animate({ width: 0 }, this.field.hasRunnersOn() ? _baseballServices_services.Animator.TIME_FROM_SET : _baseballServices_services.Animator.TIME_FROM_WINDUP, function () {
                     !giraffe.console && $('.baseball.pitch').removeClass('hide');
                     giraffe.thePitch(x, y, callback);
@@ -2210,8 +2213,8 @@ var Loop = (function () {
     }, {
         key: 'resetCamera',
         value: function resetCamera() {
-            this.setLookTarget(AHEAD, 0.9);
-            this.setMoveTarget(INITIAL_POSITION, 0.5);
+            this.setLookTarget(AHEAD, 1.5);
+            this.setMoveTarget(INITIAL_POSITION, 0.35);
         }
     }, {
         key: 'moveCamera',
@@ -2262,11 +2265,11 @@ var Loop = (function () {
             window.Ball = _meshBall.Ball;
             window.ball = ball;
             ball.deriveTrajectory(data || {
-                splay: 35,
-                travelDistance: 160,
-                flyAngle: 35,
-                x: 0,
-                y: 0
+                splay: -35,
+                travelDistance: 135,
+                flyAngle: -15,
+                x: 100,
+                y: 100
             }, {
                 x: 0, y: 0
             });
@@ -3552,11 +3555,11 @@ Animator.prototype = {
         this.loop.setLookTarget(ball.mesh.position, 0.5);
         if (Math.random() < 0.15 && game.swingResult.travelDistance > 90 || Math.random() < 0.35 && game.swingResult.travelDistance > 250) {
             var scale = 1;
-            if (Math.random() > 0.5) {
+            if (game.swingResult.splay > 0) {
                 scale = -1;
             }
             this.loop.setMoveTarget({
-                x: scale * 80, y: 2 + Math.random() * 24, z: -70
+                x: scale * 8, y: 16, z: 20
             }, 0.3);
         }
 
@@ -5231,7 +5234,9 @@ IndexController = function($scope, socket) {
         var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random()*47);
         if (typeof io !== 'undefined') {
             socket.game = game;
-            $scope.socket = io(window.location.hostname + ':64321');
+            $scope.socket = io(window.location.hostname + ':64321', {
+                reconnection: false
+            });
             $scope.socketService = socket;
             socket.socket = $scope.socket;
             socket.start(field);
@@ -5455,6 +5460,9 @@ var SocketService = function() {
             this.connected = socket.connected;
             this.on();
             socket.emit('register', key);
+            socket.on('connect_failed reconnect_failed', function() {
+                console.log('connection unavailable');
+            });
         },
         on : function() {
             var giraffe = this;
