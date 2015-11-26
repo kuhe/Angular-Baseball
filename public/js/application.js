@@ -108,7 +108,9 @@ Field.prototype = {
         swing.fielder = this.findFielder(splayAngle, landingDistance, power, flyAngle);
         if (['first', 'second', 'short', 'third'].indexOf(swing.fielder) > -1) {
             landingDistance = Math.min(landingDistance, 110); // stopped by infielder
-        }
+        } else {
+                landingDistance = Math.max(landingDistance, 150); // rolled past infielder
+            }
         swing.travelDistance = landingDistance;
         swing.flyAngle = flyAngle;
         /**
@@ -286,7 +288,7 @@ Field.prototype = {
         }
 
         var infield = landingDistance < 145 - Math.abs(angle) / 90 * 50;
-        if (flyAngle < 12) {
+        if (flyAngle < 7) {
             // 7 degrees straight would fly over the infielder, but add some for arc
             var horizontalVelocity = Math.cos(flyAngle / 180 * Math.PI) * (85 + power / 100 * 10); // mph toward infielder
             if (flyAngle < 0) horizontalVelocity *= 0.5; // velocity loss on bounce
@@ -2642,7 +2644,7 @@ var Ball = (function (_AbstractMesh) {
             var flyAngle = result.flyAngle,
                 distance = Math.abs(result.travelDistance),
                 scalar = result.travelDistance < 0 ? -1 : 1,
-                flightScalar = flyAngle < 0 ? -1 : 1,
+                flightScalar = flyAngle < 7 ? -1 : 1,
                 splay = result.splay; // 0 is up the middle
 
             if (flightScalar < 0 && result.travelDistance > 0) {
