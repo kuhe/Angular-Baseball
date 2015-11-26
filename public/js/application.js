@@ -2253,6 +2253,23 @@ var Loop = (function () {
             ball.join(this);
             // Baseball.service.Animator.loop.test();
         }
+    }, {
+        key: 'testTrajectory',
+        value: function testTrajectory(data) {
+            var ball = new _meshBall.Ball();
+            window.Ball = _meshBall.Ball;
+            window.ball = ball;
+            ball.deriveTrajectory(data || {
+                splay: 35,
+                travelDistance: 160,
+                flyAngle: 35,
+                x: 0,
+                y: 0
+            }, {
+                x: 0, y: 0
+            });
+            ball.join(this);
+        }
     }]);
 
     return Loop;
@@ -2407,6 +2424,7 @@ var Ball = (function (_AbstractMesh) {
             this.join(loop);
         }
         this.setType('4-seam', 1);
+        this.bounce = 1;
     }
 
     _createClass(Ball, [{
@@ -2440,8 +2458,11 @@ var Ball = (function (_AbstractMesh) {
 
             if (frame) {
                 pos.x += frame.x;
-                pos.y += frame.y;
+                pos.y += frame.y * this.bounce;
                 pos.z += frame.z;
+                if (pos.y < _AbstractMesh2.AbstractMesh.WORLD_BASE_Y) {
+                    this.bounce *= -1;
+                }
             }
             if (pos.z > -5 && !this.hasIndicator) {
                 this.spawnIndicator();
@@ -2621,7 +2642,12 @@ var Ball = (function (_AbstractMesh) {
             var flyAngle = result.flyAngle,
                 distance = Math.abs(result.travelDistance),
                 scalar = result.travelDistance < 0 ? -1 : 1,
+                flightScalar = flyAngle < 0 ? -1 : 1,
                 splay = result.splay; // 0 is up the middle
+
+            if (flightScalar < 0 && result.travelDistance > 0) {
+                distance = Math.max(90, distance);
+            }
 
             flyAngle = 1 + Math.abs(flyAngle); // todo why plus 1?
             if (flyAngle > 90) flyAngle = 180 - flyAngle;
@@ -2664,7 +2690,12 @@ var Ball = (function (_AbstractMesh) {
                     percent = progress * 100;
 
                 // this equation is approximate
-                var y = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 2) * apexHeight;
+                if (flightScalar < 0) {
+                    var currentDistance = progress * distance;
+                    y = (origin.y * scale + apexHeight * Math.abs(Math.sin(3 * Math.pow(currentDistance, 1.1) / distance * Math.PI / 2))) * ((100 - percent) / 100) + _AbstractMesh2.AbstractMesh.WORLD_BASE_Y * progress;
+                } else {
+                    var y = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 2) * apexHeight;
+                }
 
                 frames.push({
                     x: extrema.x / frameCount,
@@ -2759,7 +2790,7 @@ var Base = (function (_AbstractMesh) {
                     mesh.rotation.z = 0;
             }
             mesh.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y + 0.5;
-            mesh.position.z -= 18;
+            mesh.position.z -= 0;
 
             this.mesh = mesh;
             return this.mesh;
@@ -2878,7 +2909,7 @@ var Field = (function (_AbstractMesh) {
 
             mesh.position.x = 0;
             mesh.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y;
-            mesh.position.z = -120;
+            mesh.position.z = -102;
 
             this.mesh = mesh;
             return this.mesh;
@@ -2942,7 +2973,7 @@ var Grass = (function (_AbstractMesh) {
 
                 mesh.position.x = 0;
                 mesh.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y + 0.2;
-                mesh.position.z = -80;
+                mesh.position.z = -62;
             } else {
                 mesh.rotation.x = -90 / 180 * Math.PI;
                 mesh.rotation.y = 0;
@@ -3013,7 +3044,7 @@ var HomeDirt = (function (_AbstractMesh) {
 
             mesh.position.x = 0;
             mesh.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y;
-            mesh.position.z = -18;
+            mesh.position.z = 0;
 
             this.mesh = mesh;
             return this.mesh;
