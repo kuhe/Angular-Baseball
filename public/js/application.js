@@ -2404,6 +2404,8 @@ var _baseballUtilityHelper = require('baseball/Utility/helper');
  */
 var SCALE = 2.1 / 100;
 
+var INDICATOR_DEPTH = -5;
+
 var Ball = (function (_AbstractMesh) {
     _inherits(Ball, _AbstractMesh);
 
@@ -2469,7 +2471,7 @@ var Ball = (function (_AbstractMesh) {
                     this.bounce *= -1;
                 }
             }
-            if (pos.z > -5 && !this.hasIndicator) {
+            if (pos.z > INDICATOR_DEPTH && !this.hasIndicator) {
                 this.spawnIndicator();
             }
             if (frame.x + frame.y + frame.z !== 0) {
@@ -2548,7 +2550,7 @@ var Ball = (function (_AbstractMesh) {
                 left = game.pitchTarget.x,
                 breakTop = 200 - game.pitchInFlight.y,
                 breakLeft = game.pitchInFlight.x,
-                flightTime = _baseballServicesMathinator.Mathinator.getFlightTime(game.pitchInFlight.velocity);
+                flightTime = _baseballServicesMathinator.Mathinator.getFlightTime(game.pitchInFlight.velocity, _baseballUtilityHelper.helper.pitchDefinitions[game.pitchInFlight.name][2]);
 
             var scale = SCALE;
             var origin = {
@@ -2563,13 +2565,13 @@ var Ball = (function (_AbstractMesh) {
             var ARC_APPROXIMATION_Y_ADDITIVE = 38; // made up number
             var terminus = {
                 x: (left - 100) * scale,
-                y: (100 - top + 1.5 * ARC_APPROXIMATION_Y_ADDITIVE) * scale + _Loop.Loop.VERTICAL_CORRECTION,
-                z: 0
+                y: (100 - top + 2 * ARC_APPROXIMATION_Y_ADDITIVE) * scale + _Loop.Loop.VERTICAL_CORRECTION,
+                z: INDICATOR_DEPTH
             };
             var breakingTerminus = {
                 x: (breakLeft - 100) * scale,
-                y: (100 - breakTop - 0.5 * ARC_APPROXIMATION_Y_ADDITIVE) * scale + _Loop.Loop.VERTICAL_CORRECTION,
-                z: 0
+                y: (100 - breakTop) * scale + _Loop.Loop.VERTICAL_CORRECTION,
+                z: INDICATOR_DEPTH
             };
 
             var lastPosition = {
@@ -2582,26 +2584,41 @@ var Ball = (function (_AbstractMesh) {
             var frames = [],
                 breakingFrames = [],
                 frameCount = flightTime * 60 | 0,
-                counter = frameCount | 0,
+                counter = frameCount * 1.08 | 0,
                 frame = 0;
+
+            var xBreak = breakingTerminus.x - terminus.x,
+                yBreak = breakingTerminus.y - terminus.y;
+            var breakingDistance = Math.sqrt(Math.pow(xBreak, 2) + Math.pow(yBreak, 2));
+            /**
+             * @type {number} 1.0+, an expression of how late the pitch breaks
+             */
+            var breakingLateness = breakingDistance / (2 * ARC_APPROXIMATION_Y_ADDITIVE) / scale,
+                breakingLatenessMomentumExponent = 0.2 + Math.pow(0.45, breakingLateness);
 
             while (counter--) {
                 var progress = ++frame / frameCount;
 
+                // linear position
                 var position = {
                     x: origin.x + (terminus.x - origin.x) * progress,
                     y: origin.y + (terminus.y - origin.y) * progress,
                     z: origin.z + (terminus.z - origin.z) * progress
                 };
+                // linear breaking position
                 var breakingInfluencePosition = {
                     x: origin.x + (breakingTerminus.x - origin.x) * progress,
                     y: origin.y + (breakingTerminus.y - origin.y) * progress,
                     z: origin.z + (breakingTerminus.z - origin.z) * progress
                 };
-                var momentumScalar = Math.pow(1 - progress, 0.58),
-                    // approximation of arc, meaningless constant
-                breakingScalar = 1 - momentumScalar,
+                if (progress > 1) {
+                    momentumScalar = 1 - Math.pow(progress, breakingLateness);
+                } else {
+                    var momentumScalar = Math.pow(1 - progress, breakingLatenessMomentumExponent);
+                }
+                var breakingScalar = 1 - momentumScalar,
                     scalarSum = momentumScalar + breakingScalar;
+                // adjustment toward breaking ball position
                 var breakingPosition = {
                     x: (position.x * momentumScalar + breakingInfluencePosition.x * breakingScalar) / scalarSum,
                     y: (position.y * momentumScalar + breakingInfluencePosition.y * breakingScalar) / scalarSum,
@@ -3291,6 +3308,8 @@ var _baseballServices_services = require('baseball/services/_services');
 
 var _baseballRenderLoop = require('baseball/Render/Loop');
 
+var _baseballUtilityHelper = require('baseball/Utility/helper');
+
 var Animator = function Animator() {
     this.init();
     throw new Error('No need to instantiate Animator');
@@ -3433,7 +3452,7 @@ Animator.prototype = {
         var TweenMax = Animator.loadTweenMax();
         TweenMax.killAll();
         var game = $scope.y,
-            flightSpeed = _baseballServices_services.Mathinator.getFlightTime(game.pitchInFlight.velocity);
+            flightSpeed = _baseballServices_services.Mathinator.getFlightTime(game.pitchInFlight.velocity, _baseballUtilityHelper.helper.pitchDefinitions[game.pitchInFlight.name][2]);
 
         if (!this.loop) {
             this.beginRender();
@@ -3552,15 +3571,17 @@ Animator.prototype = {
         ball.deriveTrajectory(game.swingResult, game.pitchInFlight);
         ball.join(this.loop);
 
-        this.loop.setLookTarget(ball.mesh.position, 0.5);
-        if (Math.random() < 0.15 && game.swingResult.travelDistance > 90 || Math.random() < 0.35 && game.swingResult.travelDistance > 250) {
-            var scale = 1;
-            if (game.swingResult.splay > 0) {
-                scale = -1;
+        if (game.swingResult.travelDistance > 60 && Math.random() < 0.35) {
+            this.loop.setLookTarget(ball.mesh.position, 0.5);
+            if (Math.random() < 0.15 && game.swingResult.travelDistance > 90 || Math.random() < 0.35 && game.swingResult.travelDistance > 250) {
+                var scale = 1;
+                if (game.swingResult.splay > 0) {
+                    scale = -1;
+                }
+                this.loop.setMoveTarget({
+                    x: scale * 8, y: 16, z: 20
+                }, 0.3);
             }
-            this.loop.setMoveTarget({
-                x: scale * 8, y: 16, z: 20
-            }, 0.3);
         }
 
         return game.swingResult;
@@ -3575,7 +3596,7 @@ for (var fn in Animator.prototype) {
 
 exports.Animator = Animator;
 
-},{"baseball/Render/Loop":9,"baseball/services/_services":36}],22:[function(require,module,exports){
+},{"baseball/Render/Loop":9,"baseball/Utility/helper":32,"baseball/services/_services":36}],22:[function(require,module,exports){
 /**
  * For Probability!
  * @constructor
@@ -3667,11 +3688,13 @@ Distribution.prototype = {
      * @param x {number}
      * @param y {number}
      * @returns {object|{x: number, y: number}}
+     * 0.5 to 1.5 of the pitch's nominal breaking effect X
+     * 0.5 to 1.5 of the pitch's nominal breaking effect Y, magnified for lower Y
      */
     breakEffect: function breakEffect(pitch, pitcher, x, y) {
         var effect = {};
-        effect.x = Math.floor(x + pitch.breakDirection[0] * (0.55 + 1.5 * Math.random() * pitcher.pitching[pitch.name]['break'] / 250));
-        effect.y = Math.floor(y + pitch.breakDirection[1] * (0.55 + 1.5 * Math.random() * pitcher.pitching[pitch.name]['break'] / 250 / (0.5 + y / 200)));
+        effect.x = Math.floor(x + pitch.breakDirection[0] * (0.50 + 0.5 * Math.random() + pitcher.pitching[pitch.name]['break'] / 200));
+        effect.y = Math.floor(y + pitch.breakDirection[1] * ((0.50 + 0.5 * Math.random() + pitcher.pitching[pitch.name]['break'] / 200) / (0.5 + y / 200)));
         return effect;
     },
     /**
@@ -4046,10 +4069,11 @@ Mathinator.prototype = {
     },
     /**
      * @param velocityRating {Number} 0-100
+     * @param velocityScalar {Number} approx 1
      * @returns {number}
      */
-    getFlightTime: function getFlightTime(velocityRating) {
-        return 1.3 - 0.6 * (velocityRating + 300) / 400;
+    getFlightTime: function getFlightTime(velocityRating, velocityScalar) {
+        return (1.3 - 0.6 * (velocityRating + 300) / 400) / velocityScalar;
     }
 };
 
@@ -4752,12 +4776,12 @@ var helper = {
         'sinker': [15, -30, 0.95, -45, 1500],
 
         // breaking ball
-        'slider': [-50, -35, 0.9, 80, 2000],
+        'slider': [-50, -35, 0.88, 80, 2000],
         'fork': [0, -70, 0.87, 20, 500],
         'curve': [0, -110, 0.82, 10, 2500],
 
         // change-up
-        'change': [0, -10, 0.88, -15, 1000]
+        'change': [0, -10, 0.86, -15, 1000]
     },
     selectRandomPitch: function selectRandomPitch() {
         return ['4-seam', '2-seam', 'cutter', 'sinker', 'slider', 'fork', 'curve', 'change'][Math.floor(Math.random() * 8)];
