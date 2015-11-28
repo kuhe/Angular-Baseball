@@ -352,8 +352,6 @@ button.btn.disabled {
 }
 .no-swing {
   padding: 0;
-  border-top: 2px dashed grey;
-  border-bottom: 2px dashed grey;
   background: transparent;
   min-width: 300px;
   margin: 0 -10px 25px -10px;
@@ -928,7 +926,7 @@ aside.image-panel.right {
 }
 .windup.winding {
   display: block;
-  background: #363636;
+  background: #f6f6f6;
   border: none;
 }
 .pitch-selection .rating-block {
