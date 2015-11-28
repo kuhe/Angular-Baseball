@@ -256,6 +256,7 @@ Field.prototype = {
         }
         this.game.swingResult = swing;
         if (!_baseballServices_services.Animator.console) {
+            _baseballServices_services.Animator._ball.hasIndicator = true;
             _baseballServices_services.Animator.animateFieldingTrajectory(this.game);
         }
     },
@@ -542,7 +543,7 @@ Game.prototype = {
             giraffe.autoSwing(giraffe.pitchTarget.x, giraffe.pitchTarget.y, function (callback) {
                 callback();
             });
-        }, giraffe.field.hasRunnersOn() ? _baseballServices_services.Animator.TIME_FROM_SET + 1200 : _baseballServices_services.Animator.TIME_FROM_WINDUP + 1200);
+        }, giraffe.field.hasRunnersOn() ? _baseballServices_services.Animator.TIME_FROM_SET + 2500 : _baseballServices_services.Animator.TIME_FROM_WINDUP + 2500);
     },
     /**
      * generically receive click input and decide what to do
@@ -648,7 +649,7 @@ Game.prototype = {
         } else {
             setTimeout(function () {
                 giraffe.autoPitch(callback);
-            }, 4000);
+            }, 5200);
         }
     },
     awaitSwing: function awaitSwing(x, y, callback, pitchInFlight, pitchTarget) {
@@ -775,8 +776,8 @@ Game.prototype = {
             pitchInFlight = this.pitchInFlight,
             swingResult = this.swingResult;
         var origin = {
-            x: giraffe.batter.bats == 'right' ? -10 : 210,
-            y: 160
+            x: giraffe.batter.bats == 'right' ? -50 : 250,
+            y: 190
         };
         var swing = {
             x: x ? x : pitchInFlight.x + swingResult.x,

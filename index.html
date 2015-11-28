@@ -150,9 +150,9 @@
                 </button>
                 <br/>
                 <br/>
-                <p>
-                    {{ y.timeOfDay.h }}:{{ y.timeOfDay.m }}
-                </p>
+                <!--<p>-->
+                    <!--{{ y.timeOfDay.h }}:{{ y.timeOfDay.m }}-->
+                <!--</p>-->
             </div>
         </div>
         <div class='col-md-4'>
@@ -249,8 +249,11 @@
                             <span ng-if="y.batter.hero" class="glyphicon glyphicon-chevron-up"></span>
                             {{ t('LHB') }}
                         </span>
+                        {{ t('Eye :') }}
                         <rating-block rating-block='' rating='y.batter.skill.offense.eye'></rating-block>
+                        {{ t('Power :') }}
                         <rating-block rating-block='' rating='y.batter.skill.offense.power'></rating-block>
+                        {{ t('Speed :') }}
                         <rating-block rating-block='' rating='y.batter.skill.offense.speed'></rating-block>
                         <span ng-show='y.batter.bats==="right"'>
                             {{ t('RHB') }}
@@ -280,15 +283,16 @@
     <div class='visible-sm visible-xs centered'>
         {{ y.log.pitchRecord[mode()][0] }}
     </div>
-    <div class="umpire centered">
-        Umpire: {{y.umpire.says}}
-    </div>
-    <hr>
+    <!--<div class="umpire centered">-->
+        <!--Umpire: {{y.umpire.says}}-->
+    <!--</div>-->
+    <hr class='visible-sm visible-xs centered'>
     <ul class='centered list-inline pitch-selection'>
         <li class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching' ng-click="y.humanPitching() && selectPitch(name)">
             <span>
-                <strong style='text-decoration: underline;' ng-show='y.pitchInFlight.name === name'>{{ t(name) }}</strong>
-                <em ng-show='y.pitchInFlight.name !== name'>{{ t(name) }}</em>
+                <button class='pointer btn small' ng-class='{disabled: y.pitchInFlight.name !== name}'>
+                    {{ t(name) }}
+                </button>
                 <br>
                 <rating-block rating-block='' rating='pitch.control'></rating-block>
                 <rating-block rating-block='' rating='pitch.velocity'></rating-block>

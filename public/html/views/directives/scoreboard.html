@@ -7,11 +7,11 @@
                 <div class='row'>{{ y.getInning() }}</div>
             </div>
             <div class='team-names'>
-                <div class='away'>
+                <div class='away' ng-class='{red: y.half === "top"}'>
                     <div class='team-name col-xs-8'>{{ y.teams.away.getName().slice(0,4) }}</div>
                     <div class='score col-xs-4'>{{y.tally.away.R}}</div>
                 </div>
-                <div class='home'>
+                <div class='home' ng-class='{red: y.half === "bottom"}'>
                     <div class='team-name col-xs-8'>{{ y.teams.home.getName().slice(0,4) }}</div>
                     <div class='score col-xs-4'>{{y.tally.home.R}}</div>
                 </div>

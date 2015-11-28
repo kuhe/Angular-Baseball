@@ -110,13 +110,14 @@
   animation: spin 1s infinite 0s linear;
 }
 .indicator.swing {
-  padding: 10px 50px;
-  margin: -10px -50px;
-  border-radius: 5px;
+  padding: 9px 58px;
+  margin: -9px -58px;
+  border-radius: 8px;
   border-top: 1px solid rgba(34, 30, 31, 0.78);
   border-bottom: 1px solid rgba(34, 30, 31, 0.78);
   border-left: none;
   border-right: none;
+  transform: rotateY(12deg);
   background: rgba(237, 237, 237, 0.5);
   /* Old browsers */
 }
@@ -125,7 +126,7 @@
 }
 @media (min-width: 600px) {
   .indicator.swing {
-    box-shadow: 0 0 6px 2px grey;
+    box-shadow: 0 0 3px 3px #2d2d2d;
     background: -moz-radial-gradient(center, ellipse cover, rgba(237, 237, 237, 0.5) 0%, rgba(17, 22, 28, 0.64) 100%);
     /* FF3.6+ */
     background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(237, 237, 237, 0.5)), color-stop(100%, rgba(17, 22, 28, 0.64)));
@@ -570,6 +571,7 @@ aside.image-panel.right {
   /* Old browsers */
   color: white;
   border: 2px solid #34363a;
+  border-left: 6px solid #34363a;
 }
 .box-scoreboard .team-names .home.gradient,
 .box-scoreboard .team-names .away.gradient {
@@ -588,9 +590,18 @@ aside.image-panel.right {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#45484d', endColorstr='#000000', GradientType=0);
   /* IE6-9 */
 }
+.box-scoreboard .team-names .home.red,
+.box-scoreboard .team-names .away.red {
+  border-left: 6px solid #dd0000;
+}
 .box-scoreboard .team-names .team-name,
 .box-scoreboard .team-names .score {
   padding: 0 2px;
+}
+.box-scoreboard .team-names .score {
+  font-size: 120%;
+  font-weight: bolder;
+  color: #ffb202;
 }
 .box-scoreboard .the-count {
   color: white;

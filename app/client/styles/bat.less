@@ -7,18 +7,20 @@
     @color2: rgba(17, 22, 28, 0.64);
     @edge: rgba(34, 30, 31, 0.78);
 
-    padding: 10px 50px;
-    margin: -10px -50px;
-    border-radius: 5px;
+    padding: 9px 58px;
+    margin: -9px -58px;
+    border-radius: 8px;
     border-top: 1px solid @edge;
     border-bottom: 1px solid @edge;
     border-left: none;
     border-right: none;
 
+    transform: rotateY(12deg);
+
     background: @color1; /* Old browsers */
 
     @media (min-width: 600px) {
-        box-shadow: 0 0 6px 2px grey;
+        box-shadow: 0 0 3px 3px #2d2d2d;
         background: -moz-radial-gradient(center, ellipse cover,  @color1 0%, @color2 100%); /* FF3.6+ */
         background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,@color1), color-stop(100%,@color2)); /* Chrome,Safari4+ */
         background: -webkit-radial-gradient(center, ellipse cover,  @color1 0%,@color2 100%); /* Chrome10+,Safari5.1+ */
