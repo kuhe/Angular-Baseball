@@ -1821,15 +1821,15 @@ Umpire.prototype = {
                     canAdvance = function (position) {
                         switch (position) {
                             case 'first':
-                                return sacrificeAdvances.indexOf('first') > -1 && (canAdvance('second') || !second);
+                                return sacrificeAdvances.indexOf('first') > -1 && !game.field.second;
                             case 'second':
-                                return sacrificeAdvances.indexOf('second') > -1 && (canAdvance('third') || !third);
+                                return sacrificeAdvances.indexOf('second') > -1 && !game.field.third;
                             case 'third':
                                 return sacrificeAdvances.indexOf('third') > -1;
                         }
                     };
                 }
-                if (third instanceof _baseballModelPlayer.Player && canAdvance('third')) {
+                if (third && canAdvance('third')) {
                     // run scored
                     game.scoreboard[game.half == 'top' ? 'away' : 'home'][game.inning]++;
                     game.tally[game.half == 'top' ? 'away' : 'home'].R++;
@@ -1840,18 +1840,16 @@ Umpire.prototype = {
                     game.batter.stats.batting.rbi++;
                     third.stats.batting.r++;
                     game.pitcher.stats.pitching.ER++;
+                    game.field.third = null;
                 }
                 if (second && canAdvance('second')) {
                     game.field.third = second;
-                } else {
-                    game.field.third = null;
+                    game.field.second = null;
                 }
                 if (first && canAdvance('first')) {
                     game.field.second = first;
-                } else {
-                    game.field.second = null;
+                    game.field.first = null;
                 }
-                game.field.first = null;
             }
         return this;
     },
@@ -2444,7 +2442,7 @@ var Ball = (function (_AbstractMesh) {
             var loader = new THREE.TextureLoader();
             var textureColor = loader.load(baseURL + 'images/BaseballColor.jpg');
             var textureBump = loader.load(baseURL + 'images/BaseballBump.jpg');
-            var geometry = new THREE.SphereGeometry(0.5, 32, 16);
+            var geometry = new THREE.SphereGeometry(0.36, 32, 16); // real scale is 0.12
             var material = new THREE.MeshPhongMaterial({
                 map: textureColor,
                 bumpMap: textureBump,
@@ -3123,7 +3121,7 @@ var Indicator = (function (_AbstractMesh) {
         key: 'getMesh',
         value: function getMesh() {
             var THREE = window.THREE;
-            var geometry = new THREE.CircleGeometry(0.34, 32);
+            var geometry = new THREE.CircleGeometry(0.30, 32);
             var material = new THREE.MeshPhongMaterial({
                 color: 0xFFFFFF
             });
@@ -3580,8 +3578,8 @@ Animator.prototype = {
                 //if (result.splay > 0) {
                 //    scale = -1;
                 //}
-                this.loop.setLookTarget(ball.mesh.position, 2.5);
-                this.loop.setMoveTarget(ball.mesh.position, 0.3);
+                this.loop.setLookTarget(ball.mesh.position, 50.0);
+                this.loop.setMoveTarget(ball.mesh.position, 0.16);
             }
         }
 
