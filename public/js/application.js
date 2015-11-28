@@ -776,8 +776,8 @@ Game.prototype = {
             pitchInFlight = this.pitchInFlight,
             swingResult = this.swingResult;
         var origin = {
-            x: giraffe.batter.bats == 'right' ? -50 : 250,
-            y: 190
+            x: giraffe.batter.bats == 'right' ? -10 : 210,
+            y: 199
         };
         var swing = {
             x: x ? x : pitchInFlight.x + swingResult.x,
@@ -2469,14 +2469,14 @@ var Ball = (function (_AbstractMesh) {
                 if (pos.y < _AbstractMesh2.AbstractMesh.WORLD_BASE_Y) {
                     this.bounce *= -1;
                 }
+                if (frame.x + frame.y + frame.z !== 0) {
+                    this.rotate();
+                }
             }
             if (pos.z > INDICATOR_DEPTH && !this.hasIndicator) {
                 this.spawnIndicator();
             }
-            if (frame.x + frame.y + frame.z !== 0) {
-                this.rotate();
-            }
-            if (!this.trajectory.length) {
+            if (!frame) {
                 this.detach();
                 this.loop.resetCamera();
             }
@@ -4056,14 +4056,15 @@ Mathinator.prototype = {
      */
     getSplayAndFlyAngle: function getSplayAndFlyAngle(x, y, angle, eye) {
 
-        var splay = -2.5 * x - angle / 20 * y;
+        var splay = -1.5 * x - angle / 20 * y;
         var direction = splay > 0 ? 1 : -1;
-        // additional timing splay
-        splay += direction * Math.random() * 45 * (100 / (50 + eye));
+        // additional random splay
+        // todo make it pull only
+        splay += direction * Math.random() * 40 * (100 / (50 + eye));
 
         return {
             splay: splay,
-            fly: -3 * y - angle / 35 * y
+            fly: -3 * y / ((angle + 25) / 35) // more difficult to hit a pop fly on a angled bat
         };
     },
     /**
