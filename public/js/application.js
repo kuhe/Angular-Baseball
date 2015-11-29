@@ -2013,7 +2013,12 @@ var Loop = (function () {
         value: function loop() {
             requestAnimationFrame(this.loop.bind(this));
             this.panToward(this.target);
-            this.moveToward(this.moveTarget);
+            var omt = this.overwatchMoveTarget;
+            this.moveToward(this.moveTarget || {
+                x: omt.x,
+                y: omt.y + 12,
+                z: omt.z
+            });
             this.objects.map(function (i) {
                 return i.animate();
             });
@@ -2207,13 +2212,27 @@ var Loop = (function () {
             this.forAllLoops(function (loop) {
                 loop.moveSpeed = moveSpeed || 0.7;
                 loop.moveTarget = vector;
+                loop.overwatchMoveTarget = null;
+            });
+        }
+    }, {
+        key: 'setOverwatchMoveTarget',
+        value: function setOverwatchMoveTarget(vector, moveSpeed) {
+            this.forAllLoops(function (loop) {
+                loop.moveSpeed = moveSpeed || 0.7;
+                loop.overwatchMoveTarget = vector;
+                loop.moveTarget = null;
             });
         }
     }, {
         key: 'resetCamera',
         value: function resetCamera() {
-            this.setLookTarget(AHEAD, 1.5);
-            this.setMoveTarget(INITIAL_POSITION, 0.35);
+            var moveSpeed = 0.5;
+            if (this.camera.position.z !== INITIAL_POSITION.z) {
+                moveSpeed = 2.5;
+            }
+            this.setLookTarget(AHEAD, moveSpeed);
+            this.setMoveTarget(INITIAL_POSITION, moveSpeed / 10);
         }
     }, {
         key: 'moveCamera',
@@ -2281,6 +2300,7 @@ var Loop = (function () {
 
 var HEIGHT = 700;
 Loop.VERTICAL_CORRECTION = VERTICAL_CORRECTION;
+Loop.INITIAL_CAMERA_DISTANCE = INITIAL_CAMERA_DISTANCE;
 Loop.prototype.THREE = {};
 Loop.prototype.constructors = {
     Ball: _meshBall.Ball,
@@ -2366,7 +2386,7 @@ var AbstractMesh = (function () {
     return AbstractMesh;
 })();
 
-AbstractMesh.WORLD_BASE_Y = -7;
+AbstractMesh.WORLD_BASE_Y = -4;
 
 exports.AbstractMesh = AbstractMesh;
 
@@ -2680,6 +2700,8 @@ var Ball = (function (_AbstractMesh) {
             var apexHeight = velocityVerticalComponent * velocityVerticalComponent / (2 * 9.81) * dragScalarApproximation.apexHeight;
             // in seconds
             var airTime = 1.5 * Math.sqrt(2 * apexHeight / 9.81) * dragScalarApproximation.airTime; // 2x freefall equation
+
+            this.airTime = airTime;
 
             var scale = SCALE;
 
@@ -3572,15 +3594,20 @@ Animator.prototype = {
         ball.join(this.loop);
 
         if (result.thrownOut || result.caught || result.bases) {
-            this.loop.setLookTarget(ball.mesh.position, 0.5);
-            if (Math.random() < 0.15 && result.travelDistance > 90 || Math.random() < 0.50 && result.travelDistance > 200) {
+            if (Math.random() < 0.15 && ball.airTime > 1.5 || Math.random() < 0.50 && ball.airTime > 2.5) {
                 //var scale = 1;
                 //if (result.splay > 0) {
                 //    scale = -1;
                 //}
-                this.loop.setLookTarget(ball.mesh.position, 50.0);
-                this.loop.setMoveTarget(ball.mesh.position, 0.16);
+                this.loop.setLookTarget(ball.mesh.position, 0.3);
+                this.loop.setOverwatchMoveTarget(ball.mesh.position, 0.16);
+            } else {
+                this.loop.setLookTarget(ball.mesh.position, 0.5);
+                this.loop.setMoveTarget({ x: 0, y: 6, z: _baseballRenderLoop.Loop.INITIAL_CAMERA_DISTANCE }, 0.05);
             }
+        } else if (Math.abs(result.splay) < 60) {
+            this.loop.setLookTarget(ball.mesh.position, 0.5);
+            this.loop.setMoveTarget({ x: 0, y: 6, z: _baseballRenderLoop.Loop.INITIAL_CAMERA_DISTANCE }, 0.05);
         }
 
         return game.swingResult;
