@@ -20,6 +20,8 @@ todo :
     
     観客席やら
 
+    keep docs up to date, add player manual and baseball introduction
+
 
 ## Code organization
 
