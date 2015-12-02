@@ -6,21 +6,17 @@ A game of one of the top five bat-based sports! Namely, baseball! Now in JavaScr
 Click on and around the strike zone to pitch/bat (click on the outer edge to not swing). Locate your pitches well to draw groundouts, easy pop flies,
 and strikeouts from opposing batters, and use your batter's eye to hit the ball squarely in order to avoid the same.
 
--George Fu
+Demo version with single player only at [kuhe.github.io](http://kuhe.github.io)
 
-currently hosted at [georgefu.info/y/](http://georgefu.info/y)
+Full version with multi-player at [georgefu.info/y/](http://georgefu.info/y)
 
 todo :
 
     スイングタイミング
 
-    ウェブソケット
-
     送りバント、盗塁
     
     観客席やら
-
-    keep docs up to date, add player manual and baseball introduction
 
 
 ## Code organization
@@ -28,14 +24,14 @@ todo :
     app (development source code)
         / client
             / node_modules
-                / baseball : generic common js (ES6)
+                / baseball : game engine (ES6)
                     /test : mocha unit (ES6)
             / scripts : framework-specific js (ES5)
             / styles : less
-            / tests : protractor E2E
+            / tests : protractor E2E (unused, sadly)
             gulpfile.js : build control
         / server
-            # nothing here yet
+            the websocket server
     public (server assets)
         / js
         / css
@@ -60,7 +56,7 @@ Install module dependencies
 
     app/client/node_modules/baseball> npm install
 
-This will run the build once and start the file watchers
+This will run the start the file watchers. Use gulp build to just build once.
 
     app/client> gulp
 
@@ -73,5 +69,8 @@ Install protractor, configure the test spec app/client/tests/* to point to the c
 
 For mocha, see the node module 'baseball'
 
-    app/client/node_modules/baseball> mocha (es5) // doesn't work at the moment since it's configured in ES6 mode
     app/client/node_modules/baseball> npm test (es6)
+
+Incidentally, this is the CLI mode and equivalent to the above
+
+    app/client> npm run career (es6)
