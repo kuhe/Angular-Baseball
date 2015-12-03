@@ -338,15 +338,17 @@
     </ul>
     <hr/>
     <div class='row'>
-        <batters batters='' class='batter-data col-sm-6' ng-show='y.half === "top"'>
-        </batters>
-        <battery battery='' class='pitcher-data col-sm-6' ng-show='y.half === "top"'>
-        </battery>
+        <section class='col-xs-12'>
+            <batters batters='' class='batter-data col-sm-6' ng-show='y.half === "top"'>
+            </batters>
+            <battery battery='' class='pitcher-data col-sm-6' ng-show='y.half === "top"'>
+            </battery>
 
-        <battery battery='' class='pitcher-data col-sm-6' ng-show='y.half === "bottom"'>
-        </battery>
-        <batters batters='' class='batter-data col-sm-6' ng-show='y.half === "bottom"'>
-        </batters>
+            <battery battery='' class='pitcher-data col-sm-6' ng-show='y.half === "bottom"'>
+            </battery>
+            <batters batters='' class='batter-data col-sm-6' ng-show='y.half === "bottom"'>
+            </batters>
+        </section>
     </div>
     <hr/>
     <div class='block stabilized col-lg-12 hidden-lg hidden-md'>
@@ -363,9 +365,9 @@
         <hr/>
     </div>
     <div class='clear'></div>
-    <div class='col-lg-12'>
+    <div class='col-lg-12 batting-lines'>
         <ul class='list-group col-lg-6' ng-repeat='team in [y.teams.away, y.teams.home] track by $index'>
-            <li class='list-group-item'>
+            <li class='list-group-item team-name'>
                 {{team.getName()}}
             </li>
             <li class='list-group-item pointer' ng-repeat="(order, player) in team.lineup track by $index"
@@ -379,6 +381,7 @@
                     </span>
                     <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
                 </span>
+                <div class='row'></div>
                 <section ng-if='player.team.expanded == player'>
                     <div class='visible-md-inline visible-lg-inline'>
                         {{ t('Throws/Bats') }} {{t(player.throws == 'left' ? 'L' : 'R ')}}{{t.slash()}}{{t(player.bats == 'left' ? ' L ' : ' R ')}}
@@ -421,7 +424,7 @@
     </div>
     <hr>
     <div style='margin-bottom: 30px;'>
-        <button ng-click='teamJapan()'>
+        <button ng-click='teamJapan()' class='btn pointer'>
             {{ t('Play against Team Japan') }}
         </button>
         <hr>
