@@ -1656,6 +1656,7 @@ Umpire.prototype = {
 
         if (result.stoleABase) {
             var thief = result.stoleABase;
+            thief.atBats.push(_baseballUtility_utils.Log.prototype.STOLEN_BASE);
             switch (thief) {
                 case field.first:
                     field.second = thief;
@@ -1668,10 +1669,10 @@ Umpire.prototype = {
                 case field.third:
                     field.third = null;
                     thief.stats.batting.r++;
+                    thief.atBats.push(_baseballUtility_utils.Log.prototype.RUN);
                     this.runScores();
             }
             thief.stats.batting.sb++;
-            thief.atBats.push(_baseballUtility_utils.Log.prototype.STOLEN_BASE);
         }
         if (result.caughtStealing) {
             game.teams[game.half == 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding.PO++;
@@ -3908,7 +3909,6 @@ Distribution.prototype = {
      * @returns {boolean}
      */
     willSteal: function willSteal(pitch, catcher, thief, base) {
-        return true;
         return random() < 0.15 && this.stealSuccess(pitch, catcher, thief, base) && random() < 0.5;
     }
 };
