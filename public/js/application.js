@@ -103,7 +103,7 @@ Field.prototype = {
 
         var flyAngle = angles.fly;
         var power = this.game.batter.skill.offense.power + (this.game.batter.eye.bonus || 0) / 5;
-        var landingDistance = _baseballServices_services.Distribution.landingDistance(power, flyAngle);
+        var landingDistance = _baseballServices_services.Distribution.landingDistance(power, flyAngle, x, y);
         if (flyAngle < 0 && landingDistance > 95) {
             landingDistance = (landingDistance - 95) / 4 + 95;
         }
@@ -3842,6 +3842,7 @@ var random = Math.random,
     floor = Math.floor,
     ceil = Math.ceil,
     abs = Math.abs,
+    pow = Math.pow,
     sqrt = Math.sqrt;
 
 Distribution.prototype = {
@@ -3865,10 +3866,18 @@ Distribution.prototype = {
     /**
      * @param power
      * @param flyAngle
+     * @param x {number} batting offset horizontal
+     * @param y {number} batting offset vertical
      * @returns {number}
      */
-    landingDistance: function landingDistance(power, flyAngle) {
-        return (10 + random() * 320 + power / 300 + random() * power / 75 * 150) * (1 - abs(flyAngle - 30) / 60);
+    landingDistance: function landingDistance(power, flyAngle, x, y) {
+        x = min(5, abs(x) | 0);
+        y = min(5, abs(y) | 0);
+        var goodContactBonus = 8 - sqrt(x * x + y * y);
+
+        var scalar = pow(random(), 1 - goodContactBonus * 0.125);
+
+        return (10 + scalar * 320 + power / 300 + random() * power / 75 * 150) * (1 - abs(flyAngle - 30) / 60);
     },
     /**
      * @param count {{strikes: number, balls: number}}
