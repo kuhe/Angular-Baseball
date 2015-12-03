@@ -14,7 +14,9 @@ todo :
 
     スイングタイミング
 
-    送りバント、盗塁
+    送りバント
+
+    substitutions from bench
     
     観客席やら
 
