@@ -1939,8 +1939,7 @@ Umpire.prototype = {
                         third.atBats.push(_baseballUtility_utils.Log.prototype.RUN);
                         third.stats.batting.r++;
                         game.pitcher.stats.pitching.ER++;
-                        game.scoreboard[game.half == 'top' ? 'away' : 'home'][game.inning]++;
-                        game.tally[game.half == 'top' ? 'away' : 'home'].R++;
+                        this.runScores();
                         game.field.third = second;
                         game.field.second = first;
                         first = null;
@@ -1988,7 +1987,6 @@ Umpire.prototype = {
                 }
                 if (third && canAdvance('third')) {
                     // run scored
-                    game.scoreboard[game.half == 'top' ? 'away' : 'home'][game.inning]++;
                     this.runScores();
                     if (game.batter != third) {
                         game.batter.recordRBI();
@@ -2024,6 +2022,7 @@ Umpire.prototype = {
     },
     runScores: function runScores() {
         var game = this.game;
+        game.scoreboard[game.half == 'top' ? 'away' : 'home'][game.inning]++;
         game.tally[game.half == 'top' ? 'away' : 'home'].R++;
     },
     newBatter: function newBatter() {
@@ -3947,6 +3946,10 @@ Distribution.prototype = {
         var rand = random(),
             rand2 = random();
 
+        if (base == 4) {
+            rand = rand / 100;
+        }
+
         var smoothedRand2 = (1 + rand2) / 2;
 
         var pitchBaseSpeedMultiplier = (pitchDefinitions[pitch.name] || ['', '', 0.6])[2];
@@ -3961,6 +3964,7 @@ Distribution.prototype = {
      * @returns {boolean}
      */
     willSteal: function willSteal(pitch, catcher, thief, base) {
+        if (base == 4) return false;
         return random() < 0.15 && this.stealSuccess(pitch, catcher, thief, base, false) && random() < 0.5;
     }
 };
