@@ -373,9 +373,9 @@
                 {{abbreviatePosition(player.position)}}<rating-block rating-block='' rating='player.skill.defense.fielding'></rating-block> &raquo;
                 <strong>{{player.getName()}}</strong> ({{'#'+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
                 <span class='pull-right'>
-                    <span class='at-bat' ng-repeat='atBat in player.getAtBats() track by $index'>
-                        <strong ng-show='atBat.beneficial'>{{ atBat + '' }}</strong>
-                        <span ng-show='!atBat.beneficial'>{{ atBat + '' }}</span>
+                    <span class='action-line' ng-repeat='atBat in player.getAtBats() track by $index'
+                          ng-class='{beneficial: atBat.beneficial}'>
+                        {{ atBat + '' }}
                     </span>
                     <em>{{order == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
                 </span>

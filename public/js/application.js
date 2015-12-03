@@ -22,7 +22,7 @@ var AtBat = (function () {
 
         var log = new _baseballUtilityLog.Log();
 
-        var beneficial = [log.WALK, log.SINGLE, log.HOMERUN, log.DOUBLE, log.TRIPLE, log.SACRIFICE, log.REACHED_ON_ERROR];
+        var beneficial = [log.WALK, log.SINGLE, log.HOMERUN, log.DOUBLE, log.TRIPLE, log.SACRIFICE, log.REACHED_ON_ERROR, log.STOLEN_BASE, log.RUN];
         if (beneficial.indexOf(this.text) > -1) {
             this.beneficial = true;
         }
@@ -84,6 +84,11 @@ Field.prototype = {
      * @returns {object}
      */
     determineSwingContactResult: function determineSwingContactResult(swing) {
+
+        if (this.first) this.first.fatigue += 4;
+        if (this.second) this.second.fatigue += 4;
+        if (this.third) this.third.fatigue += 4;
+
         var x = swing.x,
             y = swing.y;
         var eye = this.game.batter.skill.offense.eye;
@@ -453,6 +458,7 @@ Game.prototype = {
     pitcher: {}, // Player&
     batter: {}, // Player&
     init: function init(m) {
+        this.reset();
         this.startTime = {
             h: ('00' + (Math.random() * 8 + 10 | 0)).slice(-2),
             m: ('00' + (Math.random() * 60 | 0)).slice(-2)
@@ -594,7 +600,8 @@ Game.prototype = {
                 var windup = $('.windup');
                 windup.css('width', '100%');
             }
-            var pitch = _baseballServices_services.Distribution.pitchLocation(),
+            var count = this.umpire.count;
+            var pitch = _baseballServices_services.Distribution.pitchLocation(count),
                 x = pitch.x,
                 y = pitch.y;
             if (this.quickMode) {
@@ -763,7 +770,8 @@ Game.prototype = {
 
             // stealing bases
             var field = this.field;
-            if (this.stealAttempt === 'go' || this.stealAttempt === 'runnersDiscretion') {
+            var team = this.batter.team;
+            if (team.stealAttempt === _baseballModelTeam.Team.RUNNER_GO || team.stealAttempt === _baseballModelTeam.Team.RUNNERS_DISCRETION) {
                 var thief = field.getLeadRunner();
                 if (thief instanceof _baseballModelPlayer.Player) {
                     switch (thief) {
@@ -785,11 +793,11 @@ Game.prototype = {
                     if (result.foul || result.caught) {
                         validToSteal = false;
                     }
-                    var discretion = this.stealAttempt === 'go' || _baseballServices_services.Distribution.willSteal(pitch, this.pitcher.team.positions.catcher, thief, base);
+                    var discretion = team.stealAttempt === 'go' || _baseballServices_services.Distribution.willSteal(pitch, this.pitcher.team.positions.catcher, thief, base);
                     if (discretion && validToSteal) {
                         thief.attemptSteal(this, base);
                     }
-                    this.stealAttempt = 'runnersDiscretion';
+                    team.stealAttempt = _baseballModelTeam.Team.RUNNERS_DISCRETION;
                 }
             }
 
@@ -843,16 +851,14 @@ Game.prototype = {
             return a.bases == 4;
         }).length);
         log('grounders', this.debug.filter(function (a) {
-            return !a.caught && !a.foul && a.flyAngle < -5;
+            return !a.caught && !a.foul && a.flyAngle < 0;
+        }).length, 'thrown out', this.debug.filter(function (a) {
+            return !a.caught && !a.foul && a.flyAngle < 0 && a.thrownOut;
         }).length);
-        log('grounders thrown out', this.debug.filter(function (a) {
-            return !a.caught && !a.foul && a.flyAngle < -5 && a.thrownOut;
-        }).length);
-        log('weak air hits (thrown out)', this.debug.filter(function (a) {
-            return !a.caught && !a.foul && a.flyAngle > 0 && a.thrownOut;
-        }).length);
-        log('good air hits (not caught)', this.debug.filter(function (a) {
-            return !a.caught && !a.foul && a.flyAngle > 0 && !a.thrownOut;
+        log('flies/liners', this.debug.filter(function (a) {
+            return !a.foul && a.flyAngle > 0;
+        }).length, 'caught', this.debug.filter(function (a) {
+            return a.caught && a.flyAngle > 0;
         }).length);
 
         var PO = {};
@@ -865,7 +871,7 @@ Game.prototype = {
                 PO[a.fielder]++;
             }
         });
-        log('fielding outs', PO);
+        log('fielding outs', JSON.stringify(PO));
 
         var hitters = this.teams.away.lineup.concat(this.teams.home.lineup);
         var atBats = [];
@@ -899,8 +905,16 @@ Game.prototype = {
         var FC = atBats.filter(function (ab) {
             return ab == 'FC';
         }).length;
-        log('line outs', LO, 'fly outs', FO, 'groundouts', GO, 'strikeouts', SO, 'sacrifices', SAC, 'FC', FC, 'gidp', GIDP);
-        log('BB', BB);
+        var CS = atBats.filter(function (ab) {
+            return ab == 'CS';
+        }).length;
+        var SB = atBats.filter(function (ab) {
+            return ab == 'SB';
+        }).length;
+
+        log('line outs', LO, 'fly outs', FO, 'groundouts', GO, 'strikeouts', SO, 'sacrifices', SAC, 'FC', FC, 'gidp', GIDP, 'CS', CS, 'total', LO + FO + GO + SO + SAC + FC + GIDP + CS);
+
+        log('BB', BB, 'SB', SB);
         log('fouls', this.debug.filter(function (a) {
             return a.foul;
         }).length);
@@ -1038,7 +1052,6 @@ Game.prototype = {
         };
     },
     pitchSelect: function pitchSelect() {},
-    stealAttempt: 'runnersDiscretion',
     field: null,
     teams: {
         away: null,
@@ -1070,6 +1083,33 @@ Game.prototype = {
             8: 0,
             9: 0
         }
+    },
+    reset: function reset() {
+        this.scoreboard = {
+            away: {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0,
+                6: 0,
+                7: 0,
+                8: 0,
+                9: 0
+            },
+            home: {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0,
+                6: 0,
+                7: 0,
+                8: 0,
+                9: 0
+            }
+        };
+        this.resetTally();
     },
     resetTally: function resetTally() {
         this.tally = {
@@ -1416,7 +1456,7 @@ Player.prototype = {
     },
     attemptSteal: function attemptSteal(game, base) {
         var pitch = game.pitchInFlight;
-        var success = _baseballServices_services.Distribution.stealSuccess(pitch, game.pitcher.team.positions.catcher, this, base);
+        var success = _baseballServices_services.Distribution.stealSuccess(pitch, game.pitcher.team.positions.catcher, this, base, this.team.stealAttempt === _baseballModel_models.Team.RUNNERS_DISCRETION);
         if (success) {
             game.swingResult.stoleABase = this;
             game.swingResult.caughtStealing = null;
@@ -1550,6 +1590,9 @@ var Team = function Team(game) {
     this.init(game);
 };
 
+Team.RUNNERS_DISCRETION = 'runnersDiscretion';
+Team.RUNNER_GO = 'go';
+
 Team.prototype = {
     constructor: Team,
     init: function init(game) {
@@ -1587,6 +1630,7 @@ Team.prototype = {
     getName: function getName() {
         return _baseballUtility_utils.text.mode == 'n' ? this.nameJ : this.name;
     },
+    stealAttempt: Team.RUNNERS_DISCRETION,
     lineup: [],
     positions: {},
     manager: null,
@@ -2528,7 +2572,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2905,7 +2949,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -2986,7 +3030,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3043,7 +3087,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3105,7 +3149,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3178,7 +3222,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3240,7 +3284,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3304,7 +3348,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3366,7 +3410,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3803,9 +3847,10 @@ Distribution.prototype = {
         return (10 + random() * 320 + power / 300 + random() * power / 75 * 150) * (1 - abs(flyAngle - 30) / 60);
     },
     /**
+     * @param count {{strikes: number, balls: number}}
      * @returns {{x: number, y: number}}
      */
-    pitchLocation: function pitchLocation() {
+    pitchLocation: function pitchLocation(count) {
         var x, y;
         if (random() < 0.5) {
             x = 50 + floor(random() * 70) - floor(random() * 15);
@@ -3813,6 +3858,12 @@ Distribution.prototype = {
             x = 150 + floor(random() * 15) - floor(random() * 70);
         }
         y = 30 + (170 - floor(sqrt(random() * 28900)));
+
+        var sum = count.strikes + count.balls + 1;
+
+        x = ((1 + count.strikes) * x + count.balls * 100) / sum;
+        y = ((1 + count.strikes) * y + count.balls * 100) / sum;
+
         return { x: x, y: y };
     },
     /**
@@ -3889,9 +3940,10 @@ Distribution.prototype = {
      * @param catcher {Player}
      * @param thief {Player}
      * @param base {Number} 1,2,3,4
+     * @param volitional {boolean} whether the runner decided to steal
      * @returns {boolean}
      */
-    stealSuccess: function stealSuccess(pitch, catcher, thief, base) {
+    stealSuccess: function stealSuccess(pitch, catcher, thief, base, volitional) {
         var rand = random(),
             rand2 = random();
 
@@ -3899,7 +3951,7 @@ Distribution.prototype = {
 
         var pitchBaseSpeedMultiplier = (pitchDefinitions[pitch.name] || ['', '', 0.6])[2];
 
-        return thief.skill.offense.speed * 2 + thief.skill.offense.eye * rand + (base * -25 + 45) * rand + 10 > pitchBaseSpeedMultiplier * pitch.velocity * smoothedRand2 + (catcher.skill.defense.catching + catcher.skill.defense.throwing) * rand2 + thief.fatigue;
+        return ((volitional | 0) * 35 + thief.skill.offense.eye + (base * -25 + 45)) * rand + 10 + thief.skill.offense.speed * 2 - thief.fatigue > pitchBaseSpeedMultiplier * pitch.velocity * smoothedRand2 + (catcher.skill.defense.catching + catcher.skill.defense.throwing) * rand2;
     },
     /**
      * @param pitch {Object} game.pitchInFlight
@@ -3909,7 +3961,7 @@ Distribution.prototype = {
      * @returns {boolean}
      */
     willSteal: function willSteal(pitch, catcher, thief, base) {
-        return random() < 0.15 && this.stealSuccess(pitch, catcher, thief, base) && random() < 0.5;
+        return random() < 0.15 && this.stealSuccess(pitch, catcher, thief, base, false) && random() < 0.5;
     }
 };
 
@@ -5488,6 +5540,11 @@ IndexController = function($scope, socket) {
             game.pitcher = game.teams.away.positions.pitcher;
         }
     };
+
+    $scope.sim = function() {$scope.proceedToGame(1, 1);};
+    $scope.seventh = function() {$scope.proceedToGame(7);};
+    $scope.playball = function() {$scope.proceedToGame();};
+    $scope.spectate = function() {$scope.proceedToGame(0,1);};
 
     $scope.proceedToGame = function(quickMode, spectateCpu) {
         $scope.y = new Game();

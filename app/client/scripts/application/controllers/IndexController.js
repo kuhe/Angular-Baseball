@@ -26,6 +26,11 @@ IndexController = function($scope, socket) {
         }
     };
 
+    $scope.sim = function() {$scope.proceedToGame(1, 1);};
+    $scope.seventh = function() {$scope.proceedToGame(7);};
+    $scope.playball = function() {$scope.proceedToGame();};
+    $scope.spectate = function() {$scope.proceedToGame(0,1);};
+
     $scope.proceedToGame = function(quickMode, spectateCpu) {
         $scope.y = new Game();
         var game = $scope.y;
