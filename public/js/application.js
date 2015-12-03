@@ -1464,6 +1464,20 @@ Player.prototype = {
             game.swingResult.stoleABase = null;
             game.swingResult.caughtStealing = this;
         }
+        switch (base) {
+            case 1:
+                base = '1st';
+                break;
+            case 2:
+                base = '2nd';
+                break;
+            case 3:
+                base = '3rd';
+                break;
+            case 4:
+                base = 'Home';
+        }
+        game.swingResult.attemptedBase = base;
         return this;
     },
     randomizeSkills: function randomizeSkills(hero, allPitches) {
@@ -4784,10 +4798,10 @@ Log.prototype = {
         }
         var steal = '';
         if (swingResult.stoleABase) {
-            steal = this.noteStealAttempt(swingResult.stoleABase, true);
+            steal = this.noteStealAttempt(swingResult.stoleABase, true, swingResult.attemptedBase);
         }
         if (swingResult.caughtStealing) {
-            steal = this.noteStealAttempt(swingResult.caughtStealing, false);
+            steal = this.noteStealAttempt(swingResult.caughtStealing, false, swingResult.attemptedBase);
         }
         if (steal) {
             this.note(steal, steal, _baseballUtilityText.text.mode);
@@ -4833,9 +4847,8 @@ Log.prototype = {
             setTimeout(fn, 100);
         }
     },
-    noteStealAttempt: function noteStealAttempt(thief, success) {
-        // todo mention which base
-        return _baseballUtilityText.text.space() + thief.getName() + _baseballUtilityText.text.comma() + (success ? (0, _baseballUtilityText.text)('stolen base') : (0, _baseballUtilityText.text)('caught stealing')) + _baseballUtilityText.text.stop();
+    noteStealAttempt: function noteStealAttempt(thief, success, base) {
+        return _baseballUtilityText.text.space() + thief.getName() + _baseballUtilityText.text.comma() + (success ? (0, _baseballUtilityText.text)('stolen base') : (0, _baseballUtilityText.text)('caught stealing')) + _baseballUtilityText.text.space() + '(' + _baseballUtilityText.text.baseShortName(base) + ')' + _baseballUtilityText.text.stop();
     },
     getPlateAppearanceResult: function getPlateAppearanceResult(game) {
         var r = game.swingResult;
@@ -4850,10 +4863,10 @@ Log.prototype = {
             }
             var steal = '';
             if (r.stoleABase) {
-                steal = this.noteStealAttempt(r.stoleABase, true);
+                steal = this.noteStealAttempt(r.stoleABase, true, r.attemptedBase);
             }
             if (r.caughtStealing) {
-                steal = this.noteStealAttempt(r.caughtStealing, false);
+                steal = this.noteStealAttempt(r.caughtStealing, false, r.attemptedBase);
             }
             record += steal;
         } else {
@@ -5215,6 +5228,23 @@ text.getBattersEye = function (game) {
     eye.e = text('looks like: ', 'e') + breaking ? text('breaking ball', 'e') : text('fastball', 'e');
     eye.n = text('looks like: ', 'n') + breaking ? text('breaking ball', 'n') : text('fastball', 'n');
     return eye;
+};
+
+text.baseShortName = function (base) {
+    if (text.mode == 'n') {
+        return ({
+            '1st': '一',
+            '2nd': '二',
+            '3rd': '三',
+            'home': '本',
+            'Home': '本',
+
+            'left': '左',
+            'center': '中',
+            'right': '右'
+        })[base];
+    }
+    return base;
 };
 
 text.fielderShortName = function (fielder) {
