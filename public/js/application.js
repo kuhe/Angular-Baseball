@@ -167,11 +167,10 @@ Field.prototype = {
 
                 if (swing.outfielder) {
                     swing.bases = 1;
-                    baseRunningTime *= 0.95;
+                    baseRunningTime *= 1.05;
                     fieldingReturnDelay -= baseRunningTime;
-                    eye = game.batter.skill.offense.eye / 400;
 
-                    while (fieldingReturnDelay > baseRunningTime && swing.bases < 3 && Math.random() < 0.25 + eye) {
+                    while ((fieldingReturnDelay > baseRunningTime && Math.random() < 0.25 + speed / 200 || Math.random() < 0.04 + speed / 650) && swing.bases < 3) {
                         baseRunningTime *= 0.95;
                         swing.bases++;
                         fieldingReturnDelay -= baseRunningTime;
@@ -265,6 +264,17 @@ Field.prototype = {
             second = this.second,
             third = this.third;
         return first && second && third && 'third' || first && second && 'second' || first && 'first';
+    },
+    /**
+     * @returns {Player}
+     * the best steal candidate.
+     */
+    getLeadRunner: function getLeadRunner() {
+        var first = this.first,
+            second = this.second,
+            third = this.third;
+        if (third && first && !second) return first;
+        return third || second || first;
     },
     //printRunnerNames : function() {
     //    return [this.first ? this.first.getName() : '', this.second ? this.second.getName() : '', this.third ? this.third.getname() : ''];
@@ -420,6 +430,8 @@ var _baseballModelField = require('baseball/Model/Field');
 var _baseballModelTeam = require('baseball/Model/Team');
 
 var _baseballModelUmpire = require('baseball/Model/Umpire');
+
+var _baseballModelPlayer = require('baseball/Model/Player');
 
 var _baseballUtilityLog = require('baseball/Utility/Log');
 
@@ -664,6 +676,7 @@ Game.prototype = {
         }
     },
     thePitch: function thePitch(x, y, callback, override) {
+        var pitch = this.pitchInFlight;
         if (this.stage == 'pitch') {
             if (override) {
                 this.pitchInFlight = override.inFlight;
@@ -674,27 +687,28 @@ Game.prototype = {
                 this.pitchTarget.x = x;
                 this.pitchTarget.y = y;
 
-                this.pitchInFlight.breakDirection = this.helper.pitchDefinitions[this.pitchInFlight.name].slice(0, 2);
+                pitch.breakDirection = this.helper.pitchDefinitions[pitch.name].slice(0, 2);
                 this.battersEye = _baseballUtility_utils.text.getBattersEye(this);
 
-                var control = Math.floor(this.pitchInFlight.control - this.pitcher.fatigue / 2);
+                var control = Math.floor(pitch.control - this.pitcher.fatigue / 2);
                 this.pitchTarget.x = _baseballServices_services.Distribution.pitchControl(this.pitchTarget.x, control);
                 this.pitchTarget.y = _baseballServices_services.Distribution.pitchControl(this.pitchTarget.y, control);
 
-                if (this.pitcher.throws == 'right') this.pitchInFlight.breakDirection[0] *= -1;
+                if (this.pitcher.throws == 'right') pitch.breakDirection[0] *= -1;
 
-                var breakEffect = _baseballServices_services.Distribution.breakEffect(this.pitchInFlight, this.pitcher, this.pitchTarget.x, this.pitchTarget.y);
+                var breakEffect = _baseballServices_services.Distribution.breakEffect(pitch, this.pitcher, this.pitchTarget.x, this.pitchTarget.y);
 
-                this.pitchInFlight.x = breakEffect.x;
-                this.pitchInFlight.y = breakEffect.y;
+                pitch.x = breakEffect.x;
+                pitch.y = breakEffect.y;
             }
-            this.log.notePitch(this.pitchInFlight, this.batter);
+
+            this.log.notePitch(pitch, this.batter);
 
             this.stage = 'swing';
             if (this.humanControl != 'none' && (this.humanControl == 'both' || this.humanBatting())) {
                 callback();
             } else {
-                this.awaitSwing(x, y, callback, this.pitchInFlight, this.pitchTarget);
+                this.awaitSwing(x, y, callback, pitch, this.pitchTarget);
             }
         }
     },
@@ -703,53 +717,86 @@ Game.prototype = {
         n: ''
     },
     theSwing: function theSwing(x, y, callback, override) {
+        var pitch = this.pitchInFlight;
         if (this.stage == 'swing') {
             if (override) {
-                this.swingResult = override;
+                var result = this.swingResult = override;
                 callback = this.waitingCallback;
             } else {
-                this.swingResult = {};
+                this.swingResult = result = {};
                 var bonus = this.batter.eye.bonus || 0,
                     eye = this.batter.skill.offense.eye + 6 * (this.umpire.count.balls + this.umpire.count.strikes) + bonus;
 
                 if (x >= 0 && x <= 200) {
                     this.batter.fatigue++;
 
-                    this.swingResult.x = x - this.pitchInFlight.x;
-                    this.swingResult.y = y - this.pitchInFlight.y;
-                    this.swingResult.angle = this.setBatAngle();
+                    result.x = x - pitch.x;
+                    result.y = y - pitch.y;
+                    result.angle = this.setBatAngle();
 
-                    var recalculation = _baseballServices_services.Mathinator.getAngularOffset(this.swingResult, this.swingResult.angle);
+                    var recalculation = _baseballServices_services.Mathinator.getAngularOffset(result, result.angle);
                     var precision = _baseballServices_services.Distribution.swing(eye);
 
-                    this.swingResult.x = recalculation.x * precision;
-                    this.swingResult.y = -5 + recalculation.y * precision;
+                    result.x = recalculation.x * precision;
+                    result.y = -5 + recalculation.y * precision;
 
                     //log(recalculation.y, precision);
 
-                    this.swingResult.looking = false;
-                    if (Math.abs(this.swingResult.x) < 60 && Math.abs(this.swingResult.y) < 35) {
-                        this.swingResult.contact = true;
-                        this.field.determineSwingContactResult(this.swingResult);
-                        // log(this.swingResult.flyAngle, Math.floor(this.swingResult.x), Math.floor(this.swingResult.y));
-                        this.debug.push(this.swingResult);
+                    result.looking = false;
+                    if (Math.abs(result.x) < 60 && Math.abs(result.y) < 35) {
+                        result.contact = true;
+                        this.field.determineSwingContactResult(result);
+                        // log(result.flyAngle, Math.floor(result.x), Math.floor(result.y));
+                        this.debug.push(result);
                     } else {
-                        this.swingResult.contact = false;
+                        result.contact = false;
                     }
                 } else {
-                    this.swingResult.strike = this.pitchInFlight.x > 50 && this.pitchInFlight.x < 150 && this.pitchInFlight.y > 35 && this.pitchInFlight.y < 165;
-                    this.batter.eye.bonus = Math.max(0, eye - Math.sqrt(Math.pow(this.batter.eye.x - this.pitchInFlight.x, 2) + Math.pow(this.batter.eye.y - this.pitchInFlight.y, 2)) * 1.5);
-                    this.swingResult.contact = false;
-                    this.swingResult.looking = true;
-                    this.batter.eye.x = this.pitchInFlight.x;
-                    this.batter.eye.y = this.pitchInFlight.y;
+                    result.strike = pitch.x > 50 && pitch.x < 150 && pitch.y > 35 && pitch.y < 165;
+                    this.batter.eye.bonus = Math.max(0, eye - Math.sqrt(Math.pow(this.batter.eye.x - pitch.x, 2) + Math.pow(this.batter.eye.y - pitch.y, 2)) * 1.5);
+                    result.contact = false;
+                    result.looking = true;
+                    this.batter.eye.x = pitch.x;
+                    this.batter.eye.y = pitch.y;
                 }
             }
-            this.log.noteSwing(this.swingResult);
+
+            // stealing bases
+            var field = this.field;
+            if (this.stealAttempt === 'go' || this.stealAttempt === 'runnersDiscretion') {
+                var thief = field.getLeadRunner();
+                if (thief instanceof _baseballModelPlayer.Player) {
+                    switch (thief) {
+                        case field.first:
+                            var base = 2;
+                            break;
+                        case field.second:
+                            base = 3;
+                            break;
+                        case field.third:
+                            base = 4;
+                    }
+                    var validToSteal = true;
+                    if (result.looking) {
+                        var count = this.umpire.count;
+                        if (count.strikes >= 2 && result.strike && count.outs >= 2) validToSteal = false;
+                        if (count.balls >= 3 && !result.strike && field.first) validToSteal = false;
+                    }
+                    if (result.foul || result.caught) {
+                        validToSteal = false;
+                    }
+                    var discretion = this.stealAttempt === 'go' || _baseballServices_services.Distribution.willSteal(pitch, this.pitcher.team.positions.catcher, thief, base);
+                    if (discretion && validToSteal) {
+                        thief.attemptSteal(this, base);
+                    }
+                    this.stealAttempt = 'runnersDiscretion';
+                }
+            }
+
+            this.log.noteSwing(result);
             this.stage = 'pitch';
 
             var half = this.half;
-            var result = this.swingResult;
             this.umpire.makeCall();
             emit = false;
             if (half != this.half) {
@@ -991,6 +1038,7 @@ Game.prototype = {
         };
     },
     pitchSelect: function pitchSelect() {},
+    stealAttempt: 'runnersDiscretion',
     field: null,
     teams: {
         away: null,
@@ -1053,7 +1101,7 @@ Game.prototype = {
 
 exports.Game = Game;
 
-},{"baseball/Model/Field":2,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":25,"baseball/Utility/Log":29,"baseball/Utility/_utils":30}],4:[function(require,module,exports){
+},{"baseball/Model/Field":2,"baseball/Model/Player":5,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":25,"baseball/Utility/Log":29,"baseball/Utility/_utils":30}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1266,6 +1314,8 @@ Player.prototype = {
         paRemaining -= so;
         var h = Math.floor(randBetween(185, 372, 'eye power speed') * paRemaining / 1000);
         paRemaining -= h;
+        var sb = randBetween(0, (h + bb) / 6, 'speed') | 0;
+        var cs = randBetween(sb, 0, 'speed eye') | 0;
 
         var doubles = randBetween(0, h / 4, 'power speed');
         var triples = randBetween(0, h / 12, 'speed');
@@ -1331,7 +1381,9 @@ Player.prototype = {
                 r: r,
                 rbi: rbi,
                 hbp: hbp,
-                sac: sac
+                sac: sac,
+                sb: sb,
+                cs: cs
             },
             fielding: {
                 E: E,
@@ -1361,6 +1413,18 @@ Player.prototype = {
     },
     getBaseRunningTime: function getBaseRunningTime() {
         return _baseballServices_services.Mathinator.baseRunningTime(this.skill.offense.speed);
+    },
+    attemptSteal: function attemptSteal(game, base) {
+        var pitch = game.pitchInFlight;
+        var success = _baseballServices_services.Distribution.stealSuccess(pitch, game.pitcher.team.positions.catcher, this, base);
+        if (success) {
+            game.swingResult.stoleABase = this;
+            game.swingResult.caughtStealing = null;
+        } else {
+            game.swingResult.stoleABase = null;
+            game.swingResult.caughtStealing = this;
+        }
+        return this;
     },
     randomizeSkills: function randomizeSkills(hero, allPitches) {
         this.hero = hero;
@@ -1580,6 +1644,7 @@ Umpire.prototype = {
         var result = game.swingResult;
         var pitcher = game.pitcher;
         var batter = game.batter;
+        var field = game.field;
 
         if (game.swingResult.fielder) {
             var fielder = game.teams[game.half == 'top' ? 'home' : 'away'].positions[result.fielder];
@@ -1588,6 +1653,50 @@ Umpire.prototype = {
         }
 
         game.batterRunner = game.batter;
+
+        if (result.stoleABase) {
+            var thief = result.stoleABase;
+            switch (thief) {
+                case field.first:
+                    field.second = thief;
+                    field.first = null;
+                    break;
+                case field.second:
+                    field.third = thief;
+                    field.second = null;
+                    break;
+                case field.third:
+                    field.third = null;
+                    thief.stats.batting.r++;
+                    this.runScores();
+            }
+            thief.stats.batting.sb++;
+            thief.atBats.push(_baseballUtility_utils.Log.prototype.STOLEN_BASE);
+        }
+        if (result.caughtStealing) {
+            game.teams[game.half == 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding.PO++;
+            this.count.outs++;
+            thief = result.caughtStealing;
+            thief.stats.batting.cs++;
+            thief.atBats.push(_baseballUtility_utils.Log.prototype.CAUGHT_STEALING);
+            switch (thief) {
+                case field.first:
+                    field.first = null;
+                    break;
+                case field.second:
+                    field.second = null;
+                    break;
+                case field.third:
+                    field.third = null;
+            }
+            if (this.count.outs >= 3) {
+                this.says = 'Three outs, change.';
+                this.count.outs = this.count.balls = this.count.strikes = 0;
+                pitcher.stats.pitching.IP[0]++;
+                pitcher.stats.pitching.IP[1] = 0;
+                return this.changeSides();
+            }
+        }
 
         pitcher.stats.pitching.pitches++;
         if (result.looking) {
@@ -1617,6 +1726,7 @@ Umpire.prototype = {
                         }
                     }
                     this.count.outs++;
+                    fielder.stats.fielding.PO++;
                     this.newBatter();
                 } else {
                     if (result.foul) {
@@ -1637,6 +1747,7 @@ Umpire.prototype = {
                         if (result.fieldersChoice && this.count.outs < 2) {
                             result.bases = 0;
                             this.count.outs++;
+                            fielder.stats.fielding.PO++;
                             pitcher.stats.pitching.IP[1]++;
                             game.batter.atBats.push(_baseballUtility_utils.Log.prototype.FIELDERS_CHOICE);
                             this.advanceRunners(false, result.fieldersChoice);
@@ -1650,6 +1761,7 @@ Umpire.prototype = {
                         }
                         if (result.thrownOut) {
                             this.count.outs++;
+                            fielder.stats.fielding.PO++;
                             pitcher.stats.pitching.IP[1]++;
                             game.batter.atBats.push(_baseballUtility_utils.Log.prototype.GROUNDOUT);
                             result.doublePlay && game.batter.atBats.push(_baseballUtility_utils.Log.prototype.GIDP);
@@ -1832,7 +1944,7 @@ Umpire.prototype = {
                 if (third && canAdvance('third')) {
                     // run scored
                     game.scoreboard[game.half == 'top' ? 'away' : 'home'][game.inning]++;
-                    game.tally[game.half == 'top' ? 'away' : 'home'].R++;
+                    this.runScores();
                     if (game.batter != third) {
                         game.batter.recordRBI();
                         third.atBats.push(_baseballUtility_utils.Log.prototype.RUN);
@@ -1845,13 +1957,29 @@ Umpire.prototype = {
                 if (second && canAdvance('second')) {
                     game.field.third = second;
                     game.field.second = null;
+                    if (second != game.batter && !sacrificeAdvances && Math.random() * (second.skill.offense.speed + 120) > 90) {
+                        this.runScores();
+                        if (game.batter != second) {
+                            game.batter.recordRBI();
+                            second.atBats.push(_baseballUtility_utils.Log.prototype.RUN);
+                        }
+                        game.field.third = null;
+                    }
                 }
                 if (first && canAdvance('first')) {
                     game.field.second = first;
                     game.field.first = null;
+                    if (first != game.batter && !game.field.third && !sacrificeAdvances && Math.random() * (first.skill.offense.speed + 120) > 95) {
+                        game.field.third = first;
+                        game.field.second = null;
+                    }
                 }
             }
         return this;
+    },
+    runScores: function runScores() {
+        var game = this.game;
+        game.tally[game.half == 'top' ? 'away' : 'home'].R++;
     },
     newBatter: function newBatter() {
         var game = this.game;
@@ -3623,16 +3751,29 @@ for (var fn in Animator.prototype) {
 exports.Animator = Animator;
 
 },{"baseball/Render/Loop":9,"baseball/Utility/helper":32,"baseball/services/_services":36}],22:[function(require,module,exports){
-/**
- * For Probability!
- * @constructor
- */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
     value: true
 });
+
+var _baseballUtilityHelper = require('baseball/Utility/helper');
+
+var pitchDefinitions = _baseballUtilityHelper.helper.pitchDefinitions;
+
+/**
+ * For Probability!
+ * @constructor
+ */
 var Distribution = function Distribution() {};
+
+var random = Math.random,
+    min = Math.min,
+    max = Math.max,
+    floor = Math.floor,
+    ceil = Math.ceil,
+    abs = Math.abs,
+    sqrt = Math.sqrt;
 
 Distribution.prototype = {
     identifier: 'Distribution',
@@ -3643,14 +3784,14 @@ Distribution.prototype = {
      */
     chance: function chance(scale) {
         if (!scale) scale = 1;
-        return Math.random() * scale;
+        return random() * scale;
     },
     /**
      * @param fielder {Player}
      * @returns {boolean}
      */
     error: function error(fielder) {
-        return (100 - fielder.skill.defense.fielding) * 0.40 + 4 > Math.random() * 100;
+        return (100 - fielder.skill.defense.fielding) * 0.40 + 4 > random() * 100;
     },
     /**
      * @param power
@@ -3658,19 +3799,19 @@ Distribution.prototype = {
      * @returns {number}
      */
     landingDistance: function landingDistance(power, flyAngle) {
-        return (10 + power / 2 + Math.random() * 310 + power / 100 * 30) * (1 - Math.abs(flyAngle - 30) / 60);
+        return (10 + random() * 320 + power / 300 + random() * power / 75 * 150) * (1 - abs(flyAngle - 30) / 60);
     },
     /**
      * @returns {{x: number, y: number}}
      */
     pitchLocation: function pitchLocation() {
         var x, y;
-        if (Math.random() < 0.5) {
-            x = 50 + Math.floor(Math.random() * 70) - Math.floor(Math.random() * 15);
+        if (random() < 0.5) {
+            x = 50 + floor(random() * 70) - floor(random() * 15);
         } else {
-            x = 150 + Math.floor(Math.random() * 15) - Math.floor(Math.random() * 70);
+            x = 150 + floor(random() * 15) - floor(random() * 70);
         }
-        y = 30 + (170 - Math.floor(Math.sqrt(Math.random() * 28900)));
+        y = 30 + (170 - floor(sqrt(random() * 28900)));
         return { x: x, y: y };
     },
     /**
@@ -3678,7 +3819,7 @@ Distribution.prototype = {
      * @returns {number}
      */
     centralizedNumber: function centralizedNumber() {
-        return 100 + Math.floor(Math.random() * 15) - Math.floor(Math.random() * 15);
+        return 100 + floor(random() * 15) - floor(random() * 15);
     },
     /**
      * @param eye {Player.skill.offense.eye}
@@ -3687,7 +3828,7 @@ Distribution.prototype = {
      * @param umpire {Umpire}
      */
     swingLikelihood: function swingLikelihood(eye, x, y, umpire) {
-        var swingLikelihood = (200 - Math.abs(100 - x) - Math.abs(100 - y)) / 2;
+        var swingLikelihood = (200 - abs(100 - x) - abs(100 - y)) / 2;
         if (x < 60 || x > 140 || y < 50 || y > 150) {
             // ball
             /** 138 based on avg O-Swing of 30% + 8% for fun, decreased by better eye */
@@ -3705,8 +3846,8 @@ Distribution.prototype = {
      * @returns {number}
      */
     pitchControl: function pitchControl(target, control) {
-        var effect = (50 - Math.random() * 100) / (1 + control / 100);
-        return Math.min(199.9, Math.max(0.1, target + effect));
+        var effect = (50 - random() * 100) / (1 + control / 100);
+        return min(199.9, max(0.1, target + effect));
     },
     /**
      * @param pitch {Game.pitchInFlight}
@@ -3719,8 +3860,8 @@ Distribution.prototype = {
      */
     breakEffect: function breakEffect(pitch, pitcher, x, y) {
         var effect = {};
-        effect.x = Math.floor(x + pitch.breakDirection[0] * (0.50 + 0.5 * Math.random() + pitcher.pitching[pitch.name]['break'] / 200));
-        effect.y = Math.floor(y + pitch.breakDirection[1] * ((0.50 + 0.5 * Math.random() + pitcher.pitching[pitch.name]['break'] / 200) / (0.5 + y / 200)));
+        effect.x = floor(x + pitch.breakDirection[0] * (0.50 + 0.5 * random() + pitcher.pitching[pitch.name]['break'] / 200));
+        effect.y = floor(y + pitch.breakDirection[1] * ((0.50 + 0.5 * random() + pitcher.pitching[pitch.name]['break'] / 200) / (0.5 + y / 200)));
         return effect;
     },
     /**
@@ -3731,8 +3872,8 @@ Distribution.prototype = {
      * @returns {number} 0-200
      */
     cpuSwing: function cpuSwing(target, actual, eye) {
-        eye = Math.min(eye, 100); // higher eye would overcompensate here
-        return 100 + (target - 100) * (0.5 + Math.random() * eye / 200) - actual;
+        eye = min(eye, 100); // higher eye would overcompensate here
+        return 100 + (target - 100) * (0.5 + random() * eye / 200) - actual;
     },
     /**
      * Determine the swing scalar
@@ -3740,7 +3881,35 @@ Distribution.prototype = {
      * @returns {number}
      */
     swing: function swing(eye) {
-        return 100 / (eye + 25 + Math.random() * 50);
+        return 100 / (eye + 25 + random() * 50);
+    },
+    /**
+     * @param pitch {Object} game.pitchInFlight
+     * @param catcher {Player}
+     * @param thief {Player}
+     * @param base {Number} 1,2,3,4
+     * @returns {boolean}
+     */
+    stealSuccess: function stealSuccess(pitch, catcher, thief, base) {
+        var rand = random(),
+            rand2 = random();
+
+        var smoothedRand2 = (1 + rand2) / 2;
+
+        var pitchBaseSpeedMultiplier = (pitchDefinitions[pitch.name] || ['', '', 0.6])[2];
+
+        return thief.skill.offense.speed * 2 + thief.skill.offense.eye * rand + (base * -25 + 45) * rand + 10 > pitchBaseSpeedMultiplier * pitch.velocity * smoothedRand2 + (catcher.skill.defense.catching + catcher.skill.defense.throwing) * rand2 + thief.fatigue;
+    },
+    /**
+     * @param pitch {Object} game.pitchInFlight
+     * @param catcher {Player}
+     * @param thief {Player}
+     * @param base {Number} 1,2,3,4
+     * @returns {boolean}
+     */
+    willSteal: function willSteal(pitch, catcher, thief, base) {
+        return true;
+        return random() < 0.15 && this.stealSuccess(pitch, catcher, thief, base) && random() < 0.5;
     }
 };
 
@@ -3778,7 +3947,7 @@ Distribution.main = function () {
 
 exports.Distribution = Distribution;
 
-},{}],23:[function(require,module,exports){
+},{"baseball/Utility/helper":32}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4362,6 +4531,8 @@ Log.prototype = {
     FIELDERS_CHOICE: 'FC',
     GIDP: '(IDP)',
     GITP: '(ITP)',
+    STOLEN_BASE: 'SB',
+    CAUGHT_STEALING: 'CS',
     stabilizeShortRecord: function stabilizeShortRecord() {
         var rec = this.record.e.slice(0, 6);
         this.shortRecord.e = rec;
@@ -4371,17 +4542,30 @@ Log.prototype = {
         this.shortRecord.n = rec2;
         this.stabilized.shortRecord.n = rec2.concat(['', '', '', '', '', '']).slice(0, 6);
     },
-    note: function note(_note, noteJ) {
-        this.record.e.unshift(_note);
-        this.record.n.unshift(noteJ);
-        this.stabilizeShortRecord();
-        this.async(function () {
-            if (_baseballUtilityText.text.mode === 'n') {
-                console.log(noteJ);
-            } else {
+    note: function note(_note, noteJ, only) {
+        //todo fix don't double language when specifying param [only]
+        if (only === 'e') {
+            this.record.e.unshift(_note);
+            this.async(function () {
                 console.log(_note);
-            }
-        });
+            });
+        } else if (only === 'n') {
+            this.record.n.unshift(noteJ);
+            this.async(function () {
+                console.log(noteJ);
+            });
+        } else {
+            this.record.e.unshift(_note);
+            this.record.n.unshift(noteJ);
+            this.async(function () {
+                if (_baseballUtilityText.text.mode === 'n') {
+                    console.log(noteJ);
+                } else {
+                    console.log(_note);
+                }
+            });
+        }
+        this.stabilizeShortRecord();
     },
     getBatter: function getBatter(batter) {
         var order = batter.team.nowBatting;
@@ -4542,7 +4726,17 @@ Log.prototype = {
                 result += (0, _baseballUtilityText.text)('Swinging strike.');
             }
         }
-        return result;
+        var steal = '';
+        if (swingResult.stoleABase) {
+            steal = this.noteStealAttempt(swingResult.stoleABase, true);
+        }
+        if (swingResult.caughtStealing) {
+            steal = this.noteStealAttempt(swingResult.caughtStealing, false);
+        }
+        if (steal) {
+            this.note(steal, steal, _baseballUtilityText.text.mode);
+        }
+        return result + steal;
     },
     noteSwing: function noteSwing(swingResult) {
         var m = _baseballUtilityText.text.mode,
@@ -4583,6 +4777,10 @@ Log.prototype = {
             setTimeout(fn, 100);
         }
     },
+    noteStealAttempt: function noteStealAttempt(thief, success) {
+        // todo mention which base
+        return _baseballUtilityText.text.space() + thief.getName() + _baseballUtilityText.text.comma() + (success ? (0, _baseballUtilityText.text)('stolen base') : (0, _baseballUtilityText.text)('caught stealing')) + _baseballUtilityText.text.stop();
+    },
     getPlateAppearanceResult: function getPlateAppearanceResult(game) {
         var r = game.swingResult;
         var record = '';
@@ -4594,6 +4792,14 @@ Log.prototype = {
             } else {
                 record = batter + (0, _baseballUtilityText.text)(' walked.');
             }
+            var steal = '';
+            if (r.stoleABase) {
+                steal = this.noteStealAttempt(r.stoleABase, true);
+            }
+            if (r.caughtStealing) {
+                steal = this.noteStealAttempt(r.caughtStealing, false);
+            }
+            record += steal;
         } else {
             if (r.contact) {
                 var fielder = r.fielder,
@@ -4915,6 +5121,9 @@ var text = function text(phrase, override) {
             'Bases empty': 'ランナーなし',
             'base': '塁',
 
+            'stolen base': '盗塁成功',
+            'caught stealing': '盗塁失敗',
+
             'Select Language:': '言語',
             'Run Fast Simulation': 'シミュレーションを試合終了まで行う',
             'Play Ball!': 'プレーボール',
@@ -5005,6 +5214,9 @@ text.fielderLongName = function (fielder) {
 
 text.comma = function () {
     return ({ n: '、', e: ', ' })[text.mode];
+};
+text.space = function () {
+    return ({ n: '', e: ' ' })[text.mode];
 };
 text.stop = function () {
     return ({ n: '。', e: '. ' })[text.mode];
