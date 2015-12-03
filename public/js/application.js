@@ -1999,6 +1999,15 @@ Umpire.prototype = {
                         }
                     };
                 }
+                var arm = 0;
+                if (swing.fielder) {
+                    var fielder = game.pitcher.team.positions[swing.fielder];
+                    if (['left', 'center', 'right'].indexOf(fielder.position) > -1) {
+                        arm = fielder.skill.defense.throwing;
+                    } else {
+                        arm = fielder.skill.defense.throwing + 120; // very rare extra bases on infield BIP
+                    }
+                }
                 if (third && canAdvance('third')) {
                     // run scored
                     this.runScores();
@@ -2014,7 +2023,8 @@ Umpire.prototype = {
                 if (second && canAdvance('second')) {
                     game.field.third = second;
                     game.field.second = null;
-                    if (second != game.batter && !sacrificeAdvances && Math.random() * (second.skill.offense.speed + 120) > 90) {
+                    if (second != game.batter && !sacrificeAdvances && Math.random() * (second.skill.offense.speed + 120) > arm + 50) {
+
                         this.runScores();
                         if (game.batter != second) {
                             game.batter.recordRBI();
@@ -2026,7 +2036,8 @@ Umpire.prototype = {
                 if (first && canAdvance('first')) {
                     game.field.second = first;
                     game.field.first = null;
-                    if (first != game.batter && !game.field.third && !sacrificeAdvances && Math.random() * (first.skill.offense.speed + 120) > 95) {
+                    if (first != game.batter && !game.field.third && !sacrificeAdvances && Math.random() * (first.skill.offense.speed + 120) > arm + 60) {
+
                         game.field.third = first;
                         game.field.second = null;
                     }
@@ -3866,16 +3877,16 @@ Distribution.prototype = {
     pitchLocation: function pitchLocation(count) {
         var x, y;
         if (random() < 0.5) {
-            x = 50 + floor(random() * 70) - floor(random() * 15);
+            x = 50 + floor(random() * 90) - floor(random() * 30);
         } else {
-            x = 150 + floor(random() * 15) - floor(random() * 70);
+            x = 150 + floor(random() * 30) - floor(random() * 90);
         }
         y = 30 + (170 - floor(sqrt(random() * 28900)));
 
-        var sum = count.strikes + count.balls + 1;
+        var sum = count.strikes + count.balls + 3;
 
-        x = ((1 + count.strikes) * x + count.balls * 100) / sum;
-        y = ((1 + count.strikes) * y + count.balls * 100) / sum;
+        x = ((3 + count.strikes) * x + count.balls * 100) / sum;
+        y = ((3 + count.strikes) * y + count.balls * 100) / sum;
 
         return { x: x, y: y };
     },
