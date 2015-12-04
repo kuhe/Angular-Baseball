@@ -173,7 +173,6 @@ IndexController = function($scope, socket) {
             if (player.team.sub) {
                 var sub = player.team.sub;
                 player.team.sub = null;
-                $('.batting-lines li.lineup').removeClass('click_to_sub');
                 return sub.substitute(player);
             }
             player.team.expanded = (player.team.expanded == player ? null : player);
@@ -182,12 +181,6 @@ IndexController = function($scope, socket) {
             if (game.humanControl === 'home' && player.team !== game.teams.home) return;
             if (game.humanControl === 'away' && player.team !== game.teams.away) return;
             player.team.sub = (player.team.sub === player ? null : player);
-            // stack size exceeded in ng-class
-            if (player.team.sub) {
-                $('.batting-lines li.lineup').addClass('click_to_sub');
-            } else {
-                $('.batting-lines li.lineup').removeClass('click_to_sub');
-            }
         };
 
         $scope.selectPitch = function(pitchName) {
