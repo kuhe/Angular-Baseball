@@ -197,7 +197,7 @@
                     </div>
                 </div>
             </div>
-            <div class='text-center steal-controls' ng-show='y.humanBatting() && y.field.getLeadRunner()'>
+            <div class='text-center steal-controls' ng-show='y.humanBatting() && y.field.getLeadRunner() && !y.opponentConnected'>
                 <button class='btn pointer small' ng-click='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNER_GO'
                         ng-class='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNER_GO}'>
                     {{ t('Steal') }}

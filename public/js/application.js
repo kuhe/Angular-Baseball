@@ -771,7 +771,7 @@ Game.prototype = {
             // stealing bases
             var field = this.field;
             var team = this.batter.team;
-            if (team.stealAttempt === _baseballModelTeam.Team.RUNNER_GO || team.stealAttempt === _baseballModelTeam.Team.RUNNERS_DISCRETION) {
+            if ((team.stealAttempt === _baseballModelTeam.Team.RUNNER_GO || team.stealAttempt === _baseballModelTeam.Team.RUNNERS_DISCRETION) && !this.opponentConnected) {
                 var thief = field.getLeadRunner();
                 if (thief instanceof _baseballModelPlayer.Player) {
                     switch (thief) {
