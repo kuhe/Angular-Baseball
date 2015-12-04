@@ -1310,6 +1310,38 @@ Player.prototype = {
         delete this.atBatObjects;
         this.getAtBats();
     },
+    substitute: function substitute(player) {
+        if (player.team !== this.team) return false;
+        var order = player.order,
+            position = player.position;
+        player.team.substituted.push(player);
+        player.team.positions[position] = this;
+        player.team.lineup[order] = this;
+
+        this.position = position;
+        this.order = order;
+
+        var game = this.team.game;
+        if (game.pitcher === player) game.pitcher = this;
+        if (game.batter === player) game.batter = this;
+        if (game.deck === player) game.deck = this;
+        if (game.hole === player) game.hole = this;
+
+        var field = game.field;
+        if (field.first === player) field.first = this;
+        if (field.second === player) field.second = this;
+        if (field.third === player) field.third = this;
+
+        var bench = this.team.bench,
+            bullpen = this.team.bullpen;
+        if (bench.indexOf(this) > -1) {
+            bench.splice(bench.indexOf(this), 1);
+        }
+        if (bullpen.indexOf(this) > -1) {
+            bullpen.splice(bullpen.indexOf(this), 1);
+        }
+        game.log.noteSubstitution(this, player);
+    },
     resetStats: function resetStats() {
         var gamesIntoSeason = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
 
@@ -1411,6 +1443,13 @@ Player.prototype = {
                 obp: null,
                 getSLG: function getSLG() {
                     return (this.h - this['2b'] - this['3b'] - this.hr + 2 * this['2b'] + 3 * this['3b'] + 4 * this.hr) / this.ab;
+                },
+                getSlash: function getSlash() {
+                    this.slash = this.slash || [this.getBA(), this.getOBP(), this.getSLG()].map(function (x) {
+                        if (x < 1) return (x + '0000').slice(1, 5);
+                        return (x + '0000').slice(0, 5);
+                    }).join('/');
+                    return this.slash;
                 },
                 slg: null,
                 pa: pa,
@@ -1580,6 +1619,12 @@ Player.prototype = {
     getOrder: function getOrder() {
         return (0, _baseballUtility_utils.text)([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
     },
+    /**
+     * to ease comparison in Angular
+     */
+    toString: function toString() {
+        return this.name + ' #' + this.number;
+    },
     eye: {},
     fatigue: 0,
     name: '',
@@ -1614,6 +1659,7 @@ Team.RUNNER_HOLD = 'hold';
 Team.prototype = {
     constructor: Team,
     init: function init(game) {
+        this.substituted = [];
         this.pickName();
         this.lineup = [];
         this.bench = [];
@@ -2115,6 +2161,7 @@ Umpire.prototype = {
         game.pitcher = game.teams[defense].positions.pitcher;
         game.log.noteBatter(game.batter);
         game.autoPitchSelect();
+        game.field.positions = team.positions;
     },
     says: 'Play ball!',
     game: null
@@ -4874,6 +4921,9 @@ Log.prototype = {
     noteStealAttempt: function noteStealAttempt(thief, success, base) {
         return _baseballUtilityText.text.space() + thief.getName() + _baseballUtilityText.text.comma() + (success ? (0, _baseballUtilityText.text)('stolen base') : (0, _baseballUtilityText.text)('caught stealing')) + _baseballUtilityText.text.space() + '(' + _baseballUtilityText.text.baseShortName(base) + ')' + _baseballUtilityText.text.stop();
     },
+    noteSubstitution: function noteSubstitution(sub, player) {
+        return this.note(_baseballUtilityText.text.substitution(sub, player, 'e'), _baseballUtilityText.text.substitution(sub, player, 'n'));
+    },
     getPlateAppearanceResult: function getPlateAppearanceResult(game) {
         var r = game.swingResult;
         var record = '';
@@ -5240,7 +5290,9 @@ var text = function text(phrase, override) {
 
             'Opponent connected': '相手選手見参',
             'Click Here': 'ここにクリック',
-            'Play against Team Japan': '日本代表挑戦'
+            'Play against Team Japan': '日本代表挑戦',
+
+            'Substituted': '交代'
         },
         e: {
             empty: '-',
@@ -5248,6 +5300,33 @@ var text = function text(phrase, override) {
         }
     })[override ? override : text.mode][phrase];
     return string ? string : phrase;
+};
+
+text.substitution = function (sub, player, mode) {
+    var originalMode = text.mode;
+    mode = mode || text.mode;
+    var order = ({
+        0: text(' 1st', mode),
+        1: text(' 2nd', mode),
+        2: text(' 3rd', mode),
+        3: text(' 4th', mode),
+        4: text(' 5th', mode),
+        5: text(' 6th', mode),
+        6: text(' 7th', mode),
+        7: text(' 8th', mode),
+        8: text(' 9th', mode)
+    })[player.order];
+    var position = text.fielderShortName(player.position, mode);
+
+    if (mode === 'n') {
+        text.mode = 'n';
+        var output = sub.getName() + text.comma() + player.getName() + 'の交代' + text.comma() + order + '(' + position + ')';
+    } else {
+        text.mode = 'n';
+        output = sub.getName() + ' replaces ' + player.getName() + ' at ' + position + ', batting' + order;
+    }
+    text.mode = originalMode;
+    return output;
 };
 
 text.getBattersEye = function (game) {
@@ -5275,8 +5354,9 @@ text.baseShortName = function (base) {
     return base;
 };
 
-text.fielderShortName = function (fielder) {
-    if (text.mode == 'n') {
+text.fielderShortName = function (fielder, override) {
+    var mode = override || text.mode;
+    if (mode === 'n') {
         return ({
             'first': '一',
             'second': '二',
@@ -5743,6 +5823,27 @@ IndexController = function($scope, socket) {
                 } else {
                     glove.show();
                 }
+            }
+        };
+
+        $scope.clickLineup = function(player) {
+            if (player.team.sub) {
+                var sub = player.team.sub;
+                player.team.sub = null;
+                $('.batting-lines li.lineup').removeClass('click_to_sub');
+                return sub.substitute(player);
+            }
+            player.team.expanded = (player.team.expanded == player ? null : player);
+        };
+        $scope.selectSubstitute = function(player) {
+            if (game.humanControl === 'home' && player.team !== game.teams.home) return;
+            if (game.humanControl === 'away' && player.team !== game.teams.away) return;
+            player.team.sub = (player.team.sub === player ? null : player);
+            // stack size exceeded in ng-class
+            if (player.team.sub) {
+                $('.batting-lines li.lineup').addClass('click_to_sub');
+            } else {
+                $('.batting-lines li.lineup').removeClass('click_to_sub');
             }
         };
 

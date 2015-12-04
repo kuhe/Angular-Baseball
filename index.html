@@ -163,6 +163,8 @@
                     <rating-block rating-block='' rating='25'></rating-block> : 「まあ、頑張ってね」属性
                     <br/>
                     <span class="glyphicon glyphicon-chevron-up"></span> : ヒーロー選手
+                    <br>
+                    <strong>+</strong> : {{ t('RBI') }}
                 </ul>
             </div>
         </section>
@@ -380,12 +382,12 @@
     </div>
     <div class='clear'></div>
     <div class='col-lg-12 batting-lines'>
-        <ul class='list-group col-lg-6' ng-repeat='team in [y.teams.away, y.teams.home] track by $index'>
+        <ul class='list-group col-lg-6' ng-repeat='team in [y.teams.away, y.teams.home] track by $index' ng-class='{click_to_sub: !!team.sub}'>
             <li class='list-group-item team-name'>
                 {{team.getName()}}
             </li>
-            <li class='list-group-item pointer' ng-repeat="(order, player) in team.lineup track by $index"
-                ng-click='player.team.expanded = player.team.expanded == player ? null : player'>
+            <li class='list-group-item pointer lineup' ng-repeat="(order, player) in team.lineup track by $index"
+                ng-click='clickLineup(player)' >
                 {{abbreviatePosition(player.position)}}<rating-block rating-block='' rating='player.skill.defense.fielding'></rating-block> &raquo;
                 <strong>{{player.getName()}}</strong> ({{'#'+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
                 <span class='pull-right'>
@@ -426,6 +428,32 @@
                         {{ t('Speed :') }} <rating-block rating-block='' rating='player.skill.offense.speed'></rating-block>
                     </span>
                 </section>
+            </li>
+            <li class='list-group-item pointer' ng-repeat='(key, player) in team.bench track by $index'
+                ng-click='selectSubstitute(player)' ng-class='{selected_sub: team.sub.toString() === player.toString()}'>
+                <strong>{{player.getName()}}</strong> ({{'#'+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
+                <span class='pull-right'>
+                    <!--<span class='col-md-3'>-->
+                        <!--{{ player.stats.batting.getSlash() }}-->
+                    <!--</span>-->
+                    <span>
+                        {{ t('Eye :') }} <rating-block rating-block='' rating='player.skill.offense.eye'></rating-block>
+                    </span>
+                    <span>
+                        {{ t('Power :') }} <rating-block rating-block='' rating='player.skill.offense.power'></rating-block>
+                    </span>
+                    <span>
+                        {{ t('Speed :') }} <rating-block rating-block='' rating='player.skill.offense.speed'></rating-block>
+                    </span>
+                </span>
+                <div class='row'></div>
+            </li>
+            <li class='list-group-item pointer' ng-repeat='(key, player) in team.substituted track by $index'>
+                <strong>{{player.getName()}}</strong> ({{'#'+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
+                <span class='pull-right'>
+                    {{ t('Substituted') }}
+                </span>
+                <div class='row'></div>
             </li>
         </ul>
     </div>

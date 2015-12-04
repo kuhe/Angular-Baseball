@@ -217,6 +217,12 @@ button.btn.disabled {
   height: 40px;
   min-height: 40px;
 }
+.batting-lines .list-group-item.selected_sub {
+  border-left: 4px solid #dd0000;
+}
+.batting-lines .click_to_sub .list-group-item.lineup {
+  border-left: 4px solid #e2df79;
+}
 .main-area {
   padding: 10px 30px !important;
 }
