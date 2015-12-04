@@ -4477,7 +4477,7 @@ coach.makePlayer(murata, 'Shuichi', 'Murata', '村田', '修一', 80, { eye: 82,
 
 coach.makePlayer(matsui, 'Hideki', 'Matsui', '秀樹', '松井', 75, { eye: 104, power: 130, speed: 68 }, { catching: 40, fielding: 85, throwing: 70, speed: 60 }, 'left', 'right', 55);
 
-coach.makePlayer(ichiro, 'Ichiro', 'Suzuki', 'イチロー', '', 115, { eye: 115, power: 48, speed: 99 }, { catching: 80, fielding: 110, throwing: 135, speed: 120 }, 'left', 'right', 51);
+coach.makePlayer(ichiro, '', 'Ichiro', 'イチロー', '', 115, { eye: 115, power: 48, speed: 99 }, { catching: 80, fielding: 110, throwing: 135, speed: 120 }, 'left', 'right', 51);
 
 coach.makePlayer(inaba, 'Atsunori', 'Inaba', '稲葉', '篤紀', 80, { eye: 92, power: 95, speed: 75 }, { catching: 50, fielding: 95, throwing: 95, speed: 90 }, 'right', 'right', 41);
 
