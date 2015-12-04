@@ -9,9 +9,19 @@ IndexController = function($scope, socket) {
     $scope.mode = function(setMode) {
         if (setMode) {
             text.mode = setMode;
+            if (localStorage) {
+                localStorage.__$yakyuuaikoukai_text_mode = setMode;
+            }
         }
         return text.mode;
     };
+
+    if (localStorage) {
+        var mode = localStorage.__$yakyuuaikoukai_text_mode;
+        if (mode === 'e' || mode === 'n') {
+            $scope.mode(mode);
+        }
+    }
 
     $scope.teamJapan = function() {
         var provider = new Baseball.teams.Provider;
@@ -39,7 +49,7 @@ IndexController = function($scope, socket) {
         var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random()*47);
         if (typeof io !== 'undefined') {
             socket.game = game;
-            $scope.socket = io(window.location.hostname + ':64321', {
+            $scope.socket = io(/*window.location.hostname*/'http://georgefu.info' + ':64321', {
                 reconnection: false
             });
             $scope.socketService = socket;

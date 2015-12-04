@@ -81,11 +81,10 @@
             <div class='col-md-4'>
                 <p ng-show='mode() == "e"'>
                     To restart into a new game simply reload the page. You can also share the URL of your game to play
-                    against a friend. This is not available on github.io and may not be available depending on server status.
+                    against a friend. This may not be available depending on server status.
                 </p>
                 <p ng-show='mode() == "n"'>
                     新しい試合を再開したいときにウエブページをリロードしてください。一人の友達も同じURLに誘えば、相手としては勤められています。
-                    でも、マルチプレイはgithub.ioで使用不能です。
                 </p>
             </div>
         </div>
@@ -198,10 +197,25 @@
                     </div>
                 </div>
             </div>
+            <div class='text-center steal-controls' ng-show='y.humanBatting() && y.field.getLeadRunner()'>
+                <button class='btn pointer small' ng-click='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNER_GO'
+                        ng-class='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNER_GO}'>
+                    {{ t('Steal') }}
+                </button>
+                <button class='btn pointer small' ng-click='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNERS_DISCRETION'
+                        ng-class='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNERS_DISCRETION}'>
+                    {{ t('Opportunistic') }}
+                </button>
+                <button class='btn pointer small' ng-click='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNER_HOLD'
+                        ng-class='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNER_HOLD}'>
+                    {{ t('Hold') }}
+                </button>
+            </div>
             <aside class='left image-panel' ng-style='{ backgroundImage: imagePanel.left }'></aside>
             <aside class='right image-panel' ng-style='{ backgroundImage: imagePanel.right }'></aside>
         </div>
-        <div class='col-md-4'></div>
+        <div class='col-md-4'>
+        </div>
     </div>
     <hr>
     <div class='main-area noselect row'>
