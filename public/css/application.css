@@ -887,6 +887,7 @@ aside.image-panel.right {
   height: 290px;
   transform: rotateX(0deg);
   z-index: -8;
+  display: none;
 }
 .main-area .field .dirt {
   bottom: -130px;
