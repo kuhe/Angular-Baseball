@@ -108,18 +108,7 @@ IndexController = function($scope, socket) {
             $scope.showMessage = true;
         }
         if (!quickMode || quickMode === 7) {
-            var current = game.timeOfDay.h = 0,
-                target = game.startTime.h;
-            var delay = 100,
-                interval = 200,
-                timeInterval = 0.5; // hours
-            while (current < target) {
-                current += 0.5;
-                setTimeout(function() {
-                    game.passMinutes(60 * timeInterval);
-                }, delay);
-                delay += interval;
-            }
+            Animator.loop.setTargetTimeOfDay(game.startTime.h, game.startTime.m);
         }
     };
 

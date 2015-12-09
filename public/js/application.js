@@ -498,7 +498,7 @@ Game.prototype = {
             time.m = parseInt(time.m) - 60;
             time.h = (parseInt(time.h) + 1) % 24;
         }
-        if (!_baseballServices_services.Animator.console) _baseballServices_services.Animator.loop.setTimeOfDay(time.h, time.m);
+        if (!_baseballServices_services.Animator.console) _baseballServices_services.Animator.loop.setTargetTimeOfDay(time.h, time.m);
     },
     getInning: function getInning() {
         return _baseballUtility_utils.text.mode == 'n' ? this.inning + (this.half == 'top' ? 'オモテ' : 'ウラ') : this.half.toUpperCase() + ' ' + this.inning;
@@ -2262,6 +2262,10 @@ var Loop = (function () {
         this.elementClass = elementClass;
         this.main();
         window.loop = this;
+        this.timeOfDay = {
+            h: 0,
+            m: 0
+        };
     }
 
     /**
@@ -2314,12 +2318,50 @@ var Loop = (function () {
         }
 
         /**
+         * @param addition
+         */
+    }, {
+        key: 'addMinutes',
+        value: function addMinutes(addition) {
+            var hours = this.timeOfDay.h,
+                minutes = this.timeOfDay.m;
+            minutes += addition;
+            while (minutes >= 60) {
+                minutes -= 60;
+                hours += 1;
+                hours %= 24;
+            }
+            this.setTimeOfDay(hours, minutes);
+        }
+
+        /**
+         * @param hours
+         * @param minutes
+         * gradual transition
+         */
+    }, {
+        key: 'setTargetTimeOfDay',
+        value: function setTargetTimeOfDay(hours, minutes) {
+            if (this.background) {
+                var sun = this.background.sun;
+            } else {
+                sun = this.sun;
+            }
+            sun.setTargetTime(hours, minutes);
+        }
+
+        /**
          * @param hours {Number} 0-24
          * @param minutes {Number} 0-60
+         * instant transition
          */
     }, {
         key: 'setTimeOfDay',
         value: function setTimeOfDay(hours, minutes) {
+            this.timeOfDay = {
+                h: hours,
+                m: minutes
+            };
             if (this.background) {
                 var sky = this.background.sky,
                     sun = this.background.sun;
@@ -2338,7 +2380,8 @@ var Loop = (function () {
             } else {
                 sky.uniforms.inclination = 0.39;
             }
-
+            sun.time.h = hours;
+            sun.time.m = minutes;
             sun.derivePosition(sky);
             var luminosity = (-0.5 + Math.max(Math.abs(1.25 - azimuth), Math.abs(0.25 - azimuth))) * 2;
             _baseballServicesAnimator.Animator.setLuminosity(0.1 + luminosity / 1.4);
@@ -3709,9 +3752,23 @@ var Sun = (function (_AbstractMesh) {
         if (loop instanceof _Loop.Loop) {
             this.join(loop);
         }
+        this.targetTime = {
+            h: 0,
+            m: 0
+        };
+        this.time = {
+            h: 0,
+            m: 0
+        };
     }
 
     _createClass(Sun, [{
+        key: 'setTargetTime',
+        value: function setTargetTime(hours, minutes) {
+            this.targetTime.h = hours;
+            this.targetTime.m = minutes;
+        }
+    }, {
         key: 'getMesh',
         value: function getMesh() {
             var sun = new THREE.Mesh(new THREE.SphereGeometry(20000, 16, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true }));
@@ -3748,7 +3805,17 @@ var Sun = (function (_AbstractMesh) {
         }
     }, {
         key: 'animate',
-        value: function animate() {}
+        value: function animate() {
+            if (this.time.h !== this.targetTime.h || this.time.m !== this.targetTime.m) {
+                this.loop.addMinutes(1);
+                this.time.m += 1;
+                if (this.time.m >= 60) {
+                    this.time.h++;
+                    this.time.m -= 60;
+                    this.time.h %= 24;
+                }
+            }
+        }
     }]);
 
     return Sun;
@@ -6045,18 +6112,7 @@ IndexController = function($scope, socket) {
             $scope.showMessage = true;
         }
         if (!quickMode || quickMode === 7) {
-            var current = game.timeOfDay.h = 0,
-                target = game.startTime.h;
-            var delay = 100,
-                interval = 200,
-                timeInterval = 0.5; // hours
-            while (current < target) {
-                current += 0.5;
-                setTimeout(function() {
-                    game.passMinutes(60 * timeInterval);
-                }, delay);
-                delay += interval;
-            }
+            Animator.loop.setTargetTimeOfDay(game.startTime.h, game.startTime.m);
         }
     };
 
