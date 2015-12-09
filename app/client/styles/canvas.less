@@ -1,3 +1,7 @@
+.container {
+    width: 100%;
+}
+
 .webgl-container {
     width: 100%;
     display: block;
@@ -12,10 +16,21 @@
     overflow: hidden;
 }
 
+.under-canvas {
+    background: transparent;
+    border: none;
+    height: 1px;
+    display: block;
+    z-index: -2;
+}
+.over-canvas {
+    z-index: 0;
+}
+
 .webgl-bg-container {
     .webgl-container;
 //    overflow: visible;
-    z-index: 0;
+    z-index: -1;
 }
 
 .input-area {

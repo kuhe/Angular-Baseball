@@ -6,9 +6,9 @@ A game of one of the top five bat-based sports! Namely, baseball! Now in JavaScr
 Click on and around the strike zone to pitch/bat (click on the outer edge to not swing). Locate your pitches well to draw groundouts, easy pop flies,
 and strikeouts from opposing batters, and use your batter's eye to hit the ball squarely in order to avoid the same.
 
-Demo version with single player only at [kuhe.github.io](http://kuhe.github.io)
+Hosted at [georgefu.info/y/](http://georgefu.info/y)
 
-Full version with multi-player at [georgefu.info/y/](http://georgefu.info/y)
+Also hosted at [kuhe.github.io](http://kuhe.github.io)
 
 todo :
 

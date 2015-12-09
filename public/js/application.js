@@ -45,7 +45,7 @@ AtBat.prototype.RBI_INDICATOR = '+';
 
 exports.AtBat = AtBat;
 
-},{"baseball/Utility/Log":31}],2:[function(require,module,exports){
+},{"baseball/Utility/Log":32}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -426,7 +426,7 @@ Field.prototype = {
 
 exports.Field = Field;
 
-},{"baseball/Model/Player":5,"baseball/Services/_services":27}],3:[function(require,module,exports){
+},{"baseball/Model/Player":5,"baseball/Services/_services":28}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -463,8 +463,8 @@ Game.prototype = {
     init: function init(m) {
         this.reset();
         this.startTime = {
-            h: ('00' + (Math.random() * 8 + 10 | 0)).slice(-2),
-            m: ('00' + (Math.random() * 60 | 0)).slice(-2)
+            h: Math.random() * 8 + 10 | 0,
+            m: Math.random() * 60 | 0
         };
         this.timeOfDay = {
             h: this.startTime.h,
@@ -488,14 +488,17 @@ Game.prototype = {
         }
         this.autoPitchSelect();
         _baseballServices_services.Animator.init();
+        _baseballServices_services.Animator.loop.setTimeOfDay(0, 0);
     },
     passMinutes: function passMinutes(minutes) {
-        this.timeOfDay.m = ('00' + (parseInt(this.timeOfDay.m) + parseInt(minutes))).slice(-2);
-        if (parseInt(this.timeOfDay.m) >= 60) {
-            this.timeOfDay.m = ('00' + parseInt(this.timeOfDay.m) % 60).slice(-2);
-            this.timeOfDay.h = ('00' + (parseInt(this.timeOfDay.h) + 1) % 24).slice(-2);
+        var time = this.timeOfDay;
+        time.m = parseInt(time.m);
+        time.m += parseInt(minutes);
+        while (time.m >= 60) {
+            time.m = parseInt(time.m) - 60;
+            time.h = (parseInt(time.h) + 1) % 24;
         }
-        _baseballServices_services.Animator.setLuminosity(1 - Math.abs(12 - this.timeOfDay.h) / 12);
+        _baseballServices_services.Animator.loop.setTimeOfDay(time.h, time.m);
     },
     getInning: function getInning() {
         return _baseballUtility_utils.text.mode == 'n' ? this.inning + (this.half == 'top' ? 'オモテ' : 'ウラ') : this.half.toUpperCase() + ' ' + this.inning;
@@ -1144,7 +1147,7 @@ Game.prototype = {
 
 exports.Game = Game;
 
-},{"baseball/Model/Field":2,"baseball/Model/Player":5,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":27,"baseball/Utility/Log":31,"baseball/Utility/_utils":32}],4:[function(require,module,exports){
+},{"baseball/Model/Field":2,"baseball/Model/Player":5,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":28,"baseball/Utility/Log":32,"baseball/Utility/_utils":33}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1246,7 +1249,7 @@ Manager.prototype = {
 
 exports.Manager = Manager;
 
-},{"baseball/Services/_services":27}],5:[function(require,module,exports){
+},{"baseball/Services/_services":28}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1635,7 +1638,7 @@ Player.prototype = {
 
 exports.Player = Player;
 
-},{"baseball/Model/_models":8,"baseball/Services/_services":27,"baseball/Utility/_utils":32}],6:[function(require,module,exports){
+},{"baseball/Model/_models":8,"baseball/Services/_services":28,"baseball/Utility/_utils":33}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1706,7 +1709,7 @@ Team.prototype = {
 
 exports.Team = Team;
 
-},{"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Utility/_utils":32}],7:[function(require,module,exports){
+},{"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Utility/_utils":33}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2169,7 +2172,7 @@ Umpire.prototype = {
 
 exports.Umpire = Umpire;
 
-},{"baseball/Model/Player":5,"baseball/Utility/_utils":32}],8:[function(require,module,exports){
+},{"baseball/Model/Player":5,"baseball/Utility/_utils":33}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2231,6 +2234,10 @@ var _meshSun = require('./mesh/Sun');
 
 var _sceneLighting = require('./scene/lighting');
 
+var _ShadersSkyShader = require('./Shaders/SkyShader');
+
+var _baseballServicesAnimator = require('baseball/Services/Animator');
+
 /**
  * the constants should be tuned so that the camera coincides with the DOM's strike zone overlay
  * @type {number}
@@ -2251,6 +2258,7 @@ var Loop = (function () {
     function Loop(elementClass) {
         _classCallCheck(this, Loop);
 
+        (0, _ShadersSkyShader.loadSkyShader)();
         this.elementClass = elementClass;
         this.main();
         window.loop = this;
@@ -2290,11 +2298,11 @@ var Loop = (function () {
                 var THREE = this.THREE;
 
                 var scene = this.scene = new THREE.Scene();
-                scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
+                scene.fog = new THREE.FogExp2(0x624E46, 0.002);
                 this.attach();
                 this.lighting = _sceneLighting.lighting;
                 _sceneLighting.lighting.addTo(scene);
-                var camera = this.camera = new THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 1000000000);
+                var camera = this.camera = new THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 1000000);
 
                 this.target = new THREE.Vector3(0, 0, -60.5);
                 this._target = new THREE.Vector3(0, 0, -60.5);
@@ -2303,6 +2311,37 @@ var Loop = (function () {
                 this.resetCamera();
                 this.loop();
             }
+        }
+
+        /**
+         * @param hours {Number} 0-24
+         * @param minutes {Number} 0-60
+         */
+    }, {
+        key: 'setTimeOfDay',
+        value: function setTimeOfDay(hours, minutes) {
+            if (this.background) {
+                var sky = this.background.sky,
+                    sun = this.background.sun;
+            } else {
+                sky = this.sky;
+                sun = this.sun;
+            }
+            if (hours < 7.5) {
+                hours += 24;
+            }
+            var azimuth = (hours - 7.5) / 24 + minutes / 60 / 24;
+            sky.uniforms.azimuth = azimuth;
+
+            if (azimuth > 0.5) {
+                sky.uniforms.inclination = 0.48;
+            } else {
+                sky.uniforms.inclination = 0.39;
+            }
+
+            sun.derivePosition(sky);
+            var luminosity = (-0.5 + Math.max(Math.abs(1.25 - azimuth), Math.abs(0.25 - azimuth))) * 2;
+            _baseballServicesAnimator.Animator.setLuminosity(0.1 + luminosity / 1.4);
         }
 
         /**
@@ -2317,8 +2356,14 @@ var Loop = (function () {
             new _meshGrass.Grass().join(this);
             new _meshGrass.Grass(this, true);
             new _meshBattersEye.BattersEye().join(this);
-            new _meshSky.Sky().join(this);
-            new _meshSun.Sun().join(this);
+            var sun = new _meshSun.Sun(),
+                sky = new _meshSky.Sky();
+            sun.derivePosition(sky);
+            sky.join(this);
+            sun.join(this);
+
+            this.sky = sky;
+            this.sun = sun;
 
             new _meshWall.Wall(this, -30);
             new _meshWall.Wall(this, -15);
@@ -2390,7 +2435,7 @@ var Loop = (function () {
         value: function onResize() {
             var element = document.getElementsByClassName(this.elementClass)[0];
             this.camera.aspect = this.getAspect();
-            this.camera.fov = 90 - 30 * (element.offsetWidth / 1000);
+            this.camera.fov = Math.max(90 - 30 * (element.offsetWidth / 1200), 55);
             this.camera.updateProjectionMatrix();
             this.setSize(this.renderer);
         }
@@ -2565,7 +2610,77 @@ Loop.prototype.constructors = {
 
 exports.Loop = Loop;
 
-},{"./mesh/Ball":11,"./mesh/Base":12,"./mesh/BattersEye":13,"./mesh/Field":14,"./mesh/Grass":15,"./mesh/HomeDirt":16,"./mesh/Mound":18,"./mesh/Sky":19,"./mesh/Sun":20,"./mesh/Wall":21,"./scene/lighting":22}],10:[function(require,module,exports){
+},{"./Shaders/SkyShader":10,"./mesh/Ball":12,"./mesh/Base":13,"./mesh/BattersEye":14,"./mesh/Field":15,"./mesh/Grass":16,"./mesh/HomeDirt":17,"./mesh/Mound":19,"./mesh/Sky":20,"./mesh/Sun":21,"./mesh/Wall":22,"./scene/lighting":23,"baseball/Services/Animator":24}],10:[function(require,module,exports){
+/**
+ * @author zz85 / https://github.com/zz85
+ *
+ * Based on "A Practical Analytic Model for Daylight"
+ * aka The Preetham Model, the de facto standard analytic skydome model
+ * http://www.cs.utah.edu/~shirley/papers/sunsky/sunsky.pdf
+ *
+ * First implemented by Simon Wallner
+ * http://www.simonwallner.at/projects/atmospheric-scattering
+ *
+ * Improved by Martin Upitis
+ * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
+ *
+ * Three.js integration by zz85 http://twitter.com/blurspline
+ */
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+            value: true
+});
+var loadSkyShader = function loadSkyShader() {
+            THREE.ShaderLib['sky'] = {
+
+                        uniforms: {
+                                    luminance: { type: "f", value: 1 },
+                                    turbidity: { type: "f", value: 2 },
+                                    reileigh: { type: "f", value: 1 },
+                                    mieCoefficient: { type: "f", value: 0.005 },
+                                    mieDirectionalG: { type: "f", value: 0.8 },
+                                    sunPosition: { type: "v3", value: new THREE.Vector3() }
+                        },
+
+                        vertexShader: ["varying vec3 vWorldPosition;", "void main() {", "vec4 worldPosition = modelMatrix * vec4( position, 1.0 );", "vWorldPosition = worldPosition.xyz;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
+
+                        fragmentShader: ["uniform sampler2D skySampler;", "uniform vec3 sunPosition;", "varying vec3 vWorldPosition;", "vec3 cameraPos = vec3(0., 0., 0.);", "// uniform sampler2D sDiffuse;", "// const float turbidity = 10.0; //", "// const float reileigh = 2.; //", "// const float luminance = 1.0; //", "// const float mieCoefficient = 0.005;", "// const float mieDirectionalG = 0.8;", "uniform float luminance;", "uniform float turbidity;", "uniform float reileigh;", "uniform float mieCoefficient;", "uniform float mieDirectionalG;", "// constants for atmospheric scattering", "const float e = 2.71828182845904523536028747135266249775724709369995957;", "const float pi = 3.141592653589793238462643383279502884197169;", "const float n = 1.0003; // refractive index of air", "const float N = 2.545E25; // number of molecules per unit volume for air at", "// 288.15K and 1013mb (sea level -45 celsius)", "const float pn = 0.035;	// depolatization factor for standard air", "// wavelength of used primaries, according to preetham", "const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);", "// mie stuff", "// K coefficient for the primaries", "const vec3 K = vec3(0.686, 0.678, 0.666);", "const float v = 4.0;", "// optical length at zenith for molecules", "const float rayleighZenithLength = 8.4E3;", "const float mieZenithLength = 1.25E3;", "const vec3 up = vec3(0.0, 1.0, 0.0);", "const float EE = 1000.0;", "const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;", "// 66 arc seconds -> degrees, and the cosine of that", "// earth shadow hack", "const float cutoffAngle = pi/1.95;", "const float steepness = 1.5;", "vec3 totalRayleigh(vec3 lambda)", "{", "return (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn));", "}",
+
+                        // see http://blenderartists.org/forum/showthread.php?321110-Shaders-and-Skybox-madness
+                        "// A simplied version of the total Reayleigh scattering to works on browsers that use ANGLE", "vec3 simplifiedRayleigh()", "{", "return 0.0005 / vec3(94, 40, 18);",
+                        // return 0.00054532832366 / (3.0 * 2.545E25 * pow(vec3(680E-9, 550E-9, 450E-9), vec3(4.0)) * 6.245);
+                        "}", "float rayleighPhase(float cosTheta)", "{	 ", "return (3.0 / (16.0*pi)) * (1.0 + pow(cosTheta, 2.0));", "//	return (1.0 / (3.0*pi)) * (1.0 + pow(cosTheta, 2.0));", "//	return (3.0 / 4.0) * (1.0 + pow(cosTheta, 2.0));", "}", "vec3 totalMie(vec3 lambda, vec3 K, float T)", "{", "float c = (0.2 * T ) * 10E-18;", "return 0.434 * c * pi * pow((2.0 * pi) / lambda, vec3(v - 2.0)) * K;", "}", "float hgPhase(float cosTheta, float g)", "{", "return (1.0 / (4.0*pi)) * ((1.0 - pow(g, 2.0)) / pow(1.0 - 2.0*g*cosTheta + pow(g, 2.0), 1.5));", "}", "float sunIntensity(float zenithAngleCos)", "{", "return EE * max(0.0, 1.0 - exp(-((cutoffAngle - acos(zenithAngleCos))/steepness)));", "}", "// float logLuminance(vec3 c)", "// {", "// 	return log(c.r * 0.2126 + c.g * 0.7152 + c.b * 0.0722);", "// }", "// Filmic ToneMapping http://filmicgames.com/archives/75", "float A = 0.15;", "float B = 0.50;", "float C = 0.10;", "float D = 0.20;", "float E = 0.02;", "float F = 0.30;", "float W = 1000.0;", "vec3 Uncharted2Tonemap(vec3 x)", "{", "return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;", "}", "void main() ", "{", "float sunfade = 1.0-clamp(1.0-exp((sunPosition.y/450000.0)),0.0,1.0);", "// luminance =  1.0 ;// vWorldPosition.y / 450000. + 0.5; //sunPosition.y / 450000. * 1. + 0.5;", "// gl_FragColor = vec4(sunfade, sunfade, sunfade, 1.0);", "float reileighCoefficient = reileigh - (1.0* (1.0-sunfade));", "vec3 sunDirection = normalize(sunPosition);", "float sunE = sunIntensity(dot(sunDirection, up));", "// extinction (absorbtion + out scattering) ", "// rayleigh coefficients",
+
+                        // "vec3 betaR = totalRayleigh(lambda) * reileighCoefficient;",
+                        "vec3 betaR = simplifiedRayleigh() * reileighCoefficient;", "// mie coefficients", "vec3 betaM = totalMie(lambda, K, turbidity) * mieCoefficient;", "// optical length", "// cutoff angle at 90 to avoid singularity in next formula.", "float zenithAngle = acos(max(0.0, dot(up, normalize(vWorldPosition - cameraPos))));", "float sR = rayleighZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));", "float sM = mieZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));", "// combined extinction factor	", "vec3 Fex = exp(-(betaR * sR + betaM * sM));", "// in scattering", "float cosTheta = dot(normalize(vWorldPosition - cameraPos), sunDirection);", "float rPhase = rayleighPhase(cosTheta*0.5+0.5);", "vec3 betaRTheta = betaR * rPhase;", "float mPhase = hgPhase(cosTheta, mieDirectionalG);", "vec3 betaMTheta = betaM * mPhase;", "vec3 Lin = pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * (1.0 - Fex),vec3(1.5));", "Lin *= mix(vec3(1.0),pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * Fex,vec3(1.0/2.0)),clamp(pow(1.0-dot(up, sunDirection),5.0),0.0,1.0));", "//nightsky", "vec3 direction = normalize(vWorldPosition - cameraPos);", "float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]", "float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]", "vec2 uv = vec2(phi, theta) / vec2(2.0*pi, pi) + vec2(0.5, 0.0);", "// vec3 L0 = texture2D(skySampler, uv).rgb+0.1 * Fex;", "vec3 L0 = vec3(0.1) * Fex;", "// composition + solar disc", "//if (cosTheta > sunAngularDiameterCos)", "float sundisk = smoothstep(sunAngularDiameterCos,sunAngularDiameterCos+0.00002,cosTheta);", "// if (normalize(vWorldPosition - cameraPos).y>0.0)", "L0 += (sunE * 19000.0 * Fex)*sundisk;", "vec3 whiteScale = 1.0/Uncharted2Tonemap(vec3(W));", "vec3 texColor = (Lin+L0);   ", "texColor *= 0.04 ;", "texColor += vec3(0.0,0.001,0.0025)*0.3;", "float g_fMaxLuminance = 1.0;", "float fLumScaled = 0.1 / luminance;     ", "float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (g_fMaxLuminance * g_fMaxLuminance)))) / (1.0 + fLumScaled); ", "float ExposureBias = fLumCompressed;", "vec3 curr = Uncharted2Tonemap((log2(2.0/pow(luminance,4.0)))*texColor);", "vec3 color = curr*whiteScale;", "vec3 retColor = pow(color,vec3(1.0/(1.2+(1.2*sunfade))));", "gl_FragColor.rgb = retColor;", "gl_FragColor.a = 1.0;", "}"].join("\n")
+            };
+
+            THREE.Sky = function () {
+
+                        var skyShader = THREE.ShaderLib["sky"];
+                        var skyUniforms = THREE.UniformsUtils.clone(skyShader.uniforms);
+
+                        var skyMat = new THREE.ShaderMaterial({
+                                    fragmentShader: skyShader.fragmentShader,
+                                    vertexShader: skyShader.vertexShader,
+                                    uniforms: skyUniforms,
+                                    side: THREE.BackSide
+                        });
+
+                        var skyGeo = new THREE.SphereBufferGeometry(450000, 32, 15);
+                        var skyMesh = new THREE.Mesh(skyGeo, skyMat);
+
+                        // Expose variables
+                        this.mesh = skyMesh;
+                        this.uniforms = skyUniforms;
+            };
+};
+
+exports.loadSkyShader = loadSkyShader;
+
+},{}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2645,7 +2760,7 @@ AbstractMesh.WORLD_BASE_Y = -4;
 
 exports.AbstractMesh = AbstractMesh;
 
-},{"../Loop":9}],11:[function(require,module,exports){
+},{"../Loop":9}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2654,7 +2769,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3022,7 +3137,7 @@ Ball.prototype.rotation = {
 
 exports.Ball = Ball;
 
-},{"../Loop":9,"./AbstractMesh":10,"./Indicator":17,"baseball/Services/Mathinator":26,"baseball/Utility/helper":34}],12:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"./Indicator":18,"baseball/Services/Mathinator":27,"baseball/Utility/helper":35}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3031,7 +3146,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3103,7 +3218,7 @@ var Base = (function (_AbstractMesh) {
 
 exports.Base = Base;
 
-},{"../Loop":9,"./AbstractMesh":10}],13:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3112,7 +3227,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3160,7 +3275,7 @@ var BattersEye = (function (_AbstractMesh) {
 
 exports.BattersEye = BattersEye;
 
-},{"../Loop":9,"./AbstractMesh":10}],14:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3169,7 +3284,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3222,7 +3337,7 @@ var Field = (function (_AbstractMesh) {
 
 exports.Field = Field;
 
-},{"../Loop":9,"./AbstractMesh":10}],15:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3231,7 +3346,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3295,7 +3410,7 @@ var Grass = (function (_AbstractMesh) {
 
 exports.Grass = Grass;
 
-},{"../Loop":9,"./AbstractMesh":10}],16:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3304,7 +3419,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3357,7 +3472,7 @@ var HomeDirt = (function (_AbstractMesh) {
 
 exports.HomeDirt = HomeDirt;
 
-},{"../Loop":9,"./AbstractMesh":10}],17:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3366,7 +3481,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3421,7 +3536,7 @@ var Indicator = (function (_AbstractMesh) {
 
 exports.Indicator = Indicator;
 
-},{"../Loop":9,"./AbstractMesh":10}],18:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3430,7 +3545,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3483,7 +3598,7 @@ var Mound = (function (_AbstractMesh) {
 
 exports.Mound = Mound;
 
-},{"../Loop":9,"./AbstractMesh":10}],19:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3492,7 +3607,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3516,26 +3631,42 @@ var Sky = (function (_AbstractMesh) {
     }
 
     _createClass(Sky, [{
+        key: 'setUniforms',
+        value: function setUniforms(uniforms) {
+            this.uniforms = uniforms;
+            var sky = this.sky;
+            for (var key in uniforms) {
+                if (uniforms.hasOwnProperty(key)) {
+                    if (!sky.uniforms[key]) {
+                        sky.uniforms[key] = uniforms[key];
+                    }
+                    if (typeof uniforms[key] === 'object') {
+                        sky.uniforms[key].value = uniforms[key].value;
+                    }
+                }
+            }
+        }
+    }, {
         key: 'getMesh',
         value: function getMesh() {
-            var uniforms = {
-                luminance: { type: "f", value: 0.2 },
+            var uniforms = this.uniforms = {
+                luminance: { type: "f", value: 1.00 },
                 turbidity: { type: "f", value: 10 },
-                reileigh: { type: "f", value: 1.5 },
+                reileigh: { type: "f", value: 2.00 },
                 mieCoefficient: { type: "f", value: 0.005 },
                 mieDirectionalG: { type: "f", value: 0.8 },
-                sunPosition: { type: "v3", value: new THREE.Vector3() }
+                sunPosition: { type: "v3", value: new THREE.Vector3() },
+                inclination: 0.18, // elevation / inclination
+                azimuth: 0.75,
+                sun: false
             };
 
-            var geometry = new THREE.SphereGeometry(100000, 32, 15);
-            var material = new THREE.ShaderMaterial({
-                vertexShader: document.getElementsByClassName('vertexShader')[0].textContent,
-                fragmentShader: document.getElementsByClassName('sky4')[0].textContent,
-                uniforms: uniforms,
-                side: THREE.BackSide
-            });
+            var sky = new THREE.Sky();
+            this.sky = sky;
+            this.mesh = sky.mesh;
 
-            this.mesh = new THREE.Mesh(geometry, material);
+            this.setUniforms(uniforms);
+
             return this.mesh;
         }
     }, {
@@ -3548,7 +3679,7 @@ var Sky = (function (_AbstractMesh) {
 
 exports.Sky = Sky;
 
-},{"../Loop":9,"./AbstractMesh":10}],20:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3557,7 +3688,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3583,14 +3714,37 @@ var Sun = (function (_AbstractMesh) {
     _createClass(Sun, [{
         key: 'getMesh',
         value: function getMesh() {
-            var sun = new THREE.Mesh(new THREE.SphereGeometry(20000, 30, 30), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true }));
-            sun.position.z = -95000;
-            sun.position.y = 2000;
-            sun.position.x = -200;
-            sun.visible = true;
+            var sun = new THREE.Mesh(new THREE.SphereGeometry(20000, 16, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true }));
+            sun.position.z = -950000; // initialize away from scene
+            sun.position.y = -100000;
+            sun.position.x = -200000;
+            sun.visible = false;
 
             this.mesh = sun;
             return this.mesh;
+        }
+
+        /**
+         * @param sky Sky
+         */
+    }, {
+        key: 'derivePosition',
+        value: function derivePosition(sky) {
+            var distance = 400000;
+            var uniforms = sky.uniforms;
+
+            var theta = Math.PI * (uniforms.inclination - 0.5);
+            var phi = 2 * Math.PI * (uniforms.azimuth - 0.5);
+
+            var mesh = this.mesh;
+
+            mesh.position.x = distance * Math.cos(phi);
+            mesh.position.y = distance * Math.sin(phi) * Math.sin(theta);
+            mesh.position.z = distance * Math.sin(phi) * Math.cos(theta);
+
+            mesh.visible = uniforms.sun;
+
+            sky.uniforms.sunPosition.value.copy(mesh.position);
         }
     }, {
         key: 'animate',
@@ -3602,7 +3756,7 @@ var Sun = (function (_AbstractMesh) {
 
 exports.Sun = Sun;
 
-},{"../Loop":9,"./AbstractMesh":10}],21:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3611,7 +3765,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -3668,7 +3822,7 @@ var Wall = (function (_AbstractMesh) {
 
 exports.Wall = Wall;
 
-},{"../Loop":9,"./AbstractMesh":10}],22:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3692,7 +3846,7 @@ var lighting = {
 
 exports.lighting = lighting;
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3996,7 +4150,7 @@ for (var fn in Animator.prototype) {
 
 exports.Animator = Animator;
 
-},{"baseball/Render/Loop":9,"baseball/Utility/helper":34,"baseball/services/_services":38}],24:[function(require,module,exports){
+},{"baseball/Render/Loop":9,"baseball/Utility/helper":35,"baseball/services/_services":39}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4214,7 +4368,7 @@ Distribution.main = function () {
 
 exports.Distribution = Distribution;
 
-},{"baseball/Utility/helper":34}],25:[function(require,module,exports){
+},{"baseball/Utility/helper":35}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4248,7 +4402,7 @@ for (var fn in Iterator.prototype) {
 
 exports.Iterator = Iterator;
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /**
  * For Math!
  * @constructor
@@ -4548,7 +4702,7 @@ for (var fn in Mathinator.prototype) {
 
 exports.Mathinator = Mathinator;
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4568,7 +4722,7 @@ exports.Distribution = _baseballServicesDistribution.Distribution;
 exports.Iterator = _baseballServicesIterator.Iterator;
 exports.Mathinator = _baseballServicesMathinator.Mathinator;
 
-},{"baseball/Services/Animator":23,"baseball/Services/Distribution":24,"baseball/Services/Iterator":25,"baseball/Services/Mathinator":26}],28:[function(require,module,exports){
+},{"baseball/Services/Animator":24,"baseball/Services/Distribution":25,"baseball/Services/Iterator":26,"baseball/Services/Mathinator":27}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4604,7 +4758,7 @@ Provider.prototype.teams = {
 
 exports.Provider = Provider;
 
-},{"./TeamJapan":29}],29:[function(require,module,exports){
+},{"./TeamJapan":30}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4687,7 +4841,7 @@ samurai.lineup.map(function (player, order) {
 
 exports.samurai = samurai;
 
-},{"baseball/Model/Player":5,"baseball/Model/_models":8,"baseball/Teams/Trainer":30}],30:[function(require,module,exports){
+},{"baseball/Model/Player":5,"baseball/Model/_models":8,"baseball/Teams/Trainer":31}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4744,7 +4898,7 @@ var Trainer = (function () {
 
 exports.Trainer = Trainer;
 
-},{"baseball/Services/Iterator":25}],31:[function(require,module,exports){
+},{"baseball/Services/Iterator":26}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5215,7 +5369,7 @@ Log.prototype = {
 
 exports.Log = Log;
 
-},{"baseball/Utility/text":35}],32:[function(require,module,exports){
+},{"baseball/Utility/text":36}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5235,7 +5389,7 @@ exports.helper = _baseballUtilityHelper.helper;
 exports.Log = _baseballUtilityLog.Log;
 exports.text = _baseballUtilityText.text;
 
-},{"baseball/Utility/Log":31,"baseball/Utility/data":33,"baseball/Utility/helper":34,"baseball/Utility/text":35}],33:[function(require,module,exports){
+},{"baseball/Utility/Log":32,"baseball/Utility/data":34,"baseball/Utility/helper":35,"baseball/Utility/text":36}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5257,7 +5411,7 @@ var data = {
 
 exports.data = data;
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5292,7 +5446,7 @@ var helper = {
 
 exports.helper = helper;
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5695,7 +5849,7 @@ text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances,
 
 exports.text = text;
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5710,7 +5864,7 @@ if (typeof window == 'object') {
 
 exports.Baseball = _baseballNamespace.Baseball;
 
-},{"baseball/namespace":37}],37:[function(require,module,exports){
+},{"baseball/namespace":38}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5759,7 +5913,7 @@ Baseball.teams.Provider = _baseballTeamsProvider.Provider;
 
 exports.Baseball = Baseball;
 
-},{"baseball/Model/AtBat":1,"baseball/Model/Field":2,"baseball/Model/Game":3,"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":27,"baseball/Teams/Provider":28,"baseball/Utility/_utils":32}],38:[function(require,module,exports){
+},{"baseball/Model/AtBat":1,"baseball/Model/Field":2,"baseball/Model/Game":3,"baseball/Model/Manager":4,"baseball/Model/Player":5,"baseball/Model/Team":6,"baseball/Model/Umpire":7,"baseball/Services/_services":28,"baseball/Teams/Provider":29,"baseball/Utility/_utils":33}],39:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5779,7 +5933,7 @@ exports.Distribution = _baseballServicesDistribution.Distribution;
 exports.Iterator = _baseballServicesIterator.Iterator;
 exports.Mathinator = _baseballServicesMathinator.Mathinator;
 
-},{"baseball/Services/Animator":23,"baseball/Services/Distribution":24,"baseball/Services/Iterator":25,"baseball/Services/Mathinator":26}]},{},[36]);
+},{"baseball/Services/Animator":24,"baseball/Services/Distribution":25,"baseball/Services/Iterator":26,"baseball/Services/Mathinator":27}]},{},[37]);
 
 IndexController = function($scope, socket) {
     var text = Baseball.util.text;
@@ -5891,13 +6045,15 @@ IndexController = function($scope, socket) {
             $scope.showMessage = true;
         }
         if (!quickMode || quickMode === 7) {
-            game.timeOfDay.h = '00';
+            var current = game.timeOfDay.h = 0,
+                target = game.startTime.h;
             var delay = 100,
-                interval = 150;
-            while (delay < (game.startTime.h - game.timeOfDay.h) * interval) {
+                interval = 200,
+                timeInterval = 0.5; // hours
+            while (current < target) {
+                current += 0.5;
                 setTimeout(function() {
-                    game.passMinutes(60);
-                    $scope.$apply();
+                    game.passMinutes(60 * timeInterval);
                 }, delay);
                 delay += interval;
             }
