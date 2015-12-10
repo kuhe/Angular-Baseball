@@ -133,7 +133,8 @@ Field.prototype = {
                 throwingEase = fielder.skill.defense.throwing / 100;
             //reach the batted ball?
             swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle + 90, landingDistance]);
-            var interceptRating = fielder.skill.defense.speed * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.55 - 15;
+            var speedComponent = (1 + Math.sqrt(fielder.skill.defense.speed / 100)) / 2 * 100;
+            var interceptRating = speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.55 - 15;
             if (interceptRating > 0 && flyAngle > 4) {
                 //caught cleanly?
                 if (_baseballServices_services.Distribution.error(fielder)) {
@@ -1909,22 +1910,34 @@ Umpire.prototype = {
                                 case 1:
                                     if (result.error) {
                                         game.batter.atBats.push(_baseballUtility_utils.Log.prototype.REACHED_ON_ERROR);
-                                    } else {
-                                        game.batter.atBats.push(_baseballUtility_utils.Log.prototype.SINGLE);
-                                        batter.stats.batting.h++;
+                                        break;
                                     }
+                                    game.batter.atBats.push(_baseballUtility_utils.Log.prototype.SINGLE);
+                                    batter.stats.batting.h++;
                                     break;
                                 case 2:
+                                    if (result.error) {
+                                        game.batter.atBats.push(_baseballUtility_utils.Log.prototype.REACHED_ON_ERROR);
+                                        break;
+                                    }
                                     game.batter.atBats.push(_baseballUtility_utils.Log.prototype.DOUBLE);
                                     batter.stats.batting.h++;
                                     batter.stats.batting['2b']++;
                                     break;
                                 case 3:
+                                    if (result.error) {
+                                        game.batter.atBats.push(_baseballUtility_utils.Log.prototype.REACHED_ON_ERROR);
+                                        break;
+                                    }
                                     game.batter.atBats.push(_baseballUtility_utils.Log.prototype.TRIPLE);
                                     batter.stats.batting.h++;
                                     batter.stats.batting['3b']++;
                                     break;
                                 case 4:
+                                    if (result.error) {
+                                        game.batter.atBats.push(_baseballUtility_utils.Log.prototype.REACHED_ON_ERROR);
+                                        break;
+                                    }
                                     game.batter.atBats.push(_baseballUtility_utils.Log.prototype.HOMERUN);
                                     pitcher.stats.pitching.HR++;
                                     batter.stats.batting.h++;
