@@ -5526,7 +5526,7 @@ Object.defineProperty(exports, '__esModule', {
     value: true
 });
 var text = function text(phrase, override) {
-    if (!text.mode) text.mode = 'n';
+    if (!text.mode) text.mode = 'e';
     var string = ({
         n: {
             empty: '-',
