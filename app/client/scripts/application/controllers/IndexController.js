@@ -17,9 +17,9 @@ IndexController = function($scope, socket) {
     };
 
     if (localStorage) {
-        var mode = localStorage.__$yakyuuaikoukai_text_mode;
-        if (mode === 'e' || mode === 'n') {
-            $scope.mode(mode);
+        var storedMode = localStorage.__$yakyuuaikoukai_text_mode;
+        if (storedMode === 'e' || storedMode === 'n') {
+            $scope.mode(storedMode);
         }
     }
 
