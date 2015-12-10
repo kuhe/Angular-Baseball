@@ -160,6 +160,9 @@ IndexController = function($scope, socket) {
             }
         };
 
+        $scope.generateTeam = function(heroRate) {
+            $scope.y.teams.away = new Baseball.model.Team($scope.y, heroRate);
+        };
         $scope.clickLineup = function(player) {
             if (player.team.sub) {
                 var sub = player.team.sub;

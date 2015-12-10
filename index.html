@@ -297,11 +297,11 @@
                             <span ng-if="y.batter.hero" class="glyphicon glyphicon-chevron-up"></span>
                             {{ t('LHB') }}
                         </span>
-                        {{ t('Eye :') }}
+                        {{ t('Eye') }}
                         <rating-block rating-block='' rating='y.batter.skill.offense.eye'></rating-block>
-                        {{ t('Power :') }}
+                        {{ t('Power') }}
                         <rating-block rating-block='' rating='y.batter.skill.offense.power'></rating-block>
-                        {{ t('Speed :') }}
+                        {{ t('Speed') }}
                         <rating-block rating-block='' rating='y.batter.skill.offense.speed'></rating-block>
                         <span ng-show='y.batter.bats==="right"'>
                             {{ t('RHB') }}
@@ -388,7 +388,7 @@
             </li>
             <li class='list-group-item pointer lineup' ng-repeat="(order, player) in team.lineup track by $index"
                 ng-click='clickLineup(player)' >
-                {{abbreviatePosition(player.position)}}<rating-block rating-block='' rating='player.skill.defense.fielding'></rating-block> &raquo;
+                {{abbreviatePosition(player.position)}}<rating-block rating-block='' rating='player.defensiveAverage()'></rating-block> &raquo;
                 <strong>{{player.getName()}}</strong> ({{'#'+player.number}}) <span ng-if='player.hero' class='glyphicon glyphicon-chevron-up'></span>
                 <span class='pull-right'>
                     <span class='action-line' ng-repeat='atBat in player.getAtBats() track by $index'
@@ -419,13 +419,13 @@
                         <li class='col-md-1'>{{ t('SO') }} <br> {{ stats.so }}</li>
                     </ul>
                     <span>
-                        {{ t('Eye :') }} <rating-block rating-block='' rating='player.skill.offense.eye'></rating-block>
+                        {{ t('Eye') }} <rating-block rating-block='' rating='player.skill.offense.eye'></rating-block>
                     </span>
                     <span>
-                        {{ t('Power :') }} <rating-block rating-block='' rating='player.skill.offense.power'></rating-block>
+                        {{ t('Power') }} <rating-block rating-block='' rating='player.skill.offense.power'></rating-block>
                     </span>
                     <span>
-                        {{ t('Speed :') }} <rating-block rating-block='' rating='player.skill.offense.speed'></rating-block>
+                        {{ t('Speed') }} <rating-block rating-block='' rating='player.skill.offense.speed'></rating-block>
                     </span>
                 </section>
             </li>
@@ -437,13 +437,19 @@
                         <!--{{ player.stats.batting.getSlash() }}-->
                     <!--</span>-->
                     <span>
-                        {{ t('Eye :') }} <rating-block rating-block='' rating='player.skill.offense.eye'></rating-block>
+                        {{ t('Eye') }} <rating-block rating-block='' rating='player.skill.offense.eye'></rating-block>
                     </span>
                     <span>
-                        {{ t('Power :') }} <rating-block rating-block='' rating='player.skill.offense.power'></rating-block>
+                        {{ t('Power') }} <rating-block rating-block='' rating='player.skill.offense.power'></rating-block>
                     </span>
                     <span>
-                        {{ t('Speed :') }} <rating-block rating-block='' rating='player.skill.offense.speed'></rating-block>
+                        {{ t('Speed') }} <rating-block rating-block='' rating='player.skill.offense.speed'></rating-block>
+                    </span>
+                    <span>
+                        {{ t('Fielding') }} <rating-block rating-block='' rating='player.defensiveAverage()'></rating-block>
+                    </span>
+                    <span>
+                        {{ t('Pitching') }} <rating-block rating-block='' rating='player.skill.pitching'></rating-block>
                     </span>
                 </span>
                 <div class='row'></div>
@@ -465,21 +471,80 @@
         </ul>
     </div>
     <hr>
-    <div style='margin-bottom: 30px;'>
-        <button ng-click='teamJapan()' class='btn pointer'>
-            {{ t('Play against Team Japan') }}
-        </button>
-        <hr>
-        <p ng-show='mode() === "e"'>
-            Clicking here will substitute the opposing team (away) with storied representatives of Japan. (Hard Mode)
-        </p>
-        <p ng-show='mode() === "n"'>
-            向こうのチームはベンチがすごいかも。
-        </p>
-    </div>
+    <section class='difficulty-select' ng-show='!y.opponentConnected'>
+        <h4 ng-show='mode() === "e"'>Opponent Selection</h4>
+        <h4 ng-show='mode() === "n"'>挑戦</h4>
+        <div class='team'>
+            <button ng-click='generateTeam(0.03)' class='btn pull-left pointer'>
+                {{ t('Amateur Baseball Club') }}
+            </button>
+            <div class='pull-left difficulty-indicator' ng-show='mode() === "e"'>
+                (Easy)
+            </div>
+            <div class='pull-left difficulty-indicator' ng-show='mode() === "n"'>
+                （栗鼠）
+            </div>
+        </div>
+        <div class='team'>
+            <button ng-click='generateTeam(0.12)' class='btn pull-left pointer'>
+                {{ t('Amateur Baseball Team') }}
+            </button>
+            <div class='pull-left difficulty-indicator' ng-show='mode() === "e"'>
+                (Easy)
+            </div>
+            <div class='pull-left difficulty-indicator' ng-show='mode() === "n"'>
+                （猫）
+            </div>
+        </div>
+        <div class='team'>
+            <button ng-click='generateTeam(0.24)' class='btn pull-left pointer'>
+                {{ t('College Team') }}
+            </button>
+            <div class='pull-left difficulty-indicator' ng-show='mode() === "e"'>
+                (Moderate)
+            </div>
+            <div class='pull-left difficulty-indicator' ng-show='mode() === "n"'>
+                （馬）
+            </div>
+        </div>
+        <div class='team'>
+            <button ng-click='generateTeam(0.48)' class='btn pull-left pointer'>
+                {{ t('Industrial League Team') }}
+            </button>
+            <div class='pull-left difficulty-indicator' ng-show='mode() === "e"'>
+                (Hard)
+            </div>
+            <div class='pull-left difficulty-indicator' ng-show='mode() === "n"'>
+                （牛）
+            </div>
+        </div>
+        <div class='team'>
+            <button ng-click='generateTeam(0.75)' class='btn pull-left pointer'>
+                {{ t('Training Squad') }}
+            </button>
+            <div class='pull-left difficulty-indicator' ng-show='mode() === "e"'>
+                (Hard)
+            </div>
+            <div class='pull-left difficulty-indicator' ng-show='mode() === "n"'>
+                （象）
+            </div>
+        </div>
+        <div class='team'>
+            <button ng-click='teamJapan()' class='btn pull-left pointer'>
+                {{ t('Team Japan') }}
+            </button>
+            <div class='pull-left difficulty-indicator' ng-show='mode() === "e"'>
+                (Merciless)
+            </div>
+            <div class='pull-left difficulty-indicator' ng-show='mode() === "n"'>
+                （獅子）
+            </div>
+        </div>
+    </section>
     <aside class='mousehover' ng-show='message'>
         {{ message }}
     </aside>
 </div>
+<footer style='margin-bottom: 30px;'></footer>
 </body>
 </html>
