@@ -101,12 +101,6 @@
                 <button ng-click="proceedToGame(false, true); $event.stopPropagation()" class='btn pointer'>
                     {{ t('Spectate the CPU') }}
                 </button>
-                <button ng-click='proceedToGame(true, true); $event.stopPropagation()' class='btn pointer'>
-                    {{ t('Run Fast Simulation') }} &raquo;
-                </button>
-                <button ng-click='proceedToGame(7); $event.stopPropagation()' class='btn pointer'>
-                    {{ t('Play from the 7th') }} &raquo;
-                </button>
             </div>
         </section>
         <section class='baseball-beginner text-left'>
@@ -139,6 +133,16 @@
                     <br/>
                     <span class="glyphicon glyphicon-chevron-up"></span> : Elite player
                 </ul>
+                <hr/>
+                <div class='col-md-12'>
+                    <h5>...</h5>
+                    <button ng-click='proceedToGame(true, true); $event.stopPropagation()' class='btn pointer'>
+                        {{ t('Run Fast Simulation') }} &raquo;
+                    </button>
+                    <button ng-click='proceedToGame(7); $event.stopPropagation()' class='btn pointer'>
+                        {{ t('Play from the 7th') }} &raquo;
+                    </button>
+                </div>
             </div>
             <div ng-show='mode() == "n"'>
                 <h3>捕球</h3>
