@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "career": "cd app/client/node_modules/baseball && npm test"
+  }
+}
