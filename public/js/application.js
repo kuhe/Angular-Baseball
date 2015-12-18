@@ -614,15 +614,37 @@ Game.prototype = {
         });
     },
     opponentConnected: false,
+    /**
+     * variable for what to do when the batter becomes ready for a pitch
+     */
+    onBatterReady: function onBatterReady() {},
+    /**
+     * @param setValue
+     * @returns {boolean|*}
+     * trigger batter readiness passively, or actively with setValue, i.e. ready to see pitch
+     */
+    batterReady: function batterReady(setValue) {
+        if (setValue !== undefined) {
+            this.batter.ready = !!setValue;
+        }
+        if (this.batter.ready) {
+            this.onBatterReady();
+        }
+        return this.batter.ready;
+    },
     waitingCallback: function waitingCallback() {},
     awaitPitch: function awaitPitch(callback, swingResult) {
         var giraffe = this;
         if (this.opponentConnected) {
             this.waitingCallback = callback;
             this.opponentService.emitSwing(swingResult);
+            this.onBatterReady = function () {};
         } else {
-            setTimeout(function () {
+            giraffe.onBatterReady = function () {
                 giraffe.autoPitch(callback);
+            };
+            setTimeout(function () {
+                giraffe.batterReady();
             }, 5200);
         }
     },
@@ -964,6 +986,9 @@ Game.prototype = {
         this.log.record = data.log.record;
         this.log.stabilizeShortRecord();
         this.gamesIntoSeason = data.gamesIntoSeason;
+        if (this.humanPitching()) {
+            this.autoPitchSelect();
+        }
         return this;
     },
     startOpponentPitching: null, // late function
@@ -1219,6 +1244,7 @@ var Player = function Player(team, hero) {
 Player.prototype = {
     constructor: Player,
     init: function init(team, hero) {
+        this.ready = false;
         this.throws = Math.random() > 0.86 ? 'left' : 'right';
         this.bats = Math.random() > 0.75 ? 'left' : 'right';
         this.team = team;
@@ -1701,6 +1727,7 @@ Umpire.prototype = {
         var n = '一回のオモテ、' + game.teams.away.getName() + 'の攻撃対' + game.teams.home.getName() + '、ピッチャーは' + game.teams.home.positions.pitcher.getName() + '。',
             e = 'Top 1, ' + game.teams.away.name + ' offense vs. ' + game.teams.home.positions.pitcher.name + ' starting for ' + game.teams.home.name;
         game.log.note(e, n);
+        game.batter.ready = true;
         game.log.noteBatter(game.batter);
     },
     makeCall: function makeCall() {
@@ -2081,6 +2108,10 @@ Umpire.prototype = {
         var team = game.half == 'bottom' ? game.teams.home : game.teams.away;
         game.lastBatter = game.batter;
         game.batter = team.lineup[(team.nowBatting + 1) % 9];
+        game.batter.ready = false;
+        if (!game.humanBatting()) {
+            game.batter.ready = true;
+        }
         game.deck = team.lineup[(team.nowBatting + 2) % 9];
         game.hole = team.lineup[(team.nowBatting + 3) % 9];
         team.nowBatting = (team.nowBatting + 1) % 9;
@@ -5613,7 +5644,9 @@ var text = function text(phrase, override) {
             'Training Squad': '練習軍',
             'Team Japan': '日本代表',
 
-            'Substituted': '交代'
+            'Substituted': '交代',
+
+            'Batter Ready': '打撃準備'
         },
         e: {
             empty: '-',
@@ -6174,10 +6207,13 @@ IndexController = function($scope, socket) {
             if (!$scope.allowInput) {
                 return;
             }
+            if (game.humanPitching()) {
+                $scope.allowInput = false;
+                game.pitcher.windingUp = false;
+            }
             if (game.pitcher.windingUp) {
                 return;
             }
-            if (game.humanPitching()) $scope.allowInput = false;
             var offset = $('.target').offset();
             var relativeOffset = {
                 x : $event.pageX - offset.left,
@@ -6292,8 +6328,22 @@ var SocketService = function() {
             });
             socket.on('partner_disconnect', function() {
                 console.log('The opponent has disconnected');
-                game.opponentConnected = false;
                 var scope = window.s;
+                game.opponentConnected = false;
+                game.batter.ready = false;
+                if (game.stage === 'pitch' && game.humanBatting()) {
+                    game.onBatterReady = function() {
+                        game.autoPitch(function(callback) {
+                            scope.updateFlightPath(callback);
+                        });
+                    };
+                    game.batterReady();
+                }
+                if (game.stage === 'swing' && game.humanPitching()) {
+                    game.autoSwing(-20, 0, function(fn) {
+                        fn();
+                    });
+                }
                 scope.$digest();
             });
             socket.on('partner_connect', function() {

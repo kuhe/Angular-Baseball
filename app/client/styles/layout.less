@@ -16,21 +16,20 @@ button.btn {
     color: white;
     font-weight: bold;
     font-size: 16px;
-    border-top: 0;
-    border-bottom: 0;
-    border-left: 3px solid white;
-    border-right: 3px solid white;
+    line-height: 30px;
+    border: none;
     cursor: pointer;
-    padding: 5px 5px 8px;
+    padding: 0 8px;
+    border-radius: 0;
     &.play-ball {
     }
     &.small {
         font-size: 11px;
     }
-    &::before, &::after {
-        color: white;
-        content: "|";
-    }
+    //&::before, &::after {
+    //    color: white;
+    //    content: "";
+    //}
     &:focus, &:active, &:hover {
         color: white;
     }
@@ -328,6 +327,11 @@ button.btn {
     &.lefty {
         text-align: right;
     }
+}
+
+.batter-ready {
+    z-index: 10;
+    position: relative;
 }
 
 .stabilized .list-group-item {

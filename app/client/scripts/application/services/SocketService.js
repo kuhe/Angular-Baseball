@@ -44,8 +44,22 @@ var SocketService = function() {
             });
             socket.on('partner_disconnect', function() {
                 console.log('The opponent has disconnected');
-                game.opponentConnected = false;
                 var scope = window.s;
+                game.opponentConnected = false;
+                game.batter.ready = false;
+                if (game.stage === 'pitch' && game.humanBatting()) {
+                    game.onBatterReady = function() {
+                        game.autoPitch(function(callback) {
+                            scope.updateFlightPath(callback);
+                        });
+                    };
+                    game.batterReady();
+                }
+                if (game.stage === 'swing' && game.humanPitching()) {
+                    game.autoSwing(-20, 0, function(fn) {
+                        fn();
+                    });
+                }
                 scope.$digest();
             });
             socket.on('partner_connect', function() {

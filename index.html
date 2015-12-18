@@ -306,12 +306,26 @@
                             <span ng-if="y.batter.hero" class="glyphicon glyphicon-chevron-up"></span>
                             {{ t('LHB') }}
                         </span>
+                        <button class='btn small batter-ready'
+                                ng-if='y.batter.bats==="left"'
+                                ng-class='{disabled: !y.batter.ready}'
+                                ng-click='y.batterReady(!y.batter.ready)'
+                                ng-show='!y.opponentConnected && y.humanBatting()'>
+                            {{ t('Batter Ready') }}
+                        </button>
                         {{ t('Eye') }}
                         <rating-block rating-block='' rating='y.batter.skill.offense.eye'></rating-block>
                         {{ t('Power') }}
                         <rating-block rating-block='' rating='y.batter.skill.offense.power'></rating-block>
                         {{ t('Speed') }}
                         <rating-block rating-block='' rating='y.batter.skill.offense.speed'></rating-block>
+                        <button class='btn small batter-ready'
+                                ng-if='y.batter.bats==="right"'
+                                ng-class='{disabled: !y.batter.ready}'
+                                ng-click='y.batterReady(!y.batter.ready)'
+                                ng-show='!y.opponentConnected && y.humanBatting()'>
+                            {{ t('Batter Ready') }}
+                        </button>
                         <span ng-show='y.batter.bats==="right"'>
                             {{ t('RHB') }}
                             <span ng-if="y.batter.hero" class="glyphicon glyphicon-chevron-up"></span>

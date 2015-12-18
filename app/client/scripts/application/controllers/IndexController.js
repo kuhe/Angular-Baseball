@@ -196,10 +196,13 @@ IndexController = function($scope, socket) {
             if (!$scope.allowInput) {
                 return;
             }
+            if (game.humanPitching()) {
+                $scope.allowInput = false;
+                game.pitcher.windingUp = false;
+            }
             if (game.pitcher.windingUp) {
                 return;
             }
-            if (game.humanPitching()) $scope.allowInput = false;
             var offset = $('.target').offset();
             var relativeOffset = {
                 x : $event.pageX - offset.left,
