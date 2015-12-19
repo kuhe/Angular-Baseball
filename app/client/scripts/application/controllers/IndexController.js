@@ -45,7 +45,7 @@ IndexController = function($scope, socket) {
         $scope.y = new Game();
         var game = $scope.y;
         game.humanControl = spectateCpu ? 'none' : 'home';
-        game.quickMode = !!quickMode && quickMode !== 7;
+        game.console = !!quickMode && quickMode !== 7;
         var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random()*47);
         if (typeof io !== 'undefined') {
             socket.game = game;
@@ -60,7 +60,7 @@ IndexController = function($scope, socket) {
         s2.y = game;
         bindMethods();
         $('.blocking').remove();
-        if (game.humanControl == 'none' && game.quickMode) {
+        if (game.humanControl == 'none' && game.console) {
             var n = 0;
             Animator.console = true;
             game.console = true;
@@ -74,18 +74,18 @@ IndexController = function($scope, socket) {
             log('sim ended');
             game.debugOut();
         } else if (game.humanControl == 'none') {
-            var scalar = game.quickMode ? 0.05 : 1;
+            var scalar = game.console ? 0.05 : 1;
             var auto = setInterval(function() {
                 if (game.stage == 'end') {
                     clearInterval(auto);
                 }
                 game.simulatePitchAndSwing(function(callback) {
-                    game.quickMode ? void 0 : $scope.$apply();
+                    game.console ? void 0 : $scope.$apply();
                     $scope.updateFlightPath(callback);
                 });
             }, scalar*(game.field.hasRunnersOn() ? Animator.TIME_FROM_SET + 2000 : Animator.TIME_FROM_WINDUP + 2000));
         } else if (quickMode === 7 && spectateCpu === undefined) {
-            Animator.console = game.quickMode = game.console = true;
+            Animator.console = game.console = true;
             do {
                 game.simulateInput(function(callback) {
                     typeof callback == 'function' && callback();
@@ -94,17 +94,17 @@ IndexController = function($scope, socket) {
             log('sim halted in 7th');
             // todo debug 7th inning excess callbacks
             game.debugOut();
-            Animator.console = game.quickMode = game.console = false;
+            Animator.console = game.console = false;
             game.stage = 'pitch';
             game.half = 'top';
             game.humanControl = 'home';
         }
-        if (game.humanControl == 'away') {
+        if (game.humanControl === 'away') {
             game.simulateInput(function(callback) {
                 $scope.updateFlightPath(callback);
             });
         }
-        if (game.humanControl == 'home') {
+        if (game.humanControl === 'home') {
             $scope.showMessage = true;
         }
         if (!quickMode || quickMode === 7) {
