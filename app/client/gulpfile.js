@@ -37,14 +37,14 @@ var BUNDLE_SCRIPT_FILES = [
     './scripts/application/application.js'
 ];
 var EXTERNAL_SCRIPT_FILES = [
-    './bower_components/es5-shim/es5-shim.js',
-    './bower_components/es5-shim/es5-sham.js',
-    './bower_components/html5shiv/dist/html5shiv.js',
-    './bower_components/respond/src/respond.js',
+    //'./bower_components/es5-shim/es5-shim.js',
+    //'./bower_components/es5-shim/es5-sham.js',
+    //'./bower_components/html5shiv/dist/html5shiv.js',
+    //'./bower_components/respond/src/respond.js',
     './bower_components/jquery/dist/jquery.js',
     './bower_components/angular/angular.js',
-    './bower_components/angular-sanitize/angular-sanitize.js',
-    './bower_components/angular-route/angular-route.js',
+    //'./bower_components/angular-sanitize/angular-sanitize.js',
+    //'./bower_components/angular-route/angular-route.js',
     './bower_components/gsap/src/uncompressed/TweenMax.js',
     './bower_components/three.js/three.min.js'
 ];

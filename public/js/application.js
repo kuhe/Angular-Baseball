@@ -5650,7 +5650,12 @@ var text = function text(phrase, override) {
         },
         e: {
             empty: '-',
-            'Season': 'Season'
+            'Season': 'Season',
+            Fielding: 'F%',
+            Pitching: 'P',
+            Eye: 'EYE',
+            Power: 'POW',
+            Speed: 'SPD'
         }
     })[override ? override : text.mode][phrase];
     return string ? string : phrase;
