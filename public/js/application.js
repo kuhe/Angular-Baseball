@@ -3223,10 +3223,10 @@ var Base = (function (_AbstractMesh) {
                 color: 0xFFFFFF
             });
 
-            var mesh = new THREE.Mesh(new THREE.BoxGeometry(3, 0.3, 3, 8, 8, 8), material);
+            var mesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.3, 1.5, 8, 8, 8), material);
 
             mesh.rotation.x = -0 / 180 * Math.PI;
-            mesh.rotation.y = 0;
+            mesh.rotation.y = 45 / 180 * Math.PI;
             mesh.rotation.z = 0 / 180 * Math.PI;
 
             switch (this.base) {
@@ -3246,7 +3246,7 @@ var Base = (function (_AbstractMesh) {
                     mesh.position.x = 0;
                     mesh.position.z = 0;
 
-                    mesh.rotation.z = 0;
+                    mesh.rotation.y = 0;
             }
             mesh.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y + 0.5;
             mesh.position.z -= 0;
@@ -3420,7 +3420,7 @@ var Grass = (function (_AbstractMesh) {
         key: 'getMesh',
         value: function getMesh() {
             var material = new THREE.MeshLambertMaterial({
-                color: this.infield ? 0x70934A : 0x476532
+                color: this.infield ? 0x486D1F : 0x284C19
             });
 
             var mesh = new THREE.Mesh(new THREE.PlaneGeometry(this.infield ? 80 : 8000, this.infield ? 80 : 8000, 16, 16), material);
@@ -3495,14 +3495,14 @@ var HomeDirt = (function (_AbstractMesh) {
                 color: 0xDCB096
             });
 
-            var mesh = new THREE.Mesh(new THREE.PlaneGeometry(8, 8, 16, 16), material);
+            var mesh = new THREE.Mesh(new THREE.CircleGeometry(18, 32), material);
 
             mesh.rotation.x = -90 / 180 * Math.PI;
             mesh.rotation.y = 0;
             mesh.rotation.z = 45 / 180 * Math.PI;
 
             mesh.position.x = 0;
-            mesh.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y;
+            mesh.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y + 0.3;
             mesh.position.z = 0;
 
             this.mesh = mesh;
