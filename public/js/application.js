@@ -2305,7 +2305,7 @@ var Loop = (function () {
                 var THREE = this.THREE;
 
                 var scene = this.scene = new THREE.Scene();
-                scene.fog = new THREE.FogExp2(0x624E46, 0.002);
+                scene.fog = new THREE.FogExp2(0x838888, 0.002);
                 this.attach();
                 this.lighting = _sceneLighting.lighting;
                 _sceneLighting.lighting.addTo(scene);
@@ -2378,11 +2378,11 @@ var Loop = (function () {
             var azimuth = (hours - 7.5) / 24 + minutes / 60 / 24;
             sky.uniforms.azimuth = azimuth;
 
-            if (azimuth > 0.5) {
-                sky.uniforms.inclination = 0.48;
-            } else {
-                sky.uniforms.inclination = 0.39;
-            }
+            //if (azimuth > 0.5) {
+            //    sky.uniforms.inclination = 0.48;
+            //} else {
+            sky.uniforms.inclination = 0.31;
+            //}
             sun.time.h = hours;
             sun.time.m = minutes;
             sun.derivePosition(sky);
@@ -2411,10 +2411,10 @@ var Loop = (function () {
             this.sky = sky;
             this.sun = sun;
 
-            new _meshWall.Wall(this, -30);
+            new _meshWall.Wall(this, -34);
             new _meshWall.Wall(this, -15);
             new _meshWall.Wall(this, 15);
-            new _meshWall.Wall(this, 30);
+            new _meshWall.Wall(this, 34);
 
             new _meshBase.Base(this, 'first');
             new _meshBase.Base(this, 'second');
@@ -3696,11 +3696,11 @@ var Sky = (function (_AbstractMesh) {
         key: 'getMesh',
         value: function getMesh() {
             var uniforms = this.uniforms = {
-                luminance: { type: "f", value: 1.00 },
-                turbidity: { type: "f", value: 10 },
-                reileigh: { type: "f", value: 2.00 },
-                mieCoefficient: { type: "f", value: 0.005 },
-                mieDirectionalG: { type: "f", value: 0.8 },
+                luminance: { type: "f", value: 1.10 },
+                turbidity: { type: "f", value: 1 },
+                reileigh: { type: "f", value: 1.30 },
+                mieCoefficient: { type: "f", value: 0.0022 },
+                mieDirectionalG: { type: "f", value: 0.99 },
                 sunPosition: { type: "v3", value: new THREE.Vector3() },
                 inclination: 0.18, // elevation / inclination
                 azimuth: 0.75,
@@ -3798,9 +3798,9 @@ var Sun = (function (_AbstractMesh) {
 
             var mesh = this.mesh;
 
-            mesh.position.x = distance * Math.cos(phi);
+            mesh.position.z = distance * Math.cos(phi);
             mesh.position.y = distance * Math.sin(phi) * Math.sin(theta);
-            mesh.position.z = distance * Math.sin(phi) * Math.cos(theta);
+            mesh.position.x = -(distance * Math.sin(phi) * Math.cos(theta));
 
             mesh.visible = uniforms.sun;
 
