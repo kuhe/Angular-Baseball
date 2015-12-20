@@ -1,3 +1,5 @@
+@import "stacking";
+
 #override {
     td {
         padding: 4px;
@@ -48,7 +50,7 @@
 }
 
 .box-scoreboard {
-    z-index: 10;
+    z-index: @scoreboard;
     position: fixed;
     left: 5px;
     top: 5px;

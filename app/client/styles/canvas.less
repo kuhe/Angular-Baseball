@@ -1,3 +1,5 @@
+@import "stacking";
+
 .container {
     width: 100%;
 }
@@ -9,9 +11,9 @@
     top: -20px;
     left: 0;
     right: 0;
-    height: 510px;
+    height: 613px;
     margin-top: -220px; // weird
-    z-index: 6;
+    z-index: @canvas;
     background: transparent;
     overflow: hidden;
 }
@@ -21,26 +23,27 @@
     border: none;
     height: 1px;
     display: block;
-    z-index: -2;
+    z-index: @underCanvas;
 }
 .over-canvas {
-    z-index: 0;
+    z-index: @overCanvas;
 }
 
 .webgl-bg-container {
     .webgl-container;
 //    overflow: visible;
-    z-index: -1;
+    z-index: @bgCanvas;
 }
 
 .input-area {
-    cursor: none;
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    width: 100%;
+    width: 200px;
+    margin: auto;
     height: 100%;
-    z-index: 7;
+    cursor: none;
+    z-index: @interface;
 }

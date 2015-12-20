@@ -14,6 +14,8 @@
 @import "../bower_components/bootstrap/less/glyphicons";
 @import "../bower_components/bootstrap/less/buttons";
 
+@import "stacking";
+
 @font-face {
     font-family: Noto;
     //src: url("external/noto/NotoSansJP-Regular.otf") format("opentype");
@@ -43,6 +45,9 @@ button.btn {
     &.small {
         font-size: 11px;
     }
+    &.batter-ready {
+        background: #5d0e10;
+    }
     //&::before, &::after {
     //    color: white;
     //    content: "";
@@ -57,7 +62,7 @@ button.btn {
 }
 
 .language-select {
-    z-index: 7;
+    z-index: @interface;
     background: transparent;
 }
 
@@ -71,6 +76,13 @@ button.btn {
     1px -1px 0 #000,
     -1px 1px 0 #000,
     1px 1px 0 #000;
+}
+
+.text-shadow-white {
+    text-shadow: -1px -1px 0 #FFF,
+        1px -1px 0 #FFF,
+    -1px 1px 0 #FFF,
+    1px 1px 0 #FFF;
 }
 
 .batting-lines {
@@ -245,7 +257,7 @@ button.btn {
 @target: radial-gradient(circle at 100px 100px, rgba(215, 215, 215, @alpha), rgba(166, 166, 166, @alpha));
 .target {
     &.live {
-        z-index: 4;
+        z-index: @indicator;
         cursor: none;
     }
     box-shadow: 0 0 24px 6px rgba(55, 55, 55, @alpha);
@@ -302,7 +314,7 @@ button.btn {
     width: 100%;
     height: 250%;
     min-height: 800px;
-    z-index: 11;
+    z-index: @overlay;
     left: 0;
     top: 0;
     background: white;
@@ -319,7 +331,7 @@ button.btn {
 }
 
 .steal-controls {
-    z-index: 7;
+    z-index: @interface;
     position: absolute;
     bottom: -40px;
     left: 0;
@@ -347,7 +359,7 @@ button.btn {
 }
 
 .batter-ready {
-    z-index: 10;
+    z-index: @interface;
     position: relative;
 }
 

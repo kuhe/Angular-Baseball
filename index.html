@@ -357,7 +357,7 @@
         <!--Umpire: {{y.umpire.says}}-->
     <!--</div>-->
     <hr class='visible-sm visible-xs centered'>
-    <ul class='centered list-inline pitch-selection'>
+    <ul class='centered list-inline pitch-selection' ng-if='y.humanPitching()'>
         <li class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching' ng-click="y.humanPitching() && selectPitch(name)">
             <span>
                 <button class='pointer btn small' ng-class='{disabled: y.pitchInFlight.name !== name}'>
@@ -368,6 +368,21 @@
                 <rating-block rating-block='' rating='pitch.velocity'></rating-block>
                 <rating-block rating-block='' rating='pitch.break'></rating-block>
             </span>
+        </li>
+        <br class='visible-xs'/>
+        <li class='pitch-selection-label'>
+            {{ t('Control') }} / {{ t('Velocity') }} / {{ t('Break') }}
+        </li>
+    </ul>
+    <ul class='centered list-inline pitch-selection' ng-if='!y.humanPitching()'>
+        <li class='pointer' ng-repeat='(name, pitch) in y.pitcher.pitching'>
+                <span class='pointer'>
+                    {{ t(name) }}
+                </span>
+                <br>
+                <rating-block rating-block='' rating='pitch.control'></rating-block>
+                <rating-block rating-block='' rating='pitch.velocity'></rating-block>
+                <rating-block rating-block='' rating='pitch.break'></rating-block>
         </li>
         <br class='visible-xs'/>
         <li class='pitch-selection-label'>

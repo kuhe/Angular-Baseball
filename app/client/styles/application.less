@@ -7,6 +7,7 @@
 @import "chalk";
 @import "canvas";
 @import "field";
+@import "stacking";
 
 .rating-block {
     margin: 0 6px -1px;
@@ -43,6 +44,10 @@
 }
 
 .pitch-selection {
+    position: relative;
+    z-index: @interface;
+    color: black;
+    .text-shadow-white;
     .rating-block {
         margin: 0 -1px -1px;
     }

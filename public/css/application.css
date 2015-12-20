@@ -3331,6 +3331,9 @@ button.btn {
 button.btn.small {
   font-size: 11px;
 }
+button.btn.batter-ready {
+  background: #5d0e10;
+}
 button.btn:focus,
 button.btn:active,
 button.btn:hover {
@@ -3341,7 +3344,7 @@ button.btn.disabled {
   cursor: auto;
 }
 .language-select {
-  z-index: 7;
+  z-index: 10;
   background: transparent;
 }
 .opponent-indicator {
@@ -3350,6 +3353,9 @@ button.btn.disabled {
 }
 .text-shadow {
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+.text-shadow-white {
+  text-shadow: -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF, 1px 1px 0 #FFF;
 }
 .batting-lines .list-group-item {
   min-height: 3em;
@@ -3531,7 +3537,7 @@ button.btn.disabled {
   perspective: 100px;
 }
 .target.live {
-  z-index: 4;
+  z-index: 9;
   cursor: none;
 }
 .target.pitching {
@@ -3574,7 +3580,7 @@ button.btn.disabled {
   width: 100%;
   height: 250%;
   min-height: 800px;
-  z-index: 11;
+  z-index: 30;
   left: 0;
   top: 0;
   background: white;
@@ -3590,7 +3596,7 @@ button.btn.disabled {
   border: 2px solid black;
 }
 .steal-controls {
-  z-index: 7;
+  z-index: 10;
   position: absolute;
   bottom: -40px;
   left: 0;
@@ -3729,7 +3735,7 @@ aside.image-panel.right {
   height: 120px;
 }
 .box-scoreboard {
-  z-index: 10;
+  z-index: 20;
   position: fixed;
   left: 5px;
   top: 5px;
@@ -3910,7 +3916,7 @@ aside.image-panel.right {
   top: -20px;
   left: 0;
   right: 0;
-  height: 510px;
+  height: 613px;
   margin-top: -220px;
   z-index: 6;
   background: transparent;
@@ -3933,7 +3939,7 @@ aside.image-panel.right {
   top: -20px;
   left: 0;
   right: 0;
-  height: 510px;
+  height: 613px;
   margin-top: -220px;
   z-index: 6;
   background: transparent;
@@ -3941,15 +3947,16 @@ aside.image-panel.right {
   z-index: -1;
 }
 .input-area {
-  cursor: none;
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  width: 100%;
+  width: 200px;
+  margin: auto;
   height: 100%;
-  z-index: 7;
+  cursor: none;
+  z-index: 10;
 }
 .main-area {
   position: relative;
@@ -4153,6 +4160,12 @@ aside.image-panel.right {
   border: 1px solid black;
   border-left: 0;
   border-right: 0;
+}
+.pitch-selection {
+  position: relative;
+  z-index: 10;
+  color: black;
+  text-shadow: -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF, 1px 1px 0 #FFF;
 }
 .pitch-selection .rating-block {
   margin: 0 -1px -1px;
