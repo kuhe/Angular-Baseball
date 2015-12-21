@@ -12,3 +12,17 @@ BatteryDirective = function() {
         //}
     };
 };
+
+(function(app) {
+    app.BatteryDataComponent = ng.core
+        .Component({
+            selector: 'battery-data',
+            templateUrl: BatteryDirective().templateUrl,
+            inputs : ['y', 't']
+        })
+        .Class({
+            constructor: function() {
+                this.abbreviatePosition = s.abbreviatePosition;
+            }
+        });
+})(window.app || (window.app = {}));

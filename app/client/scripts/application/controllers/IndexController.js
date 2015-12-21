@@ -1,10 +1,13 @@
 IndexController = function($scope, socket) {
+
     var text = Baseball.util.text;
     var Game = Baseball.Game;
     var Animator = Baseball.service.Animator;
 
     window.s = $scope;
     $scope.t = text;
+
+    $scope.y = new Game();
 
     $scope.mode = function(setMode) {
         if (setMode) {
@@ -36,13 +39,29 @@ IndexController = function($scope, socket) {
         }
     };
 
+    $scope.abbreviatePosition = function(position) {
+        if (text.mode == 'e') {
+            return {
+                pitcher : 'P',
+                catcher : 'C',
+                first : '1B',
+                second : '2B',
+                short : 'SS',
+                third : '3B',
+                left : 'LF',
+                center : 'CF',
+                right : 'RF'
+            }[position];
+        }
+        return text.fielderShortName(position);
+    };
+
     $scope.sim = function() {$scope.proceedToGame(1, 1);};
     $scope.seventh = function() {$scope.proceedToGame(7);};
     $scope.playball = function() {$scope.proceedToGame();};
     $scope.spectate = function() {$scope.proceedToGame(0,1);};
 
     $scope.proceedToGame = function(quickMode, spectateCpu) {
-        $scope.y = new Game();
         var game = $scope.y;
         game.humanControl = spectateCpu ? 'none' : 'home';
         game.console = !!quickMode && quickMode !== 7;
@@ -57,9 +76,9 @@ IndexController = function($scope, socket) {
             socket.start(field);
         }
         window.location.hash = '#' + field;
-        s2.y = game;
         bindMethods();
         $('.blocking').remove();
+        $('.play-begins').show();
         if (game.humanControl == 'none' && game.console) {
             var n = 0;
             Animator.console = true;
@@ -80,7 +99,6 @@ IndexController = function($scope, socket) {
                     clearInterval(auto);
                 }
                 game.simulatePitchAndSwing(function(callback) {
-                    game.console ? void 0 : $scope.$apply();
                     $scope.updateFlightPath(callback);
                 });
             }, scalar*(game.field.hasRunnersOn() ? Animator.TIME_FROM_SET + 2000 : Animator.TIME_FROM_WINDUP + 2000));
@@ -164,7 +182,7 @@ IndexController = function($scope, socket) {
             $scope.y.teams.away = new Baseball.model.Team($scope.y, heroRate);
         };
         $scope.clickLineup = function(player) {
-            if (player.team.sub) {
+            if (player.team.sub !== player.team.noSubstituteSelected) {
                 var sub = player.team.sub;
                 player.team.sub = null;
                 return sub.substitute(player);
@@ -174,7 +192,7 @@ IndexController = function($scope, socket) {
         $scope.selectSubstitute = function(player) {
             if (game.humanControl === 'home' && player.team !== game.teams.home) return;
             if (game.humanControl === 'away' && player.team !== game.teams.away) return;
-            player.team.sub = (player.team.sub === player ? null : player);
+            player.team.sub = (player.team.sub === player ? player.team.noSubstituteSelected : player);
         };
 
         $scope.selectPitch = function(pitchName) {
@@ -187,7 +205,6 @@ IndexController = function($scope, socket) {
         $scope.allowInput = true;
         $scope.holdUp = function() {
             $('.input-area').click();
-            $scope.$apply();
         };
         game.startOpponentPitching = function(callback) {
             $scope.updateFlightPath(callback);
@@ -217,42 +234,25 @@ IndexController = function($scope, socket) {
                 $scope.updateFlightPath(callback);
             });
         };
-        $scope.abbreviatePosition = function(position) {
-            if (text.mode == 'e') {
-                return {
-                    pitcher : 'P',
-                    catcher : 'C',
-                    first : '1B',
-                    second : '2B',
-                    short : 'SS',
-                    third : '3B',
-                    left : 'LF',
-                    center : 'CF',
-                    right : 'RF'
-                }[position];
-            }
-            return text.fielderShortName(position);
-        };
-        $scope.$watch('y.humanBatting()', function() {
+        game.umpire.onSideChange = function() {
             if ($scope.y.humanBatting()) {
                 $('.input-area').mousemove(showBat);
             } else {
                 $('.input-area').unbind('mousemove', showBat);
                 bat.hide();
             }
-        });
-        $scope.$watch('y.humanPitching()', function() {
             if ($scope.y.humanPitching()) {
                 $('.input-area').mousemove(showGlove);
             } else {
                 $('.input-area').unbind('mousemove', showGlove);
                 glove.hide();
             }
-        });
-        var aside = {
-            left: $('aside.image-panel.left'),
-            right: $('aside.image-panel.right')
         };
+        game.umpire.onSideChange();
+        //var aside = {
+        //    left: $('aside.image-panel.left'),
+        //    right: $('aside.image-panel.right')
+        //};
         //$scope.$watch('y.playResult', function() {
         //    aside.left.hide();
         //    aside.right.hide();
@@ -269,5 +269,28 @@ IndexController = function($scope, socket) {
         //});
     };
 
-
 };
+
+(function(app) {
+
+    app.Main = ng.core
+        .Component({
+            selector: 'application-hook',
+            templateUrl: './public/html/views/main.html',
+            directives: [ng.common.NgStyle, ng.common.NgFor,
+                app.BattersDataComponent,
+                app.BatteryDataComponent,
+                //app.FieldComponent,
+                app.RatingBlockComponent,
+                app.ScoreboardComponent
+            ],
+            pipes: [app.ToIterableService]
+        })
+        .Class({
+            constructor: function() {
+                var service = new SocketService();
+                IndexController(this, service);
+            }
+        });
+
+})(window.app || (window.app = {}));

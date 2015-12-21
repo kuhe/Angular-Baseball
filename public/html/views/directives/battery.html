@@ -3,13 +3,13 @@
         <em>{{y.pitcher.throws == 'right' ? t('RHP') : t('LHP')}}</em> &raquo;
         <br>
         <strong>{{y.pitcher.getName()}}</strong>
-        ({{'#'+y.pitcher.number}}) <span ng-if='y.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+        ({{'#'+y.pitcher.number}}) <span *ngIf='y.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>
     </div>
     <div class='col-xs-6'>
         <em>{{abbreviatePosition('catcher')}}</em> &raquo;
         <br>
         <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
-        ({{'#'+y.pitcher.team.positions.catcher.number}}) <span ng-if='y.pitcher.team.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+        ({{'#'+y.pitcher.team.positions.catcher.number}}) <span *ngIf='y.pitcher.team.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
     </div>
     <div class='col-xs-12'>
         <hr/>
@@ -19,7 +19,7 @@
                 <br>
                 {{y.pitcher.stats.pitching.W}} - {{y.pitcher.stats.pitching.L}}, {{y.pitcher.stats.pitching.GS}} GS
                 <br>
-                {{y.pitcher.stats.pitching.getERA() | number:2}} ERA
+                {{y.pitcher.stats.pitching.getERA() | number:'1.2'}} ERA
             </div>
             <div class='col-xs-6'>
                 {{ t('Game') }}

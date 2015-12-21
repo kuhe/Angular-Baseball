@@ -12,3 +12,19 @@ ScoreboardDirective = function() {
         }
     };
 };
+
+(function(app) {
+    app.ScoreboardComponent = ng.core
+        .Component({
+            selector: 'scoreboard',
+            templateUrl: ScoreboardDirective().templateUrl,
+            inputs: ['y', 't'],
+            pipes: [app.ToIterableService]
+        })
+        .Class({
+            constructor: function() {
+                window.s2 = this;
+                this.expandScoreboard = true;
+            }
+        });
+})(window.app || (window.app = {}));

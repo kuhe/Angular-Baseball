@@ -12,3 +12,15 @@ FieldDirective = function() {
         //}
     };
 };
+
+(function(app) {
+    app.FieldComponent = ng.core
+        .Component({
+            selector: 'field',
+            templateUrl: FieldDirective().templateUrl
+        })
+        .Class({
+            constructor: function() {
+            }
+        });
+})(window.app || (window.app = {}));

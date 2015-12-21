@@ -9,3 +9,17 @@ RatingBlockDirective = function() {
         }
     };
 };
+
+(function(app) {
+    app.RatingBlockComponent = ng.core
+        .Component({
+            selector: 'rating-block',
+            templateUrl: RatingBlockDirective().templateUrl,
+            inputs: ['rating'],
+            directives: [ng.common.NgStyle]
+        })
+        .Class({
+            constructor: function() {
+            }
+        });
+})(window.app || (window.app = {}));

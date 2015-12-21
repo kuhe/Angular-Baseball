@@ -1,3 +1,5 @@
+cacheKey = Math.floor(Math.random()*1500);
+
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -1647,6 +1649,7 @@ Team.RUNNER_HOLD = 'hold';
 Team.prototype = {
     constructor: Team,
     init: function init(game, heroRate) {
+        this.sub = this.noSubstituteSelected;
         heroRate = heroRate || 0.10;
         this.substituted = [];
         this.pickName();
@@ -1690,7 +1693,15 @@ Team.prototype = {
     bench: [],
     bullpen: [],
     nowBatting: 0,
-    expanded: 'Player&'
+    expanded: 'Player&',
+    noSubstituteSelected: {
+        toString: function toString() {
+            return '';
+        },
+        toValue: function toValue() {
+            return false;
+        }
+    }
 };
 
 exports.Team = Team;
@@ -1730,7 +1741,7 @@ Umpire.prototype = {
         game.deck = game.teams.away.lineup[1];
         game.hole = game.teams.away.lineup[2];
         game.pitcher = game.teams.home.positions.pitcher;
-        var n = '一回のオモテ、' + game.teams.away.getName() + 'の攻撃対' + game.teams.home.getName() + '、ピッチャーは' + game.teams.home.positions.pitcher.getName() + '。',
+        var n = '一回のオモテ、' + game.teams.away.nameJ + 'の攻撃対' + game.teams.home.nameJ + '、ピッチャーは' + game.teams.home.positions.pitcher.nameJ + '。',
             e = 'Top 1, ' + game.teams.away.name + ' offense vs. ' + game.teams.home.positions.pitcher.name + ' starting for ' + game.teams.home.name;
         game.log.note(e, n);
         game.batter.ready = true;
@@ -2168,7 +2179,9 @@ Umpire.prototype = {
         game.log.noteBatter(game.batter);
         game.autoPitchSelect();
         game.field.defense = team.positions;
+        this.onSideChange();
     },
+    onSideChange: function onSideChange() {}, // can be bound externally
     says: 'Play ball!',
     game: null
 };
@@ -4041,7 +4054,6 @@ Animator.prototype = {
             $scope.allowInput = true;
             if (typeof callback == 'function') {
                 callback();
-                $scope.$apply();
             }
         }, flightSpeed * 1000);
 
@@ -4086,7 +4098,6 @@ Animator.prototype = {
             $scope.allowInput = true;
             if (typeof callback === 'function') {
                 callback();
-                $scope.$apply();
             }
         }, flightSpeed * 1000);
 
@@ -6020,13 +6031,310 @@ exports.Mathinator = _baseballServicesMathinator.Mathinator;
 
 },{"baseball/Services/Animator":24,"baseball/Services/Distribution":25,"baseball/Services/Iterator":26,"baseball/Services/Mathinator":27}]},{},[37]);
 
+var SocketService = function() {
+    var Service = function() {};
+    var game, socket, NO_OPERATION = function() {},
+        animator = Baseball.service.Animator;
+    Service.prototype = {
+        socket : {},
+        game : {},
+        connected : false,
+        start : function(key) {
+            game = this.game;
+            socket = this.socket;
+            game.opponentService = this;
+            this.connected = socket.connected;
+            this.on();
+            socket.emit('register', key);
+            socket.on('connect_failed reconnect_failed', function() {
+                console.log('connection unavailable');
+            });
+        },
+        on : function() {
+            var giraffe = this;
+            socket.on('register', this.register);
+            socket.on('connect reconnect', function() {
+                giraffe.connected = true;
+            });
+            socket.on('disconnect', function() {
+                giraffe.connected = false;
+            });
+            socket.on('pitch', function(pitch) {
+                //console.log('receive', 'pitch', pitch);
+                game.thePitch(0, 0, NO_OPERATION, pitch);
+                var scope = window.s;
+                animator.updateFlightPath.bind(scope)();
+            });
+            socket.on('swing', function(swing) {
+                //console.log('receive', 'swing', swing);
+                game.theSwing(0, 0, NO_OPERATION, swing);
+                var scope = window.s;
+                animator.updateFlightPath.bind(scope)(function() {
+                    if (swing.contact) {
+                        animator.animateFieldingTrajectory(game);
+                    }
+                });
+            });
+            socket.on('partner_disconnect', function() {
+                console.log('The opponent has disconnected');
+                var scope = window.s;
+                game.opponentConnected = false;
+                game.batter.ready = false;
+                if (game.stage === 'pitch' && game.humanBatting()) {
+                    game.onBatterReady = function() {
+                        game.autoPitch(function(callback) {
+                            scope.updateFlightPath(callback);
+                        });
+                    };
+                    game.batterReady();
+                }
+                if (game.stage === 'swing' && game.humanPitching()) {
+                    game.autoSwing(-20, 0, function(fn) {
+                        fn();
+                    });
+                }
+                scope.$digest();
+            });
+            socket.on('partner_connect', function() {
+                game.opponentConnected = true;
+                var scope = window.s;
+                scope.$digest();
+            });
+            socket.on('opponent_taking_field', function() {
+                console.log('A challenger has appeared! Sending game data.');
+                socket.emit('game_data', game.toData());
+            });
+            socket.on('game_data', function(data) {
+                game.fromData(data);
+            });
+            socket.on('field_in_use', function() {
+                game.opponentConnected = false;
+            });
+        },
+        off : function() {
+            socket.on('register', NO_OPERATION);
+        },
+        register: function(data) {
+            console.log(data);
+            if (data === 'away') {
+                game.humanControl = 'away';
+            }
+            socket.on('register', NO_OPERATION);
+        },
+        emitPitch : function(pitch) {
+            //console.log('emit', 'pitch', pitch);
+            socket.emit('pitch', pitch);
+        },
+        emitSwing : function(swing) {
+            //console.log('emit', 'swing', swing);
+            socket.emit('swing', swing);
+        },
+        swing : function() {
+
+        },
+        pitch : function() {
+
+        }
+    };
+    return Service;
+};
+
+SocketService = SocketService();
+
+//(function(app) {
+//
+//    app.SocketService = ng.core
+//        .Class({
+//            constructor: function() {
+//                for (var i in SocketService.prototype) { if (SocketService.prototype.hasOwnProperty(i)) {
+//                    this[i] = SocketService.prototype[i];
+//                }}
+//                SocketService.bind(this)();
+//            }
+//        });
+//
+//})(window.app || (window.app = {}));
+(function(app) {
+
+    app.ToIterableService = ng.core
+        .Pipe({
+            name: 'toIterable'
+        })
+        .Class({
+            constructor: function() {
+
+            },
+            transform : function(value) {
+                if (typeof value === 'object') {
+                    var keys = Object.keys(value);
+                    var primitive = window;
+                    return keys.map(function(key) {
+                        var val = value[key];
+                        if (val instanceof Object) {
+
+                        } else {
+                            var type = (typeof val).toUpperCase()[0] + (typeof val).slice(1);
+                            if (primitive[type]) {
+                                val = new primitive[type](val);
+                            } else {
+                                val = {};
+                            }
+                        }
+                        val.__key = key;
+                        return val;
+                    });
+                }
+            }
+        });
+
+})(window.app || (window.app = {}));
+BattersDirective = function() {
+    return {
+        //scope: {
+        //    game: '=',
+        //    text: '='
+        //},
+        templateUrl: 'public/html/views/directives/batters.html?cache='+cacheKey,
+        transclude : true,
+        //link: function(scope) {
+        //    scope.t = scope.text;
+        //    scope.y = scope.game;
+        //}
+    };
+};
+
+(function(app) {
+    app.BattersDataComponent = ng.core
+        .Component({
+            selector: 'batters-data',
+            templateUrl: BattersDirective().templateUrl,
+            inputs : ['y', 't']
+        })
+        .Class({
+            constructor: function() {
+                this.abbreviatePosition = s.abbreviatePosition;
+            }
+        });
+})(window.app || (window.app = {}));
+BatteryDirective = function() {
+    return {
+        //scope: {
+        //    game: '=',
+        //    text: '='
+        //},
+        templateUrl: 'public/html/views/directives/battery.html?cache='+cacheKey,
+        transclude : true,
+        //link: function(scope) {
+        //    scope.t = scope.text;
+        //    scope.y = scope.game;
+        //}
+    };
+};
+
+(function(app) {
+    app.BatteryDataComponent = ng.core
+        .Component({
+            selector: 'battery-data',
+            templateUrl: BatteryDirective().templateUrl,
+            inputs : ['y', 't']
+        })
+        .Class({
+            constructor: function() {
+                this.abbreviatePosition = s.abbreviatePosition;
+            }
+        });
+})(window.app || (window.app = {}));
+FieldDirective = function() {
+    return {
+        //scope: {
+        //    game: '=',
+        //    text: '='
+        //},
+        templateUrl: 'public/html/views/directives/field.html?cache='+cacheKey,
+        transclude : true,
+        //link: function(scope) {
+        //    scope.t = scope.text;
+        //    scope.y = scope.game;
+        //}
+    };
+};
+
+(function(app) {
+    app.FieldComponent = ng.core
+        .Component({
+            selector: 'field',
+            templateUrl: FieldDirective().templateUrl
+        })
+        .Class({
+            constructor: function() {
+            }
+        });
+})(window.app || (window.app = {}));
+RatingBlockDirective = function() {
+    return {
+        scope: {
+            rating: '='
+        },
+        transclude: true,
+        templateUrl: 'public/html/views/directives/ratingBlock.html?cache='+cacheKey,
+        link: function(scope) {
+        }
+    };
+};
+
+(function(app) {
+    app.RatingBlockComponent = ng.core
+        .Component({
+            selector: 'rating-block',
+            templateUrl: RatingBlockDirective().templateUrl,
+            inputs: ['rating'],
+            directives: [ng.common.NgStyle]
+        })
+        .Class({
+            constructor: function() {
+            }
+        });
+})(window.app || (window.app = {}));
+ScoreboardDirective = function() {
+    return {
+        scope: {
+            game: '=',
+            text: '='
+        },
+        templateUrl: 'public/html/views/directives/scoreboard.html?cache='+cacheKey,
+        link: function(scope) {
+            window.s2 = scope;
+            scope.t = scope.text;
+            scope.y = scope.game;
+        }
+    };
+};
+
+(function(app) {
+    app.ScoreboardComponent = ng.core
+        .Component({
+            selector: 'scoreboard',
+            templateUrl: ScoreboardDirective().templateUrl,
+            inputs: ['y', 't'],
+            pipes: [app.ToIterableService]
+        })
+        .Class({
+            constructor: function() {
+                window.s2 = this;
+                this.expandScoreboard = true;
+            }
+        });
+})(window.app || (window.app = {}));
 IndexController = function($scope, socket) {
+
     var text = Baseball.util.text;
     var Game = Baseball.Game;
     var Animator = Baseball.service.Animator;
 
     window.s = $scope;
     $scope.t = text;
+
+    $scope.y = new Game();
 
     $scope.mode = function(setMode) {
         if (setMode) {
@@ -6058,13 +6366,29 @@ IndexController = function($scope, socket) {
         }
     };
 
+    $scope.abbreviatePosition = function(position) {
+        if (text.mode == 'e') {
+            return {
+                pitcher : 'P',
+                catcher : 'C',
+                first : '1B',
+                second : '2B',
+                short : 'SS',
+                third : '3B',
+                left : 'LF',
+                center : 'CF',
+                right : 'RF'
+            }[position];
+        }
+        return text.fielderShortName(position);
+    };
+
     $scope.sim = function() {$scope.proceedToGame(1, 1);};
     $scope.seventh = function() {$scope.proceedToGame(7);};
     $scope.playball = function() {$scope.proceedToGame();};
     $scope.spectate = function() {$scope.proceedToGame(0,1);};
 
     $scope.proceedToGame = function(quickMode, spectateCpu) {
-        $scope.y = new Game();
         var game = $scope.y;
         game.humanControl = spectateCpu ? 'none' : 'home';
         game.console = !!quickMode && quickMode !== 7;
@@ -6079,9 +6403,9 @@ IndexController = function($scope, socket) {
             socket.start(field);
         }
         window.location.hash = '#' + field;
-        s2.y = game;
         bindMethods();
         $('.blocking').remove();
+        $('.play-begins').show();
         if (game.humanControl == 'none' && game.console) {
             var n = 0;
             Animator.console = true;
@@ -6102,7 +6426,6 @@ IndexController = function($scope, socket) {
                     clearInterval(auto);
                 }
                 game.simulatePitchAndSwing(function(callback) {
-                    game.console ? void 0 : $scope.$apply();
                     $scope.updateFlightPath(callback);
                 });
             }, scalar*(game.field.hasRunnersOn() ? Animator.TIME_FROM_SET + 2000 : Animator.TIME_FROM_WINDUP + 2000));
@@ -6186,7 +6509,7 @@ IndexController = function($scope, socket) {
             $scope.y.teams.away = new Baseball.model.Team($scope.y, heroRate);
         };
         $scope.clickLineup = function(player) {
-            if (player.team.sub) {
+            if (player.team.sub !== player.team.noSubstituteSelected) {
                 var sub = player.team.sub;
                 player.team.sub = null;
                 return sub.substitute(player);
@@ -6196,7 +6519,7 @@ IndexController = function($scope, socket) {
         $scope.selectSubstitute = function(player) {
             if (game.humanControl === 'home' && player.team !== game.teams.home) return;
             if (game.humanControl === 'away' && player.team !== game.teams.away) return;
-            player.team.sub = (player.team.sub === player ? null : player);
+            player.team.sub = (player.team.sub === player ? player.team.noSubstituteSelected : player);
         };
 
         $scope.selectPitch = function(pitchName) {
@@ -6209,7 +6532,6 @@ IndexController = function($scope, socket) {
         $scope.allowInput = true;
         $scope.holdUp = function() {
             $('.input-area').click();
-            $scope.$apply();
         };
         game.startOpponentPitching = function(callback) {
             $scope.updateFlightPath(callback);
@@ -6239,42 +6561,25 @@ IndexController = function($scope, socket) {
                 $scope.updateFlightPath(callback);
             });
         };
-        $scope.abbreviatePosition = function(position) {
-            if (text.mode == 'e') {
-                return {
-                    pitcher : 'P',
-                    catcher : 'C',
-                    first : '1B',
-                    second : '2B',
-                    short : 'SS',
-                    third : '3B',
-                    left : 'LF',
-                    center : 'CF',
-                    right : 'RF'
-                }[position];
-            }
-            return text.fielderShortName(position);
-        };
-        $scope.$watch('y.humanBatting()', function() {
+        game.umpire.onSideChange = function() {
             if ($scope.y.humanBatting()) {
                 $('.input-area').mousemove(showBat);
             } else {
                 $('.input-area').unbind('mousemove', showBat);
                 bat.hide();
             }
-        });
-        $scope.$watch('y.humanPitching()', function() {
             if ($scope.y.humanPitching()) {
                 $('.input-area').mousemove(showGlove);
             } else {
                 $('.input-area').unbind('mousemove', showGlove);
                 glove.hide();
             }
-        });
-        var aside = {
-            left: $('aside.image-panel.left'),
-            right: $('aside.image-panel.right')
         };
+        game.umpire.onSideChange();
+        //var aside = {
+        //    left: $('aside.image-panel.left'),
+        //    right: $('aside.image-panel.right')
+        //};
         //$scope.$watch('y.playResult', function() {
         //    aside.left.hide();
         //    aside.right.hide();
@@ -6291,199 +6596,57 @@ IndexController = function($scope, socket) {
         //});
     };
 
-
 };
-var SocketService = function() {
-    var Service = function() {};
-    var game, socket, NO_OPERATION = function() {},
-        animator = Baseball.service.Animator;
-    Service.prototype = {
-        socket : {},
-        game : {},
-        connected : false,
-        start : function(key) {
-            game = this.game;
-            socket = this.socket;
-            game.opponentService = this;
-            this.connected = socket.connected;
-            this.on();
-            socket.emit('register', key);
-            socket.on('connect_failed reconnect_failed', function() {
-                console.log('connection unavailable');
-            });
-        },
-        on : function() {
-            var giraffe = this;
-            socket.on('register', this.register);
-            socket.on('connect reconnect', function() {
-                giraffe.connected = true;
-            });
-            socket.on('disconnect', function() {
-                giraffe.connected = false;
-            });
-            socket.on('pitch', function(pitch) {
-                //console.log('receive', 'pitch', pitch);
-                game.thePitch(0, 0, NO_OPERATION, pitch);
-                var scope = window.s;
-                animator.updateFlightPath.bind(scope)();
-            });
-            socket.on('swing', function(swing) {
-                //console.log('receive', 'swing', swing);
-                game.theSwing(0, 0, NO_OPERATION, swing);
-                var scope = window.s;
-                animator.updateFlightPath.bind(scope)(function() {
-                    if (swing.contact) {
-                        animator.animateFieldingTrajectory(game);
-                    }
-                });
-            });
-            socket.on('partner_disconnect', function() {
-                console.log('The opponent has disconnected');
-                var scope = window.s;
-                game.opponentConnected = false;
-                game.batter.ready = false;
-                if (game.stage === 'pitch' && game.humanBatting()) {
-                    game.onBatterReady = function() {
-                        game.autoPitch(function(callback) {
-                            scope.updateFlightPath(callback);
-                        });
-                    };
-                    game.batterReady();
-                }
-                if (game.stage === 'swing' && game.humanPitching()) {
-                    game.autoSwing(-20, 0, function(fn) {
-                        fn();
-                    });
-                }
-                scope.$digest();
-            });
-            socket.on('partner_connect', function() {
-                game.opponentConnected = true;
-                var scope = window.s;
-                scope.$digest();
-            });
-            socket.on('opponent_taking_field', function() {
-                console.log('A challenger has appeared! Sending game data.');
-                socket.emit('game_data', game.toData());
-            });
-            socket.on('game_data', function(data) {
-                game.fromData(data);
-                var scope = window.s;
-                scope.$apply();
-            });
-            socket.on('field_in_use', function() {
-                game.opponentConnected = false;
-            });
-        },
-        off : function() {
-            socket.on('register', NO_OPERATION);
-        },
-        register: function(data) {
-            console.log(data);
-            if (data === 'away') {
-                game.humanControl = 'away';
+
+(function(app) {
+
+    app.Main = ng.core
+        .Component({
+            selector: 'application-hook',
+            templateUrl: './public/html/views/main.html',
+            directives: [ng.common.NgStyle, ng.common.NgFor,
+                app.BattersDataComponent,
+                app.BatteryDataComponent,
+                //app.FieldComponent,
+                app.RatingBlockComponent,
+                app.ScoreboardComponent
+            ],
+            pipes: [app.ToIterableService]
+        })
+        .Class({
+            constructor: function() {
+                var service = new SocketService();
+                IndexController(this, service);
             }
-            socket.on('register', NO_OPERATION);
-        },
-        emitPitch : function(pitch) {
-            //console.log('emit', 'pitch', pitch);
-            socket.emit('pitch', pitch);
-        },
-        emitSwing : function(swing) {
-            //console.log('emit', 'swing', swing);
-            socket.emit('swing', swing);
-        },
-        swing : function() {
+        });
 
-        },
-        pitch : function() {
+})(window.app || (window.app = {}));
+if (typeof angular === 'object') {
 
-        }
-    };
-    return new Service;
-};
-BattersDirective = function() {
-    return {
-        //scope: {
-        //    game: '=',
-        //    text: '='
-        //},
-        templateUrl: 'public/html/views/directives/batters.html?cache='+cacheKey,
-        transclude : true,
-        //link: function(scope) {
-        //    scope.t = scope.text;
-        //    scope.y = scope.game;
-        //}
-    };
-};
-BatteryDirective = function() {
-    return {
-        //scope: {
-        //    game: '=',
-        //    text: '='
-        //},
-        templateUrl: 'public/html/views/directives/battery.html?cache='+cacheKey,
-        transclude : true,
-        //link: function(scope) {
-        //    scope.t = scope.text;
-        //    scope.y = scope.game;
-        //}
-    };
-};
-FieldDirective = function() {
-    return {
-        //scope: {
-        //    game: '=',
-        //    text: '='
-        //},
-        templateUrl: 'public/html/views/directives/field.html?cache='+cacheKey,
-        transclude : true,
-        //link: function(scope) {
-        //    scope.t = scope.text;
-        //    scope.y = scope.game;
-        //}
-    };
-};
-RatingBlockDirective = function() {
-    return {
-        scope: {
-            rating: '='
-        },
-        transclude: true,
-        templateUrl: 'public/html/views/directives/ratingBlock.html?cache='+cacheKey,
-        link: function(scope) {
-        }
-    };
-};
-ScoreboardDirective = function() {
-    return {
-        scope: {
-            game: '=',
-            text: '='
-        },
-        templateUrl: 'public/html/views/directives/scoreboard.html?cache='+cacheKey,
-        link: function(scope) {
-            window.s2 = scope;
-            scope.t = scope.text;
-            scope.y = scope.game;
-        }
-    };
-};
-var app = angular.module('YakyuuAikoukai', ['directives'])
-    .service('socket', SocketService)
-    .controller('IndexController', ['$scope', 'socket', IndexController]);
+    var app = angular.module('YakyuuAikoukai', ['directives'])
+        .service('socket', SocketService)
+        .controller('IndexController', ['$scope', 'socket', IndexController]);
 
-app.config(function($interpolateProvider) {
-    $interpolateProvider.startSymbol('{{');
-    $interpolateProvider.endSymbol('}}');
-});
+    app.config(function($interpolateProvider) {
+        $interpolateProvider.startSymbol('{{');
+        $interpolateProvider.endSymbol('}}');
+    });
 
-cacheKey = Math.floor(Math.random()*1500);
+    angular.module('directives', [])
+        .directive('scoreboard', ScoreboardDirective)
+        .directive('batters', BattersDirective)
+        .directive('battery', BatteryDirective)
+        .directive('field', FieldDirective)
+        .directive('ratingBlock', RatingBlockDirective);
 
-angular.module('directives', [])
-    .directive('scoreboard', ScoreboardDirective)
-    .directive('batters', BattersDirective)
-    .directive('battery', BatteryDirective)
-    .directive('field', FieldDirective)
-    .directive('ratingBlock', RatingBlockDirective);
+} else {
+
+    (function(app) {
+        document.addEventListener('DOMContentLoaded', function() {
+            ng.core.enableProdMode();
+            ng.platform.browser.bootstrap(app.Main);
+        });
+    })(window.app || (window.app = {}));
+
+}
 //# sourceMappingURL=sourcemaps/application.js.map

@@ -12,3 +12,17 @@ BattersDirective = function() {
         //}
     };
 };
+
+(function(app) {
+    app.BattersDataComponent = ng.core
+        .Component({
+            selector: 'batters-data',
+            templateUrl: BattersDirective().templateUrl,
+            inputs : ['y', 't']
+        })
+        .Class({
+            constructor: function() {
+                this.abbreviatePosition = s.abbreviatePosition;
+            }
+        });
+})(window.app || (window.app = {}));

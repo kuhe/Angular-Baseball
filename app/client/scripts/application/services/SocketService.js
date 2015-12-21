@@ -73,8 +73,6 @@ var SocketService = function() {
             });
             socket.on('game_data', function(data) {
                 game.fromData(data);
-                var scope = window.s;
-                scope.$apply();
             });
             socket.on('field_in_use', function() {
                 game.opponentConnected = false;
@@ -105,5 +103,21 @@ var SocketService = function() {
 
         }
     };
-    return new Service;
+    return Service;
 };
+
+SocketService = SocketService();
+
+//(function(app) {
+//
+//    app.SocketService = ng.core
+//        .Class({
+//            constructor: function() {
+//                for (var i in SocketService.prototype) { if (SocketService.prototype.hasOwnProperty(i)) {
+//                    this[i] = SocketService.prototype[i];
+//                }}
+//                SocketService.bind(this)();
+//            }
+//        });
+//
+//})(window.app || (window.app = {}));

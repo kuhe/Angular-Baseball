@@ -1,10 +1,10 @@
 <div class='row'>
-    <div class='col-xs-6' ng-repeat='batter in [y.batter, y.deck] track by $index'>
+    <div class='col-xs-6' *ngFor='#batter of [y.batter, y.deck]'>
         <div>
             {{ batter === y.batter ? t('At Bat') : t('On Deck') }} &raquo;
             <br>
             <strong>{{batter.getName()}}</strong>
-            ({{('#')+batter.number}}) <span ng-if='batter.hero' class='glyphicon glyphicon-chevron-up'></span>
+            ({{('#')+batter.number}}) <span *ngIf='batter.hero' class='glyphicon glyphicon-chevron-up'></span>
             <br/>
             <em>{{abbreviatePosition(batter.position)}}{{t.comma()}}{{batter.bats == 'left' ? t('LHB') : t('RHB')}}</em>
         </div>
@@ -12,11 +12,11 @@
         <div class='row one-line'>
             <div class='col-xs-6'>
                 <div class='prevent-break'>
-                    <strong>{{batter.stats.batting.getBA() | number:3}}</strong> {{ t('BA') }}
+                    <strong>{{batter.stats.batting.getBA() | number:'1.3'}}</strong> {{ t('BA') }}
                     <br>
-                    <strong>{{batter.stats.batting.getOBP() | number:3}}</strong> {{ t('OBP') }}
+                    <strong>{{batter.stats.batting.getOBP() | number:'1.3'}}</strong> {{ t('OBP') }}
                     <br>
-                    <strong>{{batter.stats.batting.getSLG() | number:3}}</strong> {{ t('SLG') }}
+                    <strong>{{batter.stats.batting.getSLG() | number:'1.3'}}</strong> {{ t('SLG') }}
                     <hr>
                     <strong>{{batter.stats.batting.hr}}</strong> {{ t('HR') }}
                 </div>
@@ -24,13 +24,13 @@
             <div class='col-xs-6'>
                 <div class='prevent-break'>
                     <div>
-                        {{ t('Eye') }} <rating-block rating-block='' rating='batter.skill.offense.eye'></rating-block>
+                        {{ t('Eye') }} <rating-block [rating]='batter.skill.offense.eye'></rating-block>
                     </div>
                     <div>
-                        {{ t('Power') }} <rating-block rating-block='' rating='batter.skill.offense.power'></rating-block>
+                        {{ t('Power') }} <rating-block [rating]='batter.skill.offense.power'></rating-block>
                     </div>
                     <div>
-                        {{ t('Speed') }} <rating-block rating-block='' rating='batter.skill.offense.speed'></rating-block>
+                        {{ t('Speed') }} <rating-block [rating]='batter.skill.offense.speed'></rating-block>
                     </div>
                     <hr>
                     <strong>{{batter.stats.batting.rbi}}</strong> {{ t('RBI') }}
