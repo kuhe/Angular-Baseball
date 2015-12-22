@@ -113,13 +113,20 @@
                 <table class='table'>
                     <tr>
                         <td class='font-yellow' *ngFor="#value of y.scoreboard.home | toIterable">
-                            <span class='grey'>{{value.__key}}</span>
+                            <span class='grey' *ngIf='value.__key !== "__key"'>{{value.__key}}</span>
                         </td>
                     </tr>
-                    <tr class="team-line" *ngFor="#scores of y.scoreboard | toIterable">
-                        <td class='' *ngFor="#score of scores | toIterable">
+                    <tr class="team-line">
+                        <td class='' *ngFor="#score of y.scoreboard.away | toIterable">
                             <span class='grey' *ngIf='score.__key !== "__key"'>
-                                {{ y.inning < score.__key || y.inning == score.__key && scores.__key == 'home' && y.half == 'top' ? '-' : score }}
+                                {{ y.inning < score.__key ? '-' : score }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="team-line">
+                        <td class='' *ngFor="#score of y.scoreboard.home | toIterable">
+                            <span class='grey' *ngIf='score.__key !== "__key"'>
+                                {{ y.inning < score.__key || (y.inning == score.__key && y.half == 'top') ? '-' : score }}
                             </span>
                         </td>
                     </tr>
