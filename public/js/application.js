@@ -417,8 +417,8 @@ Game.prototype = {
             m: Math.random() * 60 | 0
         };
         this.timeOfDay = {
-            h: this.startTime.h,
-            m: this.startTime.m
+            h: 1,
+            m: 30
         };
         if (m) _baseballUtility_utils.text.mode = m;
         this.gamesIntoSeason = 5 + Math.floor(Math.random() * 133);
@@ -438,7 +438,6 @@ Game.prototype = {
         }
         this.autoPitchSelect();
         _baseballServices_services.Animator.init();
-        if (!_baseballServices_services.Animator.console) _baseballServices_services.Animator.loop.setTimeOfDay(0, 0);
     },
     passMinutes: function passMinutes(minutes) {
         var time = this.timeOfDay;
@@ -6437,7 +6436,6 @@ IndexController = function($scope, socket) {
                 });
             } while (game.inning < 7);
             log('sim halted in 7th');
-            // todo debug 7th inning excess callbacks
             game.debugOut();
             Animator.console = game.console = false;
             game.stage = 'pitch';
@@ -6454,6 +6452,8 @@ IndexController = function($scope, socket) {
         }
         if (!quickMode || quickMode === 7) {
             Animator.loop.setTargetTimeOfDay(game.startTime.h, game.startTime.m);
+            game.timeOfDay.h = game.startTime.h;
+            game.timeOfDay.m = game.startTime.m;
         }
     };
 

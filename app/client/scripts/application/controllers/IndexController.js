@@ -110,7 +110,6 @@ IndexController = function($scope, socket) {
                 });
             } while (game.inning < 7);
             log('sim halted in 7th');
-            // todo debug 7th inning excess callbacks
             game.debugOut();
             Animator.console = game.console = false;
             game.stage = 'pitch';
@@ -127,6 +126,8 @@ IndexController = function($scope, socket) {
         }
         if (!quickMode || quickMode === 7) {
             Animator.loop.setTargetTimeOfDay(game.startTime.h, game.startTime.m);
+            game.timeOfDay.h = game.startTime.h;
+            game.timeOfDay.m = game.startTime.m;
         }
     };
 
