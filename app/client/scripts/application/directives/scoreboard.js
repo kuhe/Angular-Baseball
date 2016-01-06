@@ -24,7 +24,7 @@ ScoreboardDirective = function() {
         .Class({
             constructor: function() {
                 window.s2 = this;
-                this.expandScoreboard = true;
+                this.expandScoreboard = false;
             }
         });
 })(window.app || (window.app = {}));
