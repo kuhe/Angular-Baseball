@@ -26,7 +26,10 @@
     "systemjs": "^0.19.9",
     "zone.js": "^0.5.10"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "colors": "^1.1.2",
+    "mocha": "^2.2.5"
+  },
   "scripts": {
     "test": "protractor conf.js",
     "career": "cd node_modules/baseball && npm test"
