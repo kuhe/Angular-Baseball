@@ -7,13 +7,13 @@
     "test": "tests"
   },
   "dependencies": {
-    "angular2": "^2.0.0-beta.0",
+    "angular2": "^2.0.0-beta.12",
     "babel": "^5.8.23",
     "babel-core": "^6.2.1",
     "babelify": "^6.3.0",
     "browserify": "^11.1.0",
     "es6-promise": "^3.0.2",
-    "es6-shim": "^0.34.0",
+    "es6-shim": "^0.35.0",
     "gsap": "^1.18.0",
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",
@@ -21,10 +21,10 @@
     "gulp-sourcemaps": "^1.5.2",
     "gulp-uglify": "^1.4.1",
     "gulp-util": "^3.0.6",
-    "reflect-metadata": "^0.1.2",
-    "rxjs": "^5.0.0-beta.0",
+    "reflect-metadata": "0.1.2",
+    "rxjs": "5.0.0-beta.2",
     "systemjs": "^0.19.9",
-    "zone.js": "^0.5.10"
+    "zone.js": "^0.6.6"
   },
   "devDependencies": {
     "colors": "^1.1.2",

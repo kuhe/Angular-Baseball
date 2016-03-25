@@ -1,5 +1,6 @@
 {
   "scripts": {
-    "career": "cd app/client/node_modules/baseball && npm test"
+    "career": "cd app/client/node_modules/baseball && npm test",
+    "install": "cd app/client && npm i && bower i; cd ..; cd server && npm i"
   }
 }

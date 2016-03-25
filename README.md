@@ -46,17 +46,9 @@ todo :
 
 Install npm, bower
 
-Install node components
+Install dependencies
 
-    app/client> npm install
-
-Install bower components
-
-    app/client> bower install
-
-Install module dependencies
-
-    app/client/node_modules/baseball> npm install
+    > npm run install
 
 This will run the start the file watchers. Use gulp build to just build once.
 

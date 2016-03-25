@@ -76,25 +76,25 @@ gulp.task('modularScripts', function () {
 });
 gulp.task('internalScripts', function () {
     gulp.src(BUNDLE_SCRIPT_FILES)
-        .pipe(sourcemaps.init())
+        //.pipe(sourcemaps.init())
         .pipe(concat('application.min.js'))
         .pipe(uglify({ mangle: false }))
         .on('error', util.log)
-        .pipe(sourcemaps.write('./sourcemaps'))
+        //.pipe(sourcemaps.write('./sourcemaps'))
         .pipe(gulp.dest(SCRIPT_DEPLOY_DIR));
     gulp.src(BUNDLE_SCRIPT_FILES)
-        .pipe(sourcemaps.init())
+        //.pipe(sourcemaps.init())
         .pipe(concat('application.js'))
-        .pipe(sourcemaps.write('./sourcemaps'))
+        //.pipe(sourcemaps.write('./sourcemaps'))
         .pipe(gulp.dest(SCRIPT_DEPLOY_DIR));
     return 1;
 });
 gulp.task('externalScripts', function () {
     gulp.src(EXTERNAL_SCRIPT_FILES)
-        .pipe(sourcemaps.init())
+        //.pipe(sourcemaps.init())
         .pipe(concat('vendor.min.js'))
         .pipe(uglify({ mangle: false }))
-        .pipe(sourcemaps.write('./sourcemaps'))
+        //.pipe(sourcemaps.write('./sourcemaps'))
         .pipe(gulp.dest(SCRIPT_DEPLOY_DIR))
 });
 
