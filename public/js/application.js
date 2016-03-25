@@ -2335,7 +2335,6 @@ var Loop = (function () {
                         this.addStaticMeshes();
                     }
                 } else {
-                    window[this.elementClass] = this;
                     setTimeout(function () {
                         giraffe.main(background);
                     }, 2000);
