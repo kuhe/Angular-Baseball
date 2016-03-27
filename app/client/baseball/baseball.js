@@ -1,4 +1,4 @@
-import { Baseball } from 'baseball/namespace';
+import { Baseball } from './namespace';
 
 if (typeof window == 'object') {
     window.Baseball = Baseball;

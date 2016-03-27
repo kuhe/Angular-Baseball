@@ -1,6 +1,6 @@
-import { data, text } from 'baseball/Utility/_utils';
-import { Iterator, Mathinator, Distribution } from 'baseball/Services/_services';
-import { AtBat, Team } from 'baseball/Model/_models';
+import { data, text } from '../Utility/_utils';
+import { Iterator, Mathinator, Distribution } from '../Services/_services';
+import { AtBat, Team } from '../Model/_models';
 
 var Player = function(team, hero) {
     this.init(team, hero);

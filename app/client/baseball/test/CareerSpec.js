@@ -1,14 +1,14 @@
 var assert = require("assert");
 var colors = require('colors');
 
-import { Baseball } from 'baseball/baseball';
-import { Animator } from 'baseball/Services/Animator';
-import { Iterator } from 'baseball/Services/Iterator';
+import { Baseball } from '../baseball';
+import { Animator } from '../Services/Animator';
+import { Iterator } from '../Services/Iterator';
 
-import { text } from 'baseball/Utility/text';
+import { text } from '../Utility/text';
 text.mode = 'n';
 
-import { samurai } from 'baseball/Teams/TeamJapan';
+import { samurai } from '../Teams/TeamJapan';
 
 var seasons = 10;
 

@@ -1,4 +1,4 @@
-import { Iterator } from 'baseball/Services/Iterator';
+import { Iterator } from '../Services/Iterator';
 
 class Trainer {
     makePlayer(player, name, surname, surnameJ, nameJ, pitching, offense, defense, bats, throws, number) {

@@ -1,4 +1,4 @@
-import { text } from 'baseball/Utility/text';
+import { text } from '../Utility/text';
 
 var Log = function() {
     this.init();

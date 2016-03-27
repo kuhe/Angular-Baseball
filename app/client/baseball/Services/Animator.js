@@ -1,6 +1,6 @@
-import { Mathinator } from 'baseball/services/_services';
-import { Loop } from 'baseball/Render/Loop';
-import { helper } from 'baseball/Utility/helper';
+import { Mathinator } from '../services/_services';
+import { Loop } from '../Render/Loop';
+import { helper } from '../Utility/helper';
 
 var Animator = function() {
     this.init();

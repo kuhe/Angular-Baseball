@@ -1,12 +1,12 @@
-import { Field } from 'baseball/Model/Field';
-import { Team } from 'baseball/Model/Team';
-import { Umpire } from 'baseball/Model/Umpire';
-import { Player } from 'baseball/Model/Player';
-import { Log } from 'baseball/Utility/Log';
+import { Field } from '../Model/Field';
+import { Team } from '../Model/Team';
+import { Umpire } from '../Model/Umpire';
+import { Player } from '../Model/Player';
+import { Log } from '../Utility/Log';
 
-import { helper, text } from 'baseball/Utility/_utils';
+import { helper, text } from '../Utility/_utils';
 
-import { Animator, Distribution, Mathinator, Iterator } from 'baseball/Services/_services';
+import { Animator, Distribution, Mathinator, Iterator } from '../Services/_services';
 
 var Game = function(m) {
     this.init(m);

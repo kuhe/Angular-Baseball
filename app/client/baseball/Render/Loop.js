@@ -10,7 +10,7 @@ import { Sky } from './mesh/Sky';
 import { Sun } from './mesh/Sun';
 import { lighting } from './scene/lighting';
 import { loadSkyShader } from './Shaders/SkyShader';
-import { Animator } from 'baseball/Services/Animator';
+import { Animator } from '../Services/Animator';
 
 /**
  * the constants should be tuned so that the camera coincides with the DOM's strike zone overlay

@@ -1,5 +1,5 @@
-import { Log } from 'baseball/Utility/_utils';
-import { Player } from 'baseball/Model/Player';
+import { Log } from '../Utility/_utils';
+import { Player } from '../Model/Player';
 
 var Umpire = function(game) {
     this.init(game);

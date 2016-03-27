@@ -1,4 +1,4 @@
-import { Log } from 'baseball/Utility/Log';
+import { Log } from '../Utility/Log';
 
 class AtBat {
     constructor(text) {

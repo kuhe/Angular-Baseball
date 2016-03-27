@@ -19,9 +19,9 @@ var EXTERNAL_STYLE_FILES = [
     './bower_components/bootstrap/dist/css/bootstrap.min.css'
 ];
 var MODULAR_SCRIPT_FILES = [
-    './node_modules/'+name+'/**/*.js',
-    '!./node_modules/'+name+'/node_modules/**/*.js',
-    '!./node_modules/'+name+'/bundle.js'
+    './'+name+'/**/*.js',
+    '!./'+name+'/node_modules/**/*.js',
+    '!./'+name+'/bundle.js'
 ];
 var INTERNAL_SCRIPT_FILES = [
     './scripts/application/cacheKey.js',
@@ -32,7 +32,7 @@ var INTERNAL_SCRIPT_FILES = [
 ];
 var BUNDLE_SCRIPT_FILES = [
     './scripts/application/cacheKey.js',
-    './node_modules/'+name+'/bundle.js',
+    './'+name+'/bundle.js',
     './scripts/application/services/*.js',
     './scripts/application/directives/*.js',
     './scripts/application/controllers/*.js',
@@ -65,10 +65,10 @@ gulp.task('externalStyles', function () {
         .pipe(gulp.dest(STYLE_DEPLOY_DIR));
 });
 gulp.task('modularScripts', function () {
-    browserify({ entries: './node_modules/'+name+'/'+name+'.js' })
+    browserify({ entries: './'+name+'/'+name+'.js' })
         .transform(babelify)
         .bundle()
-        .pipe(fs.createWriteStream('./node_modules/'+name+'/bundle.js')).on('close', function() {
+        .pipe(fs.createWriteStream('./'+name+'/bundle.js')).on('close', function() {
             gulp.start('internalScripts');
         })
         .on('error', util.log);

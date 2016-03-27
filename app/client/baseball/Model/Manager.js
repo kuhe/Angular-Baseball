@@ -1,4 +1,4 @@
-import { Iterator } from 'baseball/Services/_services';
+import { Iterator } from '../Services/_services';
 
 var Manager = function(team) {
     this.init(team);

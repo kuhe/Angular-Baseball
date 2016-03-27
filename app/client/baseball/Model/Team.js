@@ -1,7 +1,7 @@
-import { Player } from 'baseball/Model/Player';
-import { Manager } from 'baseball/Model/Manager';
+import { Player } from '../Model/Player';
+import { Manager } from '../Model/Manager';
 
-import { data, text } from 'baseball/Utility/_utils';
+import { data, text } from '../Utility/_utils';
 
 var Team = function(game, heroRate) {
     this.init(game, heroRate);

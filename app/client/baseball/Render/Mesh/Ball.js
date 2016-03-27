@@ -1,8 +1,8 @@
 import { AbstractMesh } from './AbstractMesh';
 import { Loop } from '../Loop';
-import { Mathinator } from 'baseball/Services/Mathinator';
+import { Mathinator } from '../../Services/Mathinator';
 import { Indicator } from './Indicator';
-import { helper } from 'baseball/Utility/helper';
+import { helper } from '../../Utility/helper';
 
 /**
  * on the DOM the pitch zone is 200x200 pixels

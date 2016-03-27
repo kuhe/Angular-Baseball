@@ -1,6 +1,6 @@
-import { Game, Team } from 'baseball/Model/_models';
-import { Player } from 'baseball/Model/Player';
-import { Trainer } from 'baseball/Teams/Trainer';
+import { Game, Team } from '../Model/_models';
+import { Player } from '../Model/Player';
+import { Trainer } from '../Teams/Trainer';
 
 var samurai = new Team('no init');
 samurai.name = 'Japan';

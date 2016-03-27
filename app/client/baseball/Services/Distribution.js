@@ -1,4 +1,4 @@
-import { helper } from 'baseball/Utility/helper';
+import { helper } from '../Utility/helper';
 var pitchDefinitions = helper.pitchDefinitions;
 
 /**
