@@ -191,7 +191,8 @@ Player.prototype = {
                     return ((this.h - this['2b'] - this['3b'] - this.hr) + 2*this['2b'] + 3*this['3b'] + 4*this.hr)/this.ab;
                 },
                 getSlash : function() {
-                    this.slash = this.slash || [this.getBA(), this.getOBP(), this.getSLG()].map(x => {
+                    this.slash = this.slash || [this.getBA() || '.---', this.getOBP(), this.getSLG()].map(x => {
+                        if (isNaN(x)) return '.---';
                         if (x < 1) return (x+'0000').slice(1, 5);
                         return (x+'0000').slice(0, 5);
                     }).join('/');
@@ -411,11 +412,11 @@ Player.prototype = {
                 return text('Breaking ball');
             }
         } else {
-            if (sum([offense[0] * 1.5, offense[1] * 0.70, offense[2]]) > sum(defense)) {
-                if (offense[0] + offense[2] > ELITE * 2) {
+            if (sum([offense[0] * 2, offense[1] * 0.50, offense[2]]) > sum(defense)) {
+                if (offense[0] > 98 || (sum(offense) > ELITE * 3)) {
                     return text('Genius batter');
                 }
-                if (offense[1] > EXCELLENT) {
+                if (offense[1] > EXCELLENT && offense[1] > offense[0]) {
                     return text('Power hitter');
                 }
                 if (offense[0] > EXCELLENT) {

@@ -4169,6 +4169,7 @@ aside.image-panel.right {
   border-right: 0;
 }
 .pitch-selection {
+  min-height: 70px;
   position: relative;
   z-index: 10;
   color: black;

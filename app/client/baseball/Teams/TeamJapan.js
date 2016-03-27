@@ -30,31 +30,31 @@ coach.makePlayer(darvish, 'Yu', 'Darvish', 'ダルビッシュ', '有', 150, {ey
     {catching: 50, fielding: 70, throwing: 100, speed: 80}, 'right', 'right', 11);
 
 coach.makePlayer(johjima, 'Kenji', 'Johjima', '城島', '健司', 60, {eye: 90, power: 108, speed: 70},
-    {catching: 140, fielding: 95, throwing: 88, speed: 94}, 'right', 'right', 2);
+    {catching: 140, fielding: 88, throwing: 75, speed: 75}, 'right', 'right', 2);
 
 
 
-coach.makePlayer(ogasawara, 'Michihiro', 'Ogasawara', '小笠原', '道大', 80, {eye: 96, power: 135, speed: 90},
+coach.makePlayer(ogasawara, 'Michihiro', 'Ogasawara', '小笠原', '道大', 80, {eye: 96, power: 90, speed: 90},
     {catching: 50, fielding: 96, throwing: 85, speed: 70}, 'left', 'right', 36);
 
-coach.makePlayer(nishioka, 'Tsuyoshi', 'Nishioka', '西岡', '剛', 80, {eye: 88, power: 95, speed: 92},
+coach.makePlayer(nishioka, 'Tsuyoshi', 'Nishioka', '西岡', '剛', 80, {eye: 95, power: 75, speed: 92},
     {catching: 90, fielding: 88, throwing: 88, speed: 90}, 'right', 'right', 7);
 
-coach.makePlayer(kawasaki, 'Munenori', 'Kawasaki', '川崎', '宗則', 80, {eye: 85, power: 95, speed: 85},
+coach.makePlayer(kawasaki, 'Munenori', 'Kawasaki', '川崎', '宗則', 80, {eye: 95, power: 75, speed: 95},
     {catching: 90, fielding: 120, throwing: 99, speed: 100}, 'left', 'right', 52);
 
-coach.makePlayer(murata, 'Shuichi', 'Murata', '村田', '修一', 80, {eye: 82, power: 130, speed: 70},
+coach.makePlayer(murata, 'Shuichi', 'Murata', '村田', '修一', 80, {eye: 82, power: 110, speed: 70},
     {catching: 80, fielding: 80, throwing: 90, speed: 60}, 'right', 'right', 25);
 
 
 
-coach.makePlayer(matsui, 'Hideki', 'Matsui', '秀樹', '松井', 75, {eye: 104, power: 150, speed: 68},
+coach.makePlayer(matsui, 'Hideki', 'Matsui', '松井', '秀樹', 75, {eye: 104, power: 120, speed: 50},
     {catching: 40, fielding: 85, throwing: 70, speed: 60}, 'left', 'right', 55);
 
 coach.makePlayer(ichiro, '', 'Ichiro', 'イチロー', '', 89, {eye: 115, power: 80, speed: 115},
-    {catching: 80, fielding: 120, throwing: 115, speed: 115}, 'left', 'right', 51);
+    {catching: 80, fielding: 115, throwing: 115, speed: 115}, 'left', 'right', 51);
 
-coach.makePlayer(inaba, 'Atsunori', 'Inaba', '稲葉', '篤紀', 80, {eye: 92, power: 115, speed: 75},
+coach.makePlayer(inaba, 'Atsunori', 'Inaba', '稲葉', '篤紀', 80, {eye: 92, power: 95, speed: 75},
     {catching: 50, fielding: 95, throwing: 95, speed: 75}, 'right', 'right', 41);
 
 
