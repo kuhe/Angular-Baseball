@@ -127,7 +127,27 @@ var text = function(phrase, override) {
 
             'Substituted' : '交代',
 
-            'Batter Ready' : '打撃準備'
+            'Batter Ready' : '打撃準備',
+
+            // descriptors pitching
+            'Ace' : 'エース',
+            'Control pitcher' : '技巧派',
+            'Flamethrower' : '速球派',
+            'Breaking ball' : '変化球',
+            // descriptors batting
+            'Genius batter' : '天才',
+            'Contact' : 'バットコントロール',
+            'Power hitter' : '主砲',
+            'Speedster' : '足速い',
+            //'' : '',
+            //'' : '',
+            // descriptors fielding
+            'Defensive wizard' : '守備万能',
+            'Glove' : '好守',
+            'Range' : 'レンジ',
+            'Strong throw' : '肩強い',
+            //'' : '',
+            //'' : '',
         },
         e : {
             empty: '-',

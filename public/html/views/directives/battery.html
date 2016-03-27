@@ -20,6 +20,10 @@
                 {{y.pitcher.stats.pitching.W}} - {{y.pitcher.stats.pitching.L}}, {{y.pitcher.stats.pitching.GS}} GS
                 <br>
                 {{y.pitcher.stats.pitching.getERA() | number:'1.2'}} ERA
+                <br>
+                <span class='defining'>
+                    {{ y.pitcher.getDefiningCharacteristic() }}
+                </span>
             </div>
             <div class='col-xs-6'>
                 {{ t('Game') }}
@@ -27,6 +31,10 @@
                 {{y.pitcher.stats.pitching.strikes}} - {{y.pitcher.stats.pitching.pitches}}
                 <br>
                 {{y.pitcher.stats.pitching.K}}K {{y.pitcher.stats.pitching.H}}H {{y.pitcher.stats.pitching.BB}}BB
+                <br>
+                <span class='defining'>
+                    {{ y.pitcher.team.positions.catcher.getDefiningCharacteristic() }}
+                </span>
             </div>
         </div>
     </div>

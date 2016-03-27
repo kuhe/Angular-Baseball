@@ -181,7 +181,7 @@ Log.prototype = {
         if (justOuts) {
             return outs + text.stop();
         }
-        return count.strikes + '-' + count.balls + ', ' + outs + text.stop();
+        return this.game.getInning() + ': ' + count.strikes + '-' + count.balls + ', ' + outs + text.stop();
     },
     broadcastScore: function() {
         return this.game.teams.away.getName() + ' ' + this.game.tally.away.R

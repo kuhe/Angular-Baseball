@@ -187,7 +187,9 @@ Animator.prototype = {
         if (Animator.console) return game.swingResult;
 
         if (this.renderingMode === 'webgl') {
-            Animator.tweenFieldingTrajectory(game, true);
+            setTimeout(function(){
+                Animator.tweenFieldingTrajectory(game, true);
+            }, 50);
             return Animator.renderFieldingTrajectory(game);
         }
         return Animator.tweenFieldingTrajectory(game);

@@ -366,6 +366,75 @@ Player.prototype = {
     getOrder : function() {
         return text([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
     },
+    getDefiningCharacteristic: function() {
+        var o = this.skill.offense,
+            d = this.skill.defense,
+            pitcherRating = this.skill.pitching;
+        var p = this.pitching;
+        const ELITE = 90;
+        const EXCELLENT = 80;
+        const GOOD = 60;
+
+        var skills = [o.eye, o.power, o.speed, d.fielding, d.speed, d.throwing, pitcherRating];
+        var offense = [o.eye, o.power, o.speed];
+        var defense = [d.fielding, d.speed, d.throwing];
+
+        var sum = x => x.reduce((a,b) => a + b);
+
+        var pitching =  [0, 0, 0]; // control, speed, break
+        var pitchingKeys = Object.keys(p);
+        pitchingKeys.map(x => {
+            pitching[0] += p[x].control;
+            pitching[1] += p[x].velocity;
+            pitching[2] += p[x].break;
+        });
+        var pitches = pitchingKeys.length;
+        pitching = pitching.map(x => x/pitches | 0);
+
+        if (pitcherRating > 90) {
+            if (pitcherRating > 105) {
+                return text('Ace');
+            }
+            if (pitching[0] > EXCELLENT) {
+                return text('Control pitcher');
+            }
+            if (pitching[1] > EXCELLENT) {
+                return text('Flamethrower');
+            }
+            if (pitching[2] > EXCELLENT) {
+                return text('Breaking ball');
+            }
+        } else {
+            if (sum(offense) > sum(defense)) {
+                if (sum(offense) > ELITE * 3) {
+                    return text('Genius batter');
+                }
+                if (offense[0] > EXCELLENT) {
+                    return text('Contact');
+                }
+                if (offense[1] > EXCELLENT) {
+                    return text('Power hitter');
+                }
+                if (offense[2] > EXCELLENT) {
+                    return text('Speedster');
+                }
+            } else {
+                if (sum(defense) > EXCELLENT * 3) {
+                    return text('Defensive wizard');
+                }
+                if (defense[0] > EXCELLENT) {
+                    return text('Glove');
+                }
+                if (defense[1] > EXCELLENT) {
+                    return text('Range');
+                }
+                if (defense[2] > EXCELLENT) {
+                    return text('Strong throw');
+                }
+            }
+        }
+        return '';
+    },
     /**
      * to ease comparison in Angular (?)
      */

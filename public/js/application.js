@@ -1608,6 +1608,81 @@ Player.prototype = {
     getOrder: function getOrder() {
         return (0, _Utility_utils.text)([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
     },
+    getDefiningCharacteristic: function getDefiningCharacteristic() {
+        var o = this.skill.offense,
+            d = this.skill.defense,
+            pitcherRating = this.skill.pitching;
+        var p = this.pitching;
+        var ELITE = 90;
+        var EXCELLENT = 80;
+        var GOOD = 60;
+
+        var skills = [o.eye, o.power, o.speed, d.fielding, d.speed, d.throwing, pitcherRating];
+        var offense = [o.eye, o.power, o.speed];
+        var defense = [d.fielding, d.speed, d.throwing];
+
+        var sum = function sum(x) {
+            return x.reduce(function (a, b) {
+                return a + b;
+            });
+        };
+
+        var pitching = [0, 0, 0]; // control, speed, break
+        var pitchingKeys = Object.keys(p);
+        pitchingKeys.map(function (x) {
+            pitching[0] += p[x].control;
+            pitching[1] += p[x].velocity;
+            pitching[2] += p[x]['break'];
+        });
+        var pitches = pitchingKeys.length;
+        pitching = pitching.map(function (x) {
+            return x / pitches | 0;
+        });
+
+        if (pitcherRating > 90) {
+            if (pitcherRating > 105) {
+                return (0, _Utility_utils.text)('Ace');
+            }
+            if (pitching[0] > EXCELLENT) {
+                return (0, _Utility_utils.text)('Control pitcher');
+            }
+            if (pitching[1] > EXCELLENT) {
+                return (0, _Utility_utils.text)('Flamethrower');
+            }
+            if (pitching[2] > EXCELLENT) {
+                return (0, _Utility_utils.text)('Breaking ball');
+            }
+        } else {
+            if (sum(offense) > sum(defense)) {
+                if (sum(offense) > ELITE * 3) {
+                    return (0, _Utility_utils.text)('Genius batter');
+                }
+                if (offense[0] > EXCELLENT) {
+                    return (0, _Utility_utils.text)('Contact');
+                }
+                if (offense[1] > EXCELLENT) {
+                    return (0, _Utility_utils.text)('Power hitter');
+                }
+                if (offense[2] > EXCELLENT) {
+                    return (0, _Utility_utils.text)('Speedster');
+                }
+            } else {
+                if (sum(defense) > EXCELLENT * 3) {
+                    return (0, _Utility_utils.text)('Defensive wizard');
+                }
+                if (defense[0] > EXCELLENT) {
+                    return (0, _Utility_utils.text)('Glove');
+                }
+                if (defense[1] > EXCELLENT) {
+                    return (0, _Utility_utils.text)('Range');
+                }
+                if (defense[2] > EXCELLENT) {
+                    return (0, _Utility_utils.text)('Strong throw');
+                }
+            }
+        }
+        return '';
+    },
     /**
      * to ease comparison in Angular (?)
      */
@@ -4136,7 +4211,9 @@ Animator.prototype = {
         if (Animator.console) return game.swingResult;
 
         if (this.renderingMode === 'webgl') {
-            Animator.tweenFieldingTrajectory(game, true);
+            setTimeout(function () {
+                Animator.tweenFieldingTrajectory(game, true);
+            }, 50);
             return Animator.renderFieldingTrajectory(game);
         }
         return Animator.tweenFieldingTrajectory(game);
@@ -5192,7 +5269,7 @@ Log.prototype = {
         if (justOuts) {
             return outs + _UtilityText.text.stop();
         }
-        return count.strikes + '-' + count.balls + ', ' + outs + _UtilityText.text.stop();
+        return this.game.getInning() + ': ' + count.strikes + '-' + count.balls + ', ' + outs + _UtilityText.text.stop();
     },
     broadcastScore: function broadcastScore() {
         return this.game.teams.away.getName() + ' ' + this.game.tally.away.R + ', ' + this.game.teams.home.getName() + ' ' + this.game.tally.home.R + _UtilityText.text.stop();
@@ -5680,8 +5757,28 @@ var text = function text(phrase, override) {
 
             'Substituted': '交代',
 
-            'Batter Ready': '打撃準備'
+            'Batter Ready': '打撃準備',
+
+            // descriptors pitching
+            'Ace': 'エース',
+            'Control pitcher': '技巧派',
+            'Flamethrower': '速球派',
+            'Breaking ball': '変化球',
+            // descriptors batting
+            'Genius batter': '天才',
+            'Contact': 'バットコントロール',
+            'Power hitter': '主砲',
+            'Speedster': '足速い',
+            //'' : '',
+            //'' : '',
+            // descriptors fielding
+            'Defensive wizard': '守備万能',
+            'Glove': '好守',
+            'Range': 'レンジ',
+            'Strong throw': '肩強い'
         },
+        //'' : '',
+        //'' : '',
         e: {
             empty: '-',
             'Season': 'Season',
@@ -6110,12 +6207,12 @@ var SocketService = function() {
                         fn();
                     });
                 }
-                scope.$digest();
+                //scope.$digest();
             });
             socket.on('partner_connect', function() {
                 game.opponentConnected = true;
                 var scope = window.s;
-                scope.$digest();
+                //scope.$digest();
             });
             socket.on('opponent_taking_field', function() {
                 console.log('A challenger has appeared! Sending game data.');

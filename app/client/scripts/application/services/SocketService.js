@@ -60,12 +60,12 @@ var SocketService = function() {
                         fn();
                     });
                 }
-                scope.$digest();
+                //scope.$digest();
             });
             socket.on('partner_connect', function() {
                 game.opponentConnected = true;
                 var scope = window.s;
-                scope.$digest();
+                //scope.$digest();
             });
             socket.on('opponent_taking_field', function() {
                 console.log('A challenger has appeared! Sending game data.');
