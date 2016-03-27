@@ -392,7 +392,7 @@
         </div>
         <div class='clear'></div>
         <div class='col-lg-12 batting-lines'>
-            <ul class='list-group col-lg-6' *ngFor='#team of [y.teams.away, y.teams.home]' [ngClass]='{click_to_sub: !!team.sub}'>
+            <ul class='list-group col-lg-6' *ngFor='#team of [y.teams.away, y.teams.home]' [ngClass]='{ click_to_sub: team.sub !== team.noSubstituteSelected }'>
                 <li class='list-group-item team-name'>
                     {{team.getName()}}
                 </li>
@@ -453,7 +453,7 @@
                     </section>
                 </li>
                 <li class='list-group-item pointer' *ngFor='#player of team.bench'
-                    (click)='selectSubstitute(player)' [ngClass]='{selected_sub: team.sub.toString() === player.toString()}'>
+                    (click)='selectSubstitute(player)' [ngClass]='{selected_sub: team.sub?.toString() === player.toString()}'>
                     <strong>{{player.getName()}}</strong>
                     ({{'#'+player.number}})
                     <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>

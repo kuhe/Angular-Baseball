@@ -1639,6 +1639,8 @@ Player.prototype = {
             return x / pitches | 0;
         });
 
+        // var potentialPitcher = ((~this.team.bench.indexOf(this)) || (this.team.positions.pitcher === this));
+
         if (pitcherRating > 90) {
             if (pitcherRating > 105) {
                 return (0, _Utility_utils.text)('Ace');

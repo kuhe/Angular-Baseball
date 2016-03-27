@@ -3,13 +3,23 @@
         <em>{{y.pitcher.throws == 'right' ? t('RHP') : t('LHP')}}</em> &raquo;
         <br>
         <strong>{{y.pitcher.getName()}}</strong>
-        ({{'#'+y.pitcher.number}}) <span *ngIf='y.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+        ({{'#'+y.pitcher.number}})
+        <span *ngIf='y.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+        <br>
+        <span class='defining'>
+            {{ y.pitcher.getDefiningCharacteristic() }}
+        </span>
     </div>
     <div class='col-xs-6'>
         <em>{{abbreviatePosition('catcher')}}</em> &raquo;
         <br>
         <strong>{{y.pitcher.team.positions.catcher.getName()}}</strong>
-        ({{'#'+y.pitcher.team.positions.catcher.number}}) <span *ngIf='y.pitcher.team.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+        ({{'#'+y.pitcher.team.positions.catcher.number}})
+        <span *ngIf='y.pitcher.team.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+        <br>
+        <span class='defining'>
+            {{ y.pitcher.team.positions.catcher.getDefiningCharacteristic() }}
+        </span>
     </div>
     <div class='col-xs-12'>
         <hr/>
@@ -21,9 +31,6 @@
                 <br>
                 {{y.pitcher.stats.pitching.getERA() | number:'1.2'}} ERA
                 <br>
-                <span class='defining'>
-                    {{ y.pitcher.getDefiningCharacteristic() }}
-                </span>
             </div>
             <div class='col-xs-6'>
                 {{ t('Game') }}
@@ -32,9 +39,6 @@
                 <br>
                 {{y.pitcher.stats.pitching.K}}K {{y.pitcher.stats.pitching.H}}H {{y.pitcher.stats.pitching.BB}}BB
                 <br>
-                <span class='defining'>
-                    {{ y.pitcher.team.positions.catcher.getDefiningCharacteristic() }}
-                </span>
             </div>
         </div>
     </div>

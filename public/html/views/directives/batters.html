@@ -7,17 +7,16 @@
             ({{('#')+batter.number}}) <span *ngIf='batter.hero' class='glyphicon glyphicon-chevron-up'></span>
             <br/>
             <em>{{abbreviatePosition(batter.position)}}{{t.comma()}}{{batter.bats == 'left' ? t('LHB') : t('RHB')}}</em>
+            <span class='defining'>
+                {{ batter.getDefiningCharacteristic() }}
+            </span>
         </div>
         <hr/>
         <div class='row one-line'>
             <div class='col-xs-12'>
                 {{ batter.stats.batting.getSlash() }}
                 <br>
-                <span class='defining'>
-                    {{ batter.getDefiningCharacteristic() }}
-                </span>
             </div>
-            <hr>
             <div class='col-xs-6'>
                 <div class='prevent-break'>
                     <strong>{{batter.stats.batting.hr}}</strong> {{ t('HR') }}

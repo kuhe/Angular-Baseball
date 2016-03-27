@@ -391,6 +391,8 @@ Player.prototype = {
         var pitches = pitchingKeys.length;
         pitching = pitching.map(x => x/pitches | 0);
 
+        // var potentialPitcher = ((~this.team.bench.indexOf(this)) || (this.team.positions.pitcher === this));
+
         if (pitcherRating > 90) {
             if (pitcherRating > 105) {
                 return text('Ace');
