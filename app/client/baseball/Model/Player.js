@@ -121,6 +121,10 @@ Player.prototype = {
                 W = randBetween(0, GS*0.6, this.skill.pitching);
                 L = randBetween((GS - W), 0, this.skill.pitching);
             }
+        } else {
+            IP = 0;
+            ER = 0;
+            GS = 0; W = 0; L = 0;
         }
         var pa = randBetween(gamesIntoSeason*3, gamesIntoSeason*5, 'speed eye');
         var paRemaining = pa;
@@ -407,15 +411,15 @@ Player.prototype = {
                 return text('Breaking ball');
             }
         } else {
-            if (sum(offense) > sum(defense)) {
-                if (sum(offense) > ELITE * 3) {
+            if (sum([offense[0] * 1.5, offense[1] * 0.70, offense[2]]) > sum(defense)) {
+                if (offense[0] + offense[2] > ELITE * 2) {
                     return text('Genius batter');
-                }
-                if (offense[0] > EXCELLENT) {
-                    return text('Contact');
                 }
                 if (offense[1] > EXCELLENT) {
                     return text('Power hitter');
+                }
+                if (offense[0] > EXCELLENT) {
+                    return text('Contact');
                 }
                 if (offense[2] > EXCELLENT) {
                     return text('Speedster');
@@ -430,7 +434,7 @@ Player.prototype = {
                 if (defense[1] > EXCELLENT) {
                     return text('Range');
                 }
-                if (defense[2] > EXCELLENT) {
+                if (defense[2] > ELITE) {
                     return text('Strong throw');
                 }
             }
