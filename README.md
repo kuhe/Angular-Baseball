@@ -1,4 +1,4 @@
-[Yakyuu-Aikoukai（Baseball Club）](http://georgefu.info/y)
+[Yakyuu-Aikoukai（Baseball Club）](http://kuhe.github.io)
 ===============
 
 A game of one of the top five bat-based sports! Namely, baseball! Now in JavaScript form.
@@ -6,17 +6,13 @@ A game of one of the top five bat-based sports! Namely, baseball! Now in JavaScr
 Click on and around the strike zone to pitch/bat (click on the outer edge to not swing). Locate your pitches well to draw groundouts, easy pop flies,
 and strikeouts from opposing batters, and use your batter's eye to hit the ball squarely in order to avoid the same.
 
-Hosted at [georgefu.info/y/](http://georgefu.info/y)
-
-Also hosted at [kuhe.github.io](http://kuhe.github.io)
+Hosted at [kuhe.github.io](http://kuhe.github.io)
 
 todo :
 
     スイングタイミング
 
     送りバント
-
-    substitutions from bench
     
     観客席やら
 
@@ -57,14 +53,8 @@ This will run the start the file watchers. Use gulp build to just build once.
 
 ## Test development
 
-Install protractor, configure the test spec app/client/tests/* to point to the correct test URL.
+Incidentally, this is the CLI mode, and will run a test simulating the 10-year career of a random player.
 
-    app/client> protractor protractor.conf.js
+See app\client\baseball\test\CareerSpec.js (es6)
 
-For mocha, see the node module 'baseball'
-
-    app/client/node_modules/baseball> npm test (es6)
-
-Incidentally, this is the CLI mode and equivalent to the above
-
-    app/client> npm run career (es6)
+    > npm test
