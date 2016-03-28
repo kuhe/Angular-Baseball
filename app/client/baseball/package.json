@@ -9,7 +9,6 @@
   "author": "George Fu (george.jing.fu@gmail.com)",
   "license": "GNU",
   "devDependencies": {
-
   },
   "directories": {
     "test": "test"
