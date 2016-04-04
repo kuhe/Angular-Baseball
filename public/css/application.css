@@ -3308,6 +3308,14 @@ input[type="reset"].btn-block,
 input[type="button"].btn-block {
   width: 100%;
 }
+.standard-colors {
+  background: white;
+  color: #313131;
+}
+.faded-colors {
+  background: white;
+  color: #606060;
+}
 @font-face {
   font-family: Noto;
   src: url("../fonts/NotoSansJP-Regular.woff2") format("woff2");
@@ -3318,7 +3326,7 @@ html body {
 }
 button.btn {
   margin: 10px;
-  background: #2a2a2a;
+  background: #313131;
   color: white;
   font-weight: bold;
   font-size: 16px;
@@ -3377,10 +3385,10 @@ button.btn.disabled {
   padding: 10px 30px !important;
 }
 .main-area .list-group-item {
-  color: white;
   line-height: 14px;
   padding: 5px 10px;
   border: none;
+  color: white;
   background-color: rgba(255, 255, 255, 0.15);
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
@@ -4132,7 +4140,7 @@ aside.image-panel.right {
   min-height: 70px;
   position: relative;
   z-index: 10;
-  color: black;
+  color: #313131;
   text-shadow: -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF, 1px 1px 0 #FFF;
 }
 .pitch-selection .rating-block {

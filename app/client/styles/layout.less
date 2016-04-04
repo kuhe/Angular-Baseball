@@ -15,6 +15,7 @@
 @import "../bower_components/bootstrap/less/buttons";
 
 @import "stacking";
+@import "colors";
 
 @font-face {
     font-family: Noto;
@@ -26,13 +27,14 @@ html body {
     border-top: 4px solid #ffc031;
     font-family: Noto, sans-serif;
 }
+
 .container {
 }
 
 button.btn {
     margin: 10px;
-    background: #2a2a2a;
-    color: white;
+    background: @contrast;
+    color: @background;
     font-weight: bold;
     font-size: 16px;
     line-height: 30px;
@@ -48,12 +50,8 @@ button.btn {
     &.batter-ready {
         background: #5d0e10;
     }
-    //&::before, &::after {
-    //    color: white;
-    //    content: "";
-    //}
     &:focus, &:active, &:hover {
-        color: white;
+        color: @background;
     }
     &.disabled {
         pointer-events: auto;
@@ -107,10 +105,10 @@ button.btn {
 .main-area {
     padding: 10px 30px !important;
     .list-group-item {
-        color: white;
         line-height: 14px;
         padding: 5px 10px;
         border: none;
+        color: white;
         background-color: rgba(255, 255, 255, 0.15);
         .text-shadow;
         strong {
