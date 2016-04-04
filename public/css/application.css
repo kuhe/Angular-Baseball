@@ -3312,7 +3312,15 @@ input[type="button"].btn-block {
   background: white;
   color: #313131;
 }
+.standard-colors * {
+  background: white;
+  color: #313131;
+}
 .faded-colors {
+  background: white;
+  color: #606060;
+}
+.faded-colors * {
   background: white;
   color: #606060;
 }
@@ -3323,6 +3331,10 @@ input[type="button"].btn-block {
 html body {
   border-top: 4px solid #ffc031;
   font-family: Noto, sans-serif;
+}
+a {
+  background: white;
+  color: #313131;
 }
 button.btn {
   margin: 10px;
@@ -3380,6 +3392,22 @@ button.btn.disabled {
 }
 .batting-lines .click_to_sub .list-group-item.lineup {
   border-left: 4px solid #e2df79;
+}
+.batting-lines .lineup {
+  background: white;
+  color: #313131;
+}
+.batting-lines .lineup .personal-stats .header {
+  background: white;
+  color: #606060;
+}
+.batting-lines .bench {
+  background: white;
+  color: #313131;
+}
+.batting-lines .substituted {
+  background: white;
+  color: #606060;
 }
 .main-area {
   padding: 10px 30px !important;

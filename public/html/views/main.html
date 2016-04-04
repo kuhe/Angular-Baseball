@@ -417,42 +417,53 @@
                     </span>
                     <div class='row'></div>
                     <section *ngIf='player.team.expanded === player'>
-                        <div class='visible-md-inline visible-lg-inline'>
+                        <hr>
+                        <div class='visible-md-inline visible-lg-inline col-xs-12'>
                             {{ t('Throws/Bats') }} {{t(player.throws == 'left' ? 'L' : 'R ')}}{{t.slash()}}
                             {{t(player.bats == 'left' ? ' L ' : ' R ')}}
                         </div>
                         <ul class='list-inline personal-stats row'>
                             <li class='col-md-1'></li>
-                            <li class='col-md-3'>{{ t('BA') }} <br> {{ player.stats.batting.ba | number:'1.3' }}
-                                ({{ player.stats.batting.getBA() | number:'1.3' }})</li>
-                            <li class='col-md-1'>{{ t('OBP') }} <br> {{ player.stats.batting.getOBP() | number:'1.3' }}</li>
-                            <li class='col-md-1'>{{ t('SLG') }} <br> {{ player.stats.batting.getSLG() | number:'1.3' }}</li>
-                            <li class='col-md-1'>{{ t('PA') }} <br> {{ player.stats.batting.pa }}</li>
+                            <li class='col-md-3 header'>{{ t('BA') }} <br>
+                                {{ player.stats.batting.getBA() | number:'1.3' }}
+                                ({{ player.stats.batting.ba | number:'1.3' }})
+                            </li>
+                            <li class='col-md-1 header'>{{ t('OBP') }} <br> {{ player.stats.batting.getOBP() | number:'1.3' }}</li>
+                            <li class='col-md-1 header'>{{ t('SLG') }} <br> {{ player.stats.batting.getSLG() | number:'1.3' }}</li>
+                            <li class='col-md-1 header'>{{ t('PA') }} <br> {{ player.stats.batting.pa }}</li>
                         </ul>
                         <hr/>
                         <ul class='list-inline personal-stats row'>
                             <li class='col-md-1'></li>
-                            <li class='col-md-3'>{{ t('H/2B/3B/HR') }} <br> {{ player.stats.batting.h }}
+                            <li class='col-md-3 header'>{{ t('H 2B 3B HR') }} <br>
+                                {{ player.stats.batting.h }}
                                 - {{ player.stats.batting['2b'] }}
                                 - {{ player.stats.batting['3b'] }}
                                 - {{ player.stats.batting.hr }}</li>
-                            <li class='col-md-1'>{{ t('RBI') }} <br> {{ player.stats.batting.rbi }}</li>
-                            <li class='col-md-1'>{{ t('R') }} <br> {{ player.stats.batting.r }}</li>
-                            <li class='col-md-1'>{{ t('BB') }} <br> {{ player.stats.batting.bb }}</li>
-                            <li class='col-md-1'>{{ t('SO') }} <br> {{ player.stats.batting.so }}</li>
+                            <li class='col-md-1 header'>{{ t('RBI') }} <br> {{ player.stats.batting.rbi }}</li>
+                            <li class='col-md-1 header'>{{ t('R') }} <br> {{ player.stats.batting.r }}</li>
+                            <li class='col-md-1 header'>{{ t('BB') }} <br> {{ player.stats.batting.bb }}</li>
+                            <li class='col-md-1 header'>{{ t('SO') }} <br> {{ player.stats.batting.so }}</li>
                         </ul>
-                        <span>
-                            {{ t('Eye') }} <rating-block [rating]='player.skill.offense.eye'></rating-block>
-                        </span>
-                        <span>
-                            {{ t('Power') }} <rating-block [rating]='player.skill.offense.power'></rating-block>
-                        </span>
-                        <span>
-                            {{ t('Speed') }} <rating-block [rating]='player.skill.offense.speed'></rating-block>
-                        </span>
+                        <hr>
+                        <div class='col-xs-12'>
+                            <span>
+                                {{ t('Eye') }} <rating-block [rating]='player.skill.offense.eye'></rating-block>
+                            </span>
+                            <span>
+                                {{ t('Power') }} <rating-block [rating]='player.skill.offense.power'></rating-block>
+                            </span>
+                            <span>
+                                {{ t('Speed') }} <rating-block [rating]='player.skill.offense.speed'></rating-block>
+                            </span>
+                        </div>
+                        <div class='row'></div>
                     </section>
                 </li>
-                <li class='list-group-item pointer' *ngFor='#player of team.bench'
+                <li class='list-group-item team-name'>
+                    {{ team.getName() + t.space() + t('Bench') }}
+                </li>
+                <li class='list-group-item pointer bench' *ngFor='#player of team.bench'
                     (click)='selectSubstitute(player)' [ngClass]='{selected_sub: team.sub?.toString() === player.toString()}'>
                     <strong>{{player.getName()}}</strong>
                     ({{'#'+player.number}})
@@ -467,7 +478,7 @@
                     </span>
                     <div class='row'></div>
                 </li>
-                <li class='list-group-item pointer' *ngFor='#player of team.substituted'>
+                <li class='list-group-item pointer substituted' *ngFor='#player of team.substituted'>
                     <strong>{{player.getName()}}</strong>
                     ({{'#'+player.number}})
                     <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>
@@ -493,73 +504,83 @@
             </ul>
         </div>
         <hr>
-        <section class='difficulty-select' *ngIf='!y.opponentConnected'>
-            <h4 *ngIf='mode() === "e"'>Opponent Selection</h4>
-            <h4 *ngIf='mode() === "n"'>挑戦</h4>
-            <div class='team'>
-                <button (click)='generateTeam(0.03)' class='btn pull-left pointer'>
-                    {{ t('Amateur Baseball Club') }}
-                </button>
-                <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
-                    (Easy)
+        <section class='difficulty-select col-xs-12' *ngIf='!y.opponentConnected'>
+            <h4 *ngIf='mode() === "e"' (click)='showDifficultySelection = !showDifficultySelection' class='pointer'>
+                <a>
+                    Opponent Selection &raquo;
+                </a>
+            </h4>
+            <h4 *ngIf='mode() === "n"' (click)='showDifficultySelection = !showDifficultySelection' class='pointer'>
+                <a>
+                    挑戦 &raquo;
+                </a>
+            </h4>
+            <div [hidden]='!showDifficultySelection'>
+                <div class='team'>
+                    <button (click)='generateTeam(0.03)' class='btn pull-left pointer'>
+                        {{ t('Amateur Baseball Club') }}
+                    </button>
+                    <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
+                        (Easy)
+                    </div>
+                    <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
+                        （栗鼠）
+                    </div>
                 </div>
-                <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
-                    （栗鼠）
+                <div class='team'>
+                    <button (click)='generateTeam(0.12)' class='btn pull-left pointer'>
+                        {{ t('Amateur Baseball Team') }}
+                    </button>
+                    <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
+                        (Easy)
+                    </div>
+                    <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
+                        （猫）
+                    </div>
                 </div>
-            </div>
-            <div class='team'>
-                <button (click)='generateTeam(0.12)' class='btn pull-left pointer'>
-                    {{ t('Amateur Baseball Team') }}
-                </button>
-                <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
-                    (Easy)
+                <div class='team'>
+                    <button (click)='generateTeam(0.24)' class='btn pull-left pointer'>
+                        {{ t('College Team') }}
+                    </button>
+                    <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
+                        (Moderate)
+                    </div>
+                    <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
+                        （馬）
+                    </div>
                 </div>
-                <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
-                    （猫）
+                <div class='team'>
+                    <button (click)='generateTeam(0.48)' class='btn pull-left pointer'>
+                        {{ t('Industrial League Team') }}
+                    </button>
+                    <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
+                        (Hard)
+                    </div>
+                    <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
+                        （牛）
+                    </div>
                 </div>
-            </div>
-            <div class='team'>
-                <button (click)='generateTeam(0.24)' class='btn pull-left pointer'>
-                    {{ t('College Team') }}
-                </button>
-                <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
-                    (Moderate)
+                <div class='team'>
+                    <button (click)='generateTeam(0.75)' class='btn pull-left pointer'>
+                        {{ t('Training Squad') }}
+                    </button>
+                    <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
+                        (Hard)
+                    </div>
+                    <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
+                        （象）
+                    </div>
                 </div>
-                <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
-                    （馬）
-                </div>
-            </div>
-            <div class='team'>
-                <button (click)='generateTeam(0.48)' class='btn pull-left pointer'>
-                    {{ t('Industrial League Team') }}
-                </button>
-                <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
-                    (Hard)
-                </div>
-                <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
-                    （牛）
-                </div>
-            </div>
-            <div class='team'>
-                <button (click)='generateTeam(0.75)' class='btn pull-left pointer'>
-                    {{ t('Training Squad') }}
-                </button>
-                <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
-                    (Hard)
-                </div>
-                <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
-                    （象）
-                </div>
-            </div>
-            <div class='team'>
-                <button (click)='teamJapan()' class='btn pull-left pointer'>
-                    {{ t('Team Japan') }}
-                </button>
-                <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
-                    (Merciless)
-                </div>
-                <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
-                    （獅子）
+                <div class='team'>
+                    <button (click)='teamJapan()' class='btn pull-left pointer'>
+                        {{ t('Team Japan') }}
+                    </button>
+                    <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
+                        (Merciless)
+                    </div>
+                    <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
+                        （獅子）
+                    </div>
                 </div>
             </div>
         </section>

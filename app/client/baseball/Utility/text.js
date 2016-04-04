@@ -73,7 +73,7 @@ var text = function(phrase, override) {
             'OBP' : '出塁',
             'SLG' : '長打',
             'PA' : '打席',
-            'H/2B/3B/HR' : '安／二／三／本',
+            'H 2B 3B HR' : '安 二 三 本',
             'H' : '安',
             '2B' : '二',
             '3B' : '三',
@@ -126,6 +126,7 @@ var text = function(phrase, override) {
             'Team Japan': '日本代表',
 
             'Substituted' : '交代',
+            'Bench': 'ベンチ',
 
             'Batter Ready' : '打撃準備',
 
