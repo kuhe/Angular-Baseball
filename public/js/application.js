@@ -1704,6 +1704,7 @@ Player.prototype = {
                 }
             }
         }
+        if (battingOnly) return out;
         return this.definingCharacteristic[_Utility_utils.text.mode] = out;
     },
     /**
