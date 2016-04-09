@@ -28,7 +28,10 @@
                 </div>
             </div>
             <div class='col-xs-12'>
-                {{batter.getAtBats().join(', ')}}
+                <span class='action-line' *ngFor='#atBat of batter.getAtBats()'
+                      [ngClass]='{beneficial: atBat.beneficial}'>
+                    {{ atBat + '' }}
+                </span>
             </div>
         </div>
     </div>
