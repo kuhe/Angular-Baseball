@@ -416,10 +416,10 @@ Game.prototype = {
             h: Math.random() * 5 + 9 | 0,
             m: Math.random() * 60 | 0
         };
-        this.timeOfDay = {
-            h: 1,
-            m: 30
-        };
+        var timeOfDay = this.timeOfDay = {
+            h: 0,
+            m: 0
+        }; // @see {Loop} for time initialization
         if (m) _Utility_utils.text.mode = m;
         this.gamesIntoSeason = 5 + Math.floor(Math.random() * 133);
         this.field = new _ModelField.Field(this);
@@ -438,6 +438,7 @@ Game.prototype = {
         }
         this.autoPitchSelect();
         _Services_services.Animator.init();
+        this.passMinutes(5);
     },
     passMinutes: function passMinutes(minutes) {
         var time = this.timeOfDay;
@@ -2359,8 +2360,8 @@ var Loop = (function () {
         this.elementClass = elementClass;
         window.loop = this;
         this.timeOfDay = {
-            h: 0,
-            m: 0
+            h: 5,
+            m: 30
         };
         this.main(background);
     }

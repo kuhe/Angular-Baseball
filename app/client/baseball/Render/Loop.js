@@ -34,8 +34,8 @@ class Loop {
         this.elementClass = elementClass;
         window.loop = this;
         this.timeOfDay = {
-            h: 0,
-            m: 0
+            h: 5,
+            m: 30
         };
         this.main(background);
     }

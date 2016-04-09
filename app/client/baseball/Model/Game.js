@@ -26,10 +26,10 @@ Game.prototype = {
             h: Math.random() * 5 + 9 | 0,
             m: Math.random() * 60 | 0
         };
-        this.timeOfDay = {
-            h: 1,
-            m: 30
-        };
+        var timeOfDay = this.timeOfDay = {
+            h: 0,
+            m: 0
+        }; // @see {Loop} for time initialization
         if (m) text.mode = m;
         this.gamesIntoSeason = 5 + Math.floor(Math.random()*133);
         this.field = new Field(this);
@@ -48,6 +48,7 @@ Game.prototype = {
         }
         this.autoPitchSelect();
         Animator.init();
+        this.passMinutes(5);
     },
     passMinutes: function(minutes) {
         var time = this.timeOfDay;
