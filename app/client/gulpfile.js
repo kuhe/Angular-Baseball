@@ -42,7 +42,9 @@ var EXTERNAL_SCRIPT_FILES = [
     './bower_components/jquery/dist/jquery.js',
     //'./bower_components/angular/angular.js',
 
-    'node_modules/angular2/bundles/angular2-polyfills.js',
+    //'node_modules/angular2/bundles/angular2-polyfills.js', come on.
+    'node_modules/zone.js/dist/zone.min.js',
+    'node_modules/reflect-metadata/Reflect.js',
     'node_modules/rxjs/bundles/Rx.umd.js',
     'node_modules/angular2/bundles/angular2-all.umd.js',
 
