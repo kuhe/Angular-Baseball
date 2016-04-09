@@ -4135,6 +4135,18 @@ aside.image-panel.right {
   background: white;
   z-index: -9;
 }
+.team-flag {
+  display: inline-block;
+  background: white;
+  box-shadow: 0 0 10px -1px #3c3c3c;
+  width: 30px;
+  height: 20px;
+  background-size: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0 6px 0 3px;
+  float: left;
+}
 .rating-block {
   margin: 0 6px -1px;
   padding: 6px 5px;

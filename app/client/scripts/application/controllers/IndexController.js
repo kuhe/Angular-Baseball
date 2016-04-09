@@ -282,7 +282,7 @@ IndexController = function($scope, socket) {
             directives: [ng.common.NgStyle, ng.common.NgFor,
                 app.BattersDataComponent,
                 app.BatteryDataComponent,
-                //app.FieldComponent,
+                app.FlagComponent,
                 app.RatingBlockComponent,
                 app.ScoreboardComponent
             ],

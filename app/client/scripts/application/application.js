@@ -14,7 +14,8 @@ if (typeof angular === 'object') {
         .directive('batters', BattersDirective)
         .directive('battery', BatteryDirective)
         .directive('field', FieldDirective)
-        .directive('ratingBlock', RatingBlockDirective);
+        .directive('ratingBlock', RatingBlockDirective)
+        .directive('teamFlag', FlagDirective);
 
 } else {
 

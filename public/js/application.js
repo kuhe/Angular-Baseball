@@ -6419,6 +6419,32 @@ FieldDirective = function() {
             }
         });
 })(window.app || (window.app = {}));
+FlagDirective = function() {
+    return {
+        scope: {
+            rating: '='
+        },
+        transclude: true,
+        templateUrl: 'public/html/views/directives/flag.html?cache='+cacheKey,
+        link: function(scope) {
+        }
+    };
+};
+
+(function(app) {
+    app.FlagComponent = ng.core
+        .Component({
+            selector: 'flag',
+            templateUrl: FlagDirective().templateUrl,
+            inputs: ['team'],
+            directives: [ng.common.NgStyle]
+        })
+        .Class({
+            constructor: function() {
+
+            }
+        });
+})(window.app || (window.app = {}));
 RatingBlockDirective = function() {
     return {
         scope: {
@@ -6758,7 +6784,7 @@ IndexController = function($scope, socket) {
             directives: [ng.common.NgStyle, ng.common.NgFor,
                 app.BattersDataComponent,
                 app.BatteryDataComponent,
-                //app.FieldComponent,
+                app.FlagComponent,
                 app.RatingBlockComponent,
                 app.ScoreboardComponent
             ],
@@ -6788,7 +6814,8 @@ if (typeof angular === 'object') {
         .directive('batters', BattersDirective)
         .directive('battery', BatteryDirective)
         .directive('field', FieldDirective)
-        .directive('ratingBlock', RatingBlockDirective);
+        .directive('ratingBlock', RatingBlockDirective)
+        .directive('teamFlag', FlagDirective);
 
 } else {
 

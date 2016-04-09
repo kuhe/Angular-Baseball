@@ -395,6 +395,7 @@
         <div class='col-lg-12 batting-lines'>
             <ul class='list-group col-lg-6' *ngFor='#team of [y.teams.away, y.teams.home]' [ngClass]='{ click_to_sub: team.sub !== team.noSubstituteSelected }'>
                 <li class='list-group-item team-name'>
+                    <flag [team]='team'></flag>
                     {{team.getName()}}
                 </li>
                 <li class='list-group-item pointer lineup' *ngFor="#player of team.lineup"
@@ -462,6 +463,7 @@
                     </section>
                 </li>
                 <li class='list-group-item team-name'>
+                    <flag [team]='team'></flag>
                     {{ team.getName() + t.space() + t('Bench') }}
                 </li>
                 <li class='list-group-item pointer bench' *ngFor='#player of team.bench'
