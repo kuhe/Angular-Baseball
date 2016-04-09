@@ -140,6 +140,10 @@ var text = function(phrase, override) {
             'Contact' : 'バットコントロール',
             'Power hitter' : '主砲',
             'Speedster' : '足速い',
+            'Inept': '不器用',
+            'Weak swing': '弱い',
+            'Strikes out': '三振がち',
+            'Leisurely runner': '悠長',
             //'' : '',
             //'' : '',
             // descriptors fielding

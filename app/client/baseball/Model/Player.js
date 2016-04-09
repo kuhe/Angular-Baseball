@@ -32,6 +32,8 @@ Player.prototype = {
         this.surname = data.surnames[surnameKey];
         this.surnameJ = data.surnamesJ[surnameKey];
         this.atBats = [];
+        this.definingBattingCharacteristic = {};
+        this.definingCharacteristic = {};
     },
     spaceName : function(jSurname, jGivenName) {
         if (jSurname.length == 1 && jGivenName.length <= 2) jSurname += '・';
@@ -371,7 +373,17 @@ Player.prototype = {
     getOrder : function() {
         return text([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
     },
-    getDefiningCharacteristic: function() {
+    getDefiningBattingCharacteristic: function() {
+        if (!this.definingBattingCharacteristic[text.mode]) {
+            this.definingBattingCharacteristic[text.mode] = this.getDefiningCharacteristic(true);
+        }
+        return this.definingBattingCharacteristic[text.mode];
+    },
+    getDefiningCharacteristic: function(battingOnly) {
+        if (this.definingCharacteristic[text.mode] && !battingOnly) {
+            return this.definingCharacteristic[text.mode];
+        }
+        var out = '';
         var o = this.skill.offense,
             d = this.skill.defense,
             pitcherRating = this.skill.pitching;
@@ -379,6 +391,10 @@ Player.prototype = {
         const ELITE = 90;
         const EXCELLENT = 80;
         const GOOD = 60;
+
+        const POOR = 40;
+        const BAD = 30;
+        const INEPT = 20;
 
         var skills = [o.eye, o.power, o.speed, d.fielding, d.speed, d.throwing, pitcherRating];
         var offense = [o.eye, o.power, o.speed];
@@ -398,49 +414,48 @@ Player.prototype = {
 
         // var potentialPitcher = ((~this.team.bench.indexOf(this)) || (this.team.positions.pitcher === this));
 
-        if (pitcherRating > 90) {
+        if (pitcherRating > 90 && !battingOnly) {
             if (pitcherRating > 105) {
-                return text('Ace');
-            }
-            if (pitching[0] > EXCELLENT) {
-                return text('Control pitcher');
-            }
-            if (pitching[1] > EXCELLENT) {
-                return text('Flamethrower');
-            }
-            if (pitching[2] > EXCELLENT) {
-                return text('Breaking ball');
+                out = text('Ace');
+            } else if (pitching[0] > EXCELLENT) {
+                out = text('Control pitcher');
+            } else if (pitching[1] > EXCELLENT) {
+                out = text('Flamethrower');
+            } else if (pitching[2] > EXCELLENT) {
+                out = text('Breaking ball');
             }
         } else {
-            if (sum([offense[0] * 2, offense[1] * 0.50, offense[2]]) > sum(defense)) {
+            if (battingOnly || sum([offense[0] * 2, offense[1] * 0.50, offense[2]]) > sum(defense)) {
                 if (offense[0] > 98 || (sum(offense) > ELITE * 3)) {
-                    return text('Genius batter');
-                }
-                if (offense[1] > EXCELLENT && offense[1] > offense[0]) {
-                    return text('Power hitter');
-                }
-                if (offense[0] > EXCELLENT) {
-                    return text('Contact');
-                }
-                if (offense[2] > EXCELLENT) {
-                    return text('Speedster');
+                    out = text('Genius batter');
+                } else if (offense[1] > EXCELLENT && offense[1] > offense[0]) {
+                    out = text('Power hitter');
+                } else if (offense[0] > EXCELLENT) {
+                    out = text('Contact');
+                } else if (offense[2] > EXCELLENT) {
+                    out = text('Speedster');
+                } else if (offense[0] < INEPT || (sum(offense) < POOR * 3)) {
+                    out = text('Inept');
+                } else if (offense[1] < INEPT && offense[1] < offense[0]) {
+                    out = text('Weak swing');
+                } else if (offense[0] < BAD) {
+                    out = text('Strikes out');
+                } else if (offense[2] < POOR) {
+                    out = text('Leisurely runner');
                 }
             } else {
                 if (sum(defense) > EXCELLENT * 3) {
-                    return text('Defensive wizard');
-                }
-                if (defense[0] > EXCELLENT) {
-                    return text('Glove');
-                }
-                if (defense[1] > EXCELLENT) {
-                    return text('Range');
-                }
-                if (defense[2] > ELITE) {
-                    return text('Strong throw');
+                    out = text('Defensive wizard');
+                } else if (defense[0] > EXCELLENT) {
+                    out = text('Glove');
+                } else if (defense[1] > EXCELLENT) {
+                    out = text('Range');
+                } else if (defense[2] > ELITE) {
+                    out = text('Strong throw');
                 }
             }
         }
-        return '';
+        return this.definingCharacteristic[text.mode] = out;
     },
     /**
      * to ease comparison in Angular (?)

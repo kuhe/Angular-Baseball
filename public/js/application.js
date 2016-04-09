@@ -413,7 +413,7 @@ Game.prototype = {
     init: function init(m) {
         this.reset();
         this.startTime = {
-            h: Math.random() * 5 + 9 | 0,
+            h: Math.random() * 6 + 11 | 0,
             m: Math.random() * 60 | 0
         };
         var timeOfDay = this.timeOfDay = {
@@ -1274,6 +1274,8 @@ Player.prototype = {
         this.surname = _Utility_utils.data.surnames[surnameKey];
         this.surnameJ = _Utility_utils.data.surnamesJ[surnameKey];
         this.atBats = [];
+        this.definingBattingCharacteristic = {};
+        this.definingCharacteristic = {};
     },
     spaceName: function spaceName(jSurname, jGivenName) {
         if (jSurname.length == 1 && jGivenName.length <= 2) jSurname += '・';
@@ -1614,7 +1616,17 @@ Player.prototype = {
     getOrder: function getOrder() {
         return (0, _Utility_utils.text)([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
     },
-    getDefiningCharacteristic: function getDefiningCharacteristic() {
+    getDefiningBattingCharacteristic: function getDefiningBattingCharacteristic() {
+        if (!this.definingBattingCharacteristic[_Utility_utils.text.mode]) {
+            this.definingBattingCharacteristic[_Utility_utils.text.mode] = this.getDefiningCharacteristic(true);
+        }
+        return this.definingBattingCharacteristic[_Utility_utils.text.mode];
+    },
+    getDefiningCharacteristic: function getDefiningCharacteristic(battingOnly) {
+        if (this.definingCharacteristic[_Utility_utils.text.mode] && !battingOnly) {
+            return this.definingCharacteristic[_Utility_utils.text.mode];
+        }
+        var out = '';
         var o = this.skill.offense,
             d = this.skill.defense,
             pitcherRating = this.skill.pitching;
@@ -1622,6 +1634,10 @@ Player.prototype = {
         var ELITE = 90;
         var EXCELLENT = 80;
         var GOOD = 60;
+
+        var POOR = 40;
+        var BAD = 30;
+        var INEPT = 20;
 
         var skills = [o.eye, o.power, o.speed, d.fielding, d.speed, d.throwing, pitcherRating];
         var offense = [o.eye, o.power, o.speed];
@@ -1647,49 +1663,48 @@ Player.prototype = {
 
         // var potentialPitcher = ((~this.team.bench.indexOf(this)) || (this.team.positions.pitcher === this));
 
-        if (pitcherRating > 90) {
+        if (pitcherRating > 90 && !battingOnly) {
             if (pitcherRating > 105) {
-                return (0, _Utility_utils.text)('Ace');
-            }
-            if (pitching[0] > EXCELLENT) {
-                return (0, _Utility_utils.text)('Control pitcher');
-            }
-            if (pitching[1] > EXCELLENT) {
-                return (0, _Utility_utils.text)('Flamethrower');
-            }
-            if (pitching[2] > EXCELLENT) {
-                return (0, _Utility_utils.text)('Breaking ball');
+                out = (0, _Utility_utils.text)('Ace');
+            } else if (pitching[0] > EXCELLENT) {
+                out = (0, _Utility_utils.text)('Control pitcher');
+            } else if (pitching[1] > EXCELLENT) {
+                out = (0, _Utility_utils.text)('Flamethrower');
+            } else if (pitching[2] > EXCELLENT) {
+                out = (0, _Utility_utils.text)('Breaking ball');
             }
         } else {
-            if (sum([offense[0] * 2, offense[1] * 0.50, offense[2]]) > sum(defense)) {
+            if (battingOnly || sum([offense[0] * 2, offense[1] * 0.50, offense[2]]) > sum(defense)) {
                 if (offense[0] > 98 || sum(offense) > ELITE * 3) {
-                    return (0, _Utility_utils.text)('Genius batter');
-                }
-                if (offense[1] > EXCELLENT && offense[1] > offense[0]) {
-                    return (0, _Utility_utils.text)('Power hitter');
-                }
-                if (offense[0] > EXCELLENT) {
-                    return (0, _Utility_utils.text)('Contact');
-                }
-                if (offense[2] > EXCELLENT) {
-                    return (0, _Utility_utils.text)('Speedster');
+                    out = (0, _Utility_utils.text)('Genius batter');
+                } else if (offense[1] > EXCELLENT && offense[1] > offense[0]) {
+                    out = (0, _Utility_utils.text)('Power hitter');
+                } else if (offense[0] > EXCELLENT) {
+                    out = (0, _Utility_utils.text)('Contact');
+                } else if (offense[2] > EXCELLENT) {
+                    out = (0, _Utility_utils.text)('Speedster');
+                } else if (offense[0] < INEPT || sum(offense) < POOR * 3) {
+                    out = (0, _Utility_utils.text)('Inept');
+                } else if (offense[1] < INEPT && offense[1] < offense[0]) {
+                    out = (0, _Utility_utils.text)('Weak swing');
+                } else if (offense[0] < BAD) {
+                    out = (0, _Utility_utils.text)('Strikes out');
+                } else if (offense[2] < POOR) {
+                    out = (0, _Utility_utils.text)('Leisurely runner');
                 }
             } else {
                 if (sum(defense) > EXCELLENT * 3) {
-                    return (0, _Utility_utils.text)('Defensive wizard');
-                }
-                if (defense[0] > EXCELLENT) {
-                    return (0, _Utility_utils.text)('Glove');
-                }
-                if (defense[1] > EXCELLENT) {
-                    return (0, _Utility_utils.text)('Range');
-                }
-                if (defense[2] > ELITE) {
-                    return (0, _Utility_utils.text)('Strong throw');
+                    out = (0, _Utility_utils.text)('Defensive wizard');
+                } else if (defense[0] > EXCELLENT) {
+                    out = (0, _Utility_utils.text)('Glove');
+                } else if (defense[1] > EXCELLENT) {
+                    out = (0, _Utility_utils.text)('Range');
+                } else if (defense[2] > ELITE) {
+                    out = (0, _Utility_utils.text)('Strong throw');
                 }
             }
         }
-        return '';
+        return this.definingCharacteristic[_Utility_utils.text.mode] = out;
     },
     /**
      * to ease comparison in Angular (?)
@@ -2450,6 +2465,8 @@ var Loop = (function () {
     }, {
         key: 'setTargetTimeOfDay',
         value: function setTargetTimeOfDay(hours, minutes) {
+            var _this = this;
+
             if (this.background) {
                 var sun = this.background.sun;
             } else {
@@ -2457,6 +2474,10 @@ var Loop = (function () {
             }
             if (sun) {
                 sun.setTargetTime(hours, minutes);
+            } else {
+                setTimeout(function (x) {
+                    _this.setTargetTimeOfDay(hours, minutes);
+                }, 500);
             }
         }
 
@@ -5778,6 +5799,10 @@ var text = function text(phrase, override) {
             'Contact': 'バットコントロール',
             'Power hitter': '主砲',
             'Speedster': '足速い',
+            'Inept': '不器用',
+            'Weak swing': '弱い',
+            'Strikes out': '三振がち',
+            'Leisurely runner': '悠長',
             //'' : '',
             //'' : '',
             // descriptors fielding

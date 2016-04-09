@@ -18,6 +18,11 @@
 //    border: 1px dashed black;
 }
 
+.inline-block {
+    display: inline-block;
+    line-height: 1.2em;
+}
+
 .defining {
     color: @characteristic;
     font-style: italic;
@@ -30,6 +35,9 @@
     //&:after {
     //    content: "";
     //}
+    &.anti-color {
+        color: @characteristicLight;
+    }
 }
 
 .mousehover {

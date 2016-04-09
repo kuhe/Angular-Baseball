@@ -3430,7 +3430,7 @@ button.btn.disabled {
   text-align: left;
 }
 .main-area * {
-  font-size: 12px;
+  font-size: 14px;
 }
 .grey {
   /*background-image: url(../images/sb-tile-grey.png);*/
@@ -3583,6 +3583,7 @@ button.btn.disabled {
   width: 100%;
   margin: -25px auto auto;
   color: white;
+  font-size: 12px;
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 .batter-stats .rating-block {
@@ -4135,12 +4136,19 @@ aside.image-panel.right {
   border-top-left-radius: 8px;
   border-bottom-right-radius: 8px;
 }
+.inline-block {
+  display: inline-block;
+  line-height: 1.2em;
+}
 .defining {
   color: darkslategrey;
   font-style: italic;
   font-weight: bold;
   font-size: 12px;
   margin: 0 8px;
+}
+.defining.anti-color {
+  color: #c9ffbf;
 }
 .mousehover {
   position: fixed;

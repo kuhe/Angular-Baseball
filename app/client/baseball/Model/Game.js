@@ -23,7 +23,7 @@ Game.prototype = {
     init : function(m) {
         this.reset();
         this.startTime = {
-            h: Math.random() * 5 + 9 | 0,
+            h: Math.random() * 6 + 11 | 0,
             m: Math.random() * 60 | 0
         };
         var timeOfDay = this.timeOfDay = {

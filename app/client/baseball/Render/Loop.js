@@ -121,6 +121,10 @@ class Loop {
         }
         if (sun) {
             sun.setTargetTime(hours, minutes);
+        } else {
+            setTimeout(x => {
+                this.setTargetTimeOfDay(hours, minutes);
+            }, 500);
         }
     }
 
