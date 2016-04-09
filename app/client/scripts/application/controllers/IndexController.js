@@ -62,6 +62,7 @@ IndexController = function($scope, socket) {
     $scope.spectate = function() {$scope.proceedToGame(0,1);};
 
     $scope.proceedToGame = function(quickMode, spectateCpu) {
+        $scope.begin = true;
         var game = $scope.y;
         game.humanControl = spectateCpu ? 'none' : 'home';
         game.console = !!quickMode && quickMode !== 7;

@@ -156,7 +156,7 @@
             </div>
         </section>
     </div>
-    <div class='play-begins'>
+    <div class='play-begins' [ngClass]='{ blocked: !begin }'>
         <scoreboard [y]='y' [t]='t'></scoreboard>
         <hr class='under-canvas' />
         <div class='diamond-display row'>

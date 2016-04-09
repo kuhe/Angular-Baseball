@@ -282,10 +282,9 @@ button.btn {
 }
 
 .blocking {
+    height: auto;
     position: absolute;
     width: 100%;
-    height: 250%;
-    min-height: 800px;
     z-index: @overlay;
     left: 0;
     top: 0;
@@ -300,6 +299,14 @@ button.btn {
 }
 .blocking .no-swing {
     border: 2px solid black;
+}
+
+.play-begins {
+    height: auto;
+    &.blocked {
+        height: 100px;
+        overflow: hidden;
+    }
 }
 
 .steal-controls {
