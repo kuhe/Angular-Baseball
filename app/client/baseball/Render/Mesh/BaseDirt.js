@@ -1,9 +1,10 @@
 import { AbstractMesh } from './AbstractMesh';
 import { Loop } from '../Loop';
 
-class HomeDirt extends AbstractMesh {
-    constructor(loop) {
+class BaseDirt extends AbstractMesh {
+    constructor(loop, base) {
         super();
+        this.base = base;
         this.getMesh();
         if (loop instanceof Loop) {
             this.join(loop);
@@ -13,10 +14,11 @@ class HomeDirt extends AbstractMesh {
         var material = new THREE.MeshLambertMaterial({
             color: 0xDCB096
         });
+        var home = this.base.base === 'home';
 
         var mesh = new THREE.Mesh(
             new THREE.CircleGeometry(
-                18, 32
+                home ? 18 : 12, 32
             ),
             material
         );
@@ -25,9 +27,11 @@ class HomeDirt extends AbstractMesh {
         mesh.rotation.y = 0;
         mesh.rotation.z = 45/180 * Math.PI;
 
-        mesh.position.x = 0;
+        var base = this.base.getMesh().position;
+
+        mesh.position.x = base.x * 0.9;
         mesh.position.y = AbstractMesh.WORLD_BASE_Y + 0.3;
-        mesh.position.z = 0;
+        mesh.position.z = base.z;
 
         this.mesh = mesh;
         return this.mesh;
@@ -37,4 +41,4 @@ class HomeDirt extends AbstractMesh {
     }
 }
 
-export { HomeDirt }
+export { BaseDirt }

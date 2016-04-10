@@ -1,9 +1,10 @@
 import { AbstractMesh } from './AbstractMesh';
 import { Loop } from '../Loop';
 
-class Field extends AbstractMesh {
-    constructor(loop) {
+class FoulPole extends AbstractMesh {
+    constructor(loop, side) {
         super();
+        this.side = side;
         this.getMesh();
         if (loop instanceof Loop) {
             this.join(loop);
@@ -11,33 +12,35 @@ class Field extends AbstractMesh {
     }
     getMesh() {
         var material = new THREE.MeshLambertMaterial({
-            color: 0xDCB096
+            color: 0xE3EF6E
         });
 
         var mesh = new THREE.Mesh(
-            new THREE.PlaneGeometry(
-                160,
-                160,
-                32,
-                32
+            new THREE.CylinderGeometry(
+                0.35, 0.35,
+                180,
+                8,
+                8
             ),
             material
         );
 
-        mesh.rotation.x = -90/180 * Math.PI;
-        mesh.rotation.y = 0;
-        mesh.rotation.z = 45/180 * Math.PI;
+        var left = this.side === 'left';
 
-        mesh.position.x = 0;
+        if (left) {
+            mesh.position.x = -218;
+            mesh.position.z = -212;
+        } else {
+            mesh.position.x = 218;
+            mesh.position.z = -212;
+        }
         mesh.position.y = AbstractMesh.WORLD_BASE_Y;
-        mesh.position.z = -102;
 
         this.mesh = mesh;
         return this.mesh;
     }
     animate() {
-
     }
 }
 
-export { Field }
+export { FoulPole }

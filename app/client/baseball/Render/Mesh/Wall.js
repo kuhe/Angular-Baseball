@@ -18,7 +18,7 @@ class Wall extends AbstractMesh {
         var mesh = new THREE.Mesh(
             new THREE.BoxGeometry(
                 120,
-               15 | 0,
+                15,
                 4,
                 16, 16, 16
             ),
@@ -28,7 +28,7 @@ class Wall extends AbstractMesh {
         var radians = this.angle / 180 * Math.PI;
         mesh.rotation.y = -radians;
 
-        var hypotenuse = 320;
+        var hypotenuse = 300;
         var distance = Math.cos(radians) * hypotenuse;
         var offset = Math.sin(radians) * hypotenuse;
 

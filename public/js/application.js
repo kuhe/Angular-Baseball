@@ -47,7 +47,7 @@ AtBat.prototype.RBI_INDICATOR = '+';
 
 exports.AtBat = AtBat;
 
-},{"../Utility/Log":32}],2:[function(require,module,exports){
+},{"../Utility/Log":34}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -377,7 +377,7 @@ Field.prototype = {
 
 exports.Field = Field;
 
-},{"../Model/Player":5,"../Services/_services":28}],3:[function(require,module,exports){
+},{"../Model/Player":5,"../Services/_services":30}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1129,7 +1129,7 @@ Game.prototype = {
 
 exports.Game = Game;
 
-},{"../Model/Field":2,"../Model/Player":5,"../Model/Team":6,"../Model/Umpire":7,"../Services/_services":28,"../Utility/Log":32,"../Utility/_utils":33}],4:[function(require,module,exports){
+},{"../Model/Field":2,"../Model/Player":5,"../Model/Team":6,"../Model/Umpire":7,"../Services/_services":30,"../Utility/Log":34,"../Utility/_utils":35}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1231,7 +1231,7 @@ Manager.prototype = {
 
 exports.Manager = Manager;
 
-},{"../Services/_services":28}],5:[function(require,module,exports){
+},{"../Services/_services":30}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1723,7 +1723,7 @@ Player.prototype = {
 
 exports.Player = Player;
 
-},{"../Model/_models":8,"../Services/_services":28,"../Utility/_utils":33}],6:[function(require,module,exports){
+},{"../Model/_models":8,"../Services/_services":30,"../Utility/_utils":35}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1804,7 +1804,7 @@ Team.prototype = {
 
 exports.Team = Team;
 
-},{"../Model/Manager":4,"../Model/Player":5,"../Utility/_utils":33}],7:[function(require,module,exports){
+},{"../Model/Manager":4,"../Model/Player":5,"../Utility/_utils":35}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2286,7 +2286,7 @@ Umpire.prototype = {
 
 exports.Umpire = Umpire;
 
-},{"../Model/Player":5,"../Utility/_utils":33}],8:[function(require,module,exports){
+},{"../Model/Player":5,"../Utility/_utils":35}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2332,11 +2332,15 @@ var _meshMound = require('./mesh/Mound');
 
 var _meshBase = require('./mesh/Base');
 
+var _meshFoulLine = require('./mesh/FoulLine');
+
+var _meshFoulPole = require('./mesh/FoulPole');
+
 var _meshField = require('./mesh/Field');
 
 var _meshGrass = require('./mesh/Grass');
 
-var _meshHomeDirt = require('./mesh/HomeDirt');
+var _meshBaseDirt = require('./mesh/BaseDirt');
 
 var _meshBattersEye = require('./mesh/BattersEye');
 
@@ -2527,7 +2531,6 @@ var Loop = (function () {
         value: function addStaticMeshes() {
             new _meshField.Field().join(this);
             new _meshMound.Mound().join(this);
-            new _meshHomeDirt.HomeDirt().join(this);
             new _meshGrass.Grass().join(this);
             new _meshGrass.Grass(this, true);
             new _meshBattersEye.BattersEye().join(this);
@@ -2545,10 +2548,21 @@ var Loop = (function () {
             new _meshWall.Wall(this, 15);
             new _meshWall.Wall(this, 34);
 
-            new _meshBase.Base(this, 'first');
-            new _meshBase.Base(this, 'second');
-            new _meshBase.Base(this, 'third');
-            new _meshBase.Base(this, 'home');
+            var b1 = new _meshBase.Base(this, 'first');
+            var b2 = new _meshBase.Base(this, 'second');
+            var b3 = new _meshBase.Base(this, 'third');
+            var b4 = new _meshBase.Base(this, 'home');
+
+            new _meshBaseDirt.BaseDirt(this, b1);
+            new _meshBaseDirt.BaseDirt(this, b2);
+            new _meshBaseDirt.BaseDirt(this, b3);
+            new _meshBaseDirt.BaseDirt(this, b4);
+
+            new _meshFoulLine.FoulLine(this, 'left');
+            new _meshFoulLine.FoulLine(this, 'right');
+
+            new _meshFoulPole.FoulPole(this, 'left');
+            new _meshFoulPole.FoulPole(this, 'right');
         }
 
         /**
@@ -2792,7 +2806,7 @@ Loop.prototype.constructors = {
 
 exports.Loop = Loop;
 
-},{"../Services/Animator":24,"./Shaders/SkyShader":10,"./mesh/Ball":12,"./mesh/Base":13,"./mesh/BattersEye":14,"./mesh/Field":15,"./mesh/Grass":16,"./mesh/HomeDirt":17,"./mesh/Mound":19,"./mesh/Sky":20,"./mesh/Sun":21,"./mesh/Wall":22,"./scene/lighting":23}],10:[function(require,module,exports){
+},{"../Services/Animator":26,"./Shaders/SkyShader":10,"./mesh/Ball":12,"./mesh/Base":13,"./mesh/BaseDirt":14,"./mesh/BattersEye":15,"./mesh/Field":16,"./mesh/FoulLine":17,"./mesh/FoulPole":18,"./mesh/Grass":19,"./mesh/Mound":21,"./mesh/Sky":22,"./mesh/Sun":23,"./mesh/Wall":24,"./scene/lighting":25}],10:[function(require,module,exports){
 /**
  * @author zz85 / https://github.com/zz85
  *
@@ -3319,7 +3333,7 @@ Ball.prototype.rotation = {
 
 exports.Ball = Ball;
 
-},{"../../Services/Mathinator":27,"../../Utility/helper":35,"../Loop":9,"./AbstractMesh":11,"./Indicator":18}],13:[function(require,module,exports){
+},{"../../Services/Mathinator":29,"../../Utility/helper":37,"../Loop":9,"./AbstractMesh":11,"./Indicator":20}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3367,15 +3381,15 @@ var Base = (function (_AbstractMesh) {
 
             switch (this.base) {
                 case 'first':
-                    mesh.position.x = 64;
+                    mesh.position.x = 69;
                     mesh.position.z = -64;
                     break;
                 case 'second':
                     mesh.position.x = 0;
-                    mesh.position.z = -121;
+                    mesh.position.z = -128;
                     break;
                 case 'third':
-                    mesh.position.x = -64;
+                    mesh.position.x = -69;
                     mesh.position.z = -64;
                     break;
                 case 'home':
@@ -3401,6 +3415,72 @@ var Base = (function (_AbstractMesh) {
 exports.Base = Base;
 
 },{"../Loop":9,"./AbstractMesh":11}],14:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _AbstractMesh2 = require('./AbstractMesh');
+
+var _Loop = require('../Loop');
+
+var BaseDirt = (function (_AbstractMesh) {
+    _inherits(BaseDirt, _AbstractMesh);
+
+    function BaseDirt(loop, base) {
+        _classCallCheck(this, BaseDirt);
+
+        _get(Object.getPrototypeOf(BaseDirt.prototype), 'constructor', this).call(this);
+        this.base = base;
+        this.getMesh();
+        if (loop instanceof _Loop.Loop) {
+            this.join(loop);
+        }
+    }
+
+    _createClass(BaseDirt, [{
+        key: 'getMesh',
+        value: function getMesh() {
+            var material = new THREE.MeshLambertMaterial({
+                color: 0xDCB096
+            });
+            var home = this.base.base === 'home';
+
+            var mesh = new THREE.Mesh(new THREE.CircleGeometry(home ? 18 : 12, 32), material);
+
+            mesh.rotation.x = -90 / 180 * Math.PI;
+            mesh.rotation.y = 0;
+            mesh.rotation.z = 45 / 180 * Math.PI;
+
+            var base = this.base.getMesh().position;
+
+            mesh.position.x = base.x * 0.9;
+            mesh.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y + 0.3;
+            mesh.position.z = base.z;
+
+            this.mesh = mesh;
+            return this.mesh;
+        }
+    }, {
+        key: 'animate',
+        value: function animate() {}
+    }]);
+
+    return BaseDirt;
+})(_AbstractMesh2.AbstractMesh);
+
+exports.BaseDirt = BaseDirt;
+
+},{"../Loop":9,"./AbstractMesh":11}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3457,7 +3537,7 @@ var BattersEye = (function (_AbstractMesh) {
 
 exports.BattersEye = BattersEye;
 
-},{"../Loop":9,"./AbstractMesh":11}],15:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3496,7 +3576,7 @@ var Field = (function (_AbstractMesh) {
                 color: 0xDCB096
             });
 
-            var mesh = new THREE.Mesh(new THREE.PlaneGeometry(155, 155, 32, 32), material);
+            var mesh = new THREE.Mesh(new THREE.PlaneGeometry(160, 160, 32, 32), material);
 
             mesh.rotation.x = -90 / 180 * Math.PI;
             mesh.rotation.y = 0;
@@ -3519,7 +3599,144 @@ var Field = (function (_AbstractMesh) {
 
 exports.Field = Field;
 
-},{"../Loop":9,"./AbstractMesh":11}],16:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],17:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _AbstractMesh2 = require('./AbstractMesh');
+
+var _Loop = require('../Loop');
+
+var FoulLine = (function (_AbstractMesh) {
+    _inherits(FoulLine, _AbstractMesh);
+
+    function FoulLine(loop, side) {
+        _classCallCheck(this, FoulLine);
+
+        _get(Object.getPrototypeOf(FoulLine.prototype), 'constructor', this).call(this);
+        this.side = side;
+        this.getMesh();
+        if (loop instanceof _Loop.Loop) {
+            this.join(loop);
+        }
+    }
+
+    _createClass(FoulLine, [{
+        key: 'getMesh',
+        value: function getMesh() {
+            var material = new THREE.MeshLambertMaterial({
+                color: 0xFFFFFF
+            });
+
+            var mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 300, 1, 1), material);
+
+            var left = this.side === 'left';
+
+            mesh.rotation.x = -90 / 180 * Math.PI;
+            mesh.rotation.y = 0 / 180 * Math.PI;
+
+            if (left) {
+                mesh.rotation.z = 45 / 180 * Math.PI;
+                mesh.position.x = -108;
+                mesh.position.z = -102;
+            } else {
+                mesh.rotation.z = -45 / 180 * Math.PI;
+                mesh.position.x = 108;
+                mesh.position.z = -102;
+            }
+            mesh.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y + 0.35;
+
+            this.mesh = mesh;
+            return this.mesh;
+        }
+    }, {
+        key: 'animate',
+        value: function animate() {}
+    }]);
+
+    return FoulLine;
+})(_AbstractMesh2.AbstractMesh);
+
+exports.FoulLine = FoulLine;
+
+},{"../Loop":9,"./AbstractMesh":11}],18:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _AbstractMesh2 = require('./AbstractMesh');
+
+var _Loop = require('../Loop');
+
+var FoulPole = (function (_AbstractMesh) {
+    _inherits(FoulPole, _AbstractMesh);
+
+    function FoulPole(loop, side) {
+        _classCallCheck(this, FoulPole);
+
+        _get(Object.getPrototypeOf(FoulPole.prototype), 'constructor', this).call(this);
+        this.side = side;
+        this.getMesh();
+        if (loop instanceof _Loop.Loop) {
+            this.join(loop);
+        }
+    }
+
+    _createClass(FoulPole, [{
+        key: 'getMesh',
+        value: function getMesh() {
+            var material = new THREE.MeshLambertMaterial({
+                color: 0xE3EF6E
+            });
+
+            var mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 180, 8, 8), material);
+
+            var left = this.side === 'left';
+
+            if (left) {
+                mesh.position.x = -218;
+                mesh.position.z = -212;
+            } else {
+                mesh.position.x = 218;
+                mesh.position.z = -212;
+            }
+            mesh.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y;
+
+            this.mesh = mesh;
+            return this.mesh;
+        }
+    }, {
+        key: 'animate',
+        value: function animate() {}
+    }]);
+
+    return FoulPole;
+})(_AbstractMesh2.AbstractMesh);
+
+exports.FoulPole = FoulPole;
+
+},{"../Loop":9,"./AbstractMesh":11}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3559,7 +3776,7 @@ var Grass = (function (_AbstractMesh) {
                 color: this.infield ? 0x486D1F : 0x284C19
             });
 
-            var mesh = new THREE.Mesh(new THREE.PlaneGeometry(this.infield ? 80 : 8000, this.infield ? 80 : 8000, 16, 16), material);
+            var mesh = new THREE.Mesh(new THREE.PlaneGeometry(this.infield ? 94 : 8000, this.infield ? 94 : 8000, 16, 16), material);
 
             if (this.infield) {
                 mesh.rotation.x = -90 / 180 * Math.PI;
@@ -3592,69 +3809,7 @@ var Grass = (function (_AbstractMesh) {
 
 exports.Grass = Grass;
 
-},{"../Loop":9,"./AbstractMesh":11}],17:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-    value: true
-});
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var _AbstractMesh2 = require('./AbstractMesh');
-
-var _Loop = require('../Loop');
-
-var HomeDirt = (function (_AbstractMesh) {
-    _inherits(HomeDirt, _AbstractMesh);
-
-    function HomeDirt(loop) {
-        _classCallCheck(this, HomeDirt);
-
-        _get(Object.getPrototypeOf(HomeDirt.prototype), 'constructor', this).call(this);
-        this.getMesh();
-        if (loop instanceof _Loop.Loop) {
-            this.join(loop);
-        }
-    }
-
-    _createClass(HomeDirt, [{
-        key: 'getMesh',
-        value: function getMesh() {
-            var material = new THREE.MeshLambertMaterial({
-                color: 0xDCB096
-            });
-
-            var mesh = new THREE.Mesh(new THREE.CircleGeometry(18, 32), material);
-
-            mesh.rotation.x = -90 / 180 * Math.PI;
-            mesh.rotation.y = 0;
-            mesh.rotation.z = 45 / 180 * Math.PI;
-
-            mesh.position.x = 0;
-            mesh.position.y = _AbstractMesh2.AbstractMesh.WORLD_BASE_Y + 0.3;
-            mesh.position.z = 0;
-
-            this.mesh = mesh;
-            return this.mesh;
-        }
-    }, {
-        key: 'animate',
-        value: function animate() {}
-    }]);
-
-    return HomeDirt;
-})(_AbstractMesh2.AbstractMesh);
-
-exports.HomeDirt = HomeDirt;
-
-},{"../Loop":9,"./AbstractMesh":11}],18:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3718,7 +3873,7 @@ var Indicator = (function (_AbstractMesh) {
 
 exports.Indicator = Indicator;
 
-},{"../Loop":9,"./AbstractMesh":11}],19:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3780,7 +3935,7 @@ var Mound = (function (_AbstractMesh) {
 
 exports.Mound = Mound;
 
-},{"../Loop":9,"./AbstractMesh":11}],20:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3861,7 +4016,7 @@ var Sky = (function (_AbstractMesh) {
 
 exports.Sky = Sky;
 
-},{"../Loop":9,"./AbstractMesh":11}],21:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3962,7 +4117,7 @@ var Sun = (function (_AbstractMesh) {
 
 exports.Sun = Sun;
 
-},{"../Loop":9,"./AbstractMesh":11}],22:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4002,12 +4157,12 @@ var Wall = (function (_AbstractMesh) {
                 color: 0x3F4045
             });
 
-            var mesh = new THREE.Mesh(new THREE.BoxGeometry(120, 15 | 0, 4, 16, 16, 16), material);
+            var mesh = new THREE.Mesh(new THREE.BoxGeometry(120, 15, 4, 16, 16, 16), material);
 
             var radians = this.angle / 180 * Math.PI;
             mesh.rotation.y = -radians;
 
-            var hypotenuse = 320;
+            var hypotenuse = 300;
             var distance = Math.cos(radians) * hypotenuse;
             var offset = Math.sin(radians) * hypotenuse;
 
@@ -4028,7 +4183,7 @@ var Wall = (function (_AbstractMesh) {
 
 exports.Wall = Wall;
 
-},{"../Loop":9,"./AbstractMesh":11}],23:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4052,7 +4207,7 @@ var lighting = {
 
 exports.lighting = lighting;
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4355,7 +4510,7 @@ for (var fn in Animator.prototype) {
 
 exports.Animator = Animator;
 
-},{"../Render/Loop":9,"../Utility/helper":35,"../services/_services":39}],25:[function(require,module,exports){
+},{"../Render/Loop":9,"../Utility/helper":37,"../services/_services":41}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4573,7 +4728,7 @@ Distribution.main = function () {
 
 exports.Distribution = Distribution;
 
-},{"../Utility/helper":35}],26:[function(require,module,exports){
+},{"../Utility/helper":37}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4607,7 +4762,7 @@ for (var fn in Iterator.prototype) {
 
 exports.Iterator = Iterator;
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /**
  * For Math!
  * @constructor
@@ -4907,7 +5062,7 @@ for (var fn in Mathinator.prototype) {
 
 exports.Mathinator = Mathinator;
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4927,7 +5082,7 @@ exports.Distribution = _ServicesDistribution.Distribution;
 exports.Iterator = _ServicesIterator.Iterator;
 exports.Mathinator = _ServicesMathinator.Mathinator;
 
-},{"../Services/Animator":24,"../Services/Distribution":25,"../Services/Iterator":26,"../Services/Mathinator":27}],29:[function(require,module,exports){
+},{"../Services/Animator":26,"../Services/Distribution":27,"../Services/Iterator":28,"../Services/Mathinator":29}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4963,7 +5118,7 @@ Provider.prototype.teams = {
 
 exports.Provider = Provider;
 
-},{"./TeamJapan":30}],30:[function(require,module,exports){
+},{"./TeamJapan":32}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5047,7 +5202,7 @@ samurai.lineup.map(function (player, order) {
 
 exports.samurai = samurai;
 
-},{"../Model/Player":5,"../Model/_models":8,"../Teams/Trainer":31}],31:[function(require,module,exports){
+},{"../Model/Player":5,"../Model/_models":8,"../Teams/Trainer":33}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5104,7 +5259,7 @@ var Trainer = (function () {
 
 exports.Trainer = Trainer;
 
-},{"../Services/Iterator":26}],32:[function(require,module,exports){
+},{"../Services/Iterator":28}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5575,7 +5730,7 @@ Log.prototype = {
 
 exports.Log = Log;
 
-},{"../Utility/text":36}],33:[function(require,module,exports){
+},{"../Utility/text":38}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5595,7 +5750,7 @@ exports.helper = _UtilityHelper.helper;
 exports.Log = _UtilityLog.Log;
 exports.text = _UtilityText.text;
 
-},{"../Utility/Log":32,"../Utility/data":34,"../Utility/helper":35,"../Utility/text":36}],34:[function(require,module,exports){
+},{"../Utility/Log":34,"../Utility/data":36,"../Utility/helper":37,"../Utility/text":38}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5617,7 +5772,7 @@ var data = {
 
 exports.data = data;
 
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5652,7 +5807,7 @@ var helper = {
 
 exports.helper = helper;
 
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6094,7 +6249,7 @@ text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances,
 
 exports.text = text;
 
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6109,7 +6264,7 @@ if (typeof window == 'object') {
 
 exports.Baseball = _namespace.Baseball;
 
-},{"./namespace":38}],38:[function(require,module,exports){
+},{"./namespace":40}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6158,7 +6313,7 @@ Baseball.teams.Provider = _TeamsProvider.Provider;
 
 exports.Baseball = Baseball;
 
-},{"./Model/AtBat":1,"./Model/Field":2,"./Model/Game":3,"./Model/Manager":4,"./Model/Player":5,"./Model/Team":6,"./Model/Umpire":7,"./Services/_services":28,"./Teams/Provider":29,"./Utility/_utils":33}],39:[function(require,module,exports){
+},{"./Model/AtBat":1,"./Model/Field":2,"./Model/Game":3,"./Model/Manager":4,"./Model/Player":5,"./Model/Team":6,"./Model/Umpire":7,"./Services/_services":30,"./Teams/Provider":31,"./Utility/_utils":35}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -6178,7 +6333,7 @@ exports.Distribution = _ServicesDistribution.Distribution;
 exports.Iterator = _ServicesIterator.Iterator;
 exports.Mathinator = _ServicesMathinator.Mathinator;
 
-},{"../Services/Animator":24,"../Services/Distribution":25,"../Services/Iterator":26,"../Services/Mathinator":27}]},{},[37]);
+},{"../Services/Animator":26,"../Services/Distribution":27,"../Services/Iterator":28,"../Services/Mathinator":29}]},{},[39]);
 
 var SocketService = function() {
     var Service = function() {};

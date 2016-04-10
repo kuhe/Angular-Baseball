@@ -17,8 +17,8 @@ class Grass extends AbstractMesh {
 
         var mesh = new THREE.Mesh(
             new THREE.PlaneGeometry(
-                this.infield ? 80 : 8000,
-                this.infield ? 80 : 8000,
+                this.infield ? 94 : 8000,
+                this.infield ? 94 : 8000,
                 16,
                 16
             ),

@@ -1,9 +1,11 @@
 import { Ball } from './mesh/Ball';
 import { Mound } from './mesh/Mound';
 import { Base } from './mesh/Base';
+import { FoulLine } from './mesh/FoulLine';
+import { FoulPole } from './mesh/FoulPole';
 import { Field } from './mesh/Field';
 import { Grass } from './mesh/Grass';
-import { HomeDirt } from './mesh/HomeDirt';
+import { BaseDirt } from './mesh/BaseDirt';
 import { BattersEye } from './mesh/BattersEye';
 import { Wall } from './mesh/Wall';
 import { Sky } from './mesh/Sky';
@@ -169,7 +171,6 @@ class Loop {
     addStaticMeshes() {
         new Field().join(this);
         new Mound().join(this);
-        new HomeDirt().join(this);
         new Grass().join(this);
         new Grass(this, true);
         new BattersEye().join(this);
@@ -187,10 +188,22 @@ class Loop {
         new Wall(this, 15);
         new Wall(this, 34);
 
-        new Base(this, 'first');
-        new Base(this, 'second');
-        new Base(this, 'third');
-        new Base(this, 'home');
+        var b1 = new Base(this, 'first');
+        var b2 = new Base(this, 'second');
+        var b3 = new Base(this, 'third');
+        var b4 = new Base(this, 'home');
+
+        new BaseDirt(this, b1);
+        new BaseDirt(this, b2);
+        new BaseDirt(this, b3);
+        new BaseDirt(this, b4);
+
+        new FoulLine(this, 'left');
+        new FoulLine(this, 'right');
+
+        new FoulPole(this, 'left');
+        new FoulPole(this, 'right');
+
     }
 
     /**

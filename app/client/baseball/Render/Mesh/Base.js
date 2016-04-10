@@ -31,15 +31,15 @@ class Base extends AbstractMesh {
 
         switch (this.base) {
             case 'first':
-                mesh.position.x = 64;
+                mesh.position.x = 69;
                 mesh.position.z = -64;
                 break;
             case 'second':
                 mesh.position.x = 0;
-                mesh.position.z = -121;
+                mesh.position.z = -128;
                 break;
             case 'third':
-                mesh.position.x = -64;
+                mesh.position.x = -69;
                 mesh.position.z = -64;
                 break;
             case 'home':
