@@ -122,6 +122,33 @@ describe('Game', function() {
         career[yr] = getStats(player);
     };
 
+
+    var teams = [1,2,3,4,5,6,7].map(function() {
+        var team = new Team(game);
+        team.wins = 0;
+        team.losses = 0;
+        team.ties = 0;
+        return team;
+    });
+    var schedule = [];
+    var createSchedule = function() {
+        for (var i = 0; i < 7; i++) {
+            for (var j = i + 1; j < 7; j++) {
+                schedule = schedule.concat([
+                    {home: i, away: j}
+                ]);
+            }
+        }
+    };
+    [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map( _ => createSchedule());
+    var scheduleIndex = 0;
+    var getTeams = function() {
+        return {
+            home: teams[schedule[scheduleIndex].home],
+            away: teams[schedule[scheduleIndex].away]
+        }
+    };
+
     var year = new Date().getFullYear() - seasons;
 
     logPlayer((++year, 'Rkie'));
@@ -129,6 +156,8 @@ describe('Game', function() {
     log('------');
 
     var runSeason = function(n) {
+        game.teams.away = getTeams().away;
+        game.teams.home = getTeams().home;
         var x = 15000;
         game.gamesIntoSeason = 0;
         p = player;
@@ -149,16 +178,28 @@ describe('Game', function() {
                 typeof callback == 'function' && callback();
             });
             if (game.stage == 'end') {
-                game.teams.away = new Team(game);
+
+                if (game.tally.away.R > game.tally.home.R) {
+                    game.teams.away.wins++;
+                    game.teams.home.losses++;
+                } else if (game.tally.away.R < game.tally.home.R) {
+                    game.teams.home.wins++;
+                    game.teams.away.losses++;
+                } else {
+                    game.teams.home.ties++;
+                    game.teams.away.ties++;
+                }
+
+                game.teams.away = getTeams().away;
                 p.fatigue = 0;
                 Iterator.each(game.teams.away.positions, function(key, player) {
-                    if (key != 'pitcher' && Math.random()) {
+                    if (key != 'pitcher' && Math.random() > 0) {
                         game.teams.away.positions[key] = p;
                         game.teams.home.positions[key] = p;
                     }
                 });
+                game.teams.home = getTeams().home;
                 if (asPitcher) {
-                    game.teams.home = new Team(game);
                     game.teams.home.positions.pitcher = p;
                 }
                 game.inning = 1;
@@ -166,10 +207,11 @@ describe('Game', function() {
                 game.stage = 'pitch';
                 game.resetTally();
                 games++;
+                scheduleIndex++
             }
-            if (!asPitcher && game.batter !== player) {
-                game.umpire.changeSides();
-            }
+            //if (!asPitcher && game.batter !== player) {
+            //    game.umpire.changeSides();
+            //}
             if (!asPitcher && player.stats.batting.pa % 6 == 0) {
                 game.teams.away.positions.pitcher = new Player(game.teams.away, true);
             }
@@ -325,15 +367,36 @@ describe('Game', function() {
         logYear(totals);
     })();
 
+    var byWins = function(a, b) {
+        a = a.wins * 10000 - a.losses * 100 - a.ties;
+        b = b.wins * 10000 - b.losses * 100 - b.ties;
+        if (a > b) return -1;
+        if (b > a) return 1;
+        return 0;
+    };
+
+    var lpad = function(s, len) {
+        if (!len) len = 2;
+        s = '' + s;
+        while (s.length < len) {
+            s = ' ' + s;
+        }
+        return s;
+    };
+
     //game.debugOut();
     it('running times', function() {
         times = times.map(function(x, k) {
             return times[k] - (times[k-1] || 0);
         });
         times.shift();
-        console.log(times.join('ms, ')+'ms');
+        log(times.join('ms, ')+'ms');
         var avg = times.reduce((a, b) => a + b)/(seasons - 1) | 0;
-        console.log('average: ', avg, 'ms/year');
+        log('average: ', avg, 'ms/year');
+        log('');
+        teams.sort(byWins);
+        teams.map(t => log(lpad(t.name, 12) + ': ' + lpad(t.wins) + ' - ' + lpad(t.losses) + ' - ' + lpad(t.ties)));
+        log('');
     });
     it('このシーズンで、終わってしまうかもしれない', function () {
         assert(300 < player.stats.batting.ab || 50 < player.stats.pitching.IP[0]);
