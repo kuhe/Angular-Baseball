@@ -3,7 +3,7 @@
 
 A game of one of the top five bat-based sports! Namely, baseball! Now in JavaScript form.
 
-Click on and around the strike zone to pitch/bat (click on the outer edge to not swing). Locate your pitches well to draw groundouts, easy pop flies,
+Click on and around the strike zone to pitch/bat. Locate your pitches well to draw groundouts, easy pop flies,
 and strikeouts from opposing batters, and use your batter's eye to hit the ball squarely in order to avoid the same.
 
 Hosted at [kuhe.github.io](http://kuhe.github.io)
@@ -21,15 +21,14 @@ todo :
 
     app (development source code)
         / client
-            / node_modules
-                / baseball : game engine (ES6)
-                    /test : mocha unit (ES6)
+            / baseball : game engine (ES6)
+                / test : mocha unit (ES6)
             / scripts : framework-specific js (ES5)
             / styles : less
             / tests : protractor E2E (unused, sadly)
             gulpfile.js : build control
         / server
-            the websocket server
+            the websocket server for live head-2-head play
     public (server assets)
         / js
         / css
