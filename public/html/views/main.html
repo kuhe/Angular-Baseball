@@ -3,10 +3,6 @@
         <section class='row'>
             <div class='col-md-4'></div>
             <div class='col-md-4 language-select'>
-                <span>
-                    {{ t('Select Language:') }} &nbsp;
-                </span>
-                <hr>
                 <button class='btn pointer' (click)='mode("e"); $event.stopPropagation()'>
                     English
                 </button>
@@ -19,14 +15,6 @@
         <br/>
         <div class='row'>
             <div class='col-md-4'>
-                <p *ngIf='mode() == "e"'>
-                    When catching, click in the strike/ball zone to locate a pitch. Opponent batting swing locations are
-                    signaled by a bat icon. A grey circle will indicate where the ball crossed home plate.
-                </p>
-                <p *ngIf='mode() == "n"'>
-                    守備でのは捕手役でプレーを行う。ストライクゾーンにクリックすると、投手を狙い投げさせる。バットが
-                    現れるところがバッターの振り。灰色のまるはストライクゾーンに入ったところ。
-                </p>
             </div>
             <div class="col-md-4">
                 <div class="target swing">
@@ -41,36 +29,17 @@
                 </div>
             </div>
             <div class='col-md-4'>
-                <p *ngIf='mode() == "e"'>
-                    You can call for a different pitch by clicking on the pitch name below the field display.
-                </p>
-                <p *ngIf='mode() == "n"'>
-                    ストライクゾーンの下に投手のどの球で挑戦することも選択できる。
-                </p>
             </div>
         </div>
         <div class='row'>
             <div class='col-md-4'>
-                <p *ngIf='mode() == "e"'>
-                    When batting, you'll see a ball...
-                    Click inside the pitch zone to locate your swing, or don't click to hold up (not swing) and try to draw a walk or wait for a better pitch.
-                </p>
-                <p *ngIf='mode() == "n"'>
-                    攻撃でのはバッター役を次々務める。投球が飛んでくるときにストライクゾーンにクリックすれば、バットを振る。しない場合は見送る。打てる球待つんだ！
-                </p>
             </div>
             <div class="col-md-4">
             </div>
             <div class='col-md-4'>
-                <p *ngIf='mode() == "e"'>
-                    To restart into a new game simply reload the page. You can also share the URL of your game to play
-                    against a friend. This may not be available depending on server status.
-                </p>
-                <p *ngIf='mode() == "n"'>
-                    新しい試合を再開したいときにウエブページをリロードしてください。一人の友達も同じURLに誘えば、相手としては勤めていられます。
-                </p>
             </div>
         </div>
+        <hr>
         <section class='row options'>
             <div class='col-md-12'>
                 <button (click)="proceedToGame(); $event.stopPropagation()" class='btn play-ball pointer'>
@@ -82,71 +51,8 @@
             </div>
         </section>
         <section class='baseball-beginner text-left'>
-            <div *ngIf='mode() == "e"'>
-                <h3>Catching</h3>
-                <ul>
-                    <li>A pitch down the middle is easier to hit, but a pitch on the corners is more likely a ball.</li>
-                    <li>You control where to pitch, but a more skilled pitcher will execute more accurately.</li>
-                    <li>Throwing pitches to the same location repeatedly makes them easier to see and hit.</li>
-                    <li>A low pitch is more likely to draw a ground ball, and a high pitch a fly ball.</li>
-                    <li>When ahead in the count, spot a pitch outside the strike zone to draw a strikeout.</li>
-                    <li>The pitcher will lose some control due to fatigue over the course of the game.</li>
-                    <li>Your fielders have varied defensive skills. If your outfielders are strong but your infielders weak, try pitching high.</li>
-                </ul>
-                <h3>Batting</h3>
-                <ul>
-                    <li>A batter's eye improves with more pitches seen in an at-bat.</li>
-                    <li>Wait for the pitch! Don't swing early.</li>
-                    <li>Batters have three traits: power, speed, and eye.</li>
-                    <li>Speedier batters are less likely to be thrown out on the basepaths or on a ground ball.</li>
-                    <li>A batter with a good eye can turn even a pitch outside the strike zone into a base hit.</li>
-                    <li>Not sure if that junk pitch is a strike or ball? Hit it at an angle to foul it off.</li>
-                    <li>You can recognize pitches by their seam rotation if you look closely.</li>
-                </ul>
-                <h6><em>Notation</em></h6>
-                <ul>
-                    <rating-block [rating]='110'></rating-block> : High skill rating
-                    <br/>
-                    <rating-block [rating]='25'></rating-block> : Low skill rating
-                    <br/>
-                    <span class="glyphicon glyphicon-chevron-up"></span> : Elite player
-                </ul>
-            </div>
-            <div *ngIf='mode() == "n"'>
-                <h3>捕球</h3>
-                <ul>
-                    <li>真ん中の球は打ちやすい、内角や低めのは難しい</li>
-                    <li>捕手としてはピッチングが選択できるが、制球は投手次第</li>
-                    <li>同じコースで投げすぎと、打ちやすくなる</li>
-                    <li>低めのコースはゴロを誘導し、高めはフライのほう</li>
-                    <li>いいカウントに入ったとき、ボールコースの一球で三振をとる</li>
-                    <li>ピッチャーは少しづつ疲れていく</li>
-                    <li>野手の守備は不確定。内野手たちの方が強いならば、低めのコースを使うべき</li>
-                </ul>
-                <h3>打撃</h3>
-                <ul>
-                    <li>打席中に球を見送る旅に目が鋭くなれる</li>
-                    <li>早振りはしない為にボールをよく待って打つ</li>
-                    <li>各バッターは３つの属性で評価されている：目（バット・コントロールと選球眼）、力（長打）、速（走塁）</li>
-                    <li>足の速いバッターはゴロでも出塁できる</li>
-                    <li>目が鋭いバッターはボールコースの球でも打てる</li>
-                    <li>ボールコースかどうかが分からない時にこそ、当てるだけのファウルで生き残る</li>
-                    <li>球種にはよく見れば縫い目で区別にもできる</li>
-                </ul>
-                <h6><em>アイコン</em></h6>
-                <ul>
-                    <rating-block [rating]='110'></rating-block> : 強い属性
-                    <br/>
-                    <rating-block [rating]='25'></rating-block> : 「まあ、頑張ってね」属性
-                    <br/>
-                    <span class="glyphicon glyphicon-chevron-up"></span> : ヒーロー選手
-                    <br>
-                    <strong>+</strong> : {{ t('RBI') }}
-                </ul>
-            </div>
             <hr/>
             <div class='col-md-12'>
-                <h5>...</h5>
                 <button (click)='proceedToGame(true, true); $event.stopPropagation()' class='btn pointer'>
                     {{ t('Run Fast Simulation') }} &raquo;
                 </button>

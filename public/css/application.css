@@ -129,7 +129,7 @@
 }
 @media (min-width: 600px) {
   .indicator.swing {
-    box-shadow: 0 0 3px 3px #2d2d2d;
+    box-shadow: 0 0 1px 1px #2d2d2d;
     background: -moz-radial-gradient(center, ellipse cover, rgba(237, 237, 237, 0.5) 0%, rgba(17, 22, 28, 0.64) 100%);
     /* FF3.6+ */
     background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(237, 237, 237, 0.5)), color-stop(100%, rgba(17, 22, 28, 0.64)));
@@ -3345,7 +3345,7 @@ button.btn {
   line-height: 30px;
   border: none;
   cursor: pointer;
-  padding: 0 8px 3px;
+  padding: 0 12px 3px;
   border-radius: 0;
 }
 button.btn.small {
@@ -3373,10 +3373,10 @@ button.btn.disabled {
   opacity: 0.7;
 }
 .text-shadow {
-  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  text-shadow: -1px -1px 3px #000, 1px -1px 3px #000, -1px 1px 3px #000, 1px 1px 3px #000;
 }
 .text-shadow-white {
-  text-shadow: -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF, 1px 1px 0 #FFF;
+  text-shadow: -1px -1px 3px #FFF, 1px -1px 3px #FFF, -1px 1px 3px #FFF, 1px 1px 3px #FFF;
 }
 .batting-lines .list-group-item {
   min-height: 3em;
@@ -3419,7 +3419,7 @@ button.btn.disabled {
   border: none;
   color: white;
   background-color: rgba(255, 255, 255, 0.15);
-  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  text-shadow: -1px -1px 3px #000, 1px -1px 3px #000, -1px 1px 3px #000, 1px 1px 3px #000;
 }
 .main-area .list-group-item strong {
   font-size: 140%;
@@ -3591,7 +3591,7 @@ button.btn.disabled {
   margin: -25px auto auto;
   color: white;
   font-size: 12px;
-  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  text-shadow: -1px -1px 3px #000, 1px -1px 3px #000, -1px 1px 3px #000, 1px 1px 3px #000;
 }
 .batter-stats .rating-block {
   margin: 0 0 -1px 0;
@@ -4145,7 +4145,7 @@ footer {
   position: relative;
   z-index: 10;
   color: #313131;
-  text-shadow: -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF, 1px 1px 0 #FFF;
+  text-shadow: -1px -1px 3px #FFF, 1px -1px 3px #FFF, -1px 1px 3px #FFF, 1px 1px 3px #FFF;
 }
 .pitch-selection .rating-block {
   margin: 0 -1px -1px;
