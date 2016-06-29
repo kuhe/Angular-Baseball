@@ -22,7 +22,7 @@ if (typeof angular === 'object') {
     (function(app) {
         document.addEventListener('DOMContentLoaded', function() {
             ng.core.enableProdMode();
-            ng.platform.browser.bootstrap(app.Main);
+            ng.platformBrowserDynamic.bootstrap(app.Main);
         });
     })(window.app || (window.app = {}));
 

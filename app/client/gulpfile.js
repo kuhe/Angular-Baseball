@@ -3,7 +3,8 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify'),
     sourcemaps = require('gulp-sourcemaps'),
-    babel = require('babel-core');
+    babel = require('babel-core'),
+    helpers = require('babelify-external-helpers');
 var browserify = require('browserify'),
     babelify = require('babelify');
 var fs = require('fs');
@@ -41,12 +42,19 @@ var BUNDLE_SCRIPT_FILES = [
 var EXTERNAL_SCRIPT_FILES = [
     './bower_components/jquery/dist/jquery.js',
     //'./bower_components/angular/angular.js',
-
     //'node_modules/angular2/bundles/angular2-polyfills.js', come on.
-    'node_modules/zone.js/dist/zone.min.js',
+
+    'node_modules/core-js/client/shim.min.js',
+
+    'node_modules/zone.js/dist/zone.js',
     'node_modules/reflect-metadata/Reflect.js',
+
     'node_modules/rxjs/bundles/Rx.umd.js',
-    'node_modules/angular2/bundles/angular2-all.umd.js',
+    'node_modules/@angular/core/bundles/core.umd.js',
+    'node_modules/@angular/common/bundles/common.umd.js',
+    'node_modules/@angular/compiler/bundles/compiler.umd.js',
+    'node_modules/@angular/platform-browser/bundles/platform-browser.umd.js',
+    'node_modules/@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js',
 
     './bower_components/gsap/src/uncompressed/TweenMax.js',
     './bower_components/three.js/three.min.js'
@@ -68,7 +76,11 @@ gulp.task('externalStyles', function () {
 });
 gulp.task('modularScripts', function () {
     browserify({ entries: './'+name+'/'+name+'.js' })
-        .transform('babelify', {presets: ['es2015'], plugins: ['external-helpers-2']})
+        .transform('babelify', {
+            presets: ['es2015'],
+            plugins: ['external-helpers-2']
+        })
+        .plugin(helpers)
         .bundle()
         .pipe(fs.createWriteStream('./'+name+'/bundle.js')).on('close', function() {
             gulp.start('internalScripts');
@@ -94,10 +106,15 @@ gulp.task('internalScripts', function () {
 gulp.task('externalScripts', function () {
     gulp.src(EXTERNAL_SCRIPT_FILES)
         //.pipe(sourcemaps.init())
+        .pipe(concat('vendor.js'))
+        //.pipe(sourcemaps.write('./sourcemaps'))
+        .pipe(gulp.dest(SCRIPT_DEPLOY_DIR));
+    gulp.src(EXTERNAL_SCRIPT_FILES)
+        //.pipe(sourcemaps.init())
         .pipe(concat('vendor.min.js'))
         .pipe(uglify({ mangle: false }))
         //.pipe(sourcemaps.write('./sourcemaps'))
-        .pipe(gulp.dest(SCRIPT_DEPLOY_DIR))
+        .pipe(gulp.dest(SCRIPT_DEPLOY_DIR));
 });
 
 gulp.task('build', [

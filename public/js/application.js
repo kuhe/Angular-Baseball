@@ -1,6 +1,7 @@
 cacheKey = Math.floor(Math.random()*1500);
 
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -43,7 +44,8 @@ AtBat.prototype.RBI_INDICATOR = '+';
 
 exports.AtBat = AtBat;
 
-},{"../Utility/Log":34}],2:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Utility/Log":34,"babel/external-helpers":"babel/external-helpers"}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -115,8 +117,8 @@ Field.prototype = {
         if (['first', 'second', 'short', 'third'].includes(swing.fielder)) {
             landingDistance = Math.min(landingDistance, 110); // stopped by infielder
         } else {
-                landingDistance = Math.max(landingDistance, 150); // rolled past infielder
-            }
+            landingDistance = Math.max(landingDistance, 150); // rolled past infielder
+        }
         swing.travelDistance = landingDistance;
         swing.flyAngle = flyAngle;
         /**
@@ -242,11 +244,11 @@ Field.prototype = {
                         //    console.log('omg dp', additionalOuts);
                         //}
                     } else {
-                            delete swing.additionalOuts;
-                            delete swing.firstOut;
-                            delete swing.doublePlay;
-                            delete swing.fieldersChoice;
-                        }
+                        delete swing.additionalOuts;
+                        delete swing.firstOut;
+                        delete swing.doublePlay;
+                        delete swing.fieldersChoice;
+                    }
                 }
                 swing.thrownOut = swing.bases == 0;
                 if (swing.thrownOut) {
@@ -380,6 +382,7 @@ Field.prototype = {
 exports.Field = Field;
 
 },{"../Model/Player":5,"../Services/_services":30}],3:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1149,7 +1152,9 @@ Game.prototype = {
 
 exports.Game = Game;
 
-},{"../Model/Field":2,"../Model/Player":5,"../Model/Team":6,"../Model/Umpire":7,"../Services/_services":30,"../Utility/Log":34,"../Utility/_utils":35}],4:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Model/Field":2,"../Model/Player":5,"../Model/Team":6,"../Model/Umpire":7,"../Services/_services":30,"../Utility/Log":34,"../Utility/_utils":35,"babel/external-helpers":"babel/external-helpers"}],4:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1260,7 +1265,8 @@ Manager.prototype = {
 
 exports.Manager = Manager;
 
-},{"../Services/_services":30}],5:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Services/_services":30,"babel/external-helpers":"babel/external-helpers"}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2182,71 +2188,71 @@ Umpire.prototype = {
                 // no one on first
             }
         } else {
-                if (fieldersChoice) {
-                    game.field[fieldersChoice] = null;
-                    first = game.field.first;
-                    second = game.field.second;
-                    third = game.field.third;
-                }
-                var canAdvance = function canAdvance() {
-                    return true;
+            if (fieldersChoice) {
+                game.field[fieldersChoice] = null;
+                first = game.field.first;
+                second = game.field.second;
+                third = game.field.third;
+            }
+            var canAdvance = function canAdvance() {
+                return true;
+            };
+            if (sacrificeAdvances) {
+                canAdvance = function canAdvance(position) {
+                    switch (position) {
+                        case 'first':
+                            return sacrificeAdvances.includes('first') && !game.field.second;
+                        case 'second':
+                            return sacrificeAdvances.includes('second') && !game.field.third;
+                        case 'third':
+                            return sacrificeAdvances.includes('third');
+                    }
                 };
-                if (sacrificeAdvances) {
-                    canAdvance = function canAdvance(position) {
-                        switch (position) {
-                            case 'first':
-                                return sacrificeAdvances.includes('first') && !game.field.second;
-                            case 'second':
-                                return sacrificeAdvances.includes('second') && !game.field.third;
-                            case 'third':
-                                return sacrificeAdvances.includes('third');
-                        }
-                    };
-                }
-                var arm = 0;
-                if (swing.fielder) {
-                    var fielder = game.pitcher.team.positions[swing.fielder];
-                    if (['left', 'center', 'right'].includes(fielder.position)) {
-                        arm = fielder.skill.defense.throwing;
-                    } else {
-                        arm = fielder.skill.defense.throwing + 120; // very rare extra bases on infield BIP
-                    }
-                }
-                if (third && canAdvance('third')) {
-                    // run scored
-                    this.runScores();
-                    if (game.batter != third) {
-                        game.batter.recordRBI();
-                        third.atBats.push(_utils.Log.prototype.RUN);
-                    }
-                    game.batter.stats.batting.rbi++;
-                    third.stats.batting.r++;
-                    game.pitcher.stats.pitching.ER++;
-                    game.field.third = null;
-                }
-                if (second && canAdvance('second')) {
-                    game.field.third = second;
-                    game.field.second = null;
-                    if (second != game.batter && !sacrificeAdvances && Math.random() * (second.skill.offense.speed + 120) > arm + 50) {
-
-                        this.runScores();
-                        if (game.batter != second) {
-                            game.batter.recordRBI();
-                            second.atBats.push(_utils.Log.prototype.RUN);
-                        }
-                        game.field.third = null;
-                    }
-                }
-                if (first && canAdvance('first')) {
-                    game.field.second = first;
-                    game.field.first = null;
-                    if (first != game.batter && !game.field.third && !sacrificeAdvances && Math.random() * (first.skill.offense.speed + 120) > arm + 60) {
-
-                        game.field.third = first;
-                        game.field.second = null;
-                    }
+            }
+            var arm = 0;
+            if (swing.fielder) {
+                var fielder = game.pitcher.team.positions[swing.fielder];
+                if (['left', 'center', 'right'].includes(fielder.position)) {
+                    arm = fielder.skill.defense.throwing;
+                } else {
+                    arm = fielder.skill.defense.throwing + 120; // very rare extra bases on infield BIP
                 }
             }
+            if (third && canAdvance('third')) {
+                // run scored
+                this.runScores();
+                if (game.batter != third) {
+                    game.batter.recordRBI();
+                    third.atBats.push(_utils.Log.prototype.RUN);
+                }
+                game.batter.stats.batting.rbi++;
+                third.stats.batting.r++;
+                game.pitcher.stats.pitching.ER++;
+                game.field.third = null;
+            }
+            if (second && canAdvance('second')) {
+                game.field.third = second;
+                game.field.second = null;
+                if (second != game.batter && !sacrificeAdvances && Math.random() * (second.skill.offense.speed + 120) > arm + 50) {
+
+                    this.runScores();
+                    if (game.batter != second) {
+                        game.batter.recordRBI();
+                        second.atBats.push(_utils.Log.prototype.RUN);
+                    }
+                    game.field.third = null;
+                }
+            }
+            if (first && canAdvance('first')) {
+                game.field.second = first;
+                game.field.first = null;
+                if (first != game.batter && !game.field.third && !sacrificeAdvances && Math.random() * (first.skill.offense.speed + 120) > arm + 60) {
+
+                    game.field.third = first;
+                    game.field.second = null;
+                }
+            }
+        }
         return this;
     },
     runScores: function runScores() {
@@ -2362,6 +2368,7 @@ exports.Team = _Team.Team;
 exports.Umpire = _Umpire.Umpire;
 
 },{"../Model/AtBat":1,"../Model/Field":2,"../Model/Game":3,"../Model/Manager":4,"../Model/Player":5,"../Model/Team":6,"../Model/Umpire":7}],9:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2862,7 +2869,9 @@ Loop.prototype.constructors = {
 
 exports.Loop = Loop;
 
-},{"../Services/Animator":26,"./Shaders/SkyShader":24,"./mesh/Ball":11,"./mesh/Base":12,"./mesh/BaseDirt":13,"./mesh/BattersEye":14,"./mesh/Field":15,"./mesh/FoulLine":16,"./mesh/FoulPole":17,"./mesh/Grass":18,"./mesh/Mound":20,"./mesh/Sky":21,"./mesh/Sun":22,"./mesh/Wall":23,"./scene/lighting":25}],10:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Services/Animator":26,"./Shaders/SkyShader":24,"./mesh/Ball":11,"./mesh/Base":12,"./mesh/BaseDirt":13,"./mesh/BattersEye":14,"./mesh/Field":15,"./mesh/FoulLine":16,"./mesh/FoulPole":17,"./mesh/Grass":18,"./mesh/Mound":20,"./mesh/Sky":21,"./mesh/Sun":22,"./mesh/Wall":23,"./scene/lighting":25,"babel/external-helpers":"babel/external-helpers"}],10:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2939,7 +2948,9 @@ AbstractMesh.WORLD_BASE_Y = -4;
 
 exports.AbstractMesh = AbstractMesh;
 
-},{"../Loop":9}],11:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"babel/external-helpers":"babel/external-helpers"}],11:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3311,7 +3322,9 @@ Ball.prototype.rotation = {
 
 exports.Ball = Ball;
 
-},{"../../Services/Mathinator":29,"../../Utility/helper":37,"../Loop":9,"./AbstractMesh":10,"./Indicator":19}],12:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../../Services/Mathinator":29,"../../Utility/helper":37,"../Loop":9,"./AbstractMesh":10,"./Indicator":19,"babel/external-helpers":"babel/external-helpers"}],12:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3386,7 +3399,9 @@ var Base = function (_AbstractMesh) {
 
 exports.Base = Base;
 
-},{"../Loop":9,"./AbstractMesh":10}],13:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],13:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3446,7 +3461,9 @@ var BaseDirt = function (_AbstractMesh) {
 
 exports.BaseDirt = BaseDirt;
 
-},{"../Loop":9,"./AbstractMesh":10}],14:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],14:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3497,7 +3514,9 @@ var BattersEye = function (_AbstractMesh) {
 
 exports.BattersEye = BattersEye;
 
-},{"../Loop":9,"./AbstractMesh":10}],15:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],15:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3553,7 +3572,9 @@ var Field = function (_AbstractMesh) {
 
 exports.Field = Field;
 
-},{"../Loop":9,"./AbstractMesh":10}],16:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],16:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3618,7 +3639,9 @@ var FoulLine = function (_AbstractMesh) {
 
 exports.FoulLine = FoulLine;
 
-},{"../Loop":9,"./AbstractMesh":10}],17:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],17:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3678,7 +3701,9 @@ var FoulPole = function (_AbstractMesh) {
 
 exports.FoulPole = FoulPole;
 
-},{"../Loop":9,"./AbstractMesh":10}],18:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],18:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3745,7 +3770,9 @@ var Grass = function (_AbstractMesh) {
 
 exports.Grass = Grass;
 
-},{"../Loop":9,"./AbstractMesh":10}],19:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],19:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3803,7 +3830,9 @@ var Indicator = function (_AbstractMesh) {
 
 exports.Indicator = Indicator;
 
-},{"../Loop":9,"./AbstractMesh":10}],20:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],20:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3859,7 +3888,9 @@ var Mound = function (_AbstractMesh) {
 
 exports.Mound = Mound;
 
-},{"../Loop":9,"./AbstractMesh":10}],21:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],21:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3934,7 +3965,9 @@ var Sky = function (_AbstractMesh) {
 
 exports.Sky = Sky;
 
-},{"../Loop":9,"./AbstractMesh":10}],22:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],22:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4030,7 +4063,9 @@ var Sun = function (_AbstractMesh) {
 
 exports.Sun = Sun;
 
-},{"../Loop":9,"./AbstractMesh":10}],23:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],23:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4090,7 +4125,8 @@ var Wall = function (_AbstractMesh) {
 
 exports.Wall = Wall;
 
-},{"../Loop":9,"./AbstractMesh":10}],24:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4185,6 +4221,7 @@ var lighting = {
 exports.lighting = lighting;
 
 },{}],26:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4496,7 +4533,8 @@ for (var fn in Animator.prototype) {
 
 exports.Animator = Animator;
 
-},{"../Render/Loop":9,"../Utility/helper":37,"../services/_services":30}],27:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Render/Loop":9,"../Utility/helper":37,"../services/_services":30,"babel/external-helpers":"babel/external-helpers"}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5014,10 +5052,10 @@ Mathinator.prototype = {
      */
     fielderReturnDelay: function fielderReturnDelay(distance, throwing, fielding, intercept) {
         return distance / 90 // bip distance (up to 3s+)
-         + 5 * (distance / 310) // worst case time to reach the ball,
-         * Math.min(intercept - 120, 0) / -240 // a good intercept rating will cut the base down to 0
-         + 1 - (0.2 + fielding * 0.8) // gather time (up to 0.8s)
-         + distance / 90 / (0.5 + throwing / 2); // throwing distance (up to 2s)
+        + 5 * (distance / 310) // worst case time to reach the ball,
+        * Math.min(intercept - 120, 0) / -240 // a good intercept rating will cut the base down to 0
+        + 1 - (0.2 + fielding * 0.8) // gather time (up to 0.8s)
+        + distance / 90 / (0.5 + throwing / 2); // throwing distance (up to 2s)
     },
 
     /**
@@ -5103,6 +5141,7 @@ exports.Iterator = _Iterator.Iterator;
 exports.Mathinator = _Mathinator.Mathinator;
 
 },{"../Services/Animator":26,"../Services/Distribution":27,"../Services/Iterator":28,"../Services/Mathinator":29}],31:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5134,7 +5173,8 @@ Provider.prototype.teams = {
 
 exports.Provider = Provider;
 
-},{"./TeamJapan":32}],32:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"./TeamJapan":32,"babel/external-helpers":"babel/external-helpers"}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5220,6 +5260,7 @@ samurai.lineup.map(function (player, order) {
 exports.samurai = samurai;
 
 },{"../Model/Player":5,"../Model/_models":8,"../Teams/Trainer":33}],33:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5272,7 +5313,8 @@ var Trainer = function () {
 
 exports.Trainer = Trainer;
 
-},{"../Services/Iterator":28}],34:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"../Services/Iterator":28,"babel/external-helpers":"babel/external-helpers"}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5618,51 +5660,51 @@ Log.prototype = {
                     if (r.foul) {
                         // not possible to end PA on foul?
                     } else {
-                            if (r.error) {
-                                bases = 1;
-                                outBy = 'error';
-                            } else {
-                                if (r.thrownOut) {
-                                    if (Math.random() < 0.5) {
-                                        outBy = 'ground';
-                                    } else {
-                                        outBy = 'thrown';
-                                    }
+                        if (r.error) {
+                            bases = 1;
+                            outBy = 'error';
+                        } else {
+                            if (r.thrownOut) {
+                                if (Math.random() < 0.5) {
+                                    outBy = 'ground';
                                 } else {
-                                    switch (r.bases) {
-                                        case 1:
-                                        case 2:
-                                        case 3:
-                                            bases = r.bases;
-                                            break;
-                                        case 4:
-                                            bases = 4;
-                                            if (r.splay < -15) {
-                                                fielder = 'left';
-                                            } else if (r.splay < 15) {
-                                                fielder = 'center';
-                                            } else {
-                                                fielder = 'right';
-                                            }
-                                            break;
-                                    }
+                                    outBy = 'thrown';
                                 }
-                                if (r.firstOut) {
-                                    out = out.concat(r.additionalOuts.filter(function (runner) {
-                                        return runner !== 'batter';
-                                    }));
-                                    out.doublePlay = r.doublePlay;
+                            } else {
+                                switch (r.bases) {
+                                    case 1:
+                                    case 2:
+                                    case 3:
+                                        bases = r.bases;
+                                        break;
+                                    case 4:
+                                        bases = 4;
+                                        if (r.splay < -15) {
+                                            fielder = 'left';
+                                        } else if (r.splay < 15) {
+                                            fielder = 'center';
+                                        } else {
+                                            fielder = 'right';
+                                        }
+                                        break;
                                 }
-                                if (r.fieldersChoice) {
-                                    out.push(r.fieldersChoice);
-                                    if (r.outs == 3) {
-                                        outBy = 'ground';
-                                    } else {
-                                        outBy = 'fieldersChoice';
-                                    }
+                            }
+                            if (r.firstOut) {
+                                out = out.concat(r.additionalOuts.filter(function (runner) {
+                                    return runner !== 'batter';
+                                }));
+                                out.doublePlay = r.doublePlay;
+                            }
+                            if (r.fieldersChoice) {
+                                out.push(r.fieldersChoice);
+                                if (r.outs == 3) {
+                                    outBy = 'ground';
+                                } else {
+                                    outBy = 'fieldersChoice';
                                 }
                             }
                         }
+                    }
                 }
                 record = _text.text.contactResult(batter, fielder, bases, outBy, r.outs === 3 ? [] : r.sacrificeAdvances, out);
             } else {
@@ -5984,8 +6026,6 @@ var text = function text(phrase, override) {
             'Range': 'レンジ',
             'Strong throw': '肩強い'
         },
-        //'' : '',
-        //'' : '',
         e: {
             empty: '-',
             'Season': 'Season',
@@ -6269,6 +6309,7 @@ text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances,
 exports.text = text;
 
 },{}],39:[function(require,module,exports){
+(function (babelHelpers){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6284,7 +6325,8 @@ if ((typeof window === 'undefined' ? 'undefined' : babelHelpers.typeof(window)) 
 
 exports.Baseball = _namespace.Baseball;
 
-},{"./namespace":40}],40:[function(require,module,exports){
+}).call(this,require("babel/external-helpers"))
+},{"./namespace":40,"babel/external-helpers":"babel/external-helpers"}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6334,7 +6376,386 @@ Baseball.teams.Provider = _Provider.Provider;
 
 exports.Baseball = Baseball;
 
-},{"./Model/AtBat":1,"./Model/Field":2,"./Model/Game":3,"./Model/Manager":4,"./Model/Player":5,"./Model/Team":6,"./Model/Umpire":7,"./Services/_services":30,"./Teams/Provider":31,"./Utility/_utils":35}]},{},[39]);
+},{"./Model/AtBat":1,"./Model/Field":2,"./Model/Game":3,"./Model/Manager":4,"./Model/Player":5,"./Model/Team":6,"./Model/Umpire":7,"./Services/_services":30,"./Teams/Provider":31,"./Utility/_utils":35}],"babel/external-helpers":[function(require,module,exports){
+var global = {}; (function (global) {
+  var babelHelpers = global.babelHelpers = {};
+  babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+
+  babelHelpers.jsx = function () {
+    var REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7;
+    return function createRawReactElement(type, props, key, children) {
+      var defaultProps = type && type.defaultProps;
+      var childrenLength = arguments.length - 3;
+
+      if (!props && childrenLength !== 0) {
+        props = {};
+      }
+
+      if (props && defaultProps) {
+        for (var propName in defaultProps) {
+          if (props[propName] === void 0) {
+            props[propName] = defaultProps[propName];
+          }
+        }
+      } else if (!props) {
+        props = defaultProps || {};
+      }
+
+      if (childrenLength === 1) {
+        props.children = children;
+      } else if (childrenLength > 1) {
+        var childArray = Array(childrenLength);
+
+        for (var i = 0; i < childrenLength; i++) {
+          childArray[i] = arguments[i + 3];
+        }
+
+        props.children = childArray;
+      }
+
+      return {
+        $$typeof: REACT_ELEMENT_TYPE,
+        type: type,
+        key: key === undefined ? null : '' + key,
+        ref: null,
+        props: props,
+        _owner: null
+      };
+    };
+  }();
+
+  babelHelpers.asyncToGenerator = function (fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              return step("next", value);
+            }, function (err) {
+              return step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  };
+
+  babelHelpers.classCallCheck = function (instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  };
+
+  babelHelpers.createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  babelHelpers.defineEnumerableProperties = function (obj, descs) {
+    for (var key in descs) {
+      var desc = descs[key];
+      desc.configurable = desc.enumerable = true;
+      if ("value" in desc) desc.writable = true;
+      Object.defineProperty(obj, key, desc);
+    }
+
+    return obj;
+  };
+
+  babelHelpers.defaults = function (obj, defaults) {
+    var keys = Object.getOwnPropertyNames(defaults);
+
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var value = Object.getOwnPropertyDescriptor(defaults, key);
+
+      if (value && value.configurable && obj[key] === undefined) {
+        Object.defineProperty(obj, key, value);
+      }
+    }
+
+    return obj;
+  };
+
+  babelHelpers.defineProperty = function (obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
+  };
+
+  babelHelpers.extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  babelHelpers.get = function get(object, property, receiver) {
+    if (object === null) object = Function.prototype;
+    var desc = Object.getOwnPropertyDescriptor(object, property);
+
+    if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);
+
+      if (parent === null) {
+        return undefined;
+      } else {
+        return get(parent, property, receiver);
+      }
+    } else if ("value" in desc) {
+      return desc.value;
+    } else {
+      var getter = desc.get;
+
+      if (getter === undefined) {
+        return undefined;
+      }
+
+      return getter.call(receiver);
+    }
+  };
+
+  babelHelpers.inherits = function (subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  };
+
+  babelHelpers.instanceof = function (left, right) {
+    if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) {
+      return right[Symbol.hasInstance](left);
+    } else {
+      return left instanceof right;
+    }
+  };
+
+  babelHelpers.interopRequireDefault = function (obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  };
+
+  babelHelpers.interopRequireWildcard = function (obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  };
+
+  babelHelpers.newArrowCheck = function (innerThis, boundThis) {
+    if (innerThis !== boundThis) {
+      throw new TypeError("Cannot instantiate an arrow function");
+    }
+  };
+
+  babelHelpers.objectDestructuringEmpty = function (obj) {
+    if (obj == null) throw new TypeError("Cannot destructure undefined");
+  };
+
+  babelHelpers.objectWithoutProperties = function (obj, keys) {
+    var target = {};
+
+    for (var i in obj) {
+      if (keys.indexOf(i) >= 0) continue;
+      if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+      target[i] = obj[i];
+    }
+
+    return target;
+  };
+
+  babelHelpers.possibleConstructorReturn = function (self, call) {
+    if (!self) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+
+    return call && (typeof call === "object" || typeof call === "function") ? call : self;
+  };
+
+  babelHelpers.selfGlobal = typeof global === "undefined" ? self : global;
+
+  babelHelpers.set = function set(object, property, value, receiver) {
+    var desc = Object.getOwnPropertyDescriptor(object, property);
+
+    if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);
+
+      if (parent !== null) {
+        set(parent, property, value, receiver);
+      }
+    } else if ("value" in desc && desc.writable) {
+      desc.value = value;
+    } else {
+      var setter = desc.set;
+
+      if (setter !== undefined) {
+        setter.call(receiver, value);
+      }
+    }
+
+    return value;
+  };
+
+  babelHelpers.slicedToArray = function () {
+    function sliceIterator(arr, i) {
+      var _arr = [];
+      var _n = true;
+      var _d = false;
+      var _e = undefined;
+
+      try {
+        for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+          _arr.push(_s.value);
+
+          if (i && _arr.length === i) break;
+        }
+      } catch (err) {
+        _d = true;
+        _e = err;
+      } finally {
+        try {
+          if (!_n && _i["return"]) _i["return"]();
+        } finally {
+          if (_d) throw _e;
+        }
+      }
+
+      return _arr;
+    }
+
+    return function (arr, i) {
+      if (Array.isArray(arr)) {
+        return arr;
+      } else if (Symbol.iterator in Object(arr)) {
+        return sliceIterator(arr, i);
+      } else {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      }
+    };
+  }();
+
+  babelHelpers.slicedToArrayLoose = function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      var _arr = [];
+
+      for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+        _arr.push(_step.value);
+
+        if (i && _arr.length === i) break;
+      }
+
+      return _arr;
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+
+  babelHelpers.taggedTemplateLiteral = function (strings, raw) {
+    return Object.freeze(Object.defineProperties(strings, {
+      raw: {
+        value: Object.freeze(raw)
+      }
+    }));
+  };
+
+  babelHelpers.taggedTemplateLiteralLoose = function (strings, raw) {
+    strings.raw = raw;
+    return strings;
+  };
+
+  babelHelpers.temporalRef = function (val, name, undef) {
+    if (val === undef) {
+      throw new ReferenceError(name + " is not defined - temporal dead zone");
+    } else {
+      return val;
+    }
+  };
+
+  babelHelpers.temporalUndefined = {};
+
+  babelHelpers.toArray = function (arr) {
+    return Array.isArray(arr) ? arr : Array.from(arr);
+  };
+
+  babelHelpers.toConsumableArray = function (arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+      return arr2;
+    } else {
+      return Array.from(arr);
+    }
+  };
+})(typeof global === "undefined" ? self : global); module.exports = global.babelHelpers;
+},{}]},{},[39]);
 
 var SocketService = function() {
     var Service = function() {};
@@ -6513,7 +6934,8 @@ BattersDirective = function() {
         .Component({
             selector: 'batters-data',
             templateUrl: BattersDirective().templateUrl,
-            inputs : ['y', 't']
+            inputs : ['y', 't'],
+            directives: []
         })
         .Class({
             constructor: function() {
@@ -6541,7 +6963,8 @@ BatteryDirective = function() {
         .Component({
             selector: 'battery-data',
             templateUrl: BatteryDirective().templateUrl,
-            inputs : ['y', 't']
+            inputs : ['y', 't'],
+            directives: []
         })
         .Class({
             constructor: function() {
@@ -6568,7 +6991,8 @@ FieldDirective = function() {
     app.FieldComponent = ng.core
         .Component({
             selector: 'field',
-            templateUrl: FieldDirective().templateUrl
+            templateUrl: FieldDirective().templateUrl,
+            directives: []
         })
         .Class({
             constructor: function() {
@@ -6647,7 +7071,8 @@ ScoreboardDirective = function() {
             selector: 'scoreboard',
             templateUrl: ScoreboardDirective().templateUrl,
             inputs: ['y', 't'],
-            pipes: [app.ToIterableService]
+            pipes: [app.ToIterableService],
+            directives: []
         })
         .Class({
             constructor: function() {
@@ -6937,7 +7362,9 @@ IndexController = function($scope, socket) {
         .Component({
             selector: 'application-hook',
             templateUrl: './public/html/views/main.html',
-            directives: [ng.common.NgStyle, ng.common.NgFor,
+            directives: [
+                ng.common.NgStyle,
+                ng.common.NgFor,
                 app.BattersDataComponent,
                 app.BatteryDataComponent,
                 app.FlagComponent,
@@ -6978,7 +7405,7 @@ if (typeof angular === 'object') {
     (function(app) {
         document.addEventListener('DOMContentLoaded', function() {
             ng.core.enableProdMode();
-            ng.platform.browser.bootstrap(app.Main);
+            ng.platformBrowserDynamic.bootstrap(app.Main);
         });
     })(window.app || (window.app = {}));
 

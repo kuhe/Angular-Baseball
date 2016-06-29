@@ -104,7 +104,7 @@
                     <tr>
                         <td>&nbsp;</td>
                     </tr>
-                    <tr *ngFor="#team of y.teams | toIterable">
+                    <tr *ngFor="let team of y.teams | toIterable">
                         <td><span class='grey'>{{team.getName()}}</span></td>
                     </tr>
                 </table>
@@ -112,19 +112,19 @@
             <div class="scores col-md-6">
                 <table class='table'>
                     <tr>
-                        <td class='font-yellow' *ngFor="#value of y.scoreboard.home | toIterable">
+                        <td class='font-yellow' *ngFor="let value of y.scoreboard.home | toIterable">
                             <span class='grey' *ngIf='value.__key !== "__key"'>{{value.__key}}</span>
                         </td>
                     </tr>
                     <tr class="team-line">
-                        <td class='' *ngFor="#score of y.scoreboard.away | toIterable">
+                        <td class='' *ngFor="let score of y.scoreboard.away | toIterable">
                             <span class='grey' *ngIf='score.__key !== "__key"'>
                                 {{ y.inning < score.__key ? '-' : score }}
                             </span>
                         </td>
                     </tr>
                     <tr class="team-line">
-                        <td class='' *ngFor="#score of y.scoreboard.home | toIterable">
+                        <td class='' *ngFor="let score of y.scoreboard.home | toIterable">
                             <span class='grey' *ngIf='score.__key !== "__key"'>
                                 {{ y.inning < score.__key || (y.inning == score.__key && y.half == 'top') ? '-' : score }}
                             </span>
@@ -145,7 +145,7 @@
                             <span class='grey font-yellow'>E</span>
                         </td>
                     </tr>
-                    <tr *ngFor="#side of y.tally | toIterable">
+                    <tr *ngFor="let side of y.tally | toIterable">
                         <td>
                             <span class='grey'>{{side.H}}</span>
                         </td>

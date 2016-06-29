@@ -19,7 +19,8 @@ ScoreboardDirective = function() {
             selector: 'scoreboard',
             templateUrl: ScoreboardDirective().templateUrl,
             inputs: ['y', 't'],
-            pipes: [app.ToIterableService]
+            pipes: [app.ToIterableService],
+            directives: []
         })
         .Class({
             constructor: function() {

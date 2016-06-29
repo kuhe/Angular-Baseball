@@ -17,7 +17,8 @@ FieldDirective = function() {
     app.FieldComponent = ng.core
         .Component({
             selector: 'field',
-            templateUrl: FieldDirective().templateUrl
+            templateUrl: FieldDirective().templateUrl,
+            directives: []
         })
         .Class({
             constructor: function() {

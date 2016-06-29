@@ -18,7 +18,8 @@ BattersDirective = function() {
         .Component({
             selector: 'batters-data',
             templateUrl: BattersDirective().templateUrl,
-            inputs : ['y', 't']
+            inputs : ['y', 't'],
+            directives: []
         })
         .Class({
             constructor: function() {

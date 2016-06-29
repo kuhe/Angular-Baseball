@@ -118,11 +118,11 @@
             <div class='webgl-container'></div>
             <div class='row'>
                 <div class='col-md-4 background-color visible-lg visible-md'>
-                    <!--<div *ngFor='#(key, val) of y.swingResult'>-->
+                    <!--<div *ngFor='let (key, val) of y.swingResult'>-->
                     <!--{{key}} : {{val}}-->
                     <!--</div>-->
                     <ul class="list-group pitch-record">
-                        <li class='list-group-item' *ngFor="#event of y.log.pitchRecord[mode()]; #index = index">
+                        <li class='list-group-item' *ngFor="let event of y.log.pitchRecord[mode()]">
                             <strong *ngIf="index == 0">
                                 {{event}}
                             </strong>
@@ -216,7 +216,7 @@
                 </div>
                 <div class='col-md-4 background-color visible-lg visible-md'>
                     <ul class="list-group play-record">
-                        <li class='list-group-item' *ngFor="#event of y.log.shortRecord[mode()]; #index = index">
+                        <li class='list-group-item' *ngFor="let event of y.log.shortRecord[mode()];">
                             <strong *ngIf="index == 0">
                                 {{event}}
                             </strong>
@@ -237,7 +237,7 @@
         <!--</div>-->
         <hr class='visible-sm visible-xs centered'>
         <ul class='centered list-inline pitch-selection' *ngIf='y.humanPitching()'>
-            <li class='pointer' *ngFor='#pitch of y.pitcher.pitching | toIterable;' (click)="selectPitch(pitch.__key)">
+            <li class='pointer' *ngFor='let pitch of y.pitcher.pitching | toIterable;' (click)="selectPitch(pitch.__key)">
             <span>
                 <button class='pointer btn small' [ngClass]='{disabled: y.pitchInFlight.name !== pitch.__key}'>
                     {{ t(pitch.__key) }}
@@ -254,7 +254,7 @@
             </li>
         </ul>
         <ul class='centered list-inline pitch-selection' *ngIf='!y.humanPitching()'>
-            <li class='pointer' *ngFor='#pitch of y.pitcher.pitching | toIterable;'>
+            <li class='pointer' *ngFor='let pitch of y.pitcher.pitching | toIterable;'>
                 <span class='pointer'>
                     {{ t(pitch.__key) }}
                 </span>
@@ -281,12 +281,12 @@
         <hr/>
         <div class='block stabilized col-lg-12 hidden-lg hidden-md'>
             <ul class="list-group pitch-record col-xs-6">
-                <li class='list-group-item' *ngFor="#event of y.log.stabilized.pitchRecord[mode()]">
+                <li class='list-group-item' *ngFor="let event of y.log.stabilized.pitchRecord[mode()]">
                     {{event}}
                 </li>
             </ul>
             <ul class="list-group pitch-record col-xs-6">
-                <li class='list-group-item' *ngFor="#event of y.log.stabilized.shortRecord[mode()]">
+                <li class='list-group-item' *ngFor="let event of y.log.stabilized.shortRecord[mode()]">
                     {{event}}
                 </li>
             </ul>
@@ -294,12 +294,12 @@
         </div>
         <div class='clear'></div>
         <div class='col-lg-12 batting-lines'>
-            <ul class='list-group col-lg-6' *ngFor='#team of [y.teams.away, y.teams.home]' [ngClass]='{ click_to_sub: team.sub !== team.noSubstituteSelected }'>
+            <ul class='list-group col-lg-6' *ngFor='let team of [y.teams.away, y.teams.home]' [ngClass]='{ click_to_sub: team.sub !== team.noSubstituteSelected }'>
                 <li class='list-group-item team-name'>
                     <flag [team]='team'></flag>
                     {{team.getName()}}
                 </li>
-                <li class='list-group-item pointer lineup' *ngFor="#player of team.lineup"
+                <li class='list-group-item pointer lineup' *ngFor="let player of team.lineup"
                     (click)='clickLineup(player)'>
                     {{abbreviatePosition(player.position)}}
                     <!--<rating-block [rating]='player.defensiveAverage()'></rating-block>-->
@@ -313,7 +313,7 @@
                         <span class='defining'>
                             {{ player.getDefiningCharacteristic() }}
                         </span>
-                        <span class='action-line' *ngFor='#atBat of player.getAtBats()'
+                        <span class='action-line' *ngFor='let atBat of player.getAtBats()'
                               [ngClass]='{beneficial: atBat.beneficial}'>
                             {{ atBat + '' }}
                         </span>
@@ -367,7 +367,7 @@
                     <flag [team]='team'></flag>
                     {{ team.getName() + t.space() + t('Bench') }}
                 </li>
-                <li class='list-group-item pointer bench' *ngFor='#player of team.bench'
+                <li class='list-group-item pointer bench' *ngFor='let player of team.bench'
                     (click)='selectSubstitute(player)' [ngClass]='{selected_sub: team.sub?.toString() === player.toString()}'>
                     <strong>{{player.getName()}}</strong>
                     ({{'#'+player.number}})
@@ -382,7 +382,7 @@
                     </span>
                     <div class='row'></div>
                 </li>
-                <li class='list-group-item pointer substituted' *ngFor='#player of team.substituted'>
+                <li class='list-group-item pointer substituted' *ngFor='let player of team.substituted'>
                     <strong>{{player.getName()}}</strong>
                     ({{'#'+player.number}})
                     <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>
@@ -390,7 +390,7 @@
                         <span class='defining'>
                             {{ player.getDefiningCharacteristic() }}
                         </span>
-                        <span class='action-line' *ngFor='#atBat of player.getAtBats()'
+                        <span class='action-line' *ngFor='let atBat of player.getAtBats()'
                               [ngClass]='{beneficial: atBat.beneficial}'>
                             {{ atBat + '' }}
                         </span>
@@ -402,7 +402,7 @@
         </div>
         <div class='block col-lg-12' *ngIf='y.stage == "end"'>
             <ul class="list-group pitch-record col-xs-12">
-                <li class='list-group-item' *ngFor="#event of y.log.record[mode()]">
+                <li class='list-group-item' *ngFor="let event of y.log.record[mode()]">
                     {{event}}
                 </li>
             </ul>

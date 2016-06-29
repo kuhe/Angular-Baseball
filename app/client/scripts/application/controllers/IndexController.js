@@ -279,7 +279,9 @@ IndexController = function($scope, socket) {
         .Component({
             selector: 'application-hook',
             templateUrl: './public/html/views/main.html',
-            directives: [ng.common.NgStyle, ng.common.NgFor,
+            directives: [
+                ng.common.NgStyle,
+                ng.common.NgFor,
                 app.BattersDataComponent,
                 app.BatteryDataComponent,
                 app.FlagComponent,
