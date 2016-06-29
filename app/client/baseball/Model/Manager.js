@@ -1,16 +1,16 @@
 import { Iterator } from '../Services/_services';
 
-var Manager = function(team) {
+const Manager = function(team) {
     this.init(team);
 };
 
 Manager.prototype = {
     constructor : Manager,
-    init : function(team) {
+    init(team) {
         this.team = team;
     },
-    makeLineup : function() {
-        var jerseyNumber = 1;
+    makeLineup() {
+        let jerseyNumber = 1;
         this.team.positions.pitcher = this.selectForSkill(this.team.bench, ['pitching']);
         this.team.positions.pitcher.position = 'pitcher';
         if (!this.team.positions.pitcher.number) {
@@ -21,7 +21,7 @@ Manager.prototype = {
         if (!this.team.positions.catcher.number) {
             this.team.positions.catcher.number = jerseyNumber++;
         }
-        Iterator.each(this.team.bench, function(key, player) {
+        Iterator.each(this.team.bench, (key, player) => {
             if (!player.number) {
                 player.number = jerseyNumber++;
             }
@@ -60,30 +60,28 @@ Manager.prototype = {
         this.team.lineup[8] = this.selectForSkill(this.team.positions, ['offense', 'speed']);
         this.team.lineup[8].order = 8;
     },
-    selectForSkill : function(pool, skillset, requiredThrowingHandedness) {
-        if (this.team.bench.length || pool == this.team.positions) {
-            var selection = this.team.bench[0];
-            var rating = 0;
-            var index = 0;
-            Iterator.each(pool, function(key, player) {
-                var skills = skillset.slice();
-                var cursor = player.skill;
-                var property = skills.shift();
+    selectForSkill(pool, skillset, requiredThrowingHandedness) {
+        if (this.team.bench.length || pool === this.team.positions) {
+            let selection = this.team.bench[0];
+            let rating = 0;
+            let index = 0;
+            Iterator.each(pool, (key, player) => {
+                const skills = skillset.slice();
+                let cursor = player.skill;
+                let property = skills.shift();
                 while (property) {
                     cursor = cursor[property];
                     property = skills.shift();
                 }
-                if (!(player.order+1) && cursor >= rating && (!requiredThrowingHandedness || player.throws == requiredThrowingHandedness)) {
+                if (!(player.order+1) && cursor >= rating && (!requiredThrowingHandedness || player.throws === requiredThrowingHandedness)) {
                     rating = cursor;
                     selection = player;
                     index = key;
                 }
             });
-            if (pool == this.team.bench) {
+            if (pool === this.team.bench) {
                 delete this.team.bench[index];
-                this.team.bench = this.team.bench.filter(function(player) {
-                    return player instanceof selection.constructor;
-                });
+                this.team.bench = this.team.bench.filter(player => player instanceof selection.constructor);
             }
             return selection;
         }

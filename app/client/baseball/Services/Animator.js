@@ -2,7 +2,7 @@ import { Mathinator } from '../services/_services';
 import { Loop } from '../Render/Loop';
 import { helper } from '../Utility/helper';
 
-var Animator = function() {
+const Animator = function() {
     this.init();
     throw new Error('No need to instantiate Animator');
 };
@@ -20,7 +20,7 @@ Animator.prototype = {
      * anything other than webgl will use TweenMax for JS animations
      */
     renderingMode : 'webgl',
-    init : function() {
+    init() {
         if (Animator.console) return;
         if (!this.loop && this.renderingMode === 'webgl') {
             this.beginRender();
@@ -29,7 +29,7 @@ Animator.prototype = {
     /**
      * @returns {Loop}
      */
-    beginRender : function() {
+    beginRender() {
         this.background = new Loop('webgl-bg-container', true);
         this.loop = new Loop('webgl-container');
 
@@ -41,18 +41,18 @@ Animator.prototype = {
     /**
      * @param level {Number} 0 to 1
      */
-    setLuminosity : function(level) {
+    setLuminosity(level) {
         if (this.console) return;
         this.loop.lighting.setLuminosity(level);
         this.background.lighting.setLuminosity(level);
     },
-    loadTweenMax : function() {
+    loadTweenMax() {
         if (this.console || typeof window !== 'object') {
             Animator.TweenMax = {
-                'set': function() {},
-                'to': function() {},
-                'from': function() {},
-                killAll: function() {}
+                'set'() {},
+                'to'() {},
+                'from'() {},
+                killAll() {}
             }
         } else {
             Animator.TweenMax = window.TweenMax;
@@ -68,7 +68,7 @@ Animator.prototype = {
      * this is called with $scope context binding
      * @param callback
      */
-    updateFlightPath : function(callback) {
+    updateFlightPath(callback) {
         if (Animator.console) return;
 
         if (Animator.renderingMode === 'webgl') {
@@ -81,26 +81,15 @@ Animator.prototype = {
      * @param $scope
      * animates the pitch's flight path
      */
-    tweenFlightPath: function(callback, $scope) {
-        var TweenMax = Animator.loadTweenMax();
+    tweenFlightPath(callback, $scope) {
+        const TweenMax = Animator.loadTweenMax();
         TweenMax.killAll();
-        var game = $scope.y,
-            top = 200-game.pitchTarget.y,
-            left = game.pitchTarget.x,
-            breakTop = 200-game.pitchInFlight.y,
-            breakLeft = game.pitchInFlight.x,
-            $baseballs = $('.baseball'),
-            flightSpeed = 1.3 - 0.6*(game.pitchInFlight.velocity + 300)/400,
-            originTop = 50,
-            originLeft = 110 + (game.pitcher.throws == 'left' ? 20 : -20);
-        var pitch = this.pitchTarget = $('.main-area .target .baseball.pitch'),
-            henka = this.pitchBreak = $('.main-area .target .baseball.break'),
-            quarter = flightSpeed/4;
+        const game = $scope.y, top = 200-game.pitchTarget.y, left = game.pitchTarget.x, breakTop = 200-game.pitchInFlight.y, breakLeft = game.pitchInFlight.x, $baseballs = $('.baseball'), flightSpeed = 1.3 - 0.6*(game.pitchInFlight.velocity + 300)/400, originTop = 50, originLeft = 110 + (game.pitcher.throws == 'left' ? 20 : -20);
+        const pitch = this.pitchTarget = $('.main-area .target .baseball.pitch'), henka = this.pitchBreak = $('.main-area .target .baseball.break'), quarter = flightSpeed/4;
 
-        var pitchTransition = Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 12, 4),
-            targetTransition = Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 10, 3);
+        const pitchTransition = Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 12, 4), targetTransition = Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 10, 3);
 
-        var transitions = [
+        const transitions = [
             pitchTransition(0, 0),
             pitchTransition(10, 0),
             pitchTransition(30, 1),
@@ -117,7 +106,7 @@ Animator.prototype = {
         TweenMax.to(pitch, quarter, transitions[4]);
         TweenMax.to(henka, quarter, transitions[5]);
 
-        $scope.lastTimeout = setTimeout(function() {
+        $scope.lastTimeout = setTimeout(() => {
             $scope.allowInput = true;
             if (typeof callback == 'function') {
                 callback();
@@ -136,7 +125,7 @@ Animator.prototype = {
         }
 
         if (game.humanBatting() && !game.humanPitching()) {
-            $scope.holdUpTimeouts.push(setTimeout(function() {
+            $scope.holdUpTimeouts.push(setTimeout(() => {
                 $scope.holdUp();
             }, (flightSpeed + Animator.HOLD_UP_ALLOWANCE) * 1000));
         }
@@ -146,34 +135,34 @@ Animator.prototype = {
      * @param $scope Angular scope
      * webgl version of tweenFlightPath
      */
-    renderFlightPath: function(callback, $scope) {
-        var TweenMax = Animator.loadTweenMax();
+    renderFlightPath(callback, $scope) {
+        const TweenMax = Animator.loadTweenMax();
         TweenMax.killAll();
-        var game = $scope.y,
-            flightSpeed = Mathinator.getFlightTime(game.pitchInFlight.velocity,
-                helper.pitchDefinitions[game.pitchInFlight.name][2]);
+        const game = $scope.y,
+              flightSpeed = Mathinator.getFlightTime(game.pitchInFlight.velocity,
+                  helper.pitchDefinitions[game.pitchInFlight.name][2]);
 
         if (!this.loop) {
             this.beginRender();
         }
-        var ball = new this.loop.constructors.Ball();
+        const ball = new this.loop.constructors.Ball();
         Animator._ball = ball;
         ball.derivePitchingTrajectory(game);
         ball.trajectory = ball.breakingTrajectory;
         ball.join(this.loop);
 
-        $scope.lastTimeout = setTimeout(function() {
+        $scope.lastTimeout = setTimeout(() => {
             $scope.allowInput = true;
             if (typeof callback === 'function') {
                 callback();
             }
         }, flightSpeed * 1000);
 
-        var $baseballs = $('.baseball');
+        const $baseballs = $('.baseball');
         $baseballs.addClass('hide');
 
         if (game.humanBatting() && !game.humanPitching()) {
-            $scope.holdUpTimeouts.push(setTimeout(function() {
+            $scope.holdUpTimeouts.push(setTimeout(() => {
                 $scope.holdUp();
             }, (flightSpeed + Animator.HOLD_UP_ALLOWANCE) * 1000));
         }
@@ -183,11 +172,11 @@ Animator.prototype = {
      * @returns {*}
      * This only animates the flight arc of the ball in play.
      */
-    animateFieldingTrajectory : function(game) {
+    animateFieldingTrajectory(game) {
         if (Animator.console) return game.swingResult;
 
         if (this.renderingMode === 'webgl') {
-            setTimeout(function(){
+            setTimeout(() => {
                 Animator.tweenFieldingTrajectory(game, true);
             }, 50);
             return Animator.renderFieldingTrajectory(game);
@@ -200,35 +189,35 @@ Animator.prototype = {
      * @returns {Game.swingResult|*|swingResult|Field.game.swingResult}
      * JS/CSS animation
      */
-    tweenFieldingTrajectory: function(game, splayOnly) {
-        var TweenMax = Animator.loadTweenMax();
-        var ball = $('.splay-indicator-ball');
+    tweenFieldingTrajectory(game, splayOnly) {
+        const TweenMax = Animator.loadTweenMax();
+        let ball = $('.splay-indicator-ball');
         TweenMax.killAll();
-        var result = game.swingResult;
+        const result = game.swingResult;
 
-        var linearApproximateDragScalar = {
+        const linearApproximateDragScalar = {
             distance: 1,
             apexHeight: 0.57,
             airTime: 0.96
         };
 
-        var angle = result.flyAngle,
-            distance = Math.abs(result.travelDistance),
-            scalar = result.travelDistance < 0 ? -1 : 1;
+        let angle = result.flyAngle;
+        const distance = Math.abs(result.travelDistance);
+        const scalar = result.travelDistance < 0 ? -1 : 1;
 
         Mathinator.memory.bounding = angle < 0;
         angle = 1 + Math.abs(angle);
         if (angle > 90) angle = 180 - angle;
 
-        var velocity = linearApproximateDragScalar.distance * Math.sqrt(9.81 * distance / Math.sin(2*Math.PI*angle/180));
-        var velocityVerticalComponent = Math.sin(Mathinator.RADIAN * angle) * velocity;
-        var apexHeight = velocityVerticalComponent*velocityVerticalComponent/(2*9.81) * linearApproximateDragScalar.apexHeight;
-        var airTime = 1.5 * Math.sqrt(2*apexHeight/9.81) * linearApproximateDragScalar.airTime; // 2x freefall equation
+        const velocity = linearApproximateDragScalar.distance * Math.sqrt(9.81 * distance / Math.sin(2*Math.PI*angle/180));
+        const velocityVerticalComponent = Math.sin(Mathinator.RADIAN * angle) * velocity;
+        const apexHeight = velocityVerticalComponent*velocityVerticalComponent/(2*9.81) * linearApproximateDragScalar.apexHeight;
+        const airTime = 1.5 * Math.sqrt(2*apexHeight/9.81) * linearApproximateDragScalar.airTime; // 2x freefall equation
 
         //log('angle', angle, 'vel', velocity, 'apex', apexHeight, 'air', airTime, 'dist', result.travelDistance);
-        var quarter = airTime/4;
-        var mathinator = new Mathinator();
-        var transitions = [
+        const quarter = airTime/4;
+        const mathinator = new Mathinator();
+        let transitions = [
             mathinator.transitionalTrajectory(0, quarter, 0, apexHeight, scalar * distance, result.splay),
             mathinator.transitionalTrajectory(25, quarter, 0),
             mathinator.transitionalTrajectory(50, quarter, 1),
@@ -243,7 +232,7 @@ Animator.prototype = {
 
         if (!splayOnly) {
             ball = $('.indicator.baseball.break').removeClass('hide').show();
-            var time = quarter/2;
+            const time = quarter/2;
             transitions = [
                 mathinator.transitionalCatcherPerspectiveTrajectory(0, time, 0, apexHeight, scalar * distance,
                     result.splay, game.pitchInFlight),
@@ -266,7 +255,7 @@ Animator.prototype = {
             TweenMax.to(ball, time, transitions[7]);
             TweenMax.to(ball, time, transitions[8]);
 
-            setTimeout(function() {
+            setTimeout(() => {
                 // hack
                 $('.indicator.baseball.break').removeClass('hide').show();
             }, 50);
@@ -279,13 +268,13 @@ Animator.prototype = {
      * @returns {Game.swingResult|*|swingResult|Field.game.swingResult}
      * WebGL version of tweenFieldingTrajectory
      */
-    renderFieldingTrajectory: function(game) {
+    renderFieldingTrajectory(game) {
         if (!this.loop) {
             this.beginRender();
         }
-        var result = game.swingResult;
+        const result = game.swingResult;
 
-        var ball = Animator._ball || new this.loop.constructors.Ball();
+        const ball = Animator._ball || new this.loop.constructors.Ball();
         ball.deriveTrajectory(result, game.pitchInFlight);
         ball.join(this.loop);
 
@@ -312,7 +301,7 @@ Animator.prototype = {
     }
 };
 
-for (var fn in Animator.prototype) {
+for (const fn in Animator.prototype) {
     if (Animator.prototype.hasOwnProperty(fn)) {
         Animator[fn] = Animator.prototype[fn];
     }

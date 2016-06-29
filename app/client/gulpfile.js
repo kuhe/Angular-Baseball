@@ -3,7 +3,7 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify'),
     sourcemaps = require('gulp-sourcemaps'),
-    babel = require('babel');
+    babel = require('babel-core');
 var browserify = require('browserify'),
     babelify = require('babelify');
 var fs = require('fs');
@@ -68,7 +68,7 @@ gulp.task('externalStyles', function () {
 });
 gulp.task('modularScripts', function () {
     browserify({ entries: './'+name+'/'+name+'.js' })
-        .transform(babelify)
+        .transform('babelify', {presets: ['es2015'], plugins: ['external-helpers-2']})
         .bundle()
         .pipe(fs.createWriteStream('./'+name+'/bundle.js')).on('close', function() {
             gulp.start('internalScripts');

@@ -8,7 +8,7 @@ import { helper, text } from '../Utility/_utils';
 
 import { Animator, Distribution, Mathinator, Iterator } from '../Services/_services';
 
-var Game = function(m) {
+const Game = function(m) {
     this.init(m);
 };
 
@@ -20,13 +20,13 @@ Game.prototype = {
     debug : [],
     pitcher : {}, // Player&
     batter : {}, // Player&
-    init : function(m) {
+    init(m) {
         this.reset();
         this.startTime = {
             h: Math.random() * 6 + 11 | 0,
             m: Math.random() * 60 | 0
         };
-        var timeOfDay = this.timeOfDay = {
+        const timeOfDay = this.timeOfDay = {
             h: 0,
             m: 0
         }; // @see {Loop} for time initialization
@@ -39,7 +39,7 @@ Game.prototype = {
         this.log.game = this;
         this.debug = [];
         this.helper = helper;
-        while (this.teams.away.name == this.teams.home.name) {
+        while (this.teams.away.name === this.teams.home.name) {
             this.teams.away.pickName();
         }
         this.umpire = new Umpire(this);
@@ -50,8 +50,8 @@ Game.prototype = {
         Animator.init();
         this.passMinutes(5);
     },
-    passMinutes: function(minutes) {
-        var time = this.timeOfDay;
+    passMinutes(minutes) {
+        const time = this.timeOfDay;
         time.m = parseInt(time.m);
         time.m += parseInt(minutes);
         while (time.m >= 60) {
@@ -60,36 +60,36 @@ Game.prototype = {
         }
         if (!Animator.console) Animator.loop.setTargetTimeOfDay(time.h, time.m);
     },
-    getInning : function() {
-        return text.mode == 'n' ? (this.inning + (this.half == 'top' ? 'オモテ' : 'ウラ')) : this.half.toUpperCase() + ' ' + this.inning;
+    getInning() {
+        return text.mode === 'n' ? (this.inning + (this.half === 'top' ? 'オモテ' : 'ウラ')) : `${this.half.toUpperCase()} ${this.inning}`;
     },
-    humanBatting : function() {
-        var humanControl = this.humanControl;
-        if (humanControl == 'none') return false;
+    humanBatting() {
+        const humanControl = this.humanControl;
+        if (humanControl === 'none') return false;
         switch (this.half) {
             case 'top':
-                return humanControl == 'both' || humanControl == 'away';
+                return humanControl === 'both' || humanControl === 'away';
             case 'bottom':
-                return humanControl == 'both' || humanControl == 'home';
+                return humanControl === 'both' || humanControl === 'home';
         }
     },
-    humanPitching : function() {
-        var humanControl = this.humanControl;
-        if (humanControl == 'none') return false;
+    humanPitching() {
+        const humanControl = this.humanControl;
+        if (humanControl === 'none') return false;
         switch (this.half) {
             case 'top':
-                return humanControl == 'both' || humanControl == 'home';
+                return humanControl === 'both' || humanControl === 'home';
             case 'bottom':
-                return humanControl == 'both' || humanControl == 'away';
+                return humanControl === 'both' || humanControl === 'away';
         }
     },
-    end : function() {
+    end() {
         this.stage = 'end';
-        var e, n;
+        let e, n;
         e = this.tally.home.R > this.tally.away.R ? 'Home team wins!' :
-            (this.tally.home.R == this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!');
-        n = this.tally.home.R > this.tally.away.R ? this.teams.home.getName()+'の勝利' :
-            (this.tally.home.R == this.tally.away.R ? '引き分け' : this.teams.away.getName()+'の勝利');
+            (this.tally.home.R === this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!');
+        n = this.tally.home.R > this.tally.away.R ? `${this.teams.home.getName()}の勝利` :
+            (this.tally.home.R === this.tally.away.R ? '引き分け' : `${this.teams.away.getName()}の勝利`);
         if (this.tally.home.R > this.tally.away.R) {
             this.teams.home.positions.pitcher.stats.pitching.W++;
             this.teams.away.positions.pitcher.stats.pitching.L++;
@@ -101,32 +101,31 @@ Game.prototype = {
         this.log.note('Reload to play again', 'リロるは次の試合へ');
     },
     stage : 'pitch', //pitch, swing
-    simulateInput : function(callback) {
-        var stage = this.stage,
-            pitchTarget = this.pitchTarget;
-        if (stage == 'end') {
+    simulateInput(callback) {
+        const stage = this.stage, pitchTarget = this.pitchTarget;
+        if (stage === 'end') {
             return;
         }
-        if (stage == 'pitch') {
+        if (stage === 'pitch') {
             this.autoPitch(callback);
-        } else if (stage == 'swing') {
+        } else if (stage === 'swing') {
             if (typeof pitchTarget != 'object') {
                 this.pitchTarget = {x: 100, y: 100};
             }
             this.autoSwing(this.pitchTarget.x, this.pitchTarget.y, callback);
         }
     },
-    simulatePitchAndSwing : function(callback) {
-        if (this.stage == 'end') {
+    simulatePitchAndSwing(callback) {
+        if (this.stage === 'end') {
             return;
         }
         this.autoPitch(callback);
-        var giraffe = this;
-        setTimeout(function() {
+        const giraffe = this;
+        setTimeout(() => {
             if (typeof giraffe.pitchTarget != 'object') {
                 giraffe.pitchTarget = {x: 100, y: 100};
             }
-            giraffe.autoSwing(giraffe.pitchTarget.x, giraffe.pitchTarget.y, function(callback) {callback();});
+            giraffe.autoSwing(giraffe.pitchTarget.x, giraffe.pitchTarget.y, callback => {callback();});
         }, giraffe.field.hasRunnersOn() ? Animator.TIME_FROM_SET + 2500 : Animator.TIME_FROM_WINDUP + 2500);
     },
     /**
@@ -135,31 +134,30 @@ Game.prototype = {
      * @param y
      * @param callback
      */
-    receiveInput : function(x, y, callback) {
-        if (this.humanControl == 'none') {
+    receiveInput(x, y, callback) {
+        if (this.humanControl === 'none') {
             return;
         }
-        if (this.stage == 'end') {
+        if (this.stage === 'end') {
             return;
         }
-        if (this.stage == 'pitch' && this.humanPitching()) {
+        if (this.stage === 'pitch' && this.humanPitching()) {
             this.thePitch(x, y, callback);
-        } else if (this.stage == 'swing'  && this.humanBatting()) {
+        } else if (this.stage === 'swing'  && this.humanBatting()) {
             this.theSwing(x, y, callback);
         }
     },
-    autoPitchSelect : function() {
-        var pitchNames = Object.keys(this.pitcher.pitching);
-        var pitchName = pitchNames[Math.random() * pitchNames.length | 0];
-        var pitch = this.pitcher.pitching[pitchName];
+    autoPitchSelect() {
+        const pitchNames = Object.keys(this.pitcher.pitching);
+        const pitchName = pitchNames[Math.random() * pitchNames.length | 0];
+        const pitch = this.pitcher.pitching[pitchName];
         pitch.name = pitchName;
         this.pitchInFlight = pitch;
     },
-    autoPitch : function(callback) {
-        var pitcher = this.pitcher,
-            giraffe = this;
+    autoPitch(callback) {
+        const pitcher = this.pitcher, giraffe = this;
 
-        if (this.stage == 'pitch') {
+        if (this.stage === 'pitch') {
             this.autoPitchSelect();
             pitcher.windingUp = true;
             if (!this.console) {
@@ -167,17 +165,15 @@ Game.prototype = {
                 var windup = $('.windup');
                 windup.css('width', '100%');
             }
-            var count = this.umpire.count;
-            var pitch = Distribution.pitchLocation(count),
-                x = pitch.x,
-                y = pitch.y;
+            const count = this.umpire.count;
+            const pitch = Distribution.pitchLocation(count), x = pitch.x, y = pitch.y;
             if (this.console) {
                 this.thePitch(x, y, callback);
             } else {
                 if (!Animator.console) {
                     Animator.loop.resetCamera();
                 }
-                windup.animate({width: 0}, this.field.hasRunnersOn() ? Animator.TIME_FROM_SET : Animator.TIME_FROM_WINDUP, function() {
+                windup.animate({width: 0}, this.field.hasRunnersOn() ? Animator.TIME_FROM_SET : Animator.TIME_FROM_WINDUP, () => {
                     !giraffe.console && $('.baseball.pitch').removeClass('hide');
                     giraffe.thePitch(x, y, callback);
                     pitcher.windingUp = false;
@@ -185,14 +181,14 @@ Game.prototype = {
             }
         }
     },
-    autoSwing : function(deceptiveX, deceptiveY, callback) {
-        var giraffe = this;
-        var bonus = this.batter.eye.bonus || 0,
-            eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus,
-            convergence, convergenceSum;
+    autoSwing(deceptiveX, deceptiveY, callback) {
+        const giraffe = this;
+        const bonus = this.batter.eye.bonus || 0;
+        const eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
+        let convergence;
+        let convergenceSum;
 
-        var x = Distribution.centralizedNumber(),
-            y = Distribution.centralizedNumber();
+        let x = Distribution.centralizedNumber(), y = Distribution.centralizedNumber();
 
         if (100*Math.random() < eye) { // identified the break
             deceptiveX = this.pitchInFlight.x;
@@ -213,12 +209,12 @@ Game.prototype = {
         this.swingResult.x = Distribution.cpuSwing(x, this.pitchInFlight.x, eye);
         this.swingResult.y = Distribution.cpuSwing(y, this.pitchInFlight.y, eye * 0.75);
 
-        var swingProbability = Distribution.swingLikelihood(eye, x, y, this.umpire);
+        const swingProbability = Distribution.swingLikelihood(eye, x, y, this.umpire);
         if (swingProbability < 100*Math.random()) {
             x = -20;
         }
 
-        callback(function() {
+        callback(() => {
             giraffe.theSwing(x, y);
         });
     },
@@ -226,13 +222,13 @@ Game.prototype = {
     /**
      * variable for what to do when the batter becomes ready for a pitch
      */
-    onBatterReady : function() {},
+    onBatterReady() {},
     /**
      * @param setValue
      * @returns {boolean|*}
      * trigger batter readiness passively, or actively with setValue, i.e. ready to see pitch
      */
-    batterReady : function(setValue) {
+    batterReady(setValue) {
         clearTimeout(this.batterReadyTimeout);
         if (setValue !== undefined) {
             this.batter.ready = !!setValue;
@@ -243,27 +239,27 @@ Game.prototype = {
         return this.batter.ready;
     },
     batterReadyTimeout : -1,
-    waitingCallback : function() {},
-    awaitPitch : function(callback, swingResult) {
-        var giraffe = this;
+    waitingCallback() {},
+    awaitPitch(callback, swingResult) {
+        const giraffe = this;
         if (this.opponentConnected) {
             this.waitingCallback = callback;
             this.opponentService.emitSwing(swingResult);
-            this.onBatterReady = function() {};
+            this.onBatterReady = () => {};
         } else {
-            giraffe.onBatterReady = function() {
+            giraffe.onBatterReady = () => {
                 giraffe.autoPitch(callback);
             };
             if (this.console) {
                 giraffe.batterReady();
             } else {
-                this.batterReadyTimeout = setTimeout(function() {
+                this.batterReadyTimeout = setTimeout(() => {
                     giraffe.batterReady();
                 }, 5200);
             }
         }
     },
-    awaitSwing : function(x, y, callback, pitchInFlight, pitchTarget) {
+    awaitSwing(x, y, callback, pitchInFlight, pitchTarget) {
         if (this.opponentConnected) {
             this.waitingCallback = callback;
             this.opponentService.emitPitch({
@@ -274,9 +270,9 @@ Game.prototype = {
             this.autoSwing(x, y, callback);
         }
     },
-    thePitch : function(x, y, callback, override) {
-        var pitch = this.pitchInFlight;
-        if (this.stage == 'pitch') {
+    thePitch(x, y, callback, override) {
+        const pitch = this.pitchInFlight;
+        if (this.stage === 'pitch') {
             if (override) {
                 this.pitchInFlight = override.inFlight;
                 this.pitchTarget = override.target;
@@ -289,13 +285,13 @@ Game.prototype = {
                 pitch.breakDirection = this.helper.pitchDefinitions[pitch.name].slice(0, 2);
                 this.battersEye = text.getBattersEye(this);
 
-                var control = Math.floor(pitch.control - this.pitcher.fatigue/2);
+                const control = Math.floor(pitch.control - this.pitcher.fatigue/2);
                 this.pitchTarget.x = Distribution.pitchControl(this.pitchTarget.x, control);
                 this.pitchTarget.y = Distribution.pitchControl(this.pitchTarget.y, control);
 
-                if (this.pitcher.throws == 'right') pitch.breakDirection[0] *= -1;
+                if (this.pitcher.throws === 'right') pitch.breakDirection[0] *= -1;
 
-                var breakEffect = Distribution.breakEffect(pitch, this.pitcher, this.pitchTarget.x, this.pitchTarget.y);
+                const breakEffect = Distribution.breakEffect(pitch, this.pitcher, this.pitchTarget.x, this.pitchTarget.y);
 
                 pitch.x = breakEffect.x;
                 pitch.y = breakEffect.y;
@@ -304,7 +300,7 @@ Game.prototype = {
             this.log.notePitch(pitch, this.batter);
 
             this.stage = 'swing';
-            if (this.humanControl != 'none' && (this.humanControl == 'both' || this.humanBatting())) {
+            if (this.humanControl !== 'none' && (this.humanControl === 'both' || this.humanBatting())) {
                 callback();
             } else {
                 this.awaitSwing(x, y, callback, pitch, this.pitchTarget);
@@ -315,16 +311,15 @@ Game.prototype = {
         e: '',
         n: ''
     },
-    theSwing : function(x, y, callback, override) {
-        var pitch = this.pitchInFlight;
-        if (this.stage == 'swing') {
+    theSwing(x, y, callback, override) {
+        const pitch = this.pitchInFlight;
+        if (this.stage === 'swing') {
             if (override) {
                 var result = this.swingResult = override;
                 callback = this.waitingCallback;
             } else {
                 this.swingResult = result = {};
-                var bonus = this.batter.eye.bonus || 0,
-                    eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
+                const bonus = this.batter.eye.bonus || 0, eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
 
                 if (x >= 0 && x <= 200) {
                     this.batter.fatigue++;
@@ -333,8 +328,8 @@ Game.prototype = {
                     result.y = y - pitch.y;
                     result.angle = this.setBatAngle();
 
-                    var recalculation = Mathinator.getAngularOffset(result, result.angle);
-                    var precision = Distribution.swing(eye);
+                    const recalculation = Mathinator.getAngularOffset(result, result.angle);
+                    const precision = Distribution.swing(eye);
 
                     result.x = recalculation.x * precision;
                     result.y = -5 + recalculation.y * precision;
@@ -363,14 +358,14 @@ Game.prototype = {
             }
 
             // stealing bases
-            var field = this.field;
-            var team = this.batter.team;
+            const field = this.field;
+            const team = this.batter.team;
             if ((team.stealAttempt === Team.RUNNER_GO || team.stealAttempt === Team.RUNNERS_DISCRETION) && !this.opponentConnected) {
-                var thief = field.getLeadRunner();
+                const thief = field.getLeadRunner();
                 if (thief instanceof Player) {
                     switch (thief) {
                         case field.first:
-                            var base = 2;
+                            let base = 2;
                             break;
                         case field.second:
                             base = 3;
@@ -378,16 +373,16 @@ Game.prototype = {
                         case field.third:
                             base = 4;
                     }
-                    var validToSteal = true;
+                    let validToSteal = true;
                     if (result.looking) {
-                        var count = this.umpire.count;
+                        const count = this.umpire.count;
                         if (count.strikes >= 2 && result.strike && count.outs >= 2) validToSteal = false;
                         if (count.balls >= 3 && !result.strike && field.first) validToSteal = false;
                     }
                     if (result.foul || result.caught) {
                         validToSteal = false;
                     }
-                    var discretion = team.stealAttempt === 'go' || Distribution.willSteal(pitch, this.pitcher.team.positions.catcher, thief, base);
+                    const discretion = team.stealAttempt === 'go' || Distribution.willSteal(pitch, this.pitcher.team.positions.catcher, thief, base);
                     if (discretion && validToSteal) {
                         thief.attemptSteal(this, base);
                     }
@@ -398,7 +393,7 @@ Game.prototype = {
             this.log.noteSwing(result);
             this.stage = 'pitch';
 
-            var half = this.half;
+            const half = this.half;
             this.umpire.makeCall();
             emit = false;
             if (half != this.half) {
@@ -406,8 +401,8 @@ Game.prototype = {
                 var emit = !override;
             }
 
-            if (typeof callback == 'function') {
-                if (this.humanControl !== 'none' && (this.humanControl === 'both' || this.teams[this.humanControl] == this.pitcher.team)) {
+            if (typeof callback === 'function') {
+                if (this.humanControl !== 'none' && (this.humanControl === 'both' || this.teams[this.humanControl] === this.pitcher.team)) {
                     callback();
                     if (emit) {
                         if (this.opponentService && this.opponentConnected) {
@@ -420,33 +415,31 @@ Game.prototype = {
             }
         }
     },
-    setBatAngle : function(x, y) {
-        var giraffe = this,
-            pitchInFlight = this.pitchInFlight,
-            swingResult = this.swingResult;
-        var origin = {
-            x: giraffe.batter.bats == 'right' ? -10 : 210,
+    setBatAngle(x, y) {
+        const giraffe = this, pitchInFlight = this.pitchInFlight, swingResult = this.swingResult;
+        const origin = {
+            x: giraffe.batter.bats === 'right' ? -10 : 210,
             y: 199
         };
-        var swing = {
+        const swing = {
             x: x ? x : pitchInFlight.x + swingResult.x,
             y: y ? y : pitchInFlight.y + swingResult.y
         };
         return Mathinator.battingAngle(origin, swing);
     },
-    debugOut : function() {
-        log('slugging', this.debug.filter(function(a){return a.bases == 1;}).length,
-            this.debug.filter(function(a){return a.bases == 2;}).length,
-            this.debug.filter(function(a){return a.bases == 3;}).length,
-            this.debug.filter(function(a){return a.bases == 4;}).length
+    debugOut() {
+        log('slugging', this.debug.filter(a => a.bases == 1).length,
+            this.debug.filter(a => a.bases == 2).length,
+            this.debug.filter(a => a.bases == 3).length,
+            this.debug.filter(a => a.bases == 4).length
         );
-        log('grounders', this.debug.filter(function(a){return !a.caught && !a.foul && a.flyAngle < 0;}).length,
-            'thrown out', this.debug.filter(function(a){return !a.caught && !a.foul && a.flyAngle < 0 && a.thrownOut;}).length);
-        log('flies/liners', this.debug.filter(function(a){return !a.foul && a.flyAngle > 0;}).length,
-            'caught', this.debug.filter(function(a){return a.caught && a.flyAngle > 0;}).length);
+        log('grounders', this.debug.filter(a => !a.caught && !a.foul && a.flyAngle < 0).length,
+            'thrown out', this.debug.filter(a => !a.caught && !a.foul && a.flyAngle < 0 && a.thrownOut).length);
+        log('flies/liners', this.debug.filter(a => !a.foul && a.flyAngle > 0).length,
+            'caught', this.debug.filter(a => a.caught && a.flyAngle > 0).length);
 
-        var PO = {};
-        this.debug.map(function(a) {
+        const PO = {};
+        this.debug.map(a => {
             if (!a.fielder) return;
             if (!PO[a.fielder]) {
                 PO[a.fielder] = 0;
@@ -457,35 +450,33 @@ Game.prototype = {
         });
         log('fielding outs', JSON.stringify(PO));
 
-        var hitters = this.teams.away.lineup.concat(this.teams.home.lineup);
-        var atBats = [];
-        hitters.map(function(a) {
-            atBats = atBats.concat(a.getAtBats().map(function(ab) {
-                return ab.text;
-            }));
+        const hitters = this.teams.away.lineup.concat(this.teams.home.lineup);
+        let atBats = [];
+        hitters.map(a => {
+            atBats = atBats.concat(a.getAtBats().map(ab => ab.text));
         });
 
-        var LO = atBats.filter(function(ab) {return ab == 'LO';}).length;
-        var FO = atBats.filter(function(ab) {return ab == 'FO';}).length;
-        var GO = atBats.filter(function(ab) {return ab == 'GO';}).length;
-        var GIDP = atBats.filter(function(ab) {return ab == '(IDP)';}).length;
-        var SO = atBats.filter(function(ab) {return ab == 'SO';}).length;
-        var BB = atBats.filter(function(ab) {return ab == 'BB';}).length;
-        var SAC = atBats.filter(function(ab) {return ab == 'SAC';}).length;
-        var FC = atBats.filter(function(ab) {return ab == 'FC';}).length;
-        var CS = atBats.filter(function(ab) {return ab == 'CS';}).length;
-        var SB = atBats.filter(function(ab) {return ab == 'SB';}).length;
+        const LO = atBats.filter(ab => ab === 'LO').length;
+        const FO = atBats.filter(ab => ab === 'FO').length;
+        const GO = atBats.filter(ab => ab === 'GO').length;
+        const GIDP = atBats.filter(ab => ab === '(IDP)').length;
+        const SO = atBats.filter(ab => ab === 'SO').length;
+        const BB = atBats.filter(ab => ab === 'BB').length;
+        const SAC = atBats.filter(ab => ab === 'SAC').length;
+        const FC = atBats.filter(ab => ab === 'FC').length;
+        const CS = atBats.filter(ab => ab === 'CS').length;
+        const SB = atBats.filter(ab => ab === 'SB').length;
 
         log('line outs', LO, 'fly outs', FO, 'groundouts', GO, 'strikeouts', SO, 'sacrifices', SAC,
             'FC', FC, 'gidp', GIDP, 'CS', CS, 'total', LO+FO+GO+SO+SAC+FC+GIDP+CS);
 
         log('BB', BB, 'SB', SB);
-        log('fouls', this.debug.filter(function(a){return a.foul;}).length);
+        log('fouls', this.debug.filter(a => a.foul).length);
         log('fatigue, home vs away');
-        var teams = this.teams;
-        var fatigue = {home: {}, away: {}};
-        Iterator.each(this.teams.home.positions, function(key) {
-            var position = key;
+        const teams = this.teams;
+        const fatigue = {home: {}, away: {}};
+        Iterator.each(this.teams.home.positions, key => {
+            const position = key;
             fatigue.home[position] = teams.home.positions[position].fatigue;
             fatigue.away[position] = teams.away.positions[position].fatigue;
         });
@@ -493,13 +484,13 @@ Game.prototype = {
         console.table(this.scoreboard);
         console.table(this.tally);
     },
-    toData : function() {
-        var data = {};
+    toData() {
+        const data = {};
         data.half = this.half;
         data.inning = this.inning;
         data.tally = this.tally;
-        var giraffe = this;
-        var players = this.teams.away.lineup.concat(this.teams.home.lineup);
+        const giraffe = this;
+        const players = this.teams.away.lineup.concat(this.teams.home.lineup);
         // note: bench not included
         data.field = {
             first: players.indexOf(this.field.first),
@@ -527,9 +518,7 @@ Game.prototype = {
                 outs: giraffe.umpire.count.outs
             }
         };
-        data.players = players.map(function(player) {
-            return player.serialize();
-        });
+        data.players = players.map(player => player.serialize());
         data.log = {
             pitchRecord : giraffe.log.pitchRecord,
             record : giraffe.log.record
@@ -537,20 +526,20 @@ Game.prototype = {
         data.gamesIntoSeason = this.gamesIntoSeason;
         return data;
     },
-    fromData : function(data) {
+    fromData(data) {
         this.half = data.half;
         this.inning = data.inning;
         this.tally = data.tally;
-        var giraffe = this;
-        var players = data.players.map(function(playerJson, index) {
-            var playerData = JSON.parse(playerJson);
+        const giraffe = this;
+        const players = data.players.map((playerJson, index) => {
+            const playerData = JSON.parse(playerJson);
             if (index > 8) {
                 var side = 'home';
                 index = index - 9;
             } else {
                 side = 'away';
             }
-            var player = giraffe.teams[side].positions[playerData.position];
+            const player = giraffe.teams[side].positions[playerData.position];
             player.fromData(playerData);
             giraffe.teams[side].lineup[index] = player;
             player.resetStats(data.gamesIntoSeason);
@@ -604,22 +593,22 @@ Game.prototype = {
         batter: '',
         fielder: ''
     },
-    showPlayResultPanels : function(batter) {
-        var batterOutcomes = {
+    showPlayResultPanels(batter) {
+        const batterOutcomes = {
         };
-        var atBat = batter.atBats.slice(0).pop();
-        var fielderOutcomes = {
+        const atBat = batter.atBats.slice(0).pop();
+        const fielderOutcomes = {
         };
-        var n = function() {
-            var n = Math.floor(Math.random()*3);
+        const n = () => {
+            const n = Math.floor(Math.random()*3);
             return n ? n : '';
         };
         this.playResult = {
-            batter: 'B_placeholder' + n() || batterOutcomes[atBat] || 'batter/' + atBat,
-            fielder: 'F_placeholder' + n() || fielderOutcomes[atBat] || 'fielder/' + atBat
+            batter: `B_placeholder${n()}` || batterOutcomes[atBat] || `batter/${atBat}`,
+            fielder: `F_placeholder${n()}` || fielderOutcomes[atBat] || `fielder/${atBat}`
         };
     },
-    pitchSelect : function() {
+    pitchSelect() {
 
     },
     field : null,
@@ -654,7 +643,7 @@ Game.prototype = {
             9 : 0
         }
     },
-    reset : function() {
+    reset() {
         this.scoreboard =  {
             away : {
                 1 : 0,
@@ -681,7 +670,7 @@ Game.prototype = {
         };
         this.resetTally();
     },
-    resetTally : function() {
+    resetTally() {
         this.tally = {
             away : {
                 H : 0,

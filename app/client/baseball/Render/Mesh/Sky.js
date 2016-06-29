@@ -11,8 +11,8 @@ class Sky extends AbstractMesh {
     }
     setUniforms(uniforms) {
         this.uniforms = uniforms;
-        var sky = this.sky;
-        for (var key in uniforms) { if (uniforms.hasOwnProperty(key)) {
+        const sky = this.sky;
+        for (const key in uniforms) { if (uniforms.hasOwnProperty(key)) {
             if (!sky.uniforms[key]) {
                 sky.uniforms[key] = uniforms[key];
             }
@@ -22,7 +22,7 @@ class Sky extends AbstractMesh {
         }}
     }
     getMesh() {
-        var uniforms = this.uniforms = {
+        const uniforms = this.uniforms = {
             luminance:	 { type: "f", value: 1.10 },
             turbidity:	 { type: "f", value: 1 },
             reileigh:	 { type: "f", value: 1.30 },
@@ -34,7 +34,7 @@ class Sky extends AbstractMesh {
             sun: false
         };
 
-        var sky = new THREE.Sky();
+        const sky = new THREE.Sky();
         this.sky = sky;
         this.mesh = sky.mesh;
 

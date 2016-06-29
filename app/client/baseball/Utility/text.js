@@ -1,6 +1,6 @@
-var text = function(phrase, override) {
+const text = (phrase, override) => {
     if (!text.mode) text.mode = 'e';
-    var string = {
+    const string = {
         n : {
             empty: '-',
             ' 1st' : '1番',
@@ -167,10 +167,10 @@ var text = function(phrase, override) {
     return string ? string : phrase;
 };
 
-text.substitution = function(sub, player, mode) {
-    var originalMode = text.mode;
+text.substitution = (sub, player, mode) => {
+    const originalMode = text.mode;
     mode = mode || text.mode;
-    var order = {
+    const order = {
         0 : text(' 1st', mode),
         1 : text(' 2nd', mode),
         2 : text(' 3rd', mode),
@@ -181,22 +181,21 @@ text.substitution = function(sub, player, mode) {
         7 : text(' 8th', mode),
         8 : text(' 9th', mode)
     }[player.order];
-    var position = text.fielderShortName(player.position, mode);
+    const position = text.fielderShortName(player.position, mode);
 
     if (mode === 'n') {
         text.mode = 'n';
-        var output = sub.getName() + text.comma() + player.getName() + 'の交代' + text.comma() + order + '(' + position + ')';
+        var output = `${sub.getName() + text.comma() + player.getName()}の交代${text.comma()}${order}(${position})`;
     } else {
         text.mode = 'e';
-        output = sub.getName() + ' replaces ' + player.getName() + ' at ' + position + ', batting' + order;
+        output = `${sub.getName()} replaces ${player.getName()} at ${position}, batting${order}`;
     }
     text.mode = originalMode;
     return output;
 };
 
-text.getBattersEye = function(game) {
-    var eye = {},
-        breaking = Math.abs(game.pitchInFlight.breakDirection[0]) + Math.abs(game.pitchInFlight.breakDirection[1]) > 40;
+text.getBattersEye = game => {
+    const eye = {}, breaking = Math.abs(game.pitchInFlight.breakDirection[0]) + Math.abs(game.pitchInFlight.breakDirection[1]) > 40;
     eye.e =
         text('looks like: ', 'e')+
         breaking ? text('breaking ball', 'e') : text('fastball', 'e');
@@ -206,7 +205,7 @@ text.getBattersEye = function(game) {
     return eye;
 };
 
-text.baseShortName = function(base) {
+text.baseShortName = base => {
     if (text.mode == 'n') {
         return {
             '1st': '一',
@@ -223,8 +222,8 @@ text.baseShortName = function(base) {
     return base;
 };
 
-text.fielderShortName = function(fielder, override) {
-    var mode = override || text.mode;
+text.fielderShortName = (fielder, override) => {
+    const mode = override || text.mode;
     if (mode === 'n') {
         return {
             'first': '一',
@@ -241,14 +240,14 @@ text.fielderShortName = function(fielder, override) {
     return fielder;
 };
 
-text.slash = function() {
+text.slash = () => {
     if (text.mode == 'n') {
         return '・';
     }
     return '/';
 };
 
-text.fielderLongName = function(fielder) {
+text.fielderLongName = fielder => {
     if (text.mode == 'n') {
         return {
             'first': 'ファースト',
@@ -275,17 +274,11 @@ text.fielderLongName = function(fielder) {
     }[fielder];
 };
 
-text.comma = function() {
-    return {n: '、', e: ', '}[text.mode];
-};
-text.space = function() {
-    return {n: '', e: ' '}[text.mode];
-};
-text.stop = function() {
-    return {n: '。', e: '. '}[text.mode];
-};
+text.comma = () => ({n: '、', e: ', '})[text.mode];
+text.space = () => ({n: '', e: ' '})[text.mode];
+text.stop = () => ({n: '。', e: '. '})[text.mode];
 
-text.namePitch = function(pitch) {
+text.namePitch = pitch => {
     if (text.mode == 'e') {
         return pitch.name.charAt(0).toUpperCase() + pitch.name.slice(1)
     }
@@ -294,109 +287,107 @@ text.namePitch = function(pitch) {
     }
 };
 
-text.contactResult = function(batter, fielder, bases, outBy, sacrificeAdvances, out) {
-    var statement = '';
-    var infield = ['left', 'center', 'right'].indexOf(fielder) < 0;
-    var doublePlay = out.doublePlay;
+text.contactResult = (batter, fielder, bases, outBy, sacrificeAdvances, out) => {
+    let statement = '';
+    const infield = ['left', 'center', 'right'].indexOf(fielder) < 0;
+    const doublePlay = out.doublePlay;
     if (text.mode == 'e') {
         statement += batter;
         if (outBy) {
             switch (outBy) {
                 case 'fieldersChoice':
                     play = out.length === 2 ? 'double play ' : '';
-                    statement += ' reached on a fielder\'s choice ' + play + 'by ' + text.fielderShortName(fielder);
+                    statement += ` reached on a fielder's choice ${play}by ${text.fielderShortName(fielder)}`;
                     break;
                 case 'line':
-                    statement += ' lined out to ' + text.fielderShortName(fielder);
+                    statement += ` lined out to ${text.fielderShortName(fielder)}`;
                     break;
                 case 'fly':
-                    statement += ' flew out to ' + text.fielderShortName(fielder);
+                    statement += ` flew out to ${text.fielderShortName(fielder)}`;
                     break;
                 case 'error':
-                    statement += ' reached on error by ' + text.fielderShortName(fielder);
+                    statement += ` reached on error by ${text.fielderShortName(fielder)}`;
                     break;
                 case 'pop':
-                    statement += ' popped out to ' + text.fielderShortName(fielder);
+                    statement += ` popped out to ${text.fielderShortName(fielder)}`;
                     break;
                 case 'ground':
                     var play = doublePlay ? 'into a double play by' : 'out to';
-                    statement += ' grounded ' + play + ' ' + text.fielderShortName(fielder);
+                    statement += ` grounded ${play} ${text.fielderShortName(fielder)}`;
                     break;
                 case 'thrown':
                     play = doublePlay ? ' on a double play' : '';
-                    statement += ' was thrown out by ' + text.fielderShortName(fielder) + play;
+                    statement += ` was thrown out by ${text.fielderShortName(fielder)}${play}`;
                     break;
             }
             if (out.length) {
-                var plural = out.length > 1;
-                var runner = plural ? 'Runners' : 'Runner';
-                var is = plural ? 'are' : 'is';
-                statement += '. '+runner+' from ' + text(out.join(text.comma())) + ' ' + is + ' out';
+                const plural = out.length > 1;
+                const runner = plural ? 'Runners' : 'Runner';
+                const is = plural ? 'are' : 'is';
+                statement += `. ${runner} from ${text(out.join(text.comma()))} ${is} out`;
             }
         } else {
             switch (bases) {
                 case 1:
                     if (infield) {
-                        statement += ' reached on an infield hit to ' + text.fielderShortName(fielder);
+                        statement += ` reached on an infield hit to ${text.fielderShortName(fielder)}`;
                     } else {
-                        statement += ' reached on a single to ' + text.fielderShortName(fielder);
+                        statement += ` reached on a single to ${text.fielderShortName(fielder)}`;
                     }
                     break;
                 case 2:
-                    statement += ' doubled past ' + text.fielderShortName(fielder);
+                    statement += ` doubled past ${text.fielderShortName(fielder)}`;
                     break;
                 case 3:
-                    statement += ' tripled past ' + text.fielderShortName(fielder);
+                    statement += ` tripled past ${text.fielderShortName(fielder)}`;
                     break;
                 case 4:
-                    statement += ' homered to ' + text.fielderShortName(fielder);
+                    statement += ` homered to ${text.fielderShortName(fielder)}`;
                     break;
             }
         }
         if (sacrificeAdvances) {
-            sacrificeAdvances.map(function(base) {
+            sacrificeAdvances.map(base => {
                 if (base == 'third') {
-                    statement += text.stop() + 'Runner on third scores';
+                    statement += `${text.stop()}Runner on third scores`;
                 } else {
-                    statement += text.stop() + 'Runner on ' + base + ' advances';
+                    statement += `${text.stop()}Runner on ${base} advances`;
                 }
             });
         }
         statement += text.stop();
     }
     if (text.mode == 'n') {
-        var stop = text.stop();
-        statement += batter + 'は';
+        const stop = text.stop();
+        statement += `${batter}は`;
         if (outBy) {
-            var fielderLong = text.fielderLongName(fielder);
+            const fielderLong = text.fielderLongName(fielder);
             fielder = text.fielderShortName(fielder);
             switch (outBy) {
                 case 'fieldersChoice':
-                    statement += '野選('+fielder+')で出塁';
+                    statement += `野選(${fielder})で出塁`;
                     break;
                 case 'line':
-                    statement += fielder + '直';
+                    statement += `${fielder}直`;
                     break;
                 case 'fly':
-                    statement += fielder + '飛';
+                    statement += `${fielder}飛`;
                     break;
                 case 'error':
-                    statement += 'エラー('+fielder+')で出塁';
+                    statement += `エラー(${fielder})で出塁`;
                     break;
                 case 'pop':
-                    statement += 'ポップフライで' + fielder + '飛';
+                    statement += `ポップフライで${fielder}飛`;
                     break;
                 case 'ground':
-                    statement += fielderLong + 'ゴロに封殺';
+                    statement += `${fielderLong}ゴロに封殺`;
                     break;
                 case 'thrown':
-                    statement += fielder + 'ゴロ';
+                    statement += `${fielder}ゴロ`;
                     break;
             }
             if (out.length) {
-                statement += '。' + out.map(function(runner) {
-                        return text(runner);
-                    }).join(text.comma()) + 'ランナーはアウト';
+                statement += `。${out.map(runner => text(runner)).join(text.comma())}ランナーはアウト`;
             }
             if (doublePlay) {
                 statement += '。ゲッツー';
@@ -406,28 +397,28 @@ text.contactResult = function(batter, fielder, bases, outBy, sacrificeAdvances, 
             switch (bases) {
                 case 1:
                     if (infield) {
-                        statement += '内野安打' + '('+fielder+')'+ 'で出塁';
+                        statement += `内野安打(${fielder})で出塁`;
                     } else {
-                        statement += '安打('+fielder+')' + 'で出塁';
+                        statement += `安打(${fielder})で出塁`;
                     }
                     break;
                 case 2:
-                    statement += '二塁打（'+fielder+'）で出塁';
+                    statement += `二塁打（${fielder}）で出塁`;
                     break;
                 case 3:
-                    statement += '三塁打（'+fielder+'）で出塁';
+                    statement += `三塁打（${fielder}）で出塁`;
                     break;
                 case 4:
-                    statement += '本塁打（'+fielder+'）';
+                    statement += `本塁打（${fielder}）`;
                     break;
             }
         }
         if (sacrificeAdvances) {
-            sacrificeAdvances.map(function(base) {
+            sacrificeAdvances.map(base => {
                 if (base == 'third') {
-                    statement += stop + 'サードランナーホームイン';
+                    statement += `${stop}サードランナーホームイン`;
                 } else {
-                    statement += stop + text(base) + 'ランナー進塁';
+                    statement += `${stop + text(base)}ランナー進塁`;
                 }
             });
         }

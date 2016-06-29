@@ -10,11 +10,11 @@ class Field extends AbstractMesh {
         }
     }
     getMesh() {
-        var material = new THREE.MeshLambertMaterial({
+        const material = new THREE.MeshLambertMaterial({
             color: 0xDCB096
         });
 
-        var mesh = new THREE.Mesh(
+        const mesh = new THREE.Mesh(
             new THREE.PlaneGeometry(
                 160,
                 160,

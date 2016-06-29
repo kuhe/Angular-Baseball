@@ -1,12 +1,12 @@
 import { text } from '../Utility/text';
 
-var Log = function() {
+const Log = function() {
     this.init();
 };
 
 Log.prototype = {
     game : 'instance of Game',
-    init : function() {
+    init() {
         this.stabilized = {
             pitchRecord : {
                 e: ['', '', '', '', '', ''],
@@ -47,31 +47,31 @@ Log.prototype = {
     GITP : '(ITP)',
     STOLEN_BASE : 'SB',
     CAUGHT_STEALING : 'CS',
-    stabilizeShortRecord : function() {
-        var rec = this.record.e.slice(0, 6);
+    stabilizeShortRecord() {
+        const rec = this.record.e.slice(0, 6);
         this.shortRecord.e = rec;
         this.stabilized.shortRecord.e = rec.concat(['', '', '', '', '', '']).slice(0, 6);
 
-        var rec2 = this.record.n.slice(0, 6);
+        const rec2 = this.record.n.slice(0, 6);
         this.shortRecord.n = rec2;
         this.stabilized.shortRecord.n = rec2.concat(['', '', '', '', '', '']).slice(0, 6);
     },
-    note : function(note, noteJ, only) {
+    note(note, noteJ, only) {
         //todo fix don't double language when specifying param [only]
         if (only === 'e') {
             this.record.e.unshift(note);
-            this.async(function() {
+            this.async(() => {
                 console.log(note);
             });
         } else if (only === 'n') {
             this.record.n.unshift(noteJ);
-            this.async(function() {
+            this.async(() => {
                 console.log(noteJ);
             });
         } else {
             this.record.e.unshift(note);
             this.record.n.unshift(noteJ);
-            this.async(function() {
+            this.async(() => {
                 if (text.mode === 'n') {
                     console.log(noteJ);
                 } else {
@@ -81,8 +81,8 @@ Log.prototype = {
         }
         this.stabilizeShortRecord();
     },
-    getBatter : function(batter) {
-        var order = batter.team.nowBatting;
+    getBatter(batter) {
+        let order = batter.team.nowBatting;
         order = {
             0 : text(' 1st'),
             1 : text(' 2nd'),
@@ -94,13 +94,15 @@ Log.prototype = {
             7 : text(' 8th'),
             8 : text(' 9th')
         }[order];
-        var positions = this.longFormFielder();
+        const positions = this.longFormFielder();
         return text('Now batting')+order+text.comma()+positions[batter.position]+text.comma()+
             batter.getUniformNumber()+text.comma()+
             batter.getName();
     },
-    noteBatter : function(batter) {
-        var m = text.mode, record, recordJ;
+    noteBatter(batter) {
+        const m = text.mode;
+        let record;
+        let recordJ;
         text.mode = 'e';
         record = this.getBatter(batter);
         text.mode = 'n';
@@ -108,10 +110,12 @@ Log.prototype = {
         text.mode = m;
         this.note(record, recordJ);
     },
-    getPitchLocationDescription : function(pitchInFlight, batterIsLefty) {
-        var x = pitchInFlight.x, y = pitchInFlight.y, say = '';
-        var noComma = false, noComma2 = false;
-        var ball = false;
+    getPitchLocationDescription(pitchInFlight, batterIsLefty) {
+        let x = pitchInFlight.x;
+        const y = pitchInFlight.y;
+        let say = '';
+        let noComma = false, noComma2 = false;
+        let ball = false;
         if (!batterIsLefty) x = 200 - x;
         if (x < 50) {
             say += text('way outside');
@@ -155,8 +159,10 @@ Log.prototype = {
         say = text.namePitch(pitchInFlight) + text.comma() + say + text.stop();
         return say;
     },
-    notePitch : function(pitchInFlight, batter) {
-        var m = text.mode, record, recordJ;
+    notePitch(pitchInFlight, batter) {
+        const m = text.mode;
+        let record;
+        let recordJ;
         text.mode = 'e';
         record = this.getPitchLocationDescription(pitchInFlight, batter.bats == 'left');
         this.pitchRecord.e.unshift(record);
@@ -169,9 +175,9 @@ Log.prototype = {
         this.stabilized.pitchRecord.n.pop();
         text.mode = m;
     },
-    broadcastCount: function(justOuts) {
+    broadcastCount(justOuts) {
         if (!this.game.umpire) return '';
-        var count = this.game.umpire.count;
+        const count = this.game.umpire.count;
         if (this.lastOuts == 2 && count.outs == 0) {
             outs = 3 + text(' outs');
         } else {
@@ -181,22 +187,21 @@ Log.prototype = {
         if (justOuts) {
             return outs + text.stop();
         }
-        return this.game.getInning() + ': ' + count.strikes + '-' + count.balls + ', ' + outs + text.stop();
+        return `${this.game.getInning()}: ${count.strikes}-${count.balls}, ${outs}${text.stop()}`;
     },
-    broadcastScore: function() {
-        return this.game.teams.away.getName() + ' ' + this.game.tally.away.R
-            + ', ' + this.game.teams.home.getName() + ' ' + this.game.tally.home.R + text.stop();
+    broadcastScore() {
+        return `${this.game.teams.away.getName()} ${this.game.tally.away.R}, ${this.game.teams.home.getName()} ${this.game.tally.home.R}${text.stop()}`;
     },
-    broadcastRunners: function() {
-        var field = this.game.field;
-        var runners = [
+    broadcastRunners() {
+        const field = this.game.field;
+        const runners = [
             field.first && text('first') || '',
             field.second && text('second') || '',
             field.third && text('third') || ''
         ].filter(x => x);
 
-        var runnerCount = 0;
-        runners.map(function(runner) {
+        let runnerCount = 0;
+        runners.map(runner => {
             if (runner) {
                 runnerCount++;
             }
@@ -206,13 +211,13 @@ Log.prototype = {
             case 0:
                 return text('Bases empty') + text.stop();
             case 1:
-                return text('Runner on') + ': ' + runners.join(text.comma()) + text.stop();
+                return `${text('Runner on')}: ${runners.join(text.comma())}${text.stop()}`;
             default:
-                return text('Runners on') + ': ' + runners.join(text.comma()) + text.stop();
+                return `${text('Runners on')}: ${runners.join(text.comma())}${text.stop()}`;
         }
     },
-    getSwing : function(swingResult) {
-        var result = '';
+    getSwing(swingResult) {
+        let result = '';
         if (swingResult.looking) {
             if (swingResult.strike) {
                 result += text('Strike.')
@@ -238,7 +243,7 @@ Log.prototype = {
                 result += text('Swinging strike.')
             }
         }
-        var steal = '';
+        let steal = '';
         if (swingResult.stoleABase) {
             steal = this.noteStealAttempt(swingResult.stoleABase, true, swingResult.attemptedBase);
         }
@@ -250,10 +255,12 @@ Log.prototype = {
         }
         return result + steal;
     },
-    noteSwing : function(swingResult) {
-        var m = text.mode, record, recordJ,
-            pitchRecord = this.pitchRecord,
-            stabilized = this.stabilized.pitchRecord;
+    noteSwing(swingResult) {
+        const m = text.mode;
+        let record;
+        let recordJ;
+        const pitchRecord = this.pitchRecord;
+        const stabilized = this.stabilized.pitchRecord;
         text.mode = 'e';
         record = this.getSwing(swingResult);
         pitchRecord.e[0] += record;
@@ -265,8 +272,8 @@ Log.prototype = {
         text.mode = m;
         recordJ = stabilized.n[0];
         record = stabilized.e[0];
-        var giraffe = this;
-        record.indexOf('Previous') !== 0 && this.async(function() {
+        const giraffe = this;
+        record.indexOf('Previous') !== 0 && this.async(() => {
             if (record.indexOf('In play') > -1 && record.indexOf('struck out') > -1) {
                 if (text.mode === 'n') {
                     console.log(recordJ);
@@ -282,31 +289,30 @@ Log.prototype = {
             }
         });
     },
-    async : function(fn) {
+    async(fn) {
         if (!this.game.console) {
             setTimeout(fn, 100);
         }
     },
-    noteStealAttempt : function(thief, success, base) {
-        return text.space() + thief.getName() + text.comma()
-            + (success ? text('stolen base') : text('caught stealing')) + text.space()
-            + '(' + text.baseShortName(base) + ')' + text.stop();
+    noteStealAttempt(thief, success, base) {
+        return `${text.space() + thief.getName() + text.comma()
+    + (success ? text('stolen base') : text('caught stealing')) + text.space()}(${text.baseShortName(base)})${text.stop()}`;
     },
-    noteSubstitution : function(sub, player) {
+    noteSubstitution(sub, player) {
         return this.note(text.substitution(sub, player, 'e'), text.substitution(sub, player, 'n'));
     },
-    getPlateAppearanceResult : function(game) {
-        var r = game.swingResult;
-        var record = '';
-        var batter = game.batter.getName();
-        var out = [];
+    getPlateAppearanceResult(game) {
+        const r = game.swingResult;
+        let record = '';
+        const batter = game.batter.getName();
+        let out = [];
         if (r.looking) {
             if (r.strike) {
                 record = (batter + text(' struck out looking.'));
             } else {
                 record = (batter + text(' walked.'));
             }
-            var steal = '';
+            let steal = '';
             if (r.stoleABase) {
                 steal = this.noteStealAttempt(r.stoleABase, true, r.attemptedBase);
             }
@@ -316,7 +322,7 @@ Log.prototype = {
             record += steal;
         } else {
             if (r.contact) {
-                var fielder = r.fielder, bases = r.bases, outBy;
+                let fielder = r.fielder, bases = r.bases, outBy;
                 if (r.caught) {
                     if (r.flyAngle < 15) {
                         outBy = 'line';
@@ -361,9 +367,7 @@ Log.prototype = {
                                 }
                             }
                             if (r.firstOut) {
-                                out = out.concat(r.additionalOuts.filter(function(runner) {
-                                    return runner !== 'batter';
-                                }));
+                                out = out.concat(r.additionalOuts.filter(runner => runner !== 'batter'));
                                 out.doublePlay = r.doublePlay;
                             }
                             if (r.fieldersChoice) {
@@ -384,38 +388,36 @@ Log.prototype = {
         }
         return record;
     },
-    notePlateAppearanceResult : function(game) {
-        var m = text.mode,
-            prevJ = text('Previous: ', 'n'),
-            prev = text('Previous: ', 'e');
+    notePlateAppearanceResult(game) {
+        const m = text.mode, prevJ = text('Previous: ', 'n'), prev = text('Previous: ', 'e');
 
-        var statement,
-            record = this.record,
-            pitchRecord = this.pitchRecord,
-            stabilized = this.stabilized.pitchRecord;
+        let statement;
+        const record = this.record;
+        const pitchRecord = this.pitchRecord;
+        const stabilized = this.stabilized.pitchRecord;
 
         text.mode = 'e';
-        var result = this.getPlateAppearanceResult(game);
+        const result = this.getPlateAppearanceResult(game);
         record.e.unshift(result);
         statement = prev + result;
         pitchRecord.e = [statement];
         stabilized.e = [statement, '', '', '', '', ''];
 
         text.mode = 'n';
-        var resultJ = this.getPlateAppearanceResult(game);
+        const resultJ = this.getPlateAppearanceResult(game);
         record.n.unshift(resultJ);
         statement = prevJ + resultJ;
         pitchRecord.n = [statement];
         stabilized.n = [statement, '', '', '', '', ''];
 
         text.mode = m;
-        var giraffe = this;
-        this.async(function() {
+        const giraffe = this;
+        this.async(() => {
             if (text.mode === 'n') {
-                console.log(['%c' + resultJ, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners()].join(' '),
+                console.log([`%c${resultJ}`, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners()].join(' '),
                     'color: darkgreen;');
             } else {
-                console.log(['%c' + result, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners()].join(' '),
+                console.log([`%c${result}`, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners()].join(' '),
                     'color: darkgreen;');
             }
         });
@@ -443,7 +445,7 @@ Log.prototype = {
         e: [],
         n: []
     },
-    longFormFielder : function() {
+    longFormFielder() {
         return {
             first : text('first baseman'),
             second : text('second baseman'),

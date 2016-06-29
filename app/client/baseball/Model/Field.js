@@ -6,13 +6,13 @@ import { Distribution, Mathinator, Animator } from '../Services/_services';
  * @param game
  * @constructor
  */
-var Field = function(game) {
+const Field = function(game) {
     this.init(game);
 };
 
 Field.prototype = {
     constructor : Field,
-    init : function(game) {
+    init(game) {
         this.game = game;
         this.first = null;
         this.second = null;
@@ -21,41 +21,41 @@ Field.prototype = {
     /**
      * @returns {boolean}
      */
-    hasRunnersOn : function() {
+    hasRunnersOn() {
         return this.first instanceof Player || this.second instanceof Player || this.third instanceof Player;
     },
     /**
      * @param swing
      * @returns {object}
      */
-    determineSwingContactResult : function(swing) {
+    determineSwingContactResult(swing) {
 
         if (this.first) this.first.fatigue += 4;
         if (this.second) this.second.fatigue += 4;
         if (this.third) this.third.fatigue += 4;
 
-        var x = swing.x, y = swing.y;
-        var eye = this.game.batter.skill.offense.eye;
+        const x = swing.x, y = swing.y;
+        const eye = this.game.batter.skill.offense.eye;
         /**
          * The initial splay angle is 90 degrees for hitting up the middle and 0
          * for a hard foul left, 180 is a foul right. Depending on the angle of the bat,
          * a y-axis displacement which would otherwise pop or ground the ball can instead
          * increase the left/right effect.
          */
-        var angles = Mathinator.getSplayAndFlyAngle(x, y, swing.angle, eye);
-        var splayAngle = angles.splay;
+        const angles = Mathinator.getSplayAndFlyAngle(x, y, swing.angle, eye);
+        const splayAngle = angles.splay;
 
-        var flyAngle = angles.fly;
-        var power = this.game.batter.skill.offense.power + (this.game.batter.eye.bonus || 0)/5;
-        var landingDistance = Distribution.landingDistance(power, flyAngle, x, y);
+        const flyAngle = angles.fly;
+        const power = this.game.batter.skill.offense.power + (this.game.batter.eye.bonus || 0)/5;
+        let landingDistance = Distribution.landingDistance(power, flyAngle, x, y);
         if (flyAngle < 0 && landingDistance > 95) {
             landingDistance = (landingDistance - 95)/4 + 95;
         }
-        var game = this.game;
+        const game = this.game;
 
         if (Math.abs(splayAngle) > 50) swing.foul = true;
         swing.fielder = this.findFielder(splayAngle, landingDistance, power, flyAngle);
-        if (['first', 'second', 'short', 'third'].indexOf(swing.fielder) > -1) {
+        if (['first', 'second', 'short', 'third'].includes(swing.fielder)) {
             landingDistance = Math.min(landingDistance, 110); // stopped by infielder
         } else {
             landingDistance = Math.max(landingDistance, 150); // rolled past infielder
@@ -70,15 +70,15 @@ Field.prototype = {
         swing.sacrificeAdvances = [];
 
         if (swing.fielder) {
-            var fielder = (game.half == 'top' ? game.teams.home.positions[swing.fielder] : game.teams.away.positions[swing.fielder]);
+            const fielder = (game.half === 'top' ? game.teams.home.positions[swing.fielder] : game.teams.away.positions[swing.fielder]);
             fielder.fatigue += 4;
             swing.error = false;
-            var fieldingEase = fielder.skill.defense.fielding/100,
-                throwingEase = (fielder.skill.defense.throwing/100);
+            let fieldingEase = fielder.skill.defense.fielding/100;
+            const throwingEase = (fielder.skill.defense.throwing/100);
             //reach the batted ball?
             swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle + 90, landingDistance]);
-            var speedComponent = (1 + Math.sqrt(fielder.skill.defense.speed/100))/2 * 100;
-            var interceptRating = speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel*1.55 - 15;
+            const speedComponent = (1 + Math.sqrt(fielder.skill.defense.speed/100))/2 * 100;
+            const interceptRating = speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel*1.55 - 15;
             if (interceptRating > 0 && flyAngle > 4) {
                 //caught cleanly?
                 if (Distribution.error(fielder)) { //error
@@ -90,7 +90,7 @@ Field.prototype = {
                     fielder.stats.fielding.PO++;
                     swing.caught = true;
                     if (game.umpire.count.outs < 2) {
-                        var sacrificeThrowInTime = Mathinator.fielderReturnDelay(
+                        const sacrificeThrowInTime = Mathinator.fielderReturnDelay(
                             swing.travelDistance, throwingEase, fieldingEase, 100
                         );
                         // todo ran into outfield assist
@@ -112,11 +112,11 @@ Field.prototype = {
             if (!swing.caught) {
                 swing.bases = 0;
                 swing.thrownOut = false; // default value
-                var fieldingReturnDelay = Mathinator.fielderReturnDelay(swing.travelDistance, throwingEase, fieldingEase, interceptRating);
+                let fieldingReturnDelay = Mathinator.fielderReturnDelay(swing.travelDistance, throwingEase, fieldingEase, interceptRating);
                 swing.fieldingDelay = fieldingReturnDelay;
-                swing.outfielder = {'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] == 1;
-                var speed = game.batter.skill.offense.speed,
-                    baseRunningTime = Mathinator.baseRunningTime(speed);
+                swing.outfielder = {'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] === 1;
+                const speed = game.batter.skill.offense.speed;
+                let baseRunningTime = Mathinator.baseRunningTime(speed);
 
                 if (swing.outfielder) {
                     swing.bases = 1;
@@ -124,30 +124,28 @@ Field.prototype = {
                     fieldingReturnDelay -= baseRunningTime;
 
                     while (((fieldingReturnDelay > baseRunningTime && Math.random() < 0.25 + speed/200)
-                            || Math.random() < 0.04 + speed/650) && swing.bases < 3) {
+                    || Math.random() < 0.04 + speed/650) && swing.bases < 3) {
                         baseRunningTime *= 0.95;
                         swing.bases++;
                         fieldingReturnDelay -= baseRunningTime;
                     }
                 } else {
-                    var first = this.first,
-                        second = this.second,
-                        third = this.third;
+                    const first = this.first, second = this.second, third = this.third;
                     swing.fieldersChoice = null;
                     swing.bases = fieldingReturnDelay >= baseRunningTime + 1 ? 1 : 0;
                     if (first && fieldingReturnDelay < first.getBaseRunningTime()) swing.fieldersChoice = 'first';
                     if (first && second && fieldingReturnDelay < second.getBaseRunningTime() + 0.6) swing.fieldersChoice = 'second';
                     if (third && fieldingReturnDelay < third.getBaseRunningTime()) swing.fieldersChoice = 'third';
                     // double play
-                    var outs = game.umpire.count.outs;
+                    let outs = game.umpire.count.outs;
                     if (swing.fieldersChoice) {
                         outs++;
                         swing.bases = 1;
-                        var fielders = fielder.team.positions;
-                        var force = this.forcePlaySituation();
+                        const fielders = fielder.team.positions;
+                        let force = this.forcePlaySituation();
                         if (force) {
-                            var additionalOuts = [];
-                            var throwingDelay = fieldingReturnDelay;
+                            const additionalOuts = [];
+                            let throwingDelay = fieldingReturnDelay;
                             if (third && force === 'third' &&
                                 Mathinator.infieldThrowDelay(fielders.catcher) + throwingDelay < second.getBaseRunningTime() && outs < 3) {
                                 throwingDelay += Mathinator.infieldThrowDelay(fielders.catcher);
@@ -179,7 +177,7 @@ Field.prototype = {
                             if (additionalOuts.length) {
                                 swing.additionalOuts = additionalOuts;
                                 swing.firstOut = swing.fieldersChoice;
-                                if (additionalOuts.indexOf('batter') > -1) {
+                                if (additionalOuts.includes('batter')) {
                                     delete swing.fieldersChoice;
                                 }
                             }
@@ -217,20 +215,16 @@ Field.prototype = {
             Animator.animateFieldingTrajectory(this.game);
         }
     },
-    forcePlaySituation: function() {
-        var first = this.first,
-            second = this.second,
-            third = this.third;
+    forcePlaySituation() {
+        const first = this.first, second = this.second, third = this.third;
         return (first && second && third) && 'third' || (first && second) && 'second' || first && 'first';
     },
     /**
      * @returns {Player}
      * the best steal candidate.
      */
-    getLeadRunner: function() {
-        var first = this.first,
-            second = this.second,
-            third = this.third;
+    getLeadRunner() {
+        const first = this.first, second = this.second, third = this.third;
         if (third && first && !second) return first;
         return third || second || first;
     },
@@ -244,10 +238,10 @@ Field.prototype = {
      * @param flyAngle {Number} roughly -15 to 90
      * @returns {string|boolean}
      */
-    findFielder : function(splayAngle, landingDistance, power, flyAngle) {
-        var angle = splayAngle; // 0 is up the middle, clockwise increasing
+    findFielder(splayAngle, landingDistance, power, flyAngle) {
+        const angle = splayAngle; // 0 is up the middle, clockwise increasing
 
-        var fielder;
+        let fielder;
 
         if (Math.abs(angle) > 50) return false; // foul
         if (landingDistance < 10 && landingDistance > -20) {
@@ -256,11 +250,11 @@ Field.prototype = {
             return 'pitcher';
         }
 
-        var infield = landingDistance < 145 - (Math.abs(angle))/90*50;
+        let infield = landingDistance < 145 - (Math.abs(angle))/90*50;
         if (flyAngle < 7) { // 7 degrees straight would fly over the infielder, but add some for arc
-            var horizontalVelocity = Math.cos(flyAngle/180*Math.PI) * (85 + (power/100) * 10); // mph toward infielder
+            let horizontalVelocity = Math.cos(flyAngle/180*Math.PI) * (85 + (power/100) * 10); // mph toward infielder
             if (flyAngle < 0) horizontalVelocity *= 0.5; // velocity loss on bounce
-            var fielderLateralReachDegrees = 1 + 22.5 * (100 - horizontalVelocity)/100; // up to 90/4 = 22.5
+            const fielderLateralReachDegrees = 1 + 22.5 * (100 - horizontalVelocity)/100; // up to 90/4 = 22.5
             if (angle < -20) {
                 fielder = 'third';
             } else if (angle < 5) {
@@ -270,7 +264,7 @@ Field.prototype = {
             } else { // first has reduced arc to receive the throw
                 fielder = 'first';
             }
-            var fielderArcPosition = this.positions[fielder][0] - 90;
+            const fielderArcPosition = this.positions[fielder][0] - 90;
             // a good infielder can field a hard hit grounder even with a high terminal distance
             infield = Math.abs(angle - (fielderArcPosition)) < fielderLateralReachDegrees;
         }
@@ -313,7 +307,7 @@ Field.prototype = {
         center : [90, 280],
         right : [135 - 14, 280]
     },
-    getPolarDistance : function(a, b) {
+    getPolarDistance(a, b) {
         return Mathinator.getPolarDistance(a, b);
     }
 };

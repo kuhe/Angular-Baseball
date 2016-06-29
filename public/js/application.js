@@ -3,42 +3,38 @@ cacheKey = Math.floor(Math.random()*1500);
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.AtBat = undefined;
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _Log = require('../Utility/Log');
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-var _UtilityLog = require('../Utility/Log');
-
-var AtBat = (function () {
+var AtBat = function () {
     function AtBat(text) {
-        _classCallCheck(this, AtBat);
+        babelHelpers.classCallCheck(this, AtBat);
 
-        this.infield = text.indexOf(AtBat.prototype.INFIELD_HIT_INDICATOR) > -1 ? AtBat.prototype.INFIELD_HIT_INDICATOR : '';
+        this.infield = text.includes(AtBat.prototype.INFIELD_HIT_INDICATOR) ? AtBat.prototype.INFIELD_HIT_INDICATOR : '';
         text = text.replace(AtBat.prototype.INFIELD_HIT_INDICATOR, '');
         this.text = text.split(AtBat.prototype.RBI_INDICATOR)[0];
-        this.rbi = text.split(this.text)[1] + '';
+        this.rbi = '' + text.split(this.text)[1];
 
-        var log = new _UtilityLog.Log();
+        var log = new _Log.Log();
 
         var beneficial = [log.WALK, log.SINGLE, log.HOMERUN, log.DOUBLE, log.TRIPLE, log.SACRIFICE, log.REACHED_ON_ERROR, log.STOLEN_BASE, log.RUN];
-        if (beneficial.indexOf(this.text) > -1) {
+        if (beneficial.includes(this.text)) {
             this.beneficial = true;
         }
     }
 
-    _createClass(AtBat, [{
+    babelHelpers.createClass(AtBat, [{
         key: 'toString',
         value: function toString() {
             return '' + this.infield + this.text + this.rbi;
         }
     }]);
-
     return AtBat;
-})();
+}();
 
 AtBat.prototype.constructor = AtBat;
 AtBat.prototype.identifier = 'AtBat';
@@ -50,13 +46,14 @@ exports.AtBat = AtBat;
 },{"../Utility/Log":34}],2:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Field = undefined;
 
-var _ModelPlayer = require('../Model/Player');
+var _Player = require('../Model/Player');
 
-var _Services_services = require('../Services/_services');
+var _services = require('../Services/_services');
 
 /**
  * The baseball field tracks the ball's movement, fielders, and what runners are on
@@ -75,12 +72,14 @@ Field.prototype = {
         this.second = null;
         this.third = null;
     },
+
     /**
      * @returns {boolean}
      */
     hasRunnersOn: function hasRunnersOn() {
-        return this.first instanceof _ModelPlayer.Player || this.second instanceof _ModelPlayer.Player || this.third instanceof _ModelPlayer.Player;
+        return this.first instanceof _Player.Player || this.second instanceof _Player.Player || this.third instanceof _Player.Player;
     },
+
     /**
      * @param swing
      * @returns {object}
@@ -100,12 +99,12 @@ Field.prototype = {
          * a y-axis displacement which would otherwise pop or ground the ball can instead
          * increase the left/right effect.
          */
-        var angles = _Services_services.Mathinator.getSplayAndFlyAngle(x, y, swing.angle, eye);
+        var angles = _services.Mathinator.getSplayAndFlyAngle(x, y, swing.angle, eye);
         var splayAngle = angles.splay;
 
         var flyAngle = angles.fly;
         var power = this.game.batter.skill.offense.power + (this.game.batter.eye.bonus || 0) / 5;
-        var landingDistance = _Services_services.Distribution.landingDistance(power, flyAngle, x, y);
+        var landingDistance = _services.Distribution.landingDistance(power, flyAngle, x, y);
         if (flyAngle < 0 && landingDistance > 95) {
             landingDistance = (landingDistance - 95) / 4 + 95;
         }
@@ -113,7 +112,7 @@ Field.prototype = {
 
         if (Math.abs(splayAngle) > 50) swing.foul = true;
         swing.fielder = this.findFielder(splayAngle, landingDistance, power, flyAngle);
-        if (['first', 'second', 'short', 'third'].indexOf(swing.fielder) > -1) {
+        if (['first', 'second', 'short', 'third'].includes(swing.fielder)) {
             landingDistance = Math.min(landingDistance, 110); // stopped by infielder
         } else {
                 landingDistance = Math.max(landingDistance, 150); // rolled past infielder
@@ -128,18 +127,18 @@ Field.prototype = {
         swing.sacrificeAdvances = [];
 
         if (swing.fielder) {
-            var fielder = game.half == 'top' ? game.teams.home.positions[swing.fielder] : game.teams.away.positions[swing.fielder];
+            var fielder = game.half === 'top' ? game.teams.home.positions[swing.fielder] : game.teams.away.positions[swing.fielder];
             fielder.fatigue += 4;
             swing.error = false;
-            var fieldingEase = fielder.skill.defense.fielding / 100,
-                throwingEase = fielder.skill.defense.throwing / 100;
+            var fieldingEase = fielder.skill.defense.fielding / 100;
+            var throwingEase = fielder.skill.defense.throwing / 100;
             //reach the batted ball?
             swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle + 90, landingDistance]);
             var speedComponent = (1 + Math.sqrt(fielder.skill.defense.speed / 100)) / 2 * 100;
             var interceptRating = speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.55 - 15;
             if (interceptRating > 0 && flyAngle > 4) {
                 //caught cleanly?
-                if (_Services_services.Distribution.error(fielder)) {
+                if (_services.Distribution.error(fielder)) {
                     //error
                     fieldingEase *= 0.5;
                     swing.error = true;
@@ -149,7 +148,7 @@ Field.prototype = {
                     fielder.stats.fielding.PO++;
                     swing.caught = true;
                     if (game.umpire.count.outs < 2) {
-                        var sacrificeThrowInTime = _Services_services.Mathinator.fielderReturnDelay(swing.travelDistance, throwingEase, fieldingEase, 100);
+                        var sacrificeThrowInTime = _services.Mathinator.fielderReturnDelay(swing.travelDistance, throwingEase, fieldingEase, 100);
                         // todo ran into outfield assist
                         if (this.first && sacrificeThrowInTime > this.first.getBaseRunningTime() + 4.5) {
                             swing.sacrificeAdvances.push('first');
@@ -169,11 +168,11 @@ Field.prototype = {
             if (!swing.caught) {
                 swing.bases = 0;
                 swing.thrownOut = false; // default value
-                var fieldingReturnDelay = _Services_services.Mathinator.fielderReturnDelay(swing.travelDistance, throwingEase, fieldingEase, interceptRating);
+                var fieldingReturnDelay = _services.Mathinator.fielderReturnDelay(swing.travelDistance, throwingEase, fieldingEase, interceptRating);
                 swing.fieldingDelay = fieldingReturnDelay;
-                swing.outfielder = ({ 'left': 1, 'center': 1, 'right': 1 })[swing.fielder] == 1;
-                var speed = game.batter.skill.offense.speed,
-                    baseRunningTime = _Services_services.Mathinator.baseRunningTime(speed);
+                swing.outfielder = { 'left': 1, 'center': 1, 'right': 1 }[swing.fielder] === 1;
+                var speed = game.batter.skill.offense.speed;
+                var baseRunningTime = _services.Mathinator.baseRunningTime(speed);
 
                 if (swing.outfielder) {
                     swing.bases = 1;
@@ -204,22 +203,22 @@ Field.prototype = {
                         if (force) {
                             var additionalOuts = [];
                             var throwingDelay = fieldingReturnDelay;
-                            if (third && force === 'third' && _Services_services.Mathinator.infieldThrowDelay(fielders.catcher) + throwingDelay < second.getBaseRunningTime() && outs < 3) {
-                                throwingDelay += _Services_services.Mathinator.infieldThrowDelay(fielders.catcher);
+                            if (third && force === 'third' && _services.Mathinator.infieldThrowDelay(fielders.catcher) + throwingDelay < second.getBaseRunningTime() && outs < 3) {
+                                throwingDelay += _services.Mathinator.infieldThrowDelay(fielders.catcher);
                                 fielders.catcher.fatigue += 4;
                                 additionalOuts.push('second');
                                 outs++;
                                 force = 'second';
                             }
-                            if (second && force === 'second' && _Services_services.Mathinator.infieldThrowDelay(fielders.third) + throwingDelay < first.getBaseRunningTime() && outs < 3) {
-                                throwingDelay += _Services_services.Mathinator.infieldThrowDelay(fielders.third);
+                            if (second && force === 'second' && _services.Mathinator.infieldThrowDelay(fielders.third) + throwingDelay < first.getBaseRunningTime() && outs < 3) {
+                                throwingDelay += _services.Mathinator.infieldThrowDelay(fielders.third);
                                 fielders.third.fatigue += 4;
                                 additionalOuts.push('first');
                                 outs++;
                                 force = 'first';
                             }
-                            if (first && force === 'first' && _Services_services.Mathinator.infieldThrowDelay(fielders.second) + throwingDelay < game.batter.getBaseRunningTime() && outs < 3) {
-                                throwingDelay += _Services_services.Mathinator.infieldThrowDelay(fielders.second);
+                            if (first && force === 'first' && _services.Mathinator.infieldThrowDelay(fielders.second) + throwingDelay < game.batter.getBaseRunningTime() && outs < 3) {
+                                throwingDelay += _services.Mathinator.infieldThrowDelay(fielders.second);
                                 fielders.second.fatigue += 4;
                                 additionalOuts.push('batter');
                                 swing.bases = 0;
@@ -232,7 +231,7 @@ Field.prototype = {
                             if (additionalOuts.length) {
                                 swing.additionalOuts = additionalOuts;
                                 swing.firstOut = swing.fieldersChoice;
-                                if (additionalOuts.indexOf('batter') > -1) {
+                                if (additionalOuts.includes('batter')) {
                                     delete swing.fieldersChoice;
                                 }
                             }
@@ -265,9 +264,9 @@ Field.prototype = {
             }
         }
         this.game.swingResult = swing;
-        if (!_Services_services.Animator.console) {
-            _Services_services.Animator._ball.hasIndicator = true;
-            _Services_services.Animator.animateFieldingTrajectory(this.game);
+        if (!_services.Animator.console) {
+            _services.Animator._ball.hasIndicator = true;
+            _services.Animator.animateFieldingTrajectory(this.game);
         }
     },
     forcePlaySituation: function forcePlaySituation() {
@@ -276,6 +275,7 @@ Field.prototype = {
             third = this.third;
         return first && second && third && 'third' || first && second && 'second' || first && 'first';
     },
+
     /**
      * @returns {Player}
      * the best steal candidate.
@@ -287,6 +287,7 @@ Field.prototype = {
         if (third && first && !second) return first;
         return third || second || first;
     },
+
     //printRunnerNames : function() {
     //    return [this.first ? this.first.getName() : '', this.second ? this.second.getName() : '', this.third ? this.third.getname() : ''];
     //},
@@ -300,7 +301,7 @@ Field.prototype = {
     findFielder: function findFielder(splayAngle, landingDistance, power, flyAngle) {
         var angle = splayAngle; // 0 is up the middle, clockwise increasing
 
-        var fielder;
+        var fielder = void 0;
 
         if (Math.abs(angle) > 50) return false; // foul
         if (landingDistance < 10 && landingDistance > -20) {
@@ -356,6 +357,7 @@ Field.prototype = {
         }
         return fielder;
     },
+
     /**
      * approximate fielder positions (polar degrees where 90 is up the middle, distance from origin (home plate))
      */
@@ -371,7 +373,7 @@ Field.prototype = {
         right: [135 - 14, 280]
     },
     getPolarDistance: function getPolarDistance(a, b) {
-        return _Services_services.Mathinator.getPolarDistance(a, b);
+        return _services.Mathinator.getPolarDistance(a, b);
     }
 };
 
@@ -380,23 +382,24 @@ exports.Field = Field;
 },{"../Model/Player":5,"../Services/_services":30}],3:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Game = undefined;
 
-var _ModelField = require('../Model/Field');
+var _Field = require('../Model/Field');
 
-var _ModelTeam = require('../Model/Team');
+var _Team = require('../Model/Team');
 
-var _ModelUmpire = require('../Model/Umpire');
+var _Umpire = require('../Model/Umpire');
 
-var _ModelPlayer = require('../Model/Player');
+var _Player = require('../Model/Player');
 
-var _UtilityLog = require('../Utility/Log');
+var _Log = require('../Utility/Log');
 
-var _Utility_utils = require('../Utility/_utils');
+var _utils = require('../Utility/_utils');
 
-var _Services_services = require('../Services/_services');
+var _services = require('../Services/_services');
 
 var Game = function Game(m) {
     this.init(m);
@@ -420,24 +423,24 @@ Game.prototype = {
             h: 0,
             m: 0
         }; // @see {Loop} for time initialization
-        if (m) _Utility_utils.text.mode = m;
+        if (m) _utils.text.mode = m;
         this.gamesIntoSeason = 5 + Math.floor(Math.random() * 133);
-        this.field = new _ModelField.Field(this);
-        this.teams.away = new _ModelTeam.Team(this);
-        this.teams.home = new _ModelTeam.Team(this);
-        this.log = new _UtilityLog.Log();
+        this.field = new _Field.Field(this);
+        this.teams.away = new _Team.Team(this);
+        this.teams.home = new _Team.Team(this);
+        this.log = new _Log.Log();
         this.log.game = this;
         this.debug = [];
-        this.helper = _Utility_utils.helper;
-        while (this.teams.away.name == this.teams.home.name) {
+        this.helper = _utils.helper;
+        while (this.teams.away.name === this.teams.home.name) {
             this.teams.away.pickName();
         }
-        this.umpire = new _ModelUmpire.Umpire(this);
+        this.umpire = new _Umpire.Umpire(this);
         if (this.humanPitching()) {
             this.stage = 'pitch';
         }
         this.autoPitchSelect();
-        _Services_services.Animator.init();
+        _services.Animator.init();
         this.passMinutes(5);
     },
     passMinutes: function passMinutes(minutes) {
@@ -448,36 +451,37 @@ Game.prototype = {
             time.m = parseInt(time.m) - 60;
             time.h = (parseInt(time.h) + 1) % 24;
         }
-        if (!_Services_services.Animator.console) _Services_services.Animator.loop.setTargetTimeOfDay(time.h, time.m);
+        if (!_services.Animator.console) _services.Animator.loop.setTargetTimeOfDay(time.h, time.m);
     },
     getInning: function getInning() {
-        return _Utility_utils.text.mode == 'n' ? this.inning + (this.half == 'top' ? 'オモテ' : 'ウラ') : this.half.toUpperCase() + ' ' + this.inning;
+        return _utils.text.mode === 'n' ? this.inning + (this.half === 'top' ? 'オモテ' : 'ウラ') : this.half.toUpperCase() + ' ' + this.inning;
     },
     humanBatting: function humanBatting() {
         var humanControl = this.humanControl;
-        if (humanControl == 'none') return false;
+        if (humanControl === 'none') return false;
         switch (this.half) {
             case 'top':
-                return humanControl == 'both' || humanControl == 'away';
+                return humanControl === 'both' || humanControl === 'away';
             case 'bottom':
-                return humanControl == 'both' || humanControl == 'home';
+                return humanControl === 'both' || humanControl === 'home';
         }
     },
     humanPitching: function humanPitching() {
         var humanControl = this.humanControl;
-        if (humanControl == 'none') return false;
+        if (humanControl === 'none') return false;
         switch (this.half) {
             case 'top':
-                return humanControl == 'both' || humanControl == 'home';
+                return humanControl === 'both' || humanControl === 'home';
             case 'bottom':
-                return humanControl == 'both' || humanControl == 'away';
+                return humanControl === 'both' || humanControl === 'away';
         }
     },
     end: function end() {
         this.stage = 'end';
-        var e, n;
-        e = this.tally.home.R > this.tally.away.R ? 'Home team wins!' : this.tally.home.R == this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!';
-        n = this.tally.home.R > this.tally.away.R ? this.teams.home.getName() + 'の勝利' : this.tally.home.R == this.tally.away.R ? '引き分け' : this.teams.away.getName() + 'の勝利';
+        var e = void 0,
+            n = void 0;
+        e = this.tally.home.R > this.tally.away.R ? 'Home team wins!' : this.tally.home.R === this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!';
+        n = this.tally.home.R > this.tally.away.R ? this.teams.home.getName() + 'の勝利' : this.tally.home.R === this.tally.away.R ? '引き分け' : this.teams.away.getName() + 'の勝利';
         if (this.tally.home.R > this.tally.away.R) {
             this.teams.home.positions.pitcher.stats.pitching.W++;
             this.teams.away.positions.pitcher.stats.pitching.L++;
@@ -488,37 +492,39 @@ Game.prototype = {
         this.log.note(e, n);
         this.log.note('Reload to play again', 'リロるは次の試合へ');
     },
+
     stage: 'pitch', //pitch, swing
     simulateInput: function simulateInput(callback) {
         var stage = this.stage,
             pitchTarget = this.pitchTarget;
-        if (stage == 'end') {
+        if (stage === 'end') {
             return;
         }
-        if (stage == 'pitch') {
+        if (stage === 'pitch') {
             this.autoPitch(callback);
-        } else if (stage == 'swing') {
-            if (typeof pitchTarget != 'object') {
+        } else if (stage === 'swing') {
+            if ((typeof pitchTarget === 'undefined' ? 'undefined' : babelHelpers.typeof(pitchTarget)) != 'object') {
                 this.pitchTarget = { x: 100, y: 100 };
             }
             this.autoSwing(this.pitchTarget.x, this.pitchTarget.y, callback);
         }
     },
     simulatePitchAndSwing: function simulatePitchAndSwing(callback) {
-        if (this.stage == 'end') {
+        if (this.stage === 'end') {
             return;
         }
         this.autoPitch(callback);
         var giraffe = this;
         setTimeout(function () {
-            if (typeof giraffe.pitchTarget != 'object') {
+            if (babelHelpers.typeof(giraffe.pitchTarget) != 'object') {
                 giraffe.pitchTarget = { x: 100, y: 100 };
             }
             giraffe.autoSwing(giraffe.pitchTarget.x, giraffe.pitchTarget.y, function (callback) {
                 callback();
             });
-        }, giraffe.field.hasRunnersOn() ? _Services_services.Animator.TIME_FROM_SET + 2500 : _Services_services.Animator.TIME_FROM_WINDUP + 2500);
+        }, giraffe.field.hasRunnersOn() ? _services.Animator.TIME_FROM_SET + 2500 : _services.Animator.TIME_FROM_WINDUP + 2500);
     },
+
     /**
      * generically receive click input and decide what to do
      * @param x
@@ -526,15 +532,15 @@ Game.prototype = {
      * @param callback
      */
     receiveInput: function receiveInput(x, y, callback) {
-        if (this.humanControl == 'none') {
+        if (this.humanControl === 'none') {
             return;
         }
-        if (this.stage == 'end') {
+        if (this.stage === 'end') {
             return;
         }
-        if (this.stage == 'pitch' && this.humanPitching()) {
+        if (this.stage === 'pitch' && this.humanPitching()) {
             this.thePitch(x, y, callback);
-        } else if (this.stage == 'swing' && this.humanBatting()) {
+        } else if (this.stage === 'swing' && this.humanBatting()) {
             this.theSwing(x, y, callback);
         }
     },
@@ -546,44 +552,51 @@ Game.prototype = {
         this.pitchInFlight = pitch;
     },
     autoPitch: function autoPitch(callback) {
+        var _this = this;
+
         var pitcher = this.pitcher,
             giraffe = this;
 
-        if (this.stage == 'pitch') {
-            this.autoPitchSelect();
-            pitcher.windingUp = true;
-            if (!this.console) {
-                $('.baseball').addClass('hide');
-                var windup = $('.windup');
-                windup.css('width', '100%');
-            }
-            var count = this.umpire.count;
-            var pitch = _Services_services.Distribution.pitchLocation(count),
-                x = pitch.x,
-                y = pitch.y;
-            if (this.console) {
-                this.thePitch(x, y, callback);
-            } else {
-                if (!_Services_services.Animator.console) {
-                    _Services_services.Animator.loop.resetCamera();
+        if (this.stage === 'pitch') {
+            var windup;
+
+            (function () {
+                _this.autoPitchSelect();
+                pitcher.windingUp = true;
+                if (!_this.console) {
+                    $('.baseball').addClass('hide');
+                    windup = $('.windup');
+
+                    windup.css('width', '100%');
                 }
-                windup.animate({ width: 0 }, this.field.hasRunnersOn() ? _Services_services.Animator.TIME_FROM_SET : _Services_services.Animator.TIME_FROM_WINDUP, function () {
-                    !giraffe.console && $('.baseball.pitch').removeClass('hide');
-                    giraffe.thePitch(x, y, callback);
-                    pitcher.windingUp = false;
-                });
-            }
+                var count = _this.umpire.count;
+                var pitch = _services.Distribution.pitchLocation(count),
+                    x = pitch.x,
+                    y = pitch.y;
+                if (_this.console) {
+                    _this.thePitch(x, y, callback);
+                } else {
+                    if (!_services.Animator.console) {
+                        _services.Animator.loop.resetCamera();
+                    }
+                    windup.animate({ width: 0 }, _this.field.hasRunnersOn() ? _services.Animator.TIME_FROM_SET : _services.Animator.TIME_FROM_WINDUP, function () {
+                        !giraffe.console && $('.baseball.pitch').removeClass('hide');
+                        giraffe.thePitch(x, y, callback);
+                        pitcher.windingUp = false;
+                    });
+                }
+            })();
         }
     },
     autoSwing: function autoSwing(deceptiveX, deceptiveY, callback) {
         var giraffe = this;
-        var bonus = this.batter.eye.bonus || 0,
-            eye = this.batter.skill.offense.eye + 6 * (this.umpire.count.balls + this.umpire.count.strikes) + bonus,
-            convergence,
-            convergenceSum;
+        var bonus = this.batter.eye.bonus || 0;
+        var eye = this.batter.skill.offense.eye + 6 * (this.umpire.count.balls + this.umpire.count.strikes) + bonus;
+        var convergence = void 0;
+        var convergenceSum = void 0;
 
-        var x = _Services_services.Distribution.centralizedNumber(),
-            y = _Services_services.Distribution.centralizedNumber();
+        var x = _services.Distribution.centralizedNumber(),
+            y = _services.Distribution.centralizedNumber();
 
         if (100 * Math.random() < eye) {
             // identified the break
@@ -603,10 +616,10 @@ Game.prototype = {
         x = (deceptiveX * convergence + x) / convergenceSum;
         y = (deceptiveY * convergence + y) / convergenceSum;
 
-        this.swingResult.x = _Services_services.Distribution.cpuSwing(x, this.pitchInFlight.x, eye);
-        this.swingResult.y = _Services_services.Distribution.cpuSwing(y, this.pitchInFlight.y, eye * 0.75);
+        this.swingResult.x = _services.Distribution.cpuSwing(x, this.pitchInFlight.x, eye);
+        this.swingResult.y = _services.Distribution.cpuSwing(y, this.pitchInFlight.y, eye * 0.75);
 
-        var swingProbability = _Services_services.Distribution.swingLikelihood(eye, x, y, this.umpire);
+        var swingProbability = _services.Distribution.swingLikelihood(eye, x, y, this.umpire);
         if (swingProbability < 100 * Math.random()) {
             x = -20;
         }
@@ -615,11 +628,13 @@ Game.prototype = {
             giraffe.theSwing(x, y);
         });
     },
+
     opponentConnected: false,
     /**
      * variable for what to do when the batter becomes ready for a pitch
      */
     onBatterReady: function onBatterReady() {},
+
     /**
      * @param setValue
      * @returns {boolean|*}
@@ -635,6 +650,7 @@ Game.prototype = {
         }
         return this.batter.ready;
     },
+
     batterReadyTimeout: -1,
     waitingCallback: function waitingCallback() {},
     awaitPitch: function awaitPitch(callback, swingResult) {
@@ -669,7 +685,7 @@ Game.prototype = {
     },
     thePitch: function thePitch(x, y, callback, override) {
         var pitch = this.pitchInFlight;
-        if (this.stage == 'pitch') {
+        if (this.stage === 'pitch') {
             if (override) {
                 this.pitchInFlight = override.inFlight;
                 this.pitchTarget = override.target;
@@ -680,15 +696,15 @@ Game.prototype = {
                 this.pitchTarget.y = y;
 
                 pitch.breakDirection = this.helper.pitchDefinitions[pitch.name].slice(0, 2);
-                this.battersEye = _Utility_utils.text.getBattersEye(this);
+                this.battersEye = _utils.text.getBattersEye(this);
 
                 var control = Math.floor(pitch.control - this.pitcher.fatigue / 2);
-                this.pitchTarget.x = _Services_services.Distribution.pitchControl(this.pitchTarget.x, control);
-                this.pitchTarget.y = _Services_services.Distribution.pitchControl(this.pitchTarget.y, control);
+                this.pitchTarget.x = _services.Distribution.pitchControl(this.pitchTarget.x, control);
+                this.pitchTarget.y = _services.Distribution.pitchControl(this.pitchTarget.y, control);
 
-                if (this.pitcher.throws == 'right') pitch.breakDirection[0] *= -1;
+                if (this.pitcher.throws === 'right') pitch.breakDirection[0] *= -1;
 
-                var breakEffect = _Services_services.Distribution.breakEffect(pitch, this.pitcher, this.pitchTarget.x, this.pitchTarget.y);
+                var breakEffect = _services.Distribution.breakEffect(pitch, this.pitcher, this.pitchTarget.x, this.pitchTarget.y);
 
                 pitch.x = breakEffect.x;
                 pitch.y = breakEffect.y;
@@ -697,20 +713,21 @@ Game.prototype = {
             this.log.notePitch(pitch, this.batter);
 
             this.stage = 'swing';
-            if (this.humanControl != 'none' && (this.humanControl == 'both' || this.humanBatting())) {
+            if (this.humanControl !== 'none' && (this.humanControl === 'both' || this.humanBatting())) {
                 callback();
             } else {
                 this.awaitSwing(x, y, callback, pitch, this.pitchTarget);
             }
         }
     },
+
     battersEye: {
         e: '',
         n: ''
     },
     theSwing: function theSwing(x, y, callback, override) {
         var pitch = this.pitchInFlight;
-        if (this.stage == 'swing') {
+        if (this.stage === 'swing') {
             if (override) {
                 var result = this.swingResult = override;
                 callback = this.waitingCallback;
@@ -726,8 +743,8 @@ Game.prototype = {
                     result.y = y - pitch.y;
                     result.angle = this.setBatAngle();
 
-                    var recalculation = _Services_services.Mathinator.getAngularOffset(result, result.angle);
-                    var precision = _Services_services.Distribution.swing(eye);
+                    var recalculation = _services.Mathinator.getAngularOffset(result, result.angle);
+                    var precision = _services.Distribution.swing(eye);
 
                     result.x = recalculation.x * precision;
                     result.y = -5 + recalculation.y * precision;
@@ -756,18 +773,18 @@ Game.prototype = {
             // stealing bases
             var field = this.field;
             var team = this.batter.team;
-            if ((team.stealAttempt === _ModelTeam.Team.RUNNER_GO || team.stealAttempt === _ModelTeam.Team.RUNNERS_DISCRETION) && !this.opponentConnected) {
+            if ((team.stealAttempt === _Team.Team.RUNNER_GO || team.stealAttempt === _Team.Team.RUNNERS_DISCRETION) && !this.opponentConnected) {
                 var thief = field.getLeadRunner();
-                if (thief instanceof _ModelPlayer.Player) {
+                if (thief instanceof _Player.Player) {
                     switch (thief) {
                         case field.first:
-                            var base = 2;
+                            var _base = 2;
                             break;
                         case field.second:
-                            base = 3;
+                            _base = 3;
                             break;
                         case field.third:
-                            base = 4;
+                            _base = 4;
                     }
                     var validToSteal = true;
                     if (result.looking) {
@@ -778,11 +795,11 @@ Game.prototype = {
                     if (result.foul || result.caught) {
                         validToSteal = false;
                     }
-                    var discretion = team.stealAttempt === 'go' || _Services_services.Distribution.willSteal(pitch, this.pitcher.team.positions.catcher, thief, base);
+                    var discretion = team.stealAttempt === 'go' || _services.Distribution.willSteal(pitch, this.pitcher.team.positions.catcher, thief, base);
                     if (discretion && validToSteal) {
                         thief.attemptSteal(this, base);
                     }
-                    team.stealAttempt = _ModelTeam.Team.RUNNERS_DISCRETION;
+                    team.stealAttempt = _Team.Team.RUNNERS_DISCRETION;
                 }
             }
 
@@ -797,8 +814,8 @@ Game.prototype = {
                 var emit = !override;
             }
 
-            if (typeof callback == 'function') {
-                if (this.humanControl !== 'none' && (this.humanControl === 'both' || this.teams[this.humanControl] == this.pitcher.team)) {
+            if (typeof callback === 'function') {
+                if (this.humanControl !== 'none' && (this.humanControl === 'both' || this.teams[this.humanControl] === this.pitcher.team)) {
                     callback();
                     if (emit) {
                         if (this.opponentService && this.opponentConnected) {
@@ -816,14 +833,14 @@ Game.prototype = {
             pitchInFlight = this.pitchInFlight,
             swingResult = this.swingResult;
         var origin = {
-            x: giraffe.batter.bats == 'right' ? -10 : 210,
+            x: giraffe.batter.bats === 'right' ? -10 : 210,
             y: 199
         };
         var swing = {
             x: x ? x : pitchInFlight.x + swingResult.x,
             y: y ? y : pitchInFlight.y + swingResult.y
         };
-        return _Services_services.Mathinator.battingAngle(origin, swing);
+        return _services.Mathinator.battingAngle(origin, swing);
     },
     debugOut: function debugOut() {
         log('slugging', this.debug.filter(function (a) {
@@ -867,34 +884,34 @@ Game.prototype = {
         });
 
         var LO = atBats.filter(function (ab) {
-            return ab == 'LO';
+            return ab === 'LO';
         }).length;
         var FO = atBats.filter(function (ab) {
-            return ab == 'FO';
+            return ab === 'FO';
         }).length;
         var GO = atBats.filter(function (ab) {
-            return ab == 'GO';
+            return ab === 'GO';
         }).length;
         var GIDP = atBats.filter(function (ab) {
-            return ab == '(IDP)';
+            return ab === '(IDP)';
         }).length;
         var SO = atBats.filter(function (ab) {
-            return ab == 'SO';
+            return ab === 'SO';
         }).length;
         var BB = atBats.filter(function (ab) {
-            return ab == 'BB';
+            return ab === 'BB';
         }).length;
         var SAC = atBats.filter(function (ab) {
-            return ab == 'SAC';
+            return ab === 'SAC';
         }).length;
         var FC = atBats.filter(function (ab) {
-            return ab == 'FC';
+            return ab === 'FC';
         }).length;
         var CS = atBats.filter(function (ab) {
-            return ab == 'CS';
+            return ab === 'CS';
         }).length;
         var SB = atBats.filter(function (ab) {
-            return ab == 'SB';
+            return ab === 'SB';
         }).length;
 
         log('line outs', LO, 'fly outs', FO, 'groundouts', GO, 'strikeouts', SO, 'sacrifices', SAC, 'FC', FC, 'gidp', GIDP, 'CS', CS, 'total', LO + FO + GO + SO + SAC + FC + GIDP + CS);
@@ -906,7 +923,7 @@ Game.prototype = {
         log('fatigue, home vs away');
         var teams = this.teams;
         var fatigue = { home: {}, away: {} };
-        _Services_services.Iterator.each(this.teams.home.positions, function (key) {
+        _services.Iterator.each(this.teams.home.positions, function (key) {
             var position = key;
             fatigue.home[position] = teams.home.positions[position].fatigue;
             fatigue.away[position] = teams.away.positions[position].fatigue;
@@ -999,6 +1016,7 @@ Game.prototype = {
         }
         return this;
     },
+
     startOpponentPitching: null, // late function
     pitchTarget: { x: 100, y: 100 },
     pitchInFlight: {
@@ -1040,6 +1058,7 @@ Game.prototype = {
         };
     },
     pitchSelect: function pitchSelect() {},
+
     field: null,
     teams: {
         away: null,
@@ -1113,6 +1132,7 @@ Game.prototype = {
             }
         };
     },
+
     tally: {
         away: {
             H: 0,
@@ -1132,11 +1152,12 @@ exports.Game = Game;
 },{"../Model/Field":2,"../Model/Player":5,"../Model/Team":6,"../Model/Umpire":7,"../Services/_services":30,"../Utility/Log":34,"../Utility/_utils":35}],4:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Manager = undefined;
 
-var _Services_services = require('../Services/_services');
+var _services = require('../Services/_services');
 
 var Manager = function Manager(team) {
     this.init(team);
@@ -1159,7 +1180,7 @@ Manager.prototype = {
         if (!this.team.positions.catcher.number) {
             this.team.positions.catcher.number = jerseyNumber++;
         }
-        _Services_services.Iterator.each(this.team.bench, function (key, player) {
+        _services.Iterator.each(this.team.bench, function (key, player) {
             if (!player.number) {
                 player.number = jerseyNumber++;
             }
@@ -1199,31 +1220,39 @@ Manager.prototype = {
         this.team.lineup[8].order = 8;
     },
     selectForSkill: function selectForSkill(pool, skillset, requiredThrowingHandedness) {
-        if (this.team.bench.length || pool == this.team.positions) {
-            var selection = this.team.bench[0];
-            var rating = 0;
-            var index = 0;
-            _Services_services.Iterator.each(pool, function (key, player) {
-                var skills = skillset.slice();
-                var cursor = player.skill;
-                var property = skills.shift();
-                while (property) {
-                    cursor = cursor[property];
-                    property = skills.shift();
-                }
-                if (!(player.order + 1) && cursor >= rating && (!requiredThrowingHandedness || player.throws == requiredThrowingHandedness)) {
-                    rating = cursor;
-                    selection = player;
-                    index = key;
-                }
-            });
-            if (pool == this.team.bench) {
-                delete this.team.bench[index];
-                this.team.bench = this.team.bench.filter(function (player) {
-                    return player instanceof selection.constructor;
+        var _this = this;
+
+        if (this.team.bench.length || pool === this.team.positions) {
+            var _ret = function () {
+                var selection = _this.team.bench[0];
+                var rating = 0;
+                var index = 0;
+                _services.Iterator.each(pool, function (key, player) {
+                    var skills = skillset.slice();
+                    var cursor = player.skill;
+                    var property = skills.shift();
+                    while (property) {
+                        cursor = cursor[property];
+                        property = skills.shift();
+                    }
+                    if (!(player.order + 1) && cursor >= rating && (!requiredThrowingHandedness || player.throws === requiredThrowingHandedness)) {
+                        rating = cursor;
+                        selection = player;
+                        index = key;
+                    }
                 });
-            }
-            return selection;
+                if (pool === _this.team.bench) {
+                    delete _this.team.bench[index];
+                    _this.team.bench = _this.team.bench.filter(function (player) {
+                        return player instanceof selection.constructor;
+                    });
+                }
+                return {
+                    v: selection
+                };
+            }();
+
+            if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
         }
         return 'no players available';
     }
@@ -1234,15 +1263,16 @@ exports.Manager = Manager;
 },{"../Services/_services":30}],5:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Player = undefined;
 
-var _Utility_utils = require('../Utility/_utils');
+var _utils = require('../Utility/_utils');
 
-var _Services_services = require('../Services/_services');
+var _services = require('../Services/_services');
 
-var _Model_models = require('../Model/_models');
+var _models = require('../Model/_models');
 
 var Player = function Player(team, hero) {
     this.init(team, hero);
@@ -1264,22 +1294,22 @@ Player.prototype = {
         this.pitching = { averaging: [] };
         this.number = 0;
         this.randomizeSkills(hero || Math.random() > 0.9);
-        var surnameKey = Math.floor(Math.random() * _Utility_utils.data.surnames.length),
-            nameKey = Math.floor(Math.random() * _Utility_utils.data.names.length);
+        var surnameKey = Math.floor(Math.random() * _utils.data.surnames.length),
+            nameKey = Math.floor(Math.random() * _utils.data.names.length);
 
-        this.name = _Utility_utils.data.surnames[surnameKey] + ' ' + _Utility_utils.data.names[nameKey];
-        var jSurname = _Utility_utils.data.surnamesJ[surnameKey],
-            jGivenName = _Utility_utils.data.namesJ[nameKey];
+        this.name = _utils.data.surnames[surnameKey] + ' ' + _utils.data.names[nameKey];
+        var jSurname = _utils.data.surnamesJ[surnameKey],
+            jGivenName = _utils.data.namesJ[nameKey];
         this.spaceName(jSurname, jGivenName);
-        this.surname = _Utility_utils.data.surnames[surnameKey];
-        this.surnameJ = _Utility_utils.data.surnamesJ[surnameKey];
+        this.surname = _utils.data.surnames[surnameKey];
+        this.surnameJ = _utils.data.surnamesJ[surnameKey];
         this.atBats = [];
         this.definingBattingCharacteristic = {};
         this.definingCharacteristic = {};
     },
     spaceName: function spaceName(jSurname, jGivenName) {
-        if (jSurname.length == 1 && jGivenName.length <= 2) jSurname += '・';
-        if (jGivenName.length == 1 && jSurname.indexOf('・') < 0 && jSurname.length <= 2) jSurname += '・';
+        if (jSurname.length === 1 && jGivenName.length <= 2) jSurname += '・';
+        if (jGivenName.length === 1 && !jSurname.includes('・') && jSurname.length <= 2) jSurname += '・';
         this.nameJ = jSurname + jGivenName;
         this.surnameJ = jSurname;
     },
@@ -1292,7 +1322,7 @@ Player.prototype = {
     },
     fromData: function fromData(data) {
         var giraffe = this;
-        _Services_services.Iterator.each(data, function (key, value) {
+        _services.Iterator.each(data, function (key, value) {
             giraffe[key] = value;
         });
         delete this.atBatObjects;
@@ -1322,10 +1352,10 @@ Player.prototype = {
 
         var bench = this.team.bench,
             bullpen = this.team.bullpen;
-        if (bench.indexOf(this) > -1) {
+        if (bench.includes(this)) {
             bench.splice(bench.indexOf(this), 1);
         }
-        if (bullpen.indexOf(this) > -1) {
+        if (bullpen.includes(this)) {
             bullpen.splice(bullpen.indexOf(this), 1);
         }
         game.log.noteSubstitution(this, player);
@@ -1340,7 +1370,7 @@ Player.prototype = {
                 count = 0;
             skill += '';
             if (!skill) skill = '';
-            _Services_services.Iterator.each(skill.split(' '), function (key, value) {
+            _services.Iterator.each(skill.split(' '), function (key, value) {
                 var skill = value;
                 if (offense[skill]) skill = offense[skill];
                 if (defense[skill]) skill = defense[skill];
@@ -1352,7 +1382,11 @@ Player.prototype = {
             skill = Math.sqrt(0.05 + Math.random() * 0.95) * (total / (count * 0.97));
             return Math.floor(skill / 100 * (b - a) + a);
         };
-        var IP, ER, GS, W, L;
+        var IP = void 0,
+            ER = void 0,
+            GS = void 0,
+            W = void 0,
+            L = void 0;
         if (this.skill.pitching > 65) {
             IP = (this.skill.pitching - 65) * gamesIntoSeason / 20;
             ER = IP / 9 * randBetween(800, 215, this.skill.pitching) / 100;
@@ -1410,6 +1444,7 @@ Player.prototype = {
                 getERA: function getERA() {
                     return 9 * this.ER / Math.max(1 / 3, this.IP[0] + this.IP[1] / 3);
                 },
+
                 ERA: null,
                 ER: ER,
                 H: 0, // in game
@@ -1428,10 +1463,12 @@ Player.prototype = {
                 getBABIP: function getBABIP() {
                     return (this.h - this.hr) / (this.ab - this.so - this.hr + this.sac);
                 },
+
                 ba: null,
                 getOBP: function getOBP() {
                     return (this.h + this.bb + this.hbp) / (this.ab + this.bb + this.hbp + this.sac);
                 },
+
                 obp: null,
                 getSLG: function getSLG() {
                     return (this.h - this['2b'] - this['3b'] - this.hr + 2 * this['2b'] + 3 * this['3b'] + 4 * this.hr) / this.ab;
@@ -1444,6 +1481,7 @@ Player.prototype = {
                     }).join('/');
                     return this.slash;
                 },
+
                 slg: null,
                 pa: pa,
                 ab: ab,
@@ -1471,27 +1509,28 @@ Player.prototype = {
         this.stats.pitching.WHIP = this.stats.pitching.getWHIP();
         this.stats.batting.ba = this.stats.batting.getBA();
     },
+
     atBatObjects: [],
     getAtBats: function getAtBats() {
         if (this.atBats.length > this.atBatObjects.length) {
             this.atBatObjects = this.atBats.map(function (item) {
-                return new _Model_models.AtBat(item);
+                return new _models.AtBat(item);
             });
         }
         return this.atBatObjects;
     },
     recordRBI: function recordRBI() {
-        this.atBats[this.atBats.length - 1] += _Model_models.AtBat.prototype.RBI_INDICATOR;
+        this.atBats[this.atBats.length - 1] += _models.AtBat.prototype.RBI_INDICATOR;
     },
     recordInfieldHit: function recordInfieldHit() {
-        this.atBats[this.atBats.length - 1] += _Model_models.AtBat.prototype.INFIELD_HIT_INDICATOR;
+        this.atBats[this.atBats.length - 1] += _models.AtBat.prototype.INFIELD_HIT_INDICATOR;
     },
     getBaseRunningTime: function getBaseRunningTime() {
-        return _Services_services.Mathinator.baseRunningTime(this.skill.offense.speed);
+        return _services.Mathinator.baseRunningTime(this.skill.offense.speed);
     },
     attemptSteal: function attemptSteal(game, base) {
         var pitch = game.pitchInFlight;
-        var success = _Services_services.Distribution.stealSuccess(pitch, game.pitcher.team.positions.catcher, this, base, this.team.stealAttempt === _Model_models.Team.RUNNERS_DISCRETION);
+        var success = _services.Distribution.stealSuccess(pitch, game.pitcher.team.positions.catcher, this, base, this.team.stealAttempt === _models.Team.RUNNERS_DISCRETION);
         if (success) {
             game.swingResult.stoleABase = this;
             game.swingResult.caughtStealing = null;
@@ -1605,26 +1644,26 @@ Player.prototype = {
         delete this.pitching.averaging;
     },
     getSurname: function getSurname() {
-        return _Utility_utils.text.mode == 'n' ? this.surnameJ : this.surname;
+        return _utils.text.mode === 'n' ? this.surnameJ : this.surname;
     },
     getName: function getName() {
-        return _Utility_utils.text.mode == 'n' ? this.nameJ : this.name;
+        return _utils.text.mode === 'n' ? this.nameJ : this.name;
     },
     getUniformNumber: function getUniformNumber() {
-        return (0, _Utility_utils.text)('#') + this.number;
+        return (0, _utils.text)('#') + this.number;
     },
     getOrder: function getOrder() {
-        return (0, _Utility_utils.text)([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
+        return (0, _utils.text)([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
     },
     getDefiningBattingCharacteristic: function getDefiningBattingCharacteristic() {
-        if (!this.definingBattingCharacteristic[_Utility_utils.text.mode]) {
-            this.definingBattingCharacteristic[_Utility_utils.text.mode] = this.getDefiningCharacteristic(true);
+        if (!this.definingBattingCharacteristic[_utils.text.mode]) {
+            this.definingBattingCharacteristic[_utils.text.mode] = this.getDefiningCharacteristic(true);
         }
-        return this.definingBattingCharacteristic[_Utility_utils.text.mode];
+        return this.definingBattingCharacteristic[_utils.text.mode];
     },
     getDefiningCharacteristic: function getDefiningCharacteristic(battingOnly) {
-        if (this.definingCharacteristic[_Utility_utils.text.mode] && !battingOnly) {
-            return this.definingCharacteristic[_Utility_utils.text.mode];
+        if (this.definingCharacteristic[_utils.text.mode] && !battingOnly) {
+            return this.definingCharacteristic[_utils.text.mode];
         }
         var out = '';
         var o = this.skill.offense,
@@ -1654,65 +1693,65 @@ Player.prototype = {
         pitchingKeys.map(function (x) {
             pitching[0] += p[x].control;
             pitching[1] += p[x].velocity;
-            pitching[2] += p[x]['break'];
+            pitching[2] += p[x].break;
         });
         var pitches = pitchingKeys.length;
         pitching = pitching.map(function (x) {
             return x / pitches | 0;
         });
 
-        // var potentialPitcher = ((~this.team.bench.indexOf(this)) || (this.team.positions.pitcher === this));
-
         if (pitcherRating > 90 && !battingOnly) {
             if (pitcherRating > 105) {
-                out = (0, _Utility_utils.text)('Ace');
+                out = (0, _utils.text)('Ace');
             } else if (pitching[0] > EXCELLENT) {
-                out = (0, _Utility_utils.text)('Control pitcher');
+                out = (0, _utils.text)('Control pitcher');
             } else if (pitching[1] > EXCELLENT) {
-                out = (0, _Utility_utils.text)('Flamethrower');
+                out = (0, _utils.text)('Flamethrower');
             } else if (pitching[2] > EXCELLENT) {
-                out = (0, _Utility_utils.text)('Breaking ball');
+                out = (0, _utils.text)('Breaking ball');
             }
         } else {
             if (battingOnly || sum([offense[0] * 2, offense[1] * 0.50, offense[2]]) > sum(defense)) {
                 if (offense[0] > 98 || sum(offense) > ELITE * 3) {
-                    out = (0, _Utility_utils.text)('Genius batter');
+                    out = (0, _utils.text)('Genius batter');
                 } else if (offense[1] > EXCELLENT && offense[1] > offense[0]) {
-                    out = (0, _Utility_utils.text)('Power hitter');
+                    out = (0, _utils.text)('Power hitter');
                 } else if (offense[0] > EXCELLENT) {
-                    out = (0, _Utility_utils.text)('Contact');
+                    out = (0, _utils.text)('Contact');
                 } else if (offense[2] > EXCELLENT) {
-                    out = (0, _Utility_utils.text)('Speedster');
+                    out = (0, _utils.text)('Speedster');
                 } else if (offense[0] < INEPT || sum(offense) < POOR * 3) {
-                    out = (0, _Utility_utils.text)('Inept');
+                    out = (0, _utils.text)('Inept');
                 } else if (offense[1] < INEPT && offense[1] < offense[0]) {
-                    out = (0, _Utility_utils.text)('Weak swing');
+                    out = (0, _utils.text)('Weak swing');
                 } else if (offense[0] < BAD) {
-                    out = (0, _Utility_utils.text)('Strikes out');
+                    out = (0, _utils.text)('Strikes out');
                 } else if (offense[2] < POOR) {
-                    out = (0, _Utility_utils.text)('Leisurely runner');
+                    out = (0, _utils.text)('Leisurely runner');
                 }
             } else {
                 if (sum(defense) > EXCELLENT * 3) {
-                    out = (0, _Utility_utils.text)('Defensive wizard');
+                    out = (0, _utils.text)('Defensive wizard');
                 } else if (defense[0] > EXCELLENT) {
-                    out = (0, _Utility_utils.text)('Glove');
+                    out = (0, _utils.text)('Glove');
                 } else if (defense[1] > EXCELLENT) {
-                    out = (0, _Utility_utils.text)('Range');
+                    out = (0, _utils.text)('Range');
                 } else if (defense[2] > ELITE) {
-                    out = (0, _Utility_utils.text)('Strong throw');
+                    out = (0, _utils.text)('Strong throw');
                 }
             }
         }
         if (battingOnly) return out;
-        return this.definingCharacteristic[_Utility_utils.text.mode] = out;
+        return this.definingCharacteristic[_utils.text.mode] = out;
     },
+
     /**
      * to ease comparison in Angular (?)
      */
     toString: function toString() {
         return this.name + ' #' + this.number;
     },
+
     eye: {},
     fatigue: 0,
     name: '',
@@ -1726,15 +1765,16 @@ exports.Player = Player;
 },{"../Model/_models":8,"../Services/_services":30,"../Utility/_utils":35}],6:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Team = undefined;
 
-var _ModelPlayer = require('../Model/Player');
+var _Player = require('../Model/Player');
 
-var _ModelManager = require('../Model/Manager');
+var _Manager = require('../Model/Manager');
 
-var _Utility_utils = require('../Utility/_utils');
+var _utils = require('../Utility/_utils');
 
 var Team = function Team(game, heroRate) {
     this.init(game, heroRate);
@@ -1765,25 +1805,26 @@ Team.prototype = {
             center: null,
             right: null
         };
-        this.manager = new _ModelManager.Manager(this);
+        this.manager = new _Manager.Manager(this);
         if (game !== 'no init') {
             this.game = game;
             for (var j = 0; j < 20; j++) {
-                this.bench.push(new _ModelPlayer.Player(this, Math.random() < heroRate));
+                this.bench.push(new _Player.Player(this, Math.random() < heroRate));
             }
-            if (this.bench.length == 20) {
+            if (this.bench.length === 20) {
                 this.manager.makeLineup();
             }
         }
     },
     pickName: function pickName() {
-        var teamNameIndex = Math.floor(Math.random() * _Utility_utils.data.teamNames.length);
-        this.name = _Utility_utils.data.teamNames[teamNameIndex];
-        this.nameJ = _Utility_utils.data.teamNamesJ[teamNameIndex];
+        var teamNameIndex = Math.floor(Math.random() * _utils.data.teamNames.length);
+        this.name = _utils.data.teamNames[teamNameIndex];
+        this.nameJ = _utils.data.teamNamesJ[teamNameIndex];
     },
     getName: function getName() {
-        return _Utility_utils.text.mode == 'n' ? this.nameJ : this.name;
+        return _utils.text.mode === 'n' ? this.nameJ : this.name;
     },
+
     stealAttempt: Team.RUNNERS_DISCRETION,
     lineup: [],
     positions: {},
@@ -1807,13 +1848,14 @@ exports.Team = Team;
 },{"../Model/Manager":4,"../Model/Player":5,"../Utility/_utils":35}],7:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Umpire = undefined;
 
-var _Utility_utils = require('../Utility/_utils');
+var _utils = require('../Utility/_utils');
 
-var _ModelPlayer = require('../Model/Player');
+var _Player = require('../Model/Player');
 
 var Umpire = function Umpire(game) {
     this.init(game);
@@ -1825,6 +1867,7 @@ Umpire.prototype = {
         this.game = game;
         this.playBall();
     },
+
     count: {
         strikes: 0,
         balls: 0,
@@ -1854,7 +1897,7 @@ Umpire.prototype = {
         var field = game.field;
 
         if (game.swingResult.fielder) {
-            var fielder = game.teams[game.half == 'top' ? 'home' : 'away'].positions[result.fielder];
+            var fielder = game.teams[game.half === 'top' ? 'home' : 'away'].positions[result.fielder];
         } else {
             fielder = null;
         }
@@ -1863,7 +1906,7 @@ Umpire.prototype = {
 
         if (result.stoleABase) {
             var thief = result.stoleABase;
-            thief.atBats.push(_Utility_utils.Log.prototype.STOLEN_BASE);
+            thief.atBats.push(_utils.Log.prototype.STOLEN_BASE);
             switch (thief) {
                 case field.first:
                     field.second = thief;
@@ -1876,17 +1919,17 @@ Umpire.prototype = {
                 case field.third:
                     field.third = null;
                     thief.stats.batting.r++;
-                    thief.atBats.push(_Utility_utils.Log.prototype.RUN);
+                    thief.atBats.push(_utils.Log.prototype.RUN);
                     this.runScores();
             }
             thief.stats.batting.sb++;
         }
         if (result.caughtStealing) {
-            game.teams[game.half == 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding.PO++;
+            game.teams[game.half === 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding.PO++;
             this.count.outs++;
             thief = result.caughtStealing;
             thief.stats.batting.cs++;
-            thief.atBats.push(_Utility_utils.Log.prototype.CAUGHT_STEALING);
+            thief.atBats.push(_utils.Log.prototype.CAUGHT_STEALING);
             switch (thief) {
                 case field.first:
                     field.first = null;
@@ -1923,14 +1966,14 @@ Umpire.prototype = {
                     pitcher.stats.pitching.IP[1]++;
                     if (result.sacrificeAdvances.length && this.count.outs < 2) {
                         batter.stats.batting.sac++;
-                        game.batter.atBats.push(_Utility_utils.Log.prototype.SACRIFICE);
+                        game.batter.atBats.push(_utils.Log.prototype.SACRIFICE);
                         this.advanceRunners(false, null, result.sacrificeAdvances);
                     } else {
                         batter.stats.batting.ab++;
                         if (result.flyAngle < 15) {
-                            game.batter.atBats.push(_Utility_utils.Log.prototype.LINEOUT);
+                            game.batter.atBats.push(_utils.Log.prototype.LINEOUT);
                         } else {
-                            game.batter.atBats.push(_Utility_utils.Log.prototype.FLYOUT);
+                            game.batter.atBats.push(_utils.Log.prototype.FLYOUT);
                         }
                     }
                     this.count.outs++;
@@ -1957,9 +2000,9 @@ Umpire.prototype = {
                             this.count.outs++;
                             fielder.stats.fielding.PO++;
                             pitcher.stats.pitching.IP[1]++;
-                            game.batter.atBats.push(_Utility_utils.Log.prototype.FIELDERS_CHOICE);
+                            game.batter.atBats.push(_utils.Log.prototype.FIELDERS_CHOICE);
                             this.advanceRunners(false, result.fieldersChoice);
-                            result.doublePlay && game.batter.atBats.push(_Utility_utils.Log.prototype.GIDP);
+                            result.doublePlay && game.batter.atBats.push(_utils.Log.prototype.GIDP);
                             this.reachBase();
                             result.outs = this.count.outs;
                             this.newBatter();
@@ -1971,8 +2014,8 @@ Umpire.prototype = {
                             this.count.outs++;
                             fielder.stats.fielding.PO++;
                             pitcher.stats.pitching.IP[1]++;
-                            game.batter.atBats.push(_Utility_utils.Log.prototype.GROUNDOUT);
-                            result.doublePlay && game.batter.atBats.push(_Utility_utils.Log.prototype.GIDP);
+                            game.batter.atBats.push(_utils.Log.prototype.GROUNDOUT);
+                            result.doublePlay && game.batter.atBats.push(_utils.Log.prototype.GIDP);
                             if (this.count.outs < 3) {
                                 this.advanceRunners(false);
                             }
@@ -1984,58 +2027,58 @@ Umpire.prototype = {
                         }
                         if (result.bases) {
                             if (!result.error) {
-                                game.tally[game.half == 'top' ? 'away' : 'home'][_Utility_utils.Log.prototype.SINGLE]++;
+                                game.tally[game.half === 'top' ? 'away' : 'home'][_utils.Log.prototype.SINGLE]++;
                                 pitcher.stats.pitching.H++;
                             } else {
                                 if (result.bases > 0) {
-                                    game.tally[game.half == 'top' ? 'home' : 'away'].E++;
+                                    game.tally[game.half === 'top' ? 'home' : 'away'].E++;
                                     fielder.stats.fielding.E++;
                                 }
                             }
                             var bases = result.bases;
                             switch (bases) {
                                 case 0:
-                                    game.batter.atBats.push(_Utility_utils.Log.prototype.GROUNDOUT);
+                                    game.batter.atBats.push(_utils.Log.prototype.GROUNDOUT);
                                     break;
                                 case 1:
                                     if (result.error) {
-                                        game.batter.atBats.push(_Utility_utils.Log.prototype.REACHED_ON_ERROR);
+                                        game.batter.atBats.push(_utils.Log.prototype.REACHED_ON_ERROR);
                                         break;
                                     }
-                                    game.batter.atBats.push(_Utility_utils.Log.prototype.SINGLE);
+                                    game.batter.atBats.push(_utils.Log.prototype.SINGLE);
                                     batter.stats.batting.h++;
                                     break;
                                 case 2:
                                     if (result.error) {
-                                        game.batter.atBats.push(_Utility_utils.Log.prototype.REACHED_ON_ERROR);
+                                        game.batter.atBats.push(_utils.Log.prototype.REACHED_ON_ERROR);
                                         break;
                                     }
-                                    game.batter.atBats.push(_Utility_utils.Log.prototype.DOUBLE);
+                                    game.batter.atBats.push(_utils.Log.prototype.DOUBLE);
                                     batter.stats.batting.h++;
                                     batter.stats.batting['2b']++;
                                     break;
                                 case 3:
                                     if (result.error) {
-                                        game.batter.atBats.push(_Utility_utils.Log.prototype.REACHED_ON_ERROR);
+                                        game.batter.atBats.push(_utils.Log.prototype.REACHED_ON_ERROR);
                                         break;
                                     }
-                                    game.batter.atBats.push(_Utility_utils.Log.prototype.TRIPLE);
+                                    game.batter.atBats.push(_utils.Log.prototype.TRIPLE);
                                     batter.stats.batting.h++;
                                     batter.stats.batting['3b']++;
                                     break;
                                 case 4:
                                     if (result.error) {
-                                        game.batter.atBats.push(_Utility_utils.Log.prototype.REACHED_ON_ERROR);
+                                        game.batter.atBats.push(_utils.Log.prototype.REACHED_ON_ERROR);
                                         break;
                                     }
-                                    game.batter.atBats.push(_Utility_utils.Log.prototype.HOMERUN);
+                                    game.batter.atBats.push(_utils.Log.prototype.HOMERUN);
                                     pitcher.stats.pitching.HR++;
                                     batter.stats.batting.h++;
                                     batter.stats.batting.hr++;
                                     break;
                             }
                             if (bases > 0 && bases < 4 && !result.error) {
-                                if (['left', 'right', 'center'].indexOf(result.fielder) == -1) {
+                                if (['left', 'right', 'center'].includes(result.fielder)) {
                                     batter.recordInfieldHit();
                                 }
                             }
@@ -2070,7 +2113,7 @@ Umpire.prototype = {
             pitcher.stats.pitching.IP[1]++;
             this.count.balls = this.count.strikes = 0;
             this.says = 'Strike three. Batter out.';
-            batter.atBats.push(_Utility_utils.Log.prototype.STRIKEOUT);
+            batter.atBats.push(_utils.Log.prototype.STRIKEOUT);
             this.newBatter();
         }
         if (this.count.balls > 3) {
@@ -2079,7 +2122,7 @@ Umpire.prototype = {
             pitcher.stats.pitching.BB++;
             this.says = 'Ball four.';
             this.count.balls = this.count.strikes = 0;
-            batter.atBats.push(_Utility_utils.Log.prototype.WALK);
+            batter.atBats.push(_utils.Log.prototype.WALK);
             this.advanceRunners(true).reachBase().newBatter();
         }
         if (this.count.outs > 2) {
@@ -2099,10 +2142,10 @@ Umpire.prototype = {
     advanceRunners: function advanceRunners(isWalk, fieldersChoice, sacrificeAdvances) {
         isWalk = !!isWalk;
         var game = this.game;
-        var first = game.field.first,
-            second = game.field.second,
-            third = game.field.third,
-            swing = game.swingResult;
+        var first = game.field.first;
+        var second = game.field.second;
+        var third = game.field.third;
+        var swing = game.swingResult;
 
         if (isWalk) {
             if (first) {
@@ -2111,7 +2154,7 @@ Umpire.prototype = {
                         //bases loaded
                         game.batter.recordRBI();
                         game.batter.stats.batting.rbi++;
-                        third.atBats.push(_Utility_utils.Log.prototype.RUN);
+                        third.atBats.push(_utils.Log.prototype.RUN);
                         third.stats.batting.r++;
                         game.pitcher.stats.pitching.ER++;
                         this.runScores();
@@ -2149,21 +2192,21 @@ Umpire.prototype = {
                     return true;
                 };
                 if (sacrificeAdvances) {
-                    canAdvance = function (position) {
+                    canAdvance = function canAdvance(position) {
                         switch (position) {
                             case 'first':
-                                return sacrificeAdvances.indexOf('first') > -1 && !game.field.second;
+                                return sacrificeAdvances.includes('first') && !game.field.second;
                             case 'second':
-                                return sacrificeAdvances.indexOf('second') > -1 && !game.field.third;
+                                return sacrificeAdvances.includes('second') && !game.field.third;
                             case 'third':
-                                return sacrificeAdvances.indexOf('third') > -1;
+                                return sacrificeAdvances.includes('third');
                         }
                     };
                 }
                 var arm = 0;
                 if (swing.fielder) {
                     var fielder = game.pitcher.team.positions[swing.fielder];
-                    if (['left', 'center', 'right'].indexOf(fielder.position) > -1) {
+                    if (['left', 'center', 'right'].includes(fielder.position)) {
                         arm = fielder.skill.defense.throwing;
                     } else {
                         arm = fielder.skill.defense.throwing + 120; // very rare extra bases on infield BIP
@@ -2174,7 +2217,7 @@ Umpire.prototype = {
                     this.runScores();
                     if (game.batter != third) {
                         game.batter.recordRBI();
-                        third.atBats.push(_Utility_utils.Log.prototype.RUN);
+                        third.atBats.push(_utils.Log.prototype.RUN);
                     }
                     game.batter.stats.batting.rbi++;
                     third.stats.batting.r++;
@@ -2189,7 +2232,7 @@ Umpire.prototype = {
                         this.runScores();
                         if (game.batter != second) {
                             game.batter.recordRBI();
-                            second.atBats.push(_Utility_utils.Log.prototype.RUN);
+                            second.atBats.push(_utils.Log.prototype.RUN);
                         }
                         game.field.third = null;
                     }
@@ -2208,8 +2251,8 @@ Umpire.prototype = {
     },
     runScores: function runScores() {
         var game = this.game;
-        game.scoreboard[game.half == 'top' ? 'away' : 'home'][game.inning]++;
-        game.tally[game.half == 'top' ? 'away' : 'home'].R++;
+        game.scoreboard[game.half === 'top' ? 'away' : 'home'][game.inning]++;
+        game.tally[game.half === 'top' ? 'away' : 'home'].R++;
     },
     newBatter: function newBatter() {
         var game = this.game;
@@ -2220,7 +2263,7 @@ Umpire.prototype = {
         };
         this.count.balls = this.count.strikes = 0;
         game.log.notePlateAppearanceResult(game);
-        var team = game.half == 'bottom' ? game.teams.home : game.teams.away;
+        var team = game.half === 'bottom' ? game.teams.home : game.teams.away;
         game.lastBatter = game.batter;
         game.batter = team.lineup[(team.nowBatting + 1) % 9];
         game.batter.ready = false;
@@ -2246,11 +2289,12 @@ Umpire.prototype = {
             e: [],
             n: []
         };
-        var offense, defense;
+        var offense = void 0,
+            defense = void 0;
         game.field.first = null;
         game.field.second = null;
         game.field.third = null;
-        if (game.half == 'top') {
+        if (game.half === 'top') {
             if (game.inning == 9 && game.tally.home.R > game.tally.away.R) {
                 return game.end();
             }
@@ -2262,10 +2306,10 @@ Umpire.prototype = {
             game.inning++;
             game.half = 'top';
         }
-        offense = game.half == 'top' ? 'away' : 'home';
-        defense = game.half == 'top' ? 'home' : 'away';
-        var n = game.inning + '回の' + (game.half == 'top' ? 'オモテ' : 'ウラ') + '、' + game.teams[game.half == 'top' ? 'away' : 'home'].getName() + 'の攻撃。',
-            e = (game.half == 'top' ? 'Top' : 'Bottom') + ' ' + game.inning;
+        offense = game.half === 'top' ? 'away' : 'home';
+        defense = game.half === 'top' ? 'home' : 'away';
+        var n = game.inning + '回の' + (game.half === 'top' ? 'オモテ' : 'ウラ') + '、' + game.teams[game.half === 'top' ? 'away' : 'home'].getName() + 'の攻撃。',
+            e = (game.half === 'top' ? 'Top' : 'Bottom') + ' ' + game.inning;
         game.log.note(e, n);
         var team = game.teams[offense];
         game.batter = team.lineup[team.nowBatting];
@@ -2279,7 +2323,8 @@ Umpire.prototype = {
         game.field.defense = team.positions;
         this.onSideChange();
     },
-    onSideChange: function onSideChange() {}, // can be bound externally
+    onSideChange: function onSideChange() {},
+    // can be bound externally
     says: 'Play ball!',
     game: null
 };
@@ -2289,72 +2334,70 @@ exports.Umpire = Umpire;
 },{"../Model/Player":5,"../Utility/_utils":35}],8:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Umpire = exports.Team = exports.Player = exports.Manager = exports.Game = exports.Field = exports.AtBat = undefined;
 
-var _ModelAtBat = require('../Model/AtBat');
+var _AtBat = require('../Model/AtBat');
 
-var _ModelField = require('../Model/Field');
+var _Field = require('../Model/Field');
 
-var _ModelGame = require('../Model/Game');
+var _Game = require('../Model/Game');
 
-var _ModelManager = require('../Model/Manager');
+var _Manager = require('../Model/Manager');
 
-var _ModelPlayer = require('../Model/Player');
+var _Player = require('../Model/Player');
 
-var _ModelTeam = require('../Model/Team');
+var _Team = require('../Model/Team');
 
-var _ModelUmpire = require('../Model/Umpire');
+var _Umpire = require('../Model/Umpire');
 
-exports.AtBat = _ModelAtBat.AtBat;
-exports.Field = _ModelField.Field;
-exports.Game = _ModelGame.Game;
-exports.Manager = _ModelManager.Manager;
-exports.Player = _ModelPlayer.Player;
-exports.Team = _ModelTeam.Team;
-exports.Umpire = _ModelUmpire.Umpire;
+exports.AtBat = _AtBat.AtBat;
+exports.Field = _Field.Field;
+exports.Game = _Game.Game;
+exports.Manager = _Manager.Manager;
+exports.Player = _Player.Player;
+exports.Team = _Team.Team;
+exports.Umpire = _Umpire.Umpire;
 
 },{"../Model/AtBat":1,"../Model/Field":2,"../Model/Game":3,"../Model/Manager":4,"../Model/Player":5,"../Model/Team":6,"../Model/Umpire":7}],9:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Loop = undefined;
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _Ball = require('./mesh/Ball');
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+var _Mound = require('./mesh/Mound');
 
-var _meshBall = require('./mesh/Ball');
+var _Base = require('./mesh/Base');
 
-var _meshMound = require('./mesh/Mound');
+var _FoulLine = require('./mesh/FoulLine');
 
-var _meshBase = require('./mesh/Base');
+var _FoulPole = require('./mesh/FoulPole');
 
-var _meshFoulLine = require('./mesh/FoulLine');
+var _Field = require('./mesh/Field');
 
-var _meshFoulPole = require('./mesh/FoulPole');
+var _Grass = require('./mesh/Grass');
 
-var _meshField = require('./mesh/Field');
+var _BaseDirt = require('./mesh/BaseDirt');
 
-var _meshGrass = require('./mesh/Grass');
+var _BattersEye = require('./mesh/BattersEye');
 
-var _meshBaseDirt = require('./mesh/BaseDirt');
+var _Wall = require('./mesh/Wall');
 
-var _meshBattersEye = require('./mesh/BattersEye');
+var _Sky = require('./mesh/Sky');
 
-var _meshWall = require('./mesh/Wall');
+var _Sun = require('./mesh/Sun');
 
-var _meshSky = require('./mesh/Sky');
+var _lighting = require('./scene/lighting');
 
-var _meshSun = require('./mesh/Sun');
+var _SkyShader = require('./Shaders/SkyShader');
 
-var _sceneLighting = require('./scene/lighting');
-
-var _ShadersSkyShader = require('./Shaders/SkyShader');
-
-var _ServicesAnimator = require('../Services/Animator');
+var _Animator = require('../Services/Animator');
 
 /**
  * the constants should be tuned so that the camera coincides with the DOM's strike zone overlay
@@ -2372,11 +2415,11 @@ if (typeof THREE !== 'undefined') {
  * manager for the rendering loop
  */
 
-var Loop = (function () {
+var Loop = function () {
     function Loop(elementClass, background) {
-        _classCallCheck(this, Loop);
+        babelHelpers.classCallCheck(this, Loop);
 
-        (0, _ShadersSkyShader.loadSkyShader)();
+        (0, _SkyShader.loadSkyShader)();
         this.elementClass = elementClass;
         window.loop = this;
         this.timeOfDay = {
@@ -2390,7 +2433,8 @@ var Loop = (function () {
      * individual objects<AbstractMesh> can attach and detach to the manager to be rendered
      */
 
-    _createClass(Loop, [{
+
+    babelHelpers.createClass(Loop, [{
         key: 'loop',
         value: function loop() {
             requestAnimationFrame(this.loop.bind(this));
@@ -2411,6 +2455,7 @@ var Loop = (function () {
         /**
          * initialize lights, camera, action
          */
+
     }, {
         key: 'main',
         value: function main(background) {
@@ -2419,17 +2464,17 @@ var Loop = (function () {
 
             if (this.getThree()) {
 
-                var THREE = this.THREE;
+                var _THREE = this.THREE;
 
-                var scene = this.scene = new THREE.Scene();
-                scene.fog = new THREE.FogExp2(0x838888, 0.002);
+                var scene = this.scene = new _THREE.Scene();
+                scene.fog = new _THREE.FogExp2(0x838888, 0.002);
                 if (this.attach()) {
-                    this.lighting = _sceneLighting.lighting;
-                    _sceneLighting.lighting.addTo(scene);
-                    var camera = this.camera = new THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 1000000);
+                    this.lighting = _lighting.lighting;
+                    _lighting.lighting.addTo(scene);
+                    var camera = this.camera = new _THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 1000000);
 
-                    this.target = new THREE.Vector3(0, 0, -60.5);
-                    this._target = new THREE.Vector3(0, 0, -60.5);
+                    this.target = new _THREE.Vector3(0, 0, -60.5);
+                    this._target = new _THREE.Vector3(0, 0, -60.5);
                     this.moveTarget = camera.position;
 
                     this.resetCamera();
@@ -2448,6 +2493,7 @@ var Loop = (function () {
         /**
          * @param addition
          */
+
     }, {
         key: 'addMinutes',
         value: function addMinutes(addition) {
@@ -2467,6 +2513,7 @@ var Loop = (function () {
          * @param minutes
          * gradual transition
          */
+
     }, {
         key: 'setTargetTimeOfDay',
         value: function setTargetTimeOfDay(hours, minutes) {
@@ -2480,7 +2527,7 @@ var Loop = (function () {
             if (sun) {
                 sun.setTargetTime(hours, minutes);
             } else {
-                setTimeout(function (x) {
+                setTimeout(function () {
                     _this.setTargetTimeOfDay(hours, minutes);
                 }, 500);
             }
@@ -2491,6 +2538,7 @@ var Loop = (function () {
          * @param minutes {Number} 0-60
          * instant transition
          */
+
     }, {
         key: 'setTimeOfDay',
         value: function setTimeOfDay(hours, minutes) {
@@ -2520,22 +2568,23 @@ var Loop = (function () {
             sun.time.m = minutes;
             sun.derivePosition(sky);
             var luminosity = (-0.5 + Math.max(Math.abs(1.25 - azimuth), Math.abs(0.25 - azimuth))) * 2;
-            _ServicesAnimator.Animator.setLuminosity(0.1 + luminosity / 1.4);
+            _Animator.Animator.setLuminosity(0.1 + luminosity / 1.4);
         }
 
         /**
          * used by the background layer
          */
+
     }, {
         key: 'addStaticMeshes',
         value: function addStaticMeshes() {
-            new _meshField.Field().join(this);
-            new _meshMound.Mound().join(this);
-            new _meshGrass.Grass().join(this);
-            new _meshGrass.Grass(this, true);
-            new _meshBattersEye.BattersEye().join(this);
-            var sun = new _meshSun.Sun(),
-                sky = new _meshSky.Sky();
+            new _Field.Field().join(this);
+            new _Mound.Mound().join(this);
+            new _Grass.Grass().join(this);
+            new _Grass.Grass(this, true);
+            new _BattersEye.BattersEye().join(this);
+            var sun = new _Sun.Sun(),
+                sky = new _Sky.Sky();
             sun.derivePosition(sky);
             sky.join(this);
             sun.join(this);
@@ -2543,31 +2592,32 @@ var Loop = (function () {
             this.sky = sky;
             this.sun = sun;
 
-            new _meshWall.Wall(this, -34);
-            new _meshWall.Wall(this, -15);
-            new _meshWall.Wall(this, 15);
-            new _meshWall.Wall(this, 34);
+            new _Wall.Wall(this, -34);
+            new _Wall.Wall(this, -15);
+            new _Wall.Wall(this, 15);
+            new _Wall.Wall(this, 34);
 
-            var b1 = new _meshBase.Base(this, 'first');
-            var b2 = new _meshBase.Base(this, 'second');
-            var b3 = new _meshBase.Base(this, 'third');
-            var b4 = new _meshBase.Base(this, 'home');
+            var b1 = new _Base.Base(this, 'first');
+            var b2 = new _Base.Base(this, 'second');
+            var b3 = new _Base.Base(this, 'third');
+            var b4 = new _Base.Base(this, 'home');
 
-            new _meshBaseDirt.BaseDirt(this, b1);
-            new _meshBaseDirt.BaseDirt(this, b2);
-            new _meshBaseDirt.BaseDirt(this, b3);
-            new _meshBaseDirt.BaseDirt(this, b4);
+            new _BaseDirt.BaseDirt(this, b1);
+            new _BaseDirt.BaseDirt(this, b2);
+            new _BaseDirt.BaseDirt(this, b3);
+            new _BaseDirt.BaseDirt(this, b4);
 
-            new _meshFoulLine.FoulLine(this, 'left');
-            new _meshFoulLine.FoulLine(this, 'right');
+            new _FoulLine.FoulLine(this, 'left');
+            new _FoulLine.FoulLine(this, 'right');
 
-            new _meshFoulPole.FoulPole(this, 'left');
-            new _meshFoulPole.FoulPole(this, 'right');
+            new _FoulPole.FoulPole(this, 'left');
+            new _FoulPole.FoulPole(this, 'right');
         }
 
         /**
          * experimental camera bobbing
          */
+
     }, {
         key: 'breathe',
         value: function breathe() {
@@ -2588,7 +2638,7 @@ var Loop = (function () {
     }, {
         key: 'getThree',
         value: function getThree() {
-            if (this.THREE === Loop.prototype.THREE && typeof window === 'object' && window.THREE) {
+            if (this.THREE === Loop.prototype.THREE && (typeof window === 'undefined' ? 'undefined' : babelHelpers.typeof(window)) === 'object' && window.THREE) {
                 return this.THREE = window.THREE;
             }
             return true;
@@ -2598,6 +2648,7 @@ var Loop = (function () {
          * attach to the DOM
          * @returns {THREE.WebGLRenderer|Boolean}
          */
+
     }, {
         key: 'attach',
         value: function attach() {
@@ -2606,8 +2657,8 @@ var Loop = (function () {
             var element = document.getElementsByClassName(this.elementClass)[0];
             if (element) {
                 element.innerHTML = '';
-                var THREE = this.THREE;
-                var renderer = new THREE.WebGLRenderer({ alpha: true });
+                var _THREE2 = this.THREE;
+                var renderer = new _THREE2.WebGLRenderer({ alpha: true });
                 this.setSize(renderer);
                 //renderer.setClearColor(0xffffff, 0);
 
@@ -2622,6 +2673,7 @@ var Loop = (function () {
         /**
          * higher FOV on lower view widths
          */
+
     }, {
         key: 'onResize',
         value: function onResize() {
@@ -2649,6 +2701,7 @@ var Loop = (function () {
          * incrementally pan toward the vector given
          * @param vector
          */
+
     }, {
         key: 'panToward',
         value: function panToward(vector) {
@@ -2668,6 +2721,7 @@ var Loop = (function () {
          * incrementally move the camera to the vector
          * @param vector
          */
+
     }, {
         key: 'moveToward',
         value: function moveToward(vector) {
@@ -2687,6 +2741,7 @@ var Loop = (function () {
          * @param vector
          * @param panSpeed
          */
+
     }, {
         key: 'setLookTarget',
         value: function setLookTarget(vector, panSpeed) {
@@ -2702,6 +2757,7 @@ var Loop = (function () {
          * @param vector
          * @param moveSpeed
          */
+
     }, {
         key: 'setMoveTarget',
         value: function setMoveTarget(vector, moveSpeed) {
@@ -2733,7 +2789,7 @@ var Loop = (function () {
     }, {
         key: 'moveCamera',
         value: function moveCamera(x, y, z) {
-            if (typeof x === 'object') {
+            if ((typeof x === 'undefined' ? 'undefined' : babelHelpers.typeof(x)) === 'object') {
                 return this.moveCamera(x.x, x.y, x.z);
             }
             this.forAllLoops(function (loop) {
@@ -2747,6 +2803,7 @@ var Loop = (function () {
          * execute the function on all loops
          * @param fn {Function}
          */
+
     }, {
         key: 'forAllLoops',
         value: function forAllLoops(fn) {
@@ -2761,8 +2818,8 @@ var Loop = (function () {
     }, {
         key: 'test',
         value: function test() {
-            var ball = new _meshBall.Ball();
-            window.Ball = _meshBall.Ball;
+            var ball = new _Ball.Ball();
+            window.Ball = _Ball.Ball;
             window.ball = ball;
             ball.setType('4-seam');
             //with (ball.mesh.rotation) {x=0,y=0,z=0}; ball.rotation = {x:0.00, y:0.00};
@@ -2775,8 +2832,8 @@ var Loop = (function () {
     }, {
         key: 'testTrajectory',
         value: function testTrajectory(data) {
-            var ball = new _meshBall.Ball();
-            window.Ball = _meshBall.Ball;
+            var ball = new _Ball.Ball();
+            window.Ball = _Ball.Ball;
             window.ball = ball;
             ball.deriveTrajectory(data || {
                 splay: -35,
@@ -2790,102 +2847,28 @@ var Loop = (function () {
             ball.join(this);
         }
     }]);
-
     return Loop;
-})();
+}();
 
 var HEIGHT = 700;
 Loop.VERTICAL_CORRECTION = VERTICAL_CORRECTION;
 Loop.INITIAL_CAMERA_DISTANCE = INITIAL_CAMERA_DISTANCE;
 Loop.prototype.THREE = {};
 Loop.prototype.constructors = {
-    Ball: _meshBall.Ball,
-    Mound: _meshMound.Mound,
-    Field: _meshField.Field
+    Ball: _Ball.Ball,
+    Mound: _Mound.Mound,
+    Field: _Field.Field
 };
 
 exports.Loop = Loop;
 
-},{"../Services/Animator":26,"./Shaders/SkyShader":10,"./mesh/Ball":12,"./mesh/Base":13,"./mesh/BaseDirt":14,"./mesh/BattersEye":15,"./mesh/Field":16,"./mesh/FoulLine":17,"./mesh/FoulPole":18,"./mesh/Grass":19,"./mesh/Mound":21,"./mesh/Sky":22,"./mesh/Sun":23,"./mesh/Wall":24,"./scene/lighting":25}],10:[function(require,module,exports){
-/**
- * @author zz85 / https://github.com/zz85
- *
- * Based on "A Practical Analytic Model for Daylight"
- * aka The Preetham Model, the de facto standard analytic skydome model
- * http://www.cs.utah.edu/~shirley/papers/sunsky/sunsky.pdf
- *
- * First implemented by Simon Wallner
- * http://www.simonwallner.at/projects/atmospheric-scattering
- *
- * Improved by Martin Upitis
- * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
- *
- * Three.js integration by zz85 http://twitter.com/blurspline
- */
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-            value: true
-});
-var loadSkyShader = function loadSkyShader() {
-            THREE.ShaderLib['sky'] = {
-
-                        uniforms: {
-                                    luminance: { type: "f", value: 1 },
-                                    turbidity: { type: "f", value: 2 },
-                                    reileigh: { type: "f", value: 1 },
-                                    mieCoefficient: { type: "f", value: 0.005 },
-                                    mieDirectionalG: { type: "f", value: 0.8 },
-                                    sunPosition: { type: "v3", value: new THREE.Vector3() }
-                        },
-
-                        vertexShader: ["varying vec3 vWorldPosition;", "void main() {", "vec4 worldPosition = modelMatrix * vec4( position, 1.0 );", "vWorldPosition = worldPosition.xyz;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
-
-                        fragmentShader: ["uniform sampler2D skySampler;", "uniform vec3 sunPosition;", "varying vec3 vWorldPosition;", "vec3 cameraPos = vec3(0., 0., 0.);", "// uniform sampler2D sDiffuse;", "// const float turbidity = 10.0; //", "// const float reileigh = 2.; //", "// const float luminance = 1.0; //", "// const float mieCoefficient = 0.005;", "// const float mieDirectionalG = 0.8;", "uniform float luminance;", "uniform float turbidity;", "uniform float reileigh;", "uniform float mieCoefficient;", "uniform float mieDirectionalG;", "// constants for atmospheric scattering", "const float e = 2.71828182845904523536028747135266249775724709369995957;", "const float pi = 3.141592653589793238462643383279502884197169;", "const float n = 1.0003; // refractive index of air", "const float N = 2.545E25; // number of molecules per unit volume for air at", "// 288.15K and 1013mb (sea level -45 celsius)", "const float pn = 0.035;	// depolatization factor for standard air", "// wavelength of used primaries, according to preetham", "const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);", "// mie stuff", "// K coefficient for the primaries", "const vec3 K = vec3(0.686, 0.678, 0.666);", "const float v = 4.0;", "// optical length at zenith for molecules", "const float rayleighZenithLength = 8.4E3;", "const float mieZenithLength = 1.25E3;", "const vec3 up = vec3(0.0, 1.0, 0.0);", "const float EE = 1000.0;", "const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;", "// 66 arc seconds -> degrees, and the cosine of that", "// earth shadow hack", "const float cutoffAngle = pi/1.95;", "const float steepness = 1.5;", "vec3 totalRayleigh(vec3 lambda)", "{", "return (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn));", "}",
-
-                        // see http://blenderartists.org/forum/showthread.php?321110-Shaders-and-Skybox-madness
-                        "// A simplied version of the total Reayleigh scattering to works on browsers that use ANGLE", "vec3 simplifiedRayleigh()", "{", "return 0.0005 / vec3(94, 40, 18);",
-                        // return 0.00054532832366 / (3.0 * 2.545E25 * pow(vec3(680E-9, 550E-9, 450E-9), vec3(4.0)) * 6.245);
-                        "}", "float rayleighPhase(float cosTheta)", "{	 ", "return (3.0 / (16.0*pi)) * (1.0 + pow(cosTheta, 2.0));", "//	return (1.0 / (3.0*pi)) * (1.0 + pow(cosTheta, 2.0));", "//	return (3.0 / 4.0) * (1.0 + pow(cosTheta, 2.0));", "}", "vec3 totalMie(vec3 lambda, vec3 K, float T)", "{", "float c = (0.2 * T ) * 10E-18;", "return 0.434 * c * pi * pow((2.0 * pi) / lambda, vec3(v - 2.0)) * K;", "}", "float hgPhase(float cosTheta, float g)", "{", "return (1.0 / (4.0*pi)) * ((1.0 - pow(g, 2.0)) / pow(1.0 - 2.0*g*cosTheta + pow(g, 2.0), 1.5));", "}", "float sunIntensity(float zenithAngleCos)", "{", "return EE * max(0.0, 1.0 - exp(-((cutoffAngle - acos(zenithAngleCos))/steepness)));", "}", "// float logLuminance(vec3 c)", "// {", "// 	return log(c.r * 0.2126 + c.g * 0.7152 + c.b * 0.0722);", "// }", "// Filmic ToneMapping http://filmicgames.com/archives/75", "float A = 0.15;", "float B = 0.50;", "float C = 0.10;", "float D = 0.20;", "float E = 0.02;", "float F = 0.30;", "float W = 1000.0;", "vec3 Uncharted2Tonemap(vec3 x)", "{", "return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;", "}", "void main() ", "{", "float sunfade = 1.0-clamp(1.0-exp((sunPosition.y/450000.0)),0.0,1.0);", "// luminance =  1.0 ;// vWorldPosition.y / 450000. + 0.5; //sunPosition.y / 450000. * 1. + 0.5;", "// gl_FragColor = vec4(sunfade, sunfade, sunfade, 1.0);", "float reileighCoefficient = reileigh - (1.0* (1.0-sunfade));", "vec3 sunDirection = normalize(sunPosition);", "float sunE = sunIntensity(dot(sunDirection, up));", "// extinction (absorbtion + out scattering) ", "// rayleigh coefficients",
-
-                        // "vec3 betaR = totalRayleigh(lambda) * reileighCoefficient;",
-                        "vec3 betaR = simplifiedRayleigh() * reileighCoefficient;", "// mie coefficients", "vec3 betaM = totalMie(lambda, K, turbidity) * mieCoefficient;", "// optical length", "// cutoff angle at 90 to avoid singularity in next formula.", "float zenithAngle = acos(max(0.0, dot(up, normalize(vWorldPosition - cameraPos))));", "float sR = rayleighZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));", "float sM = mieZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));", "// combined extinction factor	", "vec3 Fex = exp(-(betaR * sR + betaM * sM));", "// in scattering", "float cosTheta = dot(normalize(vWorldPosition - cameraPos), sunDirection);", "float rPhase = rayleighPhase(cosTheta*0.5+0.5);", "vec3 betaRTheta = betaR * rPhase;", "float mPhase = hgPhase(cosTheta, mieDirectionalG);", "vec3 betaMTheta = betaM * mPhase;", "vec3 Lin = pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * (1.0 - Fex),vec3(1.5));", "Lin *= mix(vec3(1.0),pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * Fex,vec3(1.0/2.0)),clamp(pow(1.0-dot(up, sunDirection),5.0),0.0,1.0));", "//nightsky", "vec3 direction = normalize(vWorldPosition - cameraPos);", "float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]", "float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]", "vec2 uv = vec2(phi, theta) / vec2(2.0*pi, pi) + vec2(0.5, 0.0);", "// vec3 L0 = texture2D(skySampler, uv).rgb+0.1 * Fex;", "vec3 L0 = vec3(0.1) * Fex;", "// composition + solar disc", "//if (cosTheta > sunAngularDiameterCos)", "float sundisk = smoothstep(sunAngularDiameterCos,sunAngularDiameterCos+0.00002,cosTheta);", "// if (normalize(vWorldPosition - cameraPos).y>0.0)", "L0 += (sunE * 19000.0 * Fex)*sundisk;", "vec3 whiteScale = 1.0/Uncharted2Tonemap(vec3(W));", "vec3 texColor = (Lin+L0);   ", "texColor *= 0.04 ;", "texColor += vec3(0.0,0.001,0.0025)*0.3;", "float g_fMaxLuminance = 1.0;", "float fLumScaled = 0.1 / luminance;     ", "float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (g_fMaxLuminance * g_fMaxLuminance)))) / (1.0 + fLumScaled); ", "float ExposureBias = fLumCompressed;", "vec3 curr = Uncharted2Tonemap((log2(2.0/pow(luminance,4.0)))*texColor);", "vec3 color = curr*whiteScale;", "vec3 retColor = pow(color,vec3(1.0/(1.2+(1.2*sunfade))));", "gl_FragColor.rgb = retColor;", "gl_FragColor.a = 1.0;", "}"].join("\n")
-            };
-
-            THREE.Sky = function () {
-
-                        var skyShader = THREE.ShaderLib["sky"];
-                        var skyUniforms = THREE.UniformsUtils.clone(skyShader.uniforms);
-
-                        var skyMat = new THREE.ShaderMaterial({
-                                    fragmentShader: skyShader.fragmentShader,
-                                    vertexShader: skyShader.vertexShader,
-                                    uniforms: skyUniforms,
-                                    side: THREE.BackSide
-                        });
-
-                        var skyGeo = new THREE.SphereBufferGeometry(450000, 32, 15);
-                        var skyMesh = new THREE.Mesh(skyGeo, skyMat);
-
-                        // Expose variables
-                        this.mesh = skyMesh;
-                        this.uniforms = skyUniforms;
-            };
-};
-
-exports.loadSkyShader = loadSkyShader;
-
-},{}],11:[function(require,module,exports){
+},{"../Services/Animator":26,"./Shaders/SkyShader":24,"./mesh/Ball":11,"./mesh/Base":12,"./mesh/BaseDirt":13,"./mesh/BattersEye":14,"./mesh/Field":15,"./mesh/FoulLine":16,"./mesh/FoulPole":17,"./mesh/Grass":18,"./mesh/Mound":20,"./mesh/Sky":21,"./mesh/Sun":22,"./mesh/Wall":23,"./scene/lighting":25}],10:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+exports.AbstractMesh = undefined;
 
 var _Loop = require('../Loop');
 
@@ -2901,18 +2884,12 @@ var _Loop = require('../Loop');
  * For static meshes the animate method will do nothing, leaving the mesh permanently attached.
  */
 
-var AbstractMesh = (function () {
+var AbstractMesh = function () {
     function AbstractMesh() {
-        _classCallCheck(this, AbstractMesh);
+        babelHelpers.classCallCheck(this, AbstractMesh);
     }
 
-    /**
-     * since we are using (0, 0, 0) vector for the center of the strike zone, the actual ground level will be offset
-     * downward
-     * @type {number}
-     */
-
-    _createClass(AbstractMesh, [{
+    babelHelpers.createClass(AbstractMesh, [{
         key: 'attach',
 
         /**
@@ -2948,38 +2925,37 @@ var AbstractMesh = (function () {
         key: 'animate',
         value: function animate() {}
     }]);
-
     return AbstractMesh;
-})();
+}();
+
+/**
+ * since we are using (0, 0, 0) vector for the center of the strike zone, the actual ground level will be offset
+ * downward
+ * @type {number}
+ */
+
 
 AbstractMesh.WORLD_BASE_Y = -4;
 
 exports.AbstractMesh = AbstractMesh;
 
-},{"../Loop":9}],12:[function(require,module,exports){
+},{"../Loop":9}],11:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.Ball = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var _ServicesMathinator = require('../../Services/Mathinator');
+var _Mathinator = require('../../Services/Mathinator');
 
 var _Indicator = require('./Indicator');
 
-var _UtilityHelper = require('../../Utility/helper');
+var _helper = require('../../Utility/helper');
 
 /**
  * on the DOM the pitch zone is 200x200 pixels
@@ -2991,8 +2967,8 @@ var SCALE = 2.1 / 100;
 
 var INDICATOR_DEPTH = -5;
 
-var Ball = (function (_AbstractMesh) {
-    _inherits(Ball, _AbstractMesh);
+var Ball = function (_AbstractMesh) {
+    babelHelpers.inherits(Ball, _AbstractMesh);
 
     /**
      *
@@ -3002,24 +2978,26 @@ var Ball = (function (_AbstractMesh) {
      */
 
     function Ball(loop, trajectory) {
-        _classCallCheck(this, Ball);
+        babelHelpers.classCallCheck(this, Ball);
 
-        _get(Object.getPrototypeOf(Ball.prototype), 'constructor', this).call(this);
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Ball).call(this));
+
         if (!(loop instanceof _Loop.Loop) && loop instanceof Array) {
             trajectory = loop;
         }
-        this.hasIndicator = false;
-        this.trajectory = trajectory ? trajectory : [];
-        this.breakingTrajectory = [];
-        this.getMesh();
+        _this.hasIndicator = false;
+        _this.trajectory = trajectory ? trajectory : [];
+        _this.breakingTrajectory = [];
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
-        this.setType('4-seam', 1);
-        this.bounce = 1;
+        _this.setType('4-seam', 1);
+        _this.bounce = 1;
+        return _this;
     }
 
-    _createClass(Ball, [{
+    babelHelpers.createClass(Ball, [{
         key: 'getMesh',
         value: function getMesh() {
             /** @see threex.sportballs */
@@ -3042,6 +3020,7 @@ var Ball = (function (_AbstractMesh) {
          * Leave an indicator when crossing the home plate front plane,
          * and rotate while moving (default 1000 RPM)
          */
+
     }, {
         key: 'animate',
         value: function animate() {
@@ -3070,8 +3049,8 @@ var Ball = (function (_AbstractMesh) {
     }, {
         key: 'setType',
         value: function setType(type, handednessScalar) {
-            var rpm = _UtilityHelper.helper.pitchDefinitions[type][4];
-            var rotationAngle = _UtilityHelper.helper.pitchDefinitions[type][3];
+            var rpm = _helper.helper.pitchDefinitions[type][4];
+            var rotationAngle = _helper.helper.pitchDefinitions[type][3];
             this.setRotation(rpm, rotationAngle * (handednessScalar || 1));
         }
     }, {
@@ -3135,7 +3114,7 @@ var Ball = (function (_AbstractMesh) {
                 left = game.pitchTarget.x,
                 breakTop = 200 - game.pitchInFlight.y,
                 breakLeft = game.pitchInFlight.x,
-                flightTime = _ServicesMathinator.Mathinator.getFlightTime(game.pitchInFlight.velocity, _UtilityHelper.helper.pitchDefinitions[game.pitchInFlight.name][2]);
+                flightTime = _Mathinator.Mathinator.getFlightTime(game.pitchInFlight.velocity, _helper.helper.pitchDefinitions[game.pitchInFlight.name][2]);
 
             var scale = SCALE;
             var origin = {
@@ -3166,11 +3145,11 @@ var Ball = (function (_AbstractMesh) {
                 x: origin.x, y: origin.y, z: origin.z
             };
 
-            var frames = [],
-                breakingFrames = [],
-                frameCount = flightTime * 60 | 0,
-                counter = frameCount * 1.08 | 0,
-                frame = 0;
+            var frames = [];
+            var breakingFrames = [];
+            var frameCount = flightTime * 60 | 0;
+            var counter = frameCount * 1.08 | 0;
+            var frame = 0;
 
             var xBreak = breakingTerminus.x - terminus.x,
                 yBreak = breakingTerminus.y - terminus.y;
@@ -3246,11 +3225,11 @@ var Ball = (function (_AbstractMesh) {
                 airTime: 0.96
             };
 
-            var flyAngle = result.flyAngle,
-                distance = Math.abs(result.travelDistance),
-                scalar = result.travelDistance < 0 ? -1 : 1,
-                flightScalar = flyAngle < 7 ? -1 : 1,
-                splay = result.splay; // 0 is up the middle
+            var flyAngle = result.flyAngle;
+            var distance = Math.abs(result.travelDistance);
+            var scalar = result.travelDistance < 0 ? -1 : 1;
+            var flightScalar = flyAngle < 7 ? -1 : 1;
+            var splay = result.splay;
 
             if (flightScalar < 0 && result.travelDistance > 0) {
                 distance = Math.max(90, distance);
@@ -3261,7 +3240,7 @@ var Ball = (function (_AbstractMesh) {
 
             // velocity in m/s, I think
             var velocity = dragScalarApproximation.distance * Math.sqrt(9.81 * distance / Math.sin(2 * Math.PI * flyAngle / 180));
-            var velocityVerticalComponent = Math.sin(_ServicesMathinator.Mathinator.RADIAN * flyAngle) * velocity;
+            var velocityVerticalComponent = Math.sin(_Mathinator.Mathinator.RADIAN * flyAngle) * velocity;
             // in feet
             var apexHeight = velocityVerticalComponent * velocityVerticalComponent / (2 * 9.81) * dragScalarApproximation.apexHeight;
             // in seconds
@@ -3287,10 +3266,10 @@ var Ball = (function (_AbstractMesh) {
                 z: -Math.cos(splay / 180 * Math.PI) * distance
             };
 
-            var frames = [],
-                frameCount = airTime * 60 | 0,
-                counter = frameCount,
-                frame = 0;
+            var frames = [];
+            var frameCount = airTime * 60 | 0;
+            var counter = frameCount;
+            var frame = 0;
 
             var lastHeight = 0;
 
@@ -3318,9 +3297,8 @@ var Ball = (function (_AbstractMesh) {
             return frames;
         }
     }]);
-
     return Ball;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 Ball.prototype.DEFAULT_RPM = 1000;
 Ball.prototype.RPM = 1000;
@@ -3333,40 +3311,35 @@ Ball.prototype.rotation = {
 
 exports.Ball = Ball;
 
-},{"../../Services/Mathinator":29,"../../Utility/helper":37,"../Loop":9,"./AbstractMesh":11,"./Indicator":20}],13:[function(require,module,exports){
+},{"../../Services/Mathinator":29,"../../Utility/helper":37,"../Loop":9,"./AbstractMesh":10,"./Indicator":19}],12:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.Base = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Base = (function (_AbstractMesh) {
-    _inherits(Base, _AbstractMesh);
+var Base = function (_AbstractMesh) {
+    babelHelpers.inherits(Base, _AbstractMesh);
 
     function Base(loop, base) {
-        _classCallCheck(this, Base);
+        babelHelpers.classCallCheck(this, Base);
 
-        _get(Object.getPrototypeOf(Base.prototype), 'constructor', this).call(this);
-        this.base = base;
-        this.getMesh();
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Base).call(this));
+
+        _this.base = base;
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
+        return _this;
     }
 
-    _createClass(Base, [{
+    babelHelpers.createClass(Base, [{
         key: 'getMesh',
         value: function getMesh() {
             var material = new THREE.MeshLambertMaterial({
@@ -3408,46 +3381,40 @@ var Base = (function (_AbstractMesh) {
         key: 'animate',
         value: function animate() {}
     }]);
-
     return Base;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Base = Base;
 
-},{"../Loop":9,"./AbstractMesh":11}],14:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],13:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.BaseDirt = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var BaseDirt = (function (_AbstractMesh) {
-    _inherits(BaseDirt, _AbstractMesh);
+var BaseDirt = function (_AbstractMesh) {
+    babelHelpers.inherits(BaseDirt, _AbstractMesh);
 
     function BaseDirt(loop, base) {
-        _classCallCheck(this, BaseDirt);
+        babelHelpers.classCallCheck(this, BaseDirt);
 
-        _get(Object.getPrototypeOf(BaseDirt.prototype), 'constructor', this).call(this);
-        this.base = base;
-        this.getMesh();
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BaseDirt).call(this));
+
+        _this.base = base;
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
+        return _this;
     }
 
-    _createClass(BaseDirt, [{
+    babelHelpers.createClass(BaseDirt, [{
         key: 'getMesh',
         value: function getMesh() {
             var material = new THREE.MeshLambertMaterial({
@@ -3474,45 +3441,39 @@ var BaseDirt = (function (_AbstractMesh) {
         key: 'animate',
         value: function animate() {}
     }]);
-
     return BaseDirt;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.BaseDirt = BaseDirt;
 
-},{"../Loop":9,"./AbstractMesh":11}],15:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],14:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.BattersEye = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var BattersEye = (function (_AbstractMesh) {
-    _inherits(BattersEye, _AbstractMesh);
+var BattersEye = function (_AbstractMesh) {
+    babelHelpers.inherits(BattersEye, _AbstractMesh);
 
     function BattersEye(loop) {
-        _classCallCheck(this, BattersEye);
+        babelHelpers.classCallCheck(this, BattersEye);
 
-        _get(Object.getPrototypeOf(BattersEye.prototype), 'constructor', this).call(this);
-        this.getMesh();
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BattersEye).call(this));
+
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
+        return _this;
     }
 
-    _createClass(BattersEye, [{
+    babelHelpers.createClass(BattersEye, [{
         key: 'getMesh',
         value: function getMesh() {
             var material = new THREE.MeshLambertMaterial({
@@ -3531,45 +3492,39 @@ var BattersEye = (function (_AbstractMesh) {
         key: 'animate',
         value: function animate() {}
     }]);
-
     return BattersEye;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.BattersEye = BattersEye;
 
-},{"../Loop":9,"./AbstractMesh":11}],16:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],15:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.Field = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Field = (function (_AbstractMesh) {
-    _inherits(Field, _AbstractMesh);
+var Field = function (_AbstractMesh) {
+    babelHelpers.inherits(Field, _AbstractMesh);
 
     function Field(loop) {
-        _classCallCheck(this, Field);
+        babelHelpers.classCallCheck(this, Field);
 
-        _get(Object.getPrototypeOf(Field.prototype), 'constructor', this).call(this);
-        this.getMesh();
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Field).call(this));
+
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
+        return _this;
     }
 
-    _createClass(Field, [{
+    babelHelpers.createClass(Field, [{
         key: 'getMesh',
         value: function getMesh() {
             var material = new THREE.MeshLambertMaterial({
@@ -3593,46 +3548,40 @@ var Field = (function (_AbstractMesh) {
         key: 'animate',
         value: function animate() {}
     }]);
-
     return Field;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Field = Field;
 
-},{"../Loop":9,"./AbstractMesh":11}],17:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],16:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.FoulLine = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var FoulLine = (function (_AbstractMesh) {
-    _inherits(FoulLine, _AbstractMesh);
+var FoulLine = function (_AbstractMesh) {
+    babelHelpers.inherits(FoulLine, _AbstractMesh);
 
     function FoulLine(loop, side) {
-        _classCallCheck(this, FoulLine);
+        babelHelpers.classCallCheck(this, FoulLine);
 
-        _get(Object.getPrototypeOf(FoulLine.prototype), 'constructor', this).call(this);
-        this.side = side;
-        this.getMesh();
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(FoulLine).call(this));
+
+        _this.side = side;
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
+        return _this;
     }
 
-    _createClass(FoulLine, [{
+    babelHelpers.createClass(FoulLine, [{
         key: 'getMesh',
         value: function getMesh() {
             var material = new THREE.MeshLambertMaterial({
@@ -3664,46 +3613,40 @@ var FoulLine = (function (_AbstractMesh) {
         key: 'animate',
         value: function animate() {}
     }]);
-
     return FoulLine;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.FoulLine = FoulLine;
 
-},{"../Loop":9,"./AbstractMesh":11}],18:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],17:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.FoulPole = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var FoulPole = (function (_AbstractMesh) {
-    _inherits(FoulPole, _AbstractMesh);
+var FoulPole = function (_AbstractMesh) {
+    babelHelpers.inherits(FoulPole, _AbstractMesh);
 
     function FoulPole(loop, side) {
-        _classCallCheck(this, FoulPole);
+        babelHelpers.classCallCheck(this, FoulPole);
 
-        _get(Object.getPrototypeOf(FoulPole.prototype), 'constructor', this).call(this);
-        this.side = side;
-        this.getMesh();
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(FoulPole).call(this));
+
+        _this.side = side;
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
+        return _this;
     }
 
-    _createClass(FoulPole, [{
+    babelHelpers.createClass(FoulPole, [{
         key: 'getMesh',
         value: function getMesh() {
             var material = new THREE.MeshLambertMaterial({
@@ -3730,46 +3673,40 @@ var FoulPole = (function (_AbstractMesh) {
         key: 'animate',
         value: function animate() {}
     }]);
-
     return FoulPole;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.FoulPole = FoulPole;
 
-},{"../Loop":9,"./AbstractMesh":11}],19:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],18:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.Grass = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Grass = (function (_AbstractMesh) {
-    _inherits(Grass, _AbstractMesh);
+var Grass = function (_AbstractMesh) {
+    babelHelpers.inherits(Grass, _AbstractMesh);
 
     function Grass(loop, infield) {
-        _classCallCheck(this, Grass);
+        babelHelpers.classCallCheck(this, Grass);
 
-        _get(Object.getPrototypeOf(Grass.prototype), 'constructor', this).call(this);
-        this.infield = infield;
-        this.getMesh();
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Grass).call(this));
+
+        _this.infield = infield;
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
+        return _this;
     }
 
-    _createClass(Grass, [{
+    babelHelpers.createClass(Grass, [{
         key: 'getMesh',
         value: function getMesh() {
             var material = new THREE.MeshLambertMaterial({
@@ -3803,50 +3740,44 @@ var Grass = (function (_AbstractMesh) {
         key: 'animate',
         value: function animate() {}
     }]);
-
     return Grass;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Grass = Grass;
 
-},{"../Loop":9,"./AbstractMesh":11}],20:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],19:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.Indicator = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Indicator = (function (_AbstractMesh) {
-    _inherits(Indicator, _AbstractMesh);
+var Indicator = function (_AbstractMesh) {
+    babelHelpers.inherits(Indicator, _AbstractMesh);
 
     function Indicator(loop) {
-        _classCallCheck(this, Indicator);
+        babelHelpers.classCallCheck(this, Indicator);
 
-        _get(Object.getPrototypeOf(Indicator.prototype), 'constructor', this).call(this);
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Indicator).call(this));
+
         var n = 60;
-        this.trajectory = [];
+        _this.trajectory = [];
         while (n--) {
-            this.trajectory.push(1);
+            _this.trajectory.push(1);
         }
-        this.getMesh();
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
+        return _this;
     }
 
-    _createClass(Indicator, [{
+    babelHelpers.createClass(Indicator, [{
         key: 'getMesh',
         value: function getMesh() {
             var THREE = window.THREE;
@@ -3867,45 +3798,39 @@ var Indicator = (function (_AbstractMesh) {
             }
         }
     }]);
-
     return Indicator;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Indicator = Indicator;
 
-},{"../Loop":9,"./AbstractMesh":11}],21:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],20:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.Mound = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Mound = (function (_AbstractMesh) {
-    _inherits(Mound, _AbstractMesh);
+var Mound = function (_AbstractMesh) {
+    babelHelpers.inherits(Mound, _AbstractMesh);
 
     function Mound(loop) {
-        _classCallCheck(this, Mound);
+        babelHelpers.classCallCheck(this, Mound);
 
-        _get(Object.getPrototypeOf(Mound.prototype), 'constructor', this).call(this);
-        this.getMesh();
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Mound).call(this));
+
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
+        return _this;
     }
 
-    _createClass(Mound, [{
+    babelHelpers.createClass(Mound, [{
         key: 'getMesh',
         value: function getMesh() {
             var material = new THREE.MeshLambertMaterial({
@@ -3929,45 +3854,39 @@ var Mound = (function (_AbstractMesh) {
         key: 'animate',
         value: function animate() {}
     }]);
-
     return Mound;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Mound = Mound;
 
-},{"../Loop":9,"./AbstractMesh":11}],22:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],21:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.Sky = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Sky = (function (_AbstractMesh) {
-    _inherits(Sky, _AbstractMesh);
+var Sky = function (_AbstractMesh) {
+    babelHelpers.inherits(Sky, _AbstractMesh);
 
     function Sky(loop) {
-        _classCallCheck(this, Sky);
+        babelHelpers.classCallCheck(this, Sky);
 
-        _get(Object.getPrototypeOf(Sky.prototype), 'constructor', this).call(this);
-        this.getMesh();
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Sky).call(this));
+
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
+        return _this;
     }
 
-    _createClass(Sky, [{
+    babelHelpers.createClass(Sky, [{
         key: 'setUniforms',
         value: function setUniforms(uniforms) {
             this.uniforms = uniforms;
@@ -3977,7 +3896,7 @@ var Sky = (function (_AbstractMesh) {
                     if (!sky.uniforms[key]) {
                         sky.uniforms[key] = uniforms[key];
                     }
-                    if (typeof uniforms[key] === 'object') {
+                    if (babelHelpers.typeof(uniforms[key]) === 'object') {
                         sky.uniforms[key].value = uniforms[key].value;
                     }
                 }
@@ -4010,53 +3929,47 @@ var Sky = (function (_AbstractMesh) {
         key: 'animate',
         value: function animate() {}
     }]);
-
     return Sky;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Sky = Sky;
 
-},{"../Loop":9,"./AbstractMesh":11}],23:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],22:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.Sun = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Sun = (function (_AbstractMesh) {
-    _inherits(Sun, _AbstractMesh);
+var Sun = function (_AbstractMesh) {
+    babelHelpers.inherits(Sun, _AbstractMesh);
 
     function Sun(loop) {
-        _classCallCheck(this, Sun);
+        babelHelpers.classCallCheck(this, Sun);
 
-        _get(Object.getPrototypeOf(Sun.prototype), 'constructor', this).call(this);
-        this.getMesh();
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Sun).call(this));
+
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
-        this.targetTime = {
+        _this.targetTime = {
             h: 0,
             m: 0
         };
-        this.time = {
+        _this.time = {
             h: 0,
             m: 0
         };
+        return _this;
     }
 
-    _createClass(Sun, [{
+    babelHelpers.createClass(Sun, [{
         key: 'setTargetTime',
         value: function setTargetTime(hours, minutes) {
             this.targetTime.h = hours;
@@ -4078,6 +3991,7 @@ var Sun = (function (_AbstractMesh) {
         /**
          * @param sky Sky
          */
+
     }, {
         key: 'derivePosition',
         value: function derivePosition(sky) {
@@ -4111,46 +4025,40 @@ var Sun = (function (_AbstractMesh) {
             }
         }
     }]);
-
     return Sun;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Sun = Sun;
 
-},{"../Loop":9,"./AbstractMesh":11}],24:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],23:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+exports.Wall = undefined;
 
 var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Wall = (function (_AbstractMesh) {
-    _inherits(Wall, _AbstractMesh);
+var Wall = function (_AbstractMesh) {
+    babelHelpers.inherits(Wall, _AbstractMesh);
 
     function Wall(loop, angle) {
-        _classCallCheck(this, Wall);
+        babelHelpers.classCallCheck(this, Wall);
 
-        _get(Object.getPrototypeOf(Wall.prototype), 'constructor', this).call(this);
-        this.angle = angle;
-        this.getMesh();
+        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Wall).call(this));
+
+        _this.angle = angle;
+        _this.getMesh();
         if (loop instanceof _Loop.Loop) {
-            this.join(loop);
+            _this.join(loop);
         }
+        return _this;
     }
 
-    _createClass(Wall, [{
+    babelHelpers.createClass(Wall, [{
         key: 'getMesh',
         value: function getMesh() {
             var material = new THREE.MeshLambertMaterial({
@@ -4177,13 +4085,82 @@ var Wall = (function (_AbstractMesh) {
         key: 'animate',
         value: function animate() {}
     }]);
-
     return Wall;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Wall = Wall;
 
-},{"../Loop":9,"./AbstractMesh":11}],25:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":10}],24:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+/**
+ * @author zz85 / https://github.com/zz85
+ *
+ * Based on "A Practical Analytic Model for Daylight"
+ * aka The Preetham Model, the de facto standard analytic skydome model
+ * http://www.cs.utah.edu/~shirley/papers/sunsky/sunsky.pdf
+ *
+ * First implemented by Simon Wallner
+ * http://www.simonwallner.at/projects/atmospheric-scattering
+ *
+ * Improved by Martin Upitis
+ * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
+ *
+ * Three.js integration by zz85 http://twitter.com/blurspline
+ */
+
+var loadSkyShader = function loadSkyShader() {
+    THREE.ShaderLib['sky'] = {
+
+        uniforms: {
+            luminance: { type: "f", value: 1 },
+            turbidity: { type: "f", value: 2 },
+            reileigh: { type: "f", value: 1 },
+            mieCoefficient: { type: "f", value: 0.005 },
+            mieDirectionalG: { type: "f", value: 0.8 },
+            sunPosition: { type: "v3", value: new THREE.Vector3() }
+        },
+
+        vertexShader: ["varying vec3 vWorldPosition;", "void main() {", "vec4 worldPosition = modelMatrix * vec4( position, 1.0 );", "vWorldPosition = worldPosition.xyz;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
+
+        fragmentShader: ["uniform sampler2D skySampler;", "uniform vec3 sunPosition;", "varying vec3 vWorldPosition;", "vec3 cameraPos = vec3(0., 0., 0.);", "// uniform sampler2D sDiffuse;", "// const float turbidity = 10.0; //", "// const float reileigh = 2.; //", "// const float luminance = 1.0; //", "// const float mieCoefficient = 0.005;", "// const float mieDirectionalG = 0.8;", "uniform float luminance;", "uniform float turbidity;", "uniform float reileigh;", "uniform float mieCoefficient;", "uniform float mieDirectionalG;", "// constants for atmospheric scattering", "const float e = 2.71828182845904523536028747135266249775724709369995957;", "const float pi = 3.141592653589793238462643383279502884197169;", "const float n = 1.0003; // refractive index of air", "const float N = 2.545E25; // number of molecules per unit volume for air at", "// 288.15K and 1013mb (sea level -45 celsius)", "const float pn = 0.035;	// depolatization factor for standard air", "// wavelength of used primaries, according to preetham", "const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);", "// mie stuff", "// K coefficient for the primaries", "const vec3 K = vec3(0.686, 0.678, 0.666);", "const float v = 4.0;", "// optical length at zenith for molecules", "const float rayleighZenithLength = 8.4E3;", "const float mieZenithLength = 1.25E3;", "const vec3 up = vec3(0.0, 1.0, 0.0);", "const float EE = 1000.0;", "const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;", "// 66 arc seconds -> degrees, and the cosine of that", "// earth shadow hack", "const float cutoffAngle = pi/1.95;", "const float steepness = 1.5;", "vec3 totalRayleigh(vec3 lambda)", "{", "return (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn));", "}",
+
+        // see http://blenderartists.org/forum/showthread.php?321110-Shaders-and-Skybox-madness
+        "// A simplied version of the total Reayleigh scattering to works on browsers that use ANGLE", "vec3 simplifiedRayleigh()", "{", "return 0.0005 / vec3(94, 40, 18);",
+        // return 0.00054532832366 / (3.0 * 2.545E25 * pow(vec3(680E-9, 550E-9, 450E-9), vec3(4.0)) * 6.245);
+        "}", "float rayleighPhase(float cosTheta)", "{	 ", "return (3.0 / (16.0*pi)) * (1.0 + pow(cosTheta, 2.0));", "//	return (1.0 / (3.0*pi)) * (1.0 + pow(cosTheta, 2.0));", "//	return (3.0 / 4.0) * (1.0 + pow(cosTheta, 2.0));", "}", "vec3 totalMie(vec3 lambda, vec3 K, float T)", "{", "float c = (0.2 * T ) * 10E-18;", "return 0.434 * c * pi * pow((2.0 * pi) / lambda, vec3(v - 2.0)) * K;", "}", "float hgPhase(float cosTheta, float g)", "{", "return (1.0 / (4.0*pi)) * ((1.0 - pow(g, 2.0)) / pow(1.0 - 2.0*g*cosTheta + pow(g, 2.0), 1.5));", "}", "float sunIntensity(float zenithAngleCos)", "{", "return EE * max(0.0, 1.0 - exp(-((cutoffAngle - acos(zenithAngleCos))/steepness)));", "}", "// float logLuminance(vec3 c)", "// {", "// 	return log(c.r * 0.2126 + c.g * 0.7152 + c.b * 0.0722);", "// }", "// Filmic ToneMapping http://filmicgames.com/archives/75", "float A = 0.15;", "float B = 0.50;", "float C = 0.10;", "float D = 0.20;", "float E = 0.02;", "float F = 0.30;", "float W = 1000.0;", "vec3 Uncharted2Tonemap(vec3 x)", "{", "return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;", "}", "void main() ", "{", "float sunfade = 1.0-clamp(1.0-exp((sunPosition.y/450000.0)),0.0,1.0);", "// luminance =  1.0 ;// vWorldPosition.y / 450000. + 0.5; //sunPosition.y / 450000. * 1. + 0.5;", "// gl_FragColor = vec4(sunfade, sunfade, sunfade, 1.0);", "float reileighCoefficient = reileigh - (1.0* (1.0-sunfade));", "vec3 sunDirection = normalize(sunPosition);", "float sunE = sunIntensity(dot(sunDirection, up));", "// extinction (absorbtion + out scattering) ", "// rayleigh coefficients",
+
+        // "vec3 betaR = totalRayleigh(lambda) * reileighCoefficient;",
+        "vec3 betaR = simplifiedRayleigh() * reileighCoefficient;", "// mie coefficients", "vec3 betaM = totalMie(lambda, K, turbidity) * mieCoefficient;", "// optical length", "// cutoff angle at 90 to avoid singularity in next formula.", "float zenithAngle = acos(max(0.0, dot(up, normalize(vWorldPosition - cameraPos))));", "float sR = rayleighZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));", "float sM = mieZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));", "// combined extinction factor	", "vec3 Fex = exp(-(betaR * sR + betaM * sM));", "// in scattering", "float cosTheta = dot(normalize(vWorldPosition - cameraPos), sunDirection);", "float rPhase = rayleighPhase(cosTheta*0.5+0.5);", "vec3 betaRTheta = betaR * rPhase;", "float mPhase = hgPhase(cosTheta, mieDirectionalG);", "vec3 betaMTheta = betaM * mPhase;", "vec3 Lin = pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * (1.0 - Fex),vec3(1.5));", "Lin *= mix(vec3(1.0),pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * Fex,vec3(1.0/2.0)),clamp(pow(1.0-dot(up, sunDirection),5.0),0.0,1.0));", "//nightsky", "vec3 direction = normalize(vWorldPosition - cameraPos);", "float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]", "float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]", "vec2 uv = vec2(phi, theta) / vec2(2.0*pi, pi) + vec2(0.5, 0.0);", "// vec3 L0 = texture2D(skySampler, uv).rgb+0.1 * Fex;", "vec3 L0 = vec3(0.1) * Fex;", "// composition + solar disc", "//if (cosTheta > sunAngularDiameterCos)", "float sundisk = smoothstep(sunAngularDiameterCos,sunAngularDiameterCos+0.00002,cosTheta);", "// if (normalize(vWorldPosition - cameraPos).y>0.0)", "L0 += (sunE * 19000.0 * Fex)*sundisk;", "vec3 whiteScale = 1.0/Uncharted2Tonemap(vec3(W));", "vec3 texColor = (Lin+L0);   ", "texColor *= 0.04 ;", "texColor += vec3(0.0,0.001,0.0025)*0.3;", "float g_fMaxLuminance = 1.0;", "float fLumScaled = 0.1 / luminance;     ", "float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (g_fMaxLuminance * g_fMaxLuminance)))) / (1.0 + fLumScaled); ", "float ExposureBias = fLumCompressed;", "vec3 curr = Uncharted2Tonemap((log2(2.0/pow(luminance,4.0)))*texColor);", "vec3 color = curr*whiteScale;", "vec3 retColor = pow(color,vec3(1.0/(1.2+(1.2*sunfade))));", "gl_FragColor.rgb = retColor;", "gl_FragColor.a = 1.0;", "}"].join("\n")
+    };
+
+    THREE.Sky = function () {
+
+        var skyShader = THREE.ShaderLib["sky"];
+        var skyUniforms = THREE.UniformsUtils.clone(skyShader.uniforms);
+
+        var skyMat = new THREE.ShaderMaterial({
+            fragmentShader: skyShader.fragmentShader,
+            vertexShader: skyShader.vertexShader,
+            uniforms: skyUniforms,
+            side: THREE.BackSide
+        });
+
+        var skyGeo = new THREE.SphereBufferGeometry(450000, 32, 15);
+        var skyMesh = new THREE.Mesh(skyGeo, skyMat);
+
+        // Expose variables
+        this.mesh = skyMesh;
+        this.uniforms = skyUniforms;
+    };
+};
+
+exports.loadSkyShader = loadSkyShader;
+
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4210,15 +4187,16 @@ exports.lighting = lighting;
 },{}],26:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Animator = undefined;
 
-var _services_services = require('../services/_services');
+var _services = require('../services/_services');
 
-var _RenderLoop = require('../Render/Loop');
+var _Loop = require('../Render/Loop');
 
-var _UtilityHelper = require('../Utility/helper');
+var _helper = require('../Utility/helper');
 
 var Animator = function Animator() {
     this.init();
@@ -4244,18 +4222,20 @@ Animator.prototype = {
             this.beginRender();
         }
     },
+
     /**
      * @returns {Loop}
      */
     beginRender: function beginRender() {
-        this.background = new _RenderLoop.Loop('webgl-bg-container', true);
-        this.loop = new _RenderLoop.Loop('webgl-container');
+        this.background = new _Loop.Loop('webgl-bg-container', true);
+        this.loop = new _Loop.Loop('webgl-container');
 
         this.loop.background = this.background;
         this.background.foreground = this.loop;
 
         return this.loop;
     },
+
     /**
      * @param level {Number} 0 to 1
      */
@@ -4265,7 +4245,7 @@ Animator.prototype = {
         this.background.lighting.setLuminosity(level);
     },
     loadTweenMax: function loadTweenMax() {
-        if (this.console || typeof window !== 'object') {
+        if (this.console || (typeof window === 'undefined' ? 'undefined' : babelHelpers.typeof(window)) !== 'object') {
             Animator.TweenMax = {
                 'set': function set() {},
                 'to': function to() {},
@@ -4277,6 +4257,7 @@ Animator.prototype = {
         }
         return Animator.TweenMax;
     },
+
     TIME_FROM_SET: 2300, //ms
     TIME_FROM_WINDUP: 3600, //ms
     HOLD_UP_ALLOWANCE: 0.25, // seconds
@@ -4294,6 +4275,7 @@ Animator.prototype = {
         }
         return Animator.tweenFlightPath(callback, this);
     },
+
     /**
      * @param callback
      * @param $scope
@@ -4315,8 +4297,8 @@ Animator.prototype = {
             henka = this.pitchBreak = $('.main-area .target .baseball.break'),
             quarter = flightSpeed / 4;
 
-        var pitchTransition = _services_services.Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 12, 4),
-            targetTransition = _services_services.Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 10, 3);
+        var pitchTransition = _services.Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 12, 4),
+            targetTransition = _services.Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 10, 3);
 
         var transitions = [pitchTransition(0, 0), pitchTransition(10, 0), pitchTransition(30, 1), pitchTransition(50, 2), targetTransition(100, 3), pitchTransition(100, 3, breakTop, breakLeft)];
 
@@ -4351,6 +4333,7 @@ Animator.prototype = {
             }, (flightSpeed + Animator.HOLD_UP_ALLOWANCE) * 1000));
         }
     },
+
     /**
      * @param callback
      * @param $scope Angular scope
@@ -4360,7 +4343,7 @@ Animator.prototype = {
         var TweenMax = Animator.loadTweenMax();
         TweenMax.killAll();
         var game = $scope.y,
-            flightSpeed = _services_services.Mathinator.getFlightTime(game.pitchInFlight.velocity, _UtilityHelper.helper.pitchDefinitions[game.pitchInFlight.name][2]);
+            flightSpeed = _services.Mathinator.getFlightTime(game.pitchInFlight.velocity, _helper.helper.pitchDefinitions[game.pitchInFlight.name][2]);
 
         if (!this.loop) {
             this.beginRender();
@@ -4387,6 +4370,7 @@ Animator.prototype = {
             }, (flightSpeed + Animator.HOLD_UP_ALLOWANCE) * 1000));
         }
     },
+
     /**
      * @param game
      * @returns {*}
@@ -4403,6 +4387,7 @@ Animator.prototype = {
         }
         return Animator.tweenFieldingTrajectory(game);
     },
+
     /**
      * @param game
      * @param splayOnly
@@ -4421,22 +4406,22 @@ Animator.prototype = {
             airTime: 0.96
         };
 
-        var angle = result.flyAngle,
-            distance = Math.abs(result.travelDistance),
-            scalar = result.travelDistance < 0 ? -1 : 1;
+        var angle = result.flyAngle;
+        var distance = Math.abs(result.travelDistance);
+        var scalar = result.travelDistance < 0 ? -1 : 1;
 
-        _services_services.Mathinator.memory.bounding = angle < 0;
+        _services.Mathinator.memory.bounding = angle < 0;
         angle = 1 + Math.abs(angle);
         if (angle > 90) angle = 180 - angle;
 
         var velocity = linearApproximateDragScalar.distance * Math.sqrt(9.81 * distance / Math.sin(2 * Math.PI * angle / 180));
-        var velocityVerticalComponent = Math.sin(_services_services.Mathinator.RADIAN * angle) * velocity;
+        var velocityVerticalComponent = Math.sin(_services.Mathinator.RADIAN * angle) * velocity;
         var apexHeight = velocityVerticalComponent * velocityVerticalComponent / (2 * 9.81) * linearApproximateDragScalar.apexHeight;
         var airTime = 1.5 * Math.sqrt(2 * apexHeight / 9.81) * linearApproximateDragScalar.airTime; // 2x freefall equation
 
         //log('angle', angle, 'vel', velocity, 'apex', apexHeight, 'air', airTime, 'dist', result.travelDistance);
         var quarter = airTime / 4;
-        var mathinator = new _services_services.Mathinator();
+        var mathinator = new _services.Mathinator();
         var transitions = [mathinator.transitionalTrajectory(0, quarter, 0, apexHeight, scalar * distance, result.splay), mathinator.transitionalTrajectory(25, quarter, 0), mathinator.transitionalTrajectory(50, quarter, 1), mathinator.transitionalTrajectory(75, quarter, 2), mathinator.transitionalTrajectory(100, quarter, 3)];
         TweenMax.set(ball, transitions[0]);
         TweenMax.to(ball, quarter, transitions[1]);
@@ -4466,6 +4451,7 @@ Animator.prototype = {
 
         return game.swingResult;
     },
+
     /**
      * @param game
      * @returns {Game.swingResult|*|swingResult|Field.game.swingResult}
@@ -4491,11 +4477,11 @@ Animator.prototype = {
                 this.loop.setOverwatchMoveTarget(ball.mesh.position, 0.16);
             } else {
                 this.loop.setLookTarget(ball.mesh.position, 0.5);
-                this.loop.setMoveTarget({ x: 0, y: 6, z: _RenderLoop.Loop.INITIAL_CAMERA_DISTANCE }, 0.05);
+                this.loop.setMoveTarget({ x: 0, y: 6, z: _Loop.Loop.INITIAL_CAMERA_DISTANCE }, 0.05);
             }
         } else if (Math.abs(result.splay) < 60) {
             this.loop.setLookTarget(ball.mesh.position, 0.5);
-            this.loop.setMoveTarget({ x: 0, y: 6, z: _RenderLoop.Loop.INITIAL_CAMERA_DISTANCE }, 0.05);
+            this.loop.setMoveTarget({ x: 0, y: 6, z: _Loop.Loop.INITIAL_CAMERA_DISTANCE }, 0.05);
         }
 
         return game.swingResult;
@@ -4510,16 +4496,17 @@ for (var fn in Animator.prototype) {
 
 exports.Animator = Animator;
 
-},{"../Render/Loop":9,"../Utility/helper":37,"../services/_services":41}],27:[function(require,module,exports){
+},{"../Render/Loop":9,"../Utility/helper":37,"../services/_services":30}],27:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Distribution = undefined;
 
-var _UtilityHelper = require('../Utility/helper');
+var _helper = require('../Utility/helper');
 
-var pitchDefinitions = _UtilityHelper.helper.pitchDefinitions;
+var pitchDefinitions = _helper.helper.pitchDefinitions;
 
 /**
  * For Probability!
@@ -4547,6 +4534,7 @@ Distribution.prototype = {
         if (!scale) scale = 1;
         return random() * scale;
     },
+
     /**
      * @param fielder {Player}
      * @returns {boolean}
@@ -4554,6 +4542,7 @@ Distribution.prototype = {
     error: function error(fielder) {
         return (100 - fielder.skill.defense.fielding) * 0.1 + 3.25 > random() * 100;
     },
+
     /**
      * @param power
      * @param flyAngle
@@ -4570,12 +4559,14 @@ Distribution.prototype = {
 
         return (10 + scalar * 320 + power / 300 + random() * power / 75 * 150) * (1 - abs(flyAngle - 30) / 60);
     },
+
     /**
      * @param count {{strikes: number, balls: number}}
      * @returns {{x: number, y: number}}
      */
     pitchLocation: function pitchLocation(count) {
-        var x, y;
+        var x = void 0,
+            y = void 0;
         if (random() < 0.5) {
             x = 50 + floor(random() * 90) - floor(random() * 30);
         } else {
@@ -4590,6 +4581,7 @@ Distribution.prototype = {
 
         return { x: x, y: y };
     },
+
     /**
      * swing centering basis
      * @returns {number}
@@ -4597,6 +4589,7 @@ Distribution.prototype = {
     centralizedNumber: function centralizedNumber() {
         return 100 + floor(random() * 15) - floor(random() * 15);
     },
+
     /**
      * @param eye {Player.skill.offense.eye}
      * @param x
@@ -4616,6 +4609,7 @@ Distribution.prototype = {
         // higher late in the count
         return swingLikelihood - 35 + 2 * (umpire.count.balls + 8 * umpire.count.strikes);
     },
+
     /**
      * @param target {number} 0-200
      * @param control {number} 0-100
@@ -4625,6 +4619,7 @@ Distribution.prototype = {
         var effect = (50 - random() * 100) / (1 + control / 100);
         return min(199.9, max(0.1, target + effect));
     },
+
     /**
      * @param pitch {Game.pitchInFlight}
      * @param pitcher {Player}
@@ -4636,10 +4631,11 @@ Distribution.prototype = {
      */
     breakEffect: function breakEffect(pitch, pitcher, x, y) {
         var effect = {};
-        effect.x = floor(x + pitch.breakDirection[0] * (0.50 + 0.5 * random() + pitcher.pitching[pitch.name]['break'] / 200));
-        effect.y = floor(y + pitch.breakDirection[1] * ((0.50 + 0.5 * random() + pitcher.pitching[pitch.name]['break'] / 200) / (0.5 + y / 200)));
+        effect.x = floor(x + pitch.breakDirection[0] * (0.50 + 0.5 * random() + pitcher.pitching[pitch.name].break / 200));
+        effect.y = floor(y + pitch.breakDirection[1] * ((0.50 + 0.5 * random() + pitcher.pitching[pitch.name].break / 200) / (0.5 + y / 200)));
         return effect;
     },
+
     /**
      * Determine the swing target along an axis
      * @param target {number} 0-200
@@ -4651,6 +4647,7 @@ Distribution.prototype = {
         eye = min(eye, 100); // higher eye would overcompensate here
         return 100 + (target - 100) * (0.5 + random() * eye / 200) - actual;
     },
+
     /**
      * Determine the swing scalar
      * @param eye {number} 0-100
@@ -4659,6 +4656,7 @@ Distribution.prototype = {
     swing: function swing(eye) {
         return 100 / (eye + 25 + random() * 50);
     },
+
     /**
      * @param pitch {Object} game.pitchInFlight
      * @param catcher {Player}
@@ -4668,8 +4666,8 @@ Distribution.prototype = {
      * @returns {boolean}
      */
     stealSuccess: function stealSuccess(pitch, catcher, thief, base, volitional) {
-        var rand = random(),
-            rand2 = random();
+        var rand = random();
+        var rand2 = random();
 
         if (base == 4) {
             rand = rand / 100;
@@ -4681,6 +4679,7 @@ Distribution.prototype = {
 
         return ((volitional | 0) * 35 + thief.skill.offense.eye + (base * -25 + 45)) * rand + 10 + thief.skill.offense.speed * 2 - thief.fatigue > pitchBaseSpeedMultiplier * pitch.velocity * smoothedRand2 + (catcher.skill.defense.catching + catcher.skill.defense.throwing) * rand2;
     },
+
     /**
      * @param pitch {Object} game.pitchInFlight
      * @param catcher {Player}
@@ -4731,7 +4730,7 @@ exports.Distribution = Distribution;
 },{"../Utility/helper":37}],28:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
 var Iterator = function Iterator() {};
@@ -4740,7 +4739,8 @@ Iterator.prototype = {
     identifier: 'Iterator',
     constructor: Iterator,
     each: function each(collection, map) {
-        var keys, i;
+        var keys = void 0,
+            i = void 0;
         if (collection instanceof Array) {
             for (i = 0; i < collection.length; i++) {
                 map(i, collection[i]);
@@ -4763,15 +4763,15 @@ for (var fn in Iterator.prototype) {
 exports.Iterator = Iterator;
 
 },{}],29:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 /**
  * For Math!
  * @constructor
  */
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-    value: true
-});
 var Mathinator = function Mathinator() {};
 
 /**
@@ -4807,6 +4807,7 @@ Mathinator.prototype = {
             y: angledY
         };
     },
+
     /**
      * @param a {Array<Number>}
      * @param b {Array<Number>}
@@ -4816,6 +4817,7 @@ Mathinator.prototype = {
         var radians = this.RADIAN;
         return Math.sqrt(a[1] * a[1] + b[1] * b[1] - 2 * a[1] * b[1] * Math.cos(a[0] * radians - b[0] * radians));
     },
+
     /**
      * @param origin
      * @param target
@@ -4827,6 +4829,7 @@ Mathinator.prototype = {
     battingAngle: function battingAngle(origin, target) {
         return Math.atan((origin.y - target.y) / (target.x - origin.x)) / Math.PI * 125;
     },
+
     memory: {},
     /**
      * @param percent {number} 0-100
@@ -4844,7 +4847,10 @@ Mathinator.prototype = {
         var apexHeight = Mathinator.prototype.memory.apexHeight,
             distance = Mathinator.prototype.memory.distance,
             splay = Mathinator.prototype.memory.splay;
-        var bottom, left, padding, borderWidth;
+        var bottom = void 0,
+            left = void 0,
+            padding = void 0,
+            borderWidth = void 0;
         var bounding = Mathinator.prototype.memory.bounding,
             radian = this.RADIAN;
 
@@ -4876,6 +4882,7 @@ Mathinator.prototype = {
             ease: bounding ? Power4.easeOut : Linear.easeNone
         };
     },
+
     /**
      * @param percent {number} 0-100
      * @param quarter {number} seconds
@@ -4896,7 +4903,10 @@ Mathinator.prototype = {
             distance = memory.distance,
             splay = memory.splay,
             origin = memory.origin;
-        var top, left, padding, borderWidth;
+        var top = void 0,
+            left = void 0,
+            padding = void 0,
+            borderWidth = void 0;
         var bounding = Mathinator.prototype.memory.bounding,
             radian = this.RADIAN;
 
@@ -4929,13 +4939,15 @@ Mathinator.prototype = {
             ease: bounding ? Power4.easeOut : Linear.easeNone
         };
     },
+
     /**
      * @param swingResult
      * @returns {Game.swingResult}
      */
     translateSwingResultToStylePosition: function translateSwingResultToStylePosition(swingResult) {
         // CF HR bottom: 95px, centerline: left: 190px;
-        var bottom, left;
+        var bottom = void 0,
+            left = void 0;
 
         bottom = Math.cos(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95 / 300;
         left = Math.sin(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95 / 300 + this.SPLAY_INDICATOR_LEFT;
@@ -4947,6 +4959,7 @@ Mathinator.prototype = {
         swingResult.left = left + 'px';
         return swingResult;
     },
+
     /**
      * @param left {number} 0-200
      * @param top {number} 0-200
@@ -4966,7 +4979,8 @@ Mathinator.prototype = {
          * @returns {{top: number, left: number, padding: string, borderWidth: string, transform: string, delay: number, ease: *}}
          */
         return function (percent, step, breakTop, breakLeft) {
-            var _top, _left;
+            var _top = void 0,
+                _left = void 0;
             _top = breakTop || top;
             _left = breakLeft || left;
             _top = originTop + Mathinator.square(percent / 100) * (_top - originTop);
@@ -4990,6 +5004,7 @@ Mathinator.prototype = {
             };
         };
     },
+
     /**
      * @param distance {number} feet
      * @param throwing {number} 0-1
@@ -5004,6 +5019,7 @@ Mathinator.prototype = {
          + 1 - (0.2 + fielding * 0.8) // gather time (up to 0.8s)
          + distance / 90 / (0.5 + throwing / 2); // throwing distance (up to 2s)
     },
+
     /**
      * @param player {Player}
      * @returns {number} ~2.0
@@ -5013,6 +5029,7 @@ Mathinator.prototype = {
             throwing = player.skill.defense.throwing;
         return 3.5 - (fielding + throwing) / 200;
     },
+
     /**
      * @param speed {number} 0-100
      * @returns {number} seconds
@@ -5020,6 +5037,7 @@ Mathinator.prototype = {
     baseRunningTime: function baseRunningTime(speed) {
         return 7.0 - speed / 100 * 4.1;
     },
+
     /**
      * @param x {Number} bat offset
      * @param y {Number} bat offset
@@ -5044,6 +5062,7 @@ Mathinator.prototype = {
             fly: -3 * y / ((Math.abs(angle) + 25) / 35) // more difficult to hit a pop fly on a angled bat
         };
     },
+
     /**
      * @param velocityRating {Number} 0-100
      * @param velocityScalar {Number} approx 1
@@ -5065,42 +5084,40 @@ exports.Mathinator = Mathinator;
 },{}],30:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Mathinator = exports.Iterator = exports.Distribution = exports.Animator = undefined;
 
-var _ServicesAnimator = require('../Services/Animator');
+var _Animator = require('../Services/Animator');
 
-var _ServicesDistribution = require('../Services/Distribution');
+var _Distribution = require('../Services/Distribution');
 
-var _ServicesIterator = require('../Services/Iterator');
+var _Iterator = require('../Services/Iterator');
 
-var _ServicesMathinator = require('../Services/Mathinator');
+var _Mathinator = require('../Services/Mathinator');
 
-exports.Animator = _ServicesAnimator.Animator;
-exports.Distribution = _ServicesDistribution.Distribution;
-exports.Iterator = _ServicesIterator.Iterator;
-exports.Mathinator = _ServicesMathinator.Mathinator;
+exports.Animator = _Animator.Animator;
+exports.Distribution = _Distribution.Distribution;
+exports.Iterator = _Iterator.Iterator;
+exports.Mathinator = _Mathinator.Mathinator;
 
 },{"../Services/Animator":26,"../Services/Distribution":27,"../Services/Iterator":28,"../Services/Mathinator":29}],31:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+exports.Provider = undefined;
 
 var _TeamJapan = require('./TeamJapan');
 
-var Provider = (function () {
+var Provider = function () {
     function Provider() {
-        _classCallCheck(this, Provider);
+        babelHelpers.classCallCheck(this, Provider);
     }
 
-    _createClass(Provider, [{
+    babelHelpers.createClass(Provider, [{
         key: 'assignTeam',
         value: function assignTeam(game, team, side) {
             var special = this.teams[team];
@@ -5108,9 +5125,8 @@ var Provider = (function () {
             game.teams[side] = special;
         }
     }]);
-
     return Provider;
-})();
+}();
 
 Provider.prototype.teams = {
     TeamJapan: _TeamJapan.samurai
@@ -5121,37 +5137,38 @@ exports.Provider = Provider;
 },{"./TeamJapan":32}],32:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.samurai = undefined;
 
-var _Model_models = require('../Model/_models');
+var _models = require('../Model/_models');
 
-var _ModelPlayer = require('../Model/Player');
+var _Player = require('../Model/Player');
 
-var _TeamsTrainer = require('../Teams/Trainer');
+var _Trainer = require('../Teams/Trainer');
 
-var samurai = new _Model_models.Team('no init');
+var samurai = new _models.Team('no init');
 samurai.name = 'Japan';
 samurai.nameJ = '日本';
 
-var darvish = new _ModelPlayer.Player(samurai),
-    johjima = new _ModelPlayer.Player(samurai),
-    ogasawara = new _ModelPlayer.Player(samurai),
-    nishioka = new _ModelPlayer.Player(samurai),
-    kawasaki = new _ModelPlayer.Player(samurai),
-    murata = new _ModelPlayer.Player(samurai),
-    matsui = new _ModelPlayer.Player(samurai),
-    ichiro = new _ModelPlayer.Player(samurai),
-    inaba = new _ModelPlayer.Player(samurai);
+var darvish = new _Player.Player(samurai),
+    johjima = new _Player.Player(samurai),
+    ogasawara = new _Player.Player(samurai),
+    nishioka = new _Player.Player(samurai),
+    kawasaki = new _Player.Player(samurai),
+    murata = new _Player.Player(samurai),
+    matsui = new _Player.Player(samurai),
+    ichiro = new _Player.Player(samurai),
+    inaba = new _Player.Player(samurai);
 
-var matsuzaka = new _ModelPlayer.Player(samurai),
-    fukudome = new _ModelPlayer.Player(samurai),
-    aoki = new _ModelPlayer.Player(samurai),
-    abe = new _ModelPlayer.Player(samurai),
-    iwamura = new _ModelPlayer.Player(samurai);
+var matsuzaka = new _Player.Player(samurai),
+    fukudome = new _Player.Player(samurai),
+    aoki = new _Player.Player(samurai),
+    abe = new _Player.Player(samurai),
+    iwamura = new _Player.Player(samurai);
 
-var coach = new _TeamsTrainer.Trainer();
+var coach = new _Trainer.Trainer();
 
 coach.makePlayer(darvish, 'Yu', 'Darvish', 'ダルビッシュ', '有', 150, { eye: 80, power: 80, speed: 80 }, { catching: 50, fielding: 70, throwing: 100, speed: 80 }, 'right', 'right', 11);
 
@@ -5205,22 +5222,19 @@ exports.samurai = samurai;
 },{"../Model/Player":5,"../Model/_models":8,"../Teams/Trainer":33}],33:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Trainer = undefined;
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _Iterator = require('../Services/Iterator');
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-var _ServicesIterator = require('../Services/Iterator');
-
-var Trainer = (function () {
+var Trainer = function () {
     function Trainer() {
-        _classCallCheck(this, Trainer);
+        babelHelpers.classCallCheck(this, Trainer);
     }
 
-    _createClass(Trainer, [{
+    babelHelpers.createClass(Trainer, [{
         key: 'makePlayer',
         value: function makePlayer(player, name, surname, surnameJ, nameJ, pitching, offense, defense, bats, throws, number) {
             player.hero = true;
@@ -5245,28 +5259,28 @@ var Trainer = (function () {
             player.bats = bats;
             player.throws = throws;
             player.number = number;
-            _ServicesIterator.Iterator.each(player.pitching, function (key, value) {
+            _Iterator.Iterator.each(player.pitching, function (key, value) {
                 player.pitching[key].velocity += pitching / 5 | 0;
-                player.pitching[key]['break'] += pitching / 5 | 0;
+                player.pitching[key].break += pitching / 5 | 0;
                 player.pitching[key].control += pitching / 5 | 0;
             });
             player.resetStats(0);
         }
     }]);
-
     return Trainer;
-})();
+}();
 
 exports.Trainer = Trainer;
 
 },{"../Services/Iterator":28}],34:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Log = undefined;
 
-var _UtilityText = require('../Utility/text');
+var _text = require('../Utility/text');
 
 var Log = function Log() {
     this.init();
@@ -5298,6 +5312,7 @@ Log.prototype = {
             n: []
         };
     },
+
     SINGLE: 'H',
     DOUBLE: '2B',
     TRIPLE: '3B',
@@ -5340,7 +5355,7 @@ Log.prototype = {
             this.record.e.unshift(_note);
             this.record.n.unshift(noteJ);
             this.async(function () {
-                if (_UtilityText.text.mode === 'n') {
+                if (_text.text.mode === 'n') {
                     console.log(noteJ);
                 } else {
                     console.log(_note);
@@ -5351,44 +5366,44 @@ Log.prototype = {
     },
     getBatter: function getBatter(batter) {
         var order = batter.team.nowBatting;
-        order = ({
-            0: (0, _UtilityText.text)(' 1st'),
-            1: (0, _UtilityText.text)(' 2nd'),
-            2: (0, _UtilityText.text)(' 3rd'),
-            3: (0, _UtilityText.text)(' 4th'),
-            4: (0, _UtilityText.text)(' 5th'),
-            5: (0, _UtilityText.text)(' 6th'),
-            6: (0, _UtilityText.text)(' 7th'),
-            7: (0, _UtilityText.text)(' 8th'),
-            8: (0, _UtilityText.text)(' 9th')
-        })[order];
+        order = {
+            0: (0, _text.text)(' 1st'),
+            1: (0, _text.text)(' 2nd'),
+            2: (0, _text.text)(' 3rd'),
+            3: (0, _text.text)(' 4th'),
+            4: (0, _text.text)(' 5th'),
+            5: (0, _text.text)(' 6th'),
+            6: (0, _text.text)(' 7th'),
+            7: (0, _text.text)(' 8th'),
+            8: (0, _text.text)(' 9th')
+        }[order];
         var positions = this.longFormFielder();
-        return (0, _UtilityText.text)('Now batting') + order + _UtilityText.text.comma() + positions[batter.position] + _UtilityText.text.comma() + batter.getUniformNumber() + _UtilityText.text.comma() + batter.getName();
+        return (0, _text.text)('Now batting') + order + _text.text.comma() + positions[batter.position] + _text.text.comma() + batter.getUniformNumber() + _text.text.comma() + batter.getName();
     },
     noteBatter: function noteBatter(batter) {
-        var m = _UtilityText.text.mode,
-            record,
-            recordJ;
-        _UtilityText.text.mode = 'e';
+        var m = _text.text.mode;
+        var record = void 0;
+        var recordJ = void 0;
+        _text.text.mode = 'e';
         record = this.getBatter(batter);
-        _UtilityText.text.mode = 'n';
+        _text.text.mode = 'n';
         recordJ = this.getBatter(batter);
-        _UtilityText.text.mode = m;
+        _text.text.mode = m;
         this.note(record, recordJ);
     },
     getPitchLocationDescription: function getPitchLocationDescription(pitchInFlight, batterIsLefty) {
-        var x = pitchInFlight.x,
-            y = pitchInFlight.y,
-            say = '';
+        var x = pitchInFlight.x;
+        var y = pitchInFlight.y;
+        var say = '';
         var noComma = false,
             noComma2 = false;
         var ball = false;
         if (!batterIsLefty) x = 200 - x;
         if (x < 50) {
-            say += (0, _UtilityText.text)('way outside');
+            say += (0, _text.text)('way outside');
             ball = true;
         } else if (x < 70) {
-            say += (0, _UtilityText.text)('outside');
+            say += (0, _text.text)('outside');
         } else if (x < 100) {
             say += '';
             noComma = true;
@@ -5396,72 +5411,72 @@ Log.prototype = {
             say += '';
             noComma = true;
         } else if (x < 150) {
-            say += (0, _UtilityText.text)('inside');
+            say += (0, _text.text)('inside');
         } else {
-            say += (0, _UtilityText.text)('way inside');
+            say += (0, _text.text)('way inside');
             ball = true;
         }
-        if (say != '') say += _UtilityText.text.comma();
+        if (say != '') say += _text.text.comma();
         if (y < 35) {
-            say += (0, _UtilityText.text)('way low');
+            say += (0, _text.text)('way low');
             ball = true;
         } else if (y < 65) {
-            say += (0, _UtilityText.text)('low');
+            say += (0, _text.text)('low');
         } else if (y < 135) {
             say += '';
             noComma2 = true;
         } else if (y < 165) {
-            say += (0, _UtilityText.text)('high');
+            say += (0, _text.text)('high');
         } else {
-            say += (0, _UtilityText.text)('way high');
+            say += (0, _text.text)('way high');
             ball = true;
         }
         if (noComma || noComma2) {
-            say = say.split(_UtilityText.text.comma()).join('');
+            say = say.split(_text.text.comma()).join('');
             if (noComma && noComma2) {
-                say = (0, _UtilityText.text)('down the middle');
+                say = (0, _text.text)('down the middle');
             }
         }
         // say = (ball ? 'Ball, ' : 'Strike, ') + say;
-        say = _UtilityText.text.namePitch(pitchInFlight) + _UtilityText.text.comma() + say + _UtilityText.text.stop();
+        say = _text.text.namePitch(pitchInFlight) + _text.text.comma() + say + _text.text.stop();
         return say;
     },
     notePitch: function notePitch(pitchInFlight, batter) {
-        var m = _UtilityText.text.mode,
-            record,
-            recordJ;
-        _UtilityText.text.mode = 'e';
+        var m = _text.text.mode;
+        var record = void 0;
+        var recordJ = void 0;
+        _text.text.mode = 'e';
         record = this.getPitchLocationDescription(pitchInFlight, batter.bats == 'left');
         this.pitchRecord.e.unshift(record);
         this.stabilized.pitchRecord.e.unshift(record);
         this.stabilized.pitchRecord.e.pop();
-        _UtilityText.text.mode = 'n';
+        _text.text.mode = 'n';
         recordJ = this.getPitchLocationDescription(pitchInFlight, batter.bats == 'left');
         this.pitchRecord.n.unshift(recordJ);
         this.stabilized.pitchRecord.n.unshift(recordJ);
         this.stabilized.pitchRecord.n.pop();
-        _UtilityText.text.mode = m;
+        _text.text.mode = m;
     },
     broadcastCount: function broadcastCount(justOuts) {
         if (!this.game.umpire) return '';
         var count = this.game.umpire.count;
         if (this.lastOuts == 2 && count.outs == 0) {
-            outs = 3 + (0, _UtilityText.text)(' outs');
+            outs = 3 + (0, _text.text)(' outs');
         } else {
-            var outs = count.outs + (count.outs == 1 ? (0, _UtilityText.text)(' out') : (0, _UtilityText.text)(' outs'));
+            var outs = count.outs + (count.outs == 1 ? (0, _text.text)(' out') : (0, _text.text)(' outs'));
         }
         this.lastOuts = count.outs;
         if (justOuts) {
-            return outs + _UtilityText.text.stop();
+            return outs + _text.text.stop();
         }
-        return this.game.getInning() + ': ' + count.strikes + '-' + count.balls + ', ' + outs + _UtilityText.text.stop();
+        return this.game.getInning() + ': ' + count.strikes + '-' + count.balls + ', ' + outs + _text.text.stop();
     },
     broadcastScore: function broadcastScore() {
-        return this.game.teams.away.getName() + ' ' + this.game.tally.away.R + ', ' + this.game.teams.home.getName() + ' ' + this.game.tally.home.R + _UtilityText.text.stop();
+        return this.game.teams.away.getName() + ' ' + this.game.tally.away.R + ', ' + this.game.teams.home.getName() + ' ' + this.game.tally.home.R + _text.text.stop();
     },
     broadcastRunners: function broadcastRunners() {
         var field = this.game.field;
-        var runners = [field.first && (0, _UtilityText.text)('first') || '', field.second && (0, _UtilityText.text)('second') || '', field.third && (0, _UtilityText.text)('third') || ''].filter(function (x) {
+        var runners = [field.first && (0, _text.text)('first') || '', field.second && (0, _text.text)('second') || '', field.third && (0, _text.text)('third') || ''].filter(function (x) {
             return x;
         });
 
@@ -5474,38 +5489,38 @@ Log.prototype = {
 
         switch (runnerCount) {
             case 0:
-                return (0, _UtilityText.text)('Bases empty') + _UtilityText.text.stop();
+                return (0, _text.text)('Bases empty') + _text.text.stop();
             case 1:
-                return (0, _UtilityText.text)('Runner on') + ': ' + runners.join(_UtilityText.text.comma()) + _UtilityText.text.stop();
+                return (0, _text.text)('Runner on') + ': ' + runners.join(_text.text.comma()) + _text.text.stop();
             default:
-                return (0, _UtilityText.text)('Runners on') + ': ' + runners.join(_UtilityText.text.comma()) + _UtilityText.text.stop();
+                return (0, _text.text)('Runners on') + ': ' + runners.join(_text.text.comma()) + _text.text.stop();
         }
     },
     getSwing: function getSwing(swingResult) {
         var result = '';
         if (swingResult.looking) {
             if (swingResult.strike) {
-                result += (0, _UtilityText.text)('Strike.');
+                result += (0, _text.text)('Strike.');
             } else {
-                result += (0, _UtilityText.text)('Ball.');
+                result += (0, _text.text)('Ball.');
             }
         } else {
             if (swingResult.contact) {
                 if (swingResult.foul) {
-                    result += (0, _UtilityText.text)('Fouled off.');
+                    result += (0, _text.text)('Fouled off.');
                 } else {
                     if (swingResult.caught) {
-                        result += (0, _UtilityText.text)('In play.');
+                        result += (0, _text.text)('In play.');
                     } else {
                         if (swingResult.thrownOut) {
-                            result += (0, _UtilityText.text)('In play.');
+                            result += (0, _text.text)('In play.');
                         } else {
-                            result += (0, _UtilityText.text)('In play.');
+                            result += (0, _text.text)('In play.');
                         }
                     }
                 }
             } else {
-                result += (0, _UtilityText.text)('Swinging strike.');
+                result += (0, _text.text)('Swinging strike.');
             }
         }
         var steal = '';
@@ -5516,37 +5531,37 @@ Log.prototype = {
             steal = this.noteStealAttempt(swingResult.caughtStealing, false, swingResult.attemptedBase);
         }
         if (steal) {
-            this.note(steal, steal, _UtilityText.text.mode);
+            this.note(steal, steal, _text.text.mode);
         }
         return result + steal;
     },
     noteSwing: function noteSwing(swingResult) {
-        var m = _UtilityText.text.mode,
-            record,
-            recordJ,
-            pitchRecord = this.pitchRecord,
-            stabilized = this.stabilized.pitchRecord;
-        _UtilityText.text.mode = 'e';
+        var m = _text.text.mode;
+        var record = void 0;
+        var recordJ = void 0;
+        var pitchRecord = this.pitchRecord;
+        var stabilized = this.stabilized.pitchRecord;
+        _text.text.mode = 'e';
         record = this.getSwing(swingResult);
         pitchRecord.e[0] += record;
         stabilized.e[0] += record;
-        _UtilityText.text.mode = 'n';
+        _text.text.mode = 'n';
         recordJ = this.getSwing(swingResult);
         pitchRecord.n[0] += recordJ;
         stabilized.n[0] += recordJ;
-        _UtilityText.text.mode = m;
+        _text.text.mode = m;
         recordJ = stabilized.n[0];
         record = stabilized.e[0];
         var giraffe = this;
         record.indexOf('Previous') !== 0 && this.async(function () {
             if (record.indexOf('In play') > -1 && record.indexOf('struck out') > -1) {
-                if (_UtilityText.text.mode === 'n') {
+                if (_text.text.mode === 'n') {
                     console.log(recordJ);
                 } else {
                     console.log(record);
                 }
             } else {
-                if (_UtilityText.text.mode === 'n') {
+                if (_text.text.mode === 'n') {
                     console.log(giraffe.broadcastCount(), recordJ);
                 } else {
                     console.log(giraffe.broadcastCount(), record);
@@ -5560,10 +5575,10 @@ Log.prototype = {
         }
     },
     noteStealAttempt: function noteStealAttempt(thief, success, base) {
-        return _UtilityText.text.space() + thief.getName() + _UtilityText.text.comma() + (success ? (0, _UtilityText.text)('stolen base') : (0, _UtilityText.text)('caught stealing')) + _UtilityText.text.space() + '(' + _UtilityText.text.baseShortName(base) + ')' + _UtilityText.text.stop();
+        return _text.text.space() + thief.getName() + _text.text.comma() + (success ? (0, _text.text)('stolen base') : (0, _text.text)('caught stealing')) + _text.text.space() + '(' + _text.text.baseShortName(base) + ')' + _text.text.stop();
     },
     noteSubstitution: function noteSubstitution(sub, player) {
-        return this.note(_UtilityText.text.substitution(sub, player, 'e'), _UtilityText.text.substitution(sub, player, 'n'));
+        return this.note(_text.text.substitution(sub, player, 'e'), _text.text.substitution(sub, player, 'n'));
     },
     getPlateAppearanceResult: function getPlateAppearanceResult(game) {
         var r = game.swingResult;
@@ -5572,9 +5587,9 @@ Log.prototype = {
         var out = [];
         if (r.looking) {
             if (r.strike) {
-                record = batter + (0, _UtilityText.text)(' struck out looking.');
+                record = batter + (0, _text.text)(' struck out looking.');
             } else {
-                record = batter + (0, _UtilityText.text)(' walked.');
+                record = batter + (0, _text.text)(' walked.');
             }
             var steal = '';
             if (r.stoleABase) {
@@ -5588,7 +5603,7 @@ Log.prototype = {
             if (r.contact) {
                 var fielder = r.fielder,
                     bases = r.bases,
-                    outBy;
+                    outBy = void 0;
                 if (r.caught) {
                     if (r.flyAngle < 15) {
                         outBy = 'line';
@@ -5649,47 +5664,48 @@ Log.prototype = {
                             }
                         }
                 }
-                record = _UtilityText.text.contactResult(batter, fielder, bases, outBy, r.outs === 3 ? [] : r.sacrificeAdvances, out);
+                record = _text.text.contactResult(batter, fielder, bases, outBy, r.outs === 3 ? [] : r.sacrificeAdvances, out);
             } else {
-                record = batter + (0, _UtilityText.text)(' struck out swinging.');
+                record = batter + (0, _text.text)(' struck out swinging.');
             }
         }
         return record;
     },
     notePlateAppearanceResult: function notePlateAppearanceResult(game) {
-        var m = _UtilityText.text.mode,
-            prevJ = (0, _UtilityText.text)('Previous: ', 'n'),
-            prev = (0, _UtilityText.text)('Previous: ', 'e');
+        var m = _text.text.mode,
+            prevJ = (0, _text.text)('Previous: ', 'n'),
+            prev = (0, _text.text)('Previous: ', 'e');
 
-        var statement,
-            record = this.record,
-            pitchRecord = this.pitchRecord,
-            stabilized = this.stabilized.pitchRecord;
+        var statement = void 0;
+        var record = this.record;
+        var pitchRecord = this.pitchRecord;
+        var stabilized = this.stabilized.pitchRecord;
 
-        _UtilityText.text.mode = 'e';
+        _text.text.mode = 'e';
         var result = this.getPlateAppearanceResult(game);
         record.e.unshift(result);
         statement = prev + result;
         pitchRecord.e = [statement];
         stabilized.e = [statement, '', '', '', '', ''];
 
-        _UtilityText.text.mode = 'n';
+        _text.text.mode = 'n';
         var resultJ = this.getPlateAppearanceResult(game);
         record.n.unshift(resultJ);
         statement = prevJ + resultJ;
         pitchRecord.n = [statement];
         stabilized.n = [statement, '', '', '', '', ''];
 
-        _UtilityText.text.mode = m;
+        _text.text.mode = m;
         var giraffe = this;
         this.async(function () {
-            if (_UtilityText.text.mode === 'n') {
+            if (_text.text.mode === 'n') {
                 console.log(['%c' + resultJ, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners()].join(' '), 'color: darkgreen;');
             } else {
                 console.log(['%c' + result, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners()].join(' '), 'color: darkgreen;');
             }
         });
     },
+
     pointer: 0,
     stabilized: {
         pitchRecord: {
@@ -5715,15 +5731,15 @@ Log.prototype = {
     },
     longFormFielder: function longFormFielder() {
         return {
-            first: (0, _UtilityText.text)('first baseman'),
-            second: (0, _UtilityText.text)('second baseman'),
-            third: (0, _UtilityText.text)('third baseman'),
-            short: (0, _UtilityText.text)('shortstop'),
-            pitcher: (0, _UtilityText.text)('pitcher'),
-            catcher: (0, _UtilityText.text)('catcher'),
-            left: (0, _UtilityText.text)('left fielder'),
-            center: (0, _UtilityText.text)('center fielder'),
-            right: (0, _UtilityText.text)('right fielder')
+            first: (0, _text.text)('first baseman'),
+            second: (0, _text.text)('second baseman'),
+            third: (0, _text.text)('third baseman'),
+            short: (0, _text.text)('shortstop'),
+            pitcher: (0, _text.text)('pitcher'),
+            catcher: (0, _text.text)('catcher'),
+            left: (0, _text.text)('left fielder'),
+            center: (0, _text.text)('center fielder'),
+            right: (0, _text.text)('right fielder')
         };
     }
 };
@@ -5733,27 +5749,28 @@ exports.Log = Log;
 },{"../Utility/text":38}],35:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.text = exports.Log = exports.helper = exports.data = undefined;
 
-var _UtilityData = require('../Utility/data');
+var _data = require('../Utility/data');
 
-var _UtilityHelper = require('../Utility/helper');
+var _helper = require('../Utility/helper');
 
-var _UtilityLog = require('../Utility/Log');
+var _Log = require('../Utility/Log');
 
-var _UtilityText = require('../Utility/text');
+var _text = require('../Utility/text');
 
-exports.data = _UtilityData.data;
-exports.helper = _UtilityHelper.helper;
-exports.Log = _UtilityLog.Log;
-exports.text = _UtilityText.text;
+exports.data = _data.data;
+exports.helper = _helper.helper;
+exports.Log = _Log.Log;
+exports.text = _text.text;
 
 },{"../Utility/Log":34,"../Utility/data":36,"../Utility/helper":37,"../Utility/text":38}],36:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
 var data = {
@@ -5775,7 +5792,7 @@ exports.data = data;
 },{}],37:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
 var helper = {
@@ -5810,12 +5827,12 @@ exports.helper = helper;
 },{}],38:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
 var text = function text(phrase, override) {
     if (!text.mode) text.mode = 'e';
-    var string = ({
+    var string = {
         n: {
             empty: '-',
             ' 1st': '1番',
@@ -5978,14 +5995,14 @@ var text = function text(phrase, override) {
             Power: 'Pow',
             Speed: 'Spd'
         }
-    })[override ? override : text.mode][phrase];
+    }[override ? override : text.mode][phrase];
     return string ? string : phrase;
 };
 
 text.substitution = function (sub, player, mode) {
     var originalMode = text.mode;
     mode = mode || text.mode;
-    var order = ({
+    var order = {
         0: text(' 1st', mode),
         1: text(' 2nd', mode),
         2: text(' 3rd', mode),
@@ -5995,7 +6012,7 @@ text.substitution = function (sub, player, mode) {
         6: text(' 7th', mode),
         7: text(' 8th', mode),
         8: text(' 9th', mode)
-    })[player.order];
+    }[player.order];
     var position = text.fielderShortName(player.position, mode);
 
     if (mode === 'n') {
@@ -6019,7 +6036,7 @@ text.getBattersEye = function (game) {
 
 text.baseShortName = function (base) {
     if (text.mode == 'n') {
-        return ({
+        return {
             '1st': '一',
             '2nd': '二',
             '3rd': '三',
@@ -6029,7 +6046,7 @@ text.baseShortName = function (base) {
             'left': '左',
             'center': '中',
             'right': '右'
-        })[base];
+        }[base];
     }
     return base;
 };
@@ -6037,7 +6054,7 @@ text.baseShortName = function (base) {
 text.fielderShortName = function (fielder, override) {
     var mode = override || text.mode;
     if (mode === 'n') {
-        return ({
+        return {
             'first': '一',
             'second': '二',
             'third': '三',
@@ -6047,7 +6064,7 @@ text.fielderShortName = function (fielder, override) {
             'left': '左',
             'center': '中',
             'right': '右'
-        })[fielder];
+        }[fielder];
     }
     return fielder;
 };
@@ -6061,7 +6078,7 @@ text.slash = function () {
 
 text.fielderLongName = function (fielder) {
     if (text.mode == 'n') {
-        return ({
+        return {
             'first': 'ファースト',
             'second': 'セカンド',
             'third': 'サード',
@@ -6071,9 +6088,9 @@ text.fielderLongName = function (fielder) {
             'left': 'レフト',
             'center': 'センター',
             'right': 'ライト'
-        })[fielder];
+        }[fielder];
     }
-    return ({
+    return {
         first: text('first baseman'),
         second: text('second baseman'),
         third: text('third baseman'),
@@ -6083,17 +6100,17 @@ text.fielderLongName = function (fielder) {
         left: text('left fielder'),
         center: text('center fielder'),
         right: text('right fielder')
-    })[fielder];
+    }[fielder];
 };
 
 text.comma = function () {
-    return ({ n: '、', e: ', ' })[text.mode];
+    return { n: '、', e: ', ' }[text.mode];
 };
 text.space = function () {
-    return ({ n: '', e: ' ' })[text.mode];
+    return { n: '', e: ' ' }[text.mode];
 };
 text.stop = function () {
-    return ({ n: '。', e: '. ' })[text.mode];
+    return { n: '。', e: '. ' }[text.mode];
 };
 
 text.namePitch = function (pitch) {
@@ -6176,73 +6193,75 @@ text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances,
         statement += text.stop();
     }
     if (text.mode == 'n') {
-        var stop = text.stop();
-        statement += batter + 'は';
-        if (outBy) {
-            var fielderLong = text.fielderLongName(fielder);
-            fielder = text.fielderShortName(fielder);
-            switch (outBy) {
-                case 'fieldersChoice':
-                    statement += '野選(' + fielder + ')で出塁';
-                    break;
-                case 'line':
-                    statement += fielder + '直';
-                    break;
-                case 'fly':
-                    statement += fielder + '飛';
-                    break;
-                case 'error':
-                    statement += 'エラー(' + fielder + ')で出塁';
-                    break;
-                case 'pop':
-                    statement += 'ポップフライで' + fielder + '飛';
-                    break;
-                case 'ground':
-                    statement += fielderLong + 'ゴロに封殺';
-                    break;
-                case 'thrown':
-                    statement += fielder + 'ゴロ';
-                    break;
-            }
-            if (out.length) {
-                statement += '。' + out.map(function (runner) {
-                    return text(runner);
-                }).join(text.comma()) + 'ランナーはアウト';
-            }
-            if (doublePlay) {
-                statement += '。ゲッツー';
-            }
-        } else {
-            fielder = text.fielderShortName(fielder);
-            switch (bases) {
-                case 1:
-                    if (infield) {
-                        statement += '内野安打' + '(' + fielder + ')' + 'で出塁';
-                    } else {
-                        statement += '安打(' + fielder + ')' + 'で出塁';
-                    }
-                    break;
-                case 2:
-                    statement += '二塁打（' + fielder + '）で出塁';
-                    break;
-                case 3:
-                    statement += '三塁打（' + fielder + '）で出塁';
-                    break;
-                case 4:
-                    statement += '本塁打（' + fielder + '）';
-                    break;
-            }
-        }
-        if (sacrificeAdvances) {
-            sacrificeAdvances.map(function (base) {
-                if (base == 'third') {
-                    statement += stop + 'サードランナーホームイン';
-                } else {
-                    statement += stop + text(base) + 'ランナー進塁';
+        (function () {
+            var stop = text.stop();
+            statement += batter + 'は';
+            if (outBy) {
+                var fielderLong = text.fielderLongName(fielder);
+                fielder = text.fielderShortName(fielder);
+                switch (outBy) {
+                    case 'fieldersChoice':
+                        statement += '野選(' + fielder + ')で出塁';
+                        break;
+                    case 'line':
+                        statement += fielder + '直';
+                        break;
+                    case 'fly':
+                        statement += fielder + '飛';
+                        break;
+                    case 'error':
+                        statement += 'エラー(' + fielder + ')で出塁';
+                        break;
+                    case 'pop':
+                        statement += 'ポップフライで' + fielder + '飛';
+                        break;
+                    case 'ground':
+                        statement += fielderLong + 'ゴロに封殺';
+                        break;
+                    case 'thrown':
+                        statement += fielder + 'ゴロ';
+                        break;
                 }
-            });
-        }
-        statement += stop;
+                if (out.length) {
+                    statement += '。' + out.map(function (runner) {
+                        return text(runner);
+                    }).join(text.comma()) + 'ランナーはアウト';
+                }
+                if (doublePlay) {
+                    statement += '。ゲッツー';
+                }
+            } else {
+                fielder = text.fielderShortName(fielder);
+                switch (bases) {
+                    case 1:
+                        if (infield) {
+                            statement += '内野安打(' + fielder + ')で出塁';
+                        } else {
+                            statement += '安打(' + fielder + ')で出塁';
+                        }
+                        break;
+                    case 2:
+                        statement += '二塁打（' + fielder + '）で出塁';
+                        break;
+                    case 3:
+                        statement += '三塁打（' + fielder + '）で出塁';
+                        break;
+                    case 4:
+                        statement += '本塁打（' + fielder + '）';
+                        break;
+                }
+            }
+            if (sacrificeAdvances) {
+                sacrificeAdvances.map(function (base) {
+                    if (base == 'third') {
+                        statement += stop + 'サードランナーホームイン';
+                    } else {
+                        statement += stop + text(base) + 'ランナー進塁';
+                    }
+                });
+            }
+            statement += stop;
+        })();
     }
     return statement;
 };
@@ -6252,13 +6271,14 @@ exports.text = text;
 },{}],39:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Baseball = undefined;
 
 var _namespace = require('./namespace');
 
-if (typeof window == 'object') {
+if ((typeof window === 'undefined' ? 'undefined' : babelHelpers.typeof(window)) == 'object') {
     window.Baseball = _namespace.Baseball;
 }
 
@@ -6267,73 +6287,54 @@ exports.Baseball = _namespace.Baseball;
 },{"./namespace":40}],40:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Baseball = undefined;
 
-var _ModelAtBat = require('./Model/AtBat');
+var _AtBat = require('./Model/AtBat');
 
-var _ModelField = require('./Model/Field');
+var _Field = require('./Model/Field');
 
-var _ModelGame = require('./Model/Game');
+var _Game = require('./Model/Game');
 
-var _ModelManager = require('./Model/Manager');
+var _Manager = require('./Model/Manager');
 
-var _ModelPlayer = require('./Model/Player');
+var _Player = require('./Model/Player');
 
-var _ModelTeam = require('./Model/Team');
+var _Team = require('./Model/Team');
 
-var _ModelUmpire = require('./Model/Umpire');
+var _Umpire = require('./Model/Umpire');
 
-var _Utility_utils = require('./Utility/_utils');
+var _utils = require('./Utility/_utils');
 
-var _Services_services = require('./Services/_services');
+var _services = require('./Services/_services');
 
-var _TeamsProvider = require('./Teams/Provider');
+var _Provider = require('./Teams/Provider');
 
 var Baseball = {};
 
 Baseball.model = {};
-Baseball.model.Game = Baseball.Game = _ModelGame.Game;
-Baseball.model.Player = Baseball.Player = _ModelPlayer.Player;
-Baseball.model.Team = Baseball.Team = _ModelTeam.Team;
+Baseball.model.Game = Baseball.Game = _Game.Game;
+Baseball.model.Player = Baseball.Player = _Player.Player;
+Baseball.model.Team = Baseball.Team = _Team.Team;
 
 Baseball.service = {};
-Baseball.service.Animator = _Services_services.Animator;
-Baseball.service.Distribution = _Services_services.Distribution;
-Baseball.service.Iterator = _Services_services.Iterator;
-Baseball.service.Mathinator = _Services_services.Mathinator;
+Baseball.service.Animator = _services.Animator;
+Baseball.service.Distribution = _services.Distribution;
+Baseball.service.Iterator = _services.Iterator;
+Baseball.service.Mathinator = _services.Mathinator;
 
 Baseball.util = {};
-Baseball.util.text = _Utility_utils.text;
-Baseball.util.Log = _Utility_utils.Log;
+Baseball.util.text = _utils.text;
+Baseball.util.Log = _utils.Log;
 
 Baseball.teams = {};
-Baseball.teams.Provider = _TeamsProvider.Provider;
+Baseball.teams.Provider = _Provider.Provider;
 
 exports.Baseball = Baseball;
 
-},{"./Model/AtBat":1,"./Model/Field":2,"./Model/Game":3,"./Model/Manager":4,"./Model/Player":5,"./Model/Team":6,"./Model/Umpire":7,"./Services/_services":30,"./Teams/Provider":31,"./Utility/_utils":35}],41:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-var _ServicesAnimator = require('../Services/Animator');
-
-var _ServicesDistribution = require('../Services/Distribution');
-
-var _ServicesIterator = require('../Services/Iterator');
-
-var _ServicesMathinator = require('../Services/Mathinator');
-
-exports.Animator = _ServicesAnimator.Animator;
-exports.Distribution = _ServicesDistribution.Distribution;
-exports.Iterator = _ServicesIterator.Iterator;
-exports.Mathinator = _ServicesMathinator.Mathinator;
-
-},{"../Services/Animator":26,"../Services/Distribution":27,"../Services/Iterator":28,"../Services/Mathinator":29}]},{},[39]);
+},{"./Model/AtBat":1,"./Model/Field":2,"./Model/Game":3,"./Model/Manager":4,"./Model/Player":5,"./Model/Team":6,"./Model/Umpire":7,"./Services/_services":30,"./Teams/Provider":31,"./Utility/_utils":35}]},{},[39]);
 
 var SocketService = function() {
     var Service = function() {};

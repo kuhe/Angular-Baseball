@@ -11,7 +11,7 @@ class Trainer {
             surname = 'JPN';
         }
 
-        player.name = name + ' ' + surname;
+        player.name = `${name} ${surname}`;
         player.nameJ = surnameJ + nameJ;
         player.surname = surname;
         player.surnameJ = surnameJ;
@@ -24,7 +24,7 @@ class Trainer {
         player.bats = bats;
         player.throws = throws;
         player.number = number;
-        Iterator.each(player.pitching, function(key, value) {
+        Iterator.each(player.pitching, (key, value) => {
             player.pitching[key].velocity += pitching/5 | 0;
             player.pitching[key].break += pitching/5 | 0;
             player.pitching[key].control += pitching/5 | 0;

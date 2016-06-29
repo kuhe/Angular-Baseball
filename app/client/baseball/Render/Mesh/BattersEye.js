@@ -10,11 +10,11 @@ class BattersEye extends AbstractMesh {
         }
     }
     getMesh() {
-        var material = new THREE.MeshLambertMaterial({
+        const material = new THREE.MeshLambertMaterial({
             color: 0x3F4045
         });
 
-        var mesh = new THREE.Mesh(
+        const mesh = new THREE.Mesh(
             new THREE.BoxGeometry(
                 200,
                 45,

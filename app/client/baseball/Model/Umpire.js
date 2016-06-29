@@ -1,13 +1,13 @@
 import { Log } from '../Utility/_utils';
 import { Player } from '../Model/Player';
 
-var Umpire = function(game) {
+const Umpire = function(game) {
     this.init(game);
 };
 
 Umpire.prototype = {
     constructor : Umpire,
-    init : function(game) {
+    init(game) {
         this.game = game;
         this.playBall();
     },
@@ -16,8 +16,8 @@ Umpire.prototype = {
         balls : 0,
         outs : 0
     },
-    playBall : function() {
-        var game = this.game;
+    playBall() {
+        const game = this.game;
         game.half = 'top';
         game.inning = 1;
         game.batter = game.teams.away.lineup[0];
@@ -25,24 +25,23 @@ Umpire.prototype = {
         game.deck = game.teams.away.lineup[1];
         game.hole = game.teams.away.lineup[2];
         game.pitcher = game.teams.home.positions.pitcher;
-        var n = '一回のオモテ、'+game.teams.away.nameJ+'の攻撃対'+game.teams.home.nameJ+'、ピッチャーは'+game.teams.home.positions.pitcher.nameJ+'。',
-            e = 'Top 1, '+game.teams.away.name+' offense vs. '+game.teams.home.positions.pitcher.name+' starting for '+game.teams.home.name;
+        const n = `一回のオモテ、${game.teams.away.nameJ}の攻撃対${game.teams.home.nameJ}、ピッチャーは${game.teams.home.positions.pitcher.nameJ}。`, e = `Top 1, ${game.teams.away.name} offense vs. ${game.teams.home.positions.pitcher.name} starting for ${game.teams.home.name}`;
         game.log.note(e, n);
         game.batter.ready = true;
         game.log.noteBatter(
             game.batter
         );
     },
-    makeCall : function() {
+    makeCall() {
         this.says = '';
-        var game = this.game;
-        var result = game.swingResult;
-        var pitcher = game.pitcher;
-        var batter = game.batter;
-        var field = game.field;
+        const game = this.game;
+        const result = game.swingResult;
+        const pitcher = game.pitcher;
+        const batter = game.batter;
+        const field = game.field;
 
         if (game.swingResult.fielder) {
-            var fielder = game.teams[game.half == 'top' ? 'home' : 'away'].positions[result.fielder]
+            var fielder = game.teams[game.half === 'top' ? 'home' : 'away'].positions[result.fielder]
         } else {
             fielder = null;
         }
@@ -70,7 +69,7 @@ Umpire.prototype = {
             thief.stats.batting.sb++;
         }
         if (result.caughtStealing) {
-            game.teams[game.half == 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding.PO++;
+            game.teams[game.half === 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding.PO++;
             this.count.outs++;
             thief = result.caughtStealing;
             thief.stats.batting.cs++;
@@ -133,7 +132,7 @@ Umpire.prototype = {
                         batter.stats.batting.ab++;
                         if (result.firstOut) {
                             game.field[result.firstOut] = null;
-                            result.additionalOuts.map(function(runner) {
+                            result.additionalOuts.map(runner => {
                                 if (runner !== 'batter') {
                                     game.field[runner] = null;
                                 }
@@ -172,15 +171,15 @@ Umpire.prototype = {
                         }
                         if (result.bases) {
                             if (!result.error) {
-                                game.tally[game.half == 'top' ? 'away' : 'home'][Log.prototype.SINGLE]++;
+                                game.tally[game.half === 'top' ? 'away' : 'home'][Log.prototype.SINGLE]++;
                                 pitcher.stats.pitching.H++;
                             } else {
                                 if (result.bases > 0) {
-                                    game.tally[game.half == 'top' ? 'home' : 'away'].E++;
+                                    game.tally[game.half === 'top' ? 'home' : 'away'].E++;
                                     fielder.stats.fielding.E++;
                                 }
                             }
-                            var bases = result.bases;
+                            let bases = result.bases;
                             switch (bases) {
                                 case 0 :
                                     game.batter.atBats.push(Log.prototype.GROUNDOUT);
@@ -223,7 +222,7 @@ Umpire.prototype = {
                                     break;
                             }
                             if (bases > 0 && bases < 4 && !result.error) {
-                                if (['left', 'right', 'center'].indexOf(result.fielder) == -1) {
+                                if (['left', 'right', 'center'].includes(result.fielder)) {
                                     batter.recordInfieldHit();
                                 }
                             }
@@ -245,7 +244,7 @@ Umpire.prototype = {
             }
         }
 
-        this.says = (this.count.balls + ' and ' + this.count.strikes);
+        this.says = (`${this.count.balls} and ${this.count.strikes}`);
 
         result.outs = this.count.outs;
 
@@ -278,20 +277,20 @@ Umpire.prototype = {
             this.changeSides();
         }
     },
-    reachBase : function() {
-        var game = this.game;
+    reachBase() {
+        const game = this.game;
         game.field.first = game.batter;
         game.field.first.fatigue += 2;
         return this;
     },
-    advanceRunners : function(isWalk, fieldersChoice, sacrificeAdvances) {
+    advanceRunners(isWalk, fieldersChoice, sacrificeAdvances) {
         isWalk = !!isWalk;
-        var game = this.game;
-        var first = game.field.first,
-            second = game.field.second,
-            third = game.field.third,
-            swing = game.swingResult;
-        
+        const game = this.game;
+        let first = game.field.first;
+        let second = game.field.second;
+        let third = game.field.third;
+        const swing = game.swingResult;
+
         if (isWalk) {
             if (first) {
                 if (second) {
@@ -333,23 +332,23 @@ Umpire.prototype = {
                 second = game.field.second;
                 third = game.field.third;
             }
-            var canAdvance = function() {return true;};
+            let canAdvance = () => true;
             if (sacrificeAdvances) {
-                canAdvance = function(position) {
+                canAdvance = position => {
                     switch (position) {
                         case 'first':
-                            return sacrificeAdvances.indexOf('first') > -1 && (!game.field.second);
+                            return sacrificeAdvances.includes('first') && (!game.field.second);
                         case 'second':
-                            return sacrificeAdvances.indexOf('second') > -1 && (!game.field.third);
+                            return sacrificeAdvances.includes('second') && (!game.field.third);
                         case 'third':
-                            return sacrificeAdvances.indexOf('third') > -1;
+                            return sacrificeAdvances.includes('third');
                     }
                 };
             }
-            var arm = 0;
+            let arm = 0;
             if (swing.fielder) {
-                var fielder = game.pitcher.team.positions[swing.fielder];
-                if (['left', 'center', 'right'].indexOf(fielder.position) > -1) {
+                const fielder = game.pitcher.team.positions[swing.fielder];
+                if (['left', 'center', 'right'].includes(fielder.position)) {
                     arm = fielder.skill.defense.throwing;
                 } else {
                     arm = fielder.skill.defense.throwing + 120; // very rare extra bases on infield BIP
@@ -396,13 +395,13 @@ Umpire.prototype = {
         }
         return this;
     },
-    runScores : function() {
-        var game = this.game;
-        game.scoreboard[game.half == 'top' ? 'away' : 'home'][game.inning]++;
-        game.tally[game.half == 'top' ? 'away' : 'home'].R++;
+    runScores() {
+        const game = this.game;
+        game.scoreboard[game.half === 'top' ? 'away' : 'home'][game.inning]++;
+        game.tally[game.half === 'top' ? 'away' : 'home'].R++;
     },
-    newBatter : function() {
-        var game = this.game;
+    newBatter() {
+        const game = this.game;
         game.passMinutes(2);
         game.log.pitchRecord = {
             e: [],
@@ -410,7 +409,7 @@ Umpire.prototype = {
         };
         this.count.balls = this.count.strikes = 0;
         game.log.notePlateAppearanceResult(game);
-        var team = game.half == 'bottom' ? game.teams.home : game.teams.away;
+        const team = game.half === 'bottom' ? game.teams.home : game.teams.away;
         game.lastBatter = game.batter;
         game.batter = team.lineup[(team.nowBatting + 1)%9];
         game.batter.ready = false;
@@ -425,8 +424,8 @@ Umpire.prototype = {
         }
         game.showPlayResultPanels(game.lastBatter);
     },
-    changeSides : function() {
-        var game = this.game;
+    changeSides() {
+        const game = this.game;
         game.passMinutes(5);
         game.swingResult = {};
         game.swingResult.looking = true; // hide bat
@@ -436,11 +435,11 @@ Umpire.prototype = {
             e: [],
             n: []
         };
-        var offense, defense;
+        let offense, defense;
         game.field.first = null;
         game.field.second = null;
         game.field.third = null;
-        if (game.half == 'top') {
+        if (game.half === 'top') {
             if (game.inning == 9 && game.tally.home.R > game.tally.away.R) {
                 return game.end();
             }
@@ -452,13 +451,11 @@ Umpire.prototype = {
             game.inning++;
             game.half = 'top';
         }
-        offense = game.half == 'top' ? 'away' : 'home';
-        defense = game.half == 'top' ? 'home' : 'away';
-        var n = game.inning+'回の'+(game.half == 'top' ? 'オモテ' : 'ウラ')
-                +'、'+game.teams[(game.half == 'top' ? 'away' : 'home')].getName()+'の攻撃。',
-            e = (game.half == 'top' ? 'Top' : 'Bottom')+' '+game.inning;
+        offense = game.half === 'top' ? 'away' : 'home';
+        defense = game.half === 'top' ? 'home' : 'away';
+        const n = `${game.inning}回の${game.half === 'top' ? 'オモテ' : 'ウラ'}、${game.teams[(game.half === 'top' ? 'away' : 'home')].getName()}の攻撃。`, e = `${game.half === 'top' ? 'Top' : 'Bottom'} ${game.inning}`;
         game.log.note(e, n);
-        var team = game.teams[offense];
+        const team = game.teams[offense];
         game.batter = team.lineup[team.nowBatting];
         game.batterRunner = game.batter;
         game.deck = team.lineup[(team.nowBatting + 1)%9];
@@ -470,7 +467,7 @@ Umpire.prototype = {
         game.field.defense = team.positions;
         this.onSideChange();
     },
-    onSideChange : function() {}, // can be bound externally
+    onSideChange() {}, // can be bound externally
     says : 'Play ball!',
     game : null
 };

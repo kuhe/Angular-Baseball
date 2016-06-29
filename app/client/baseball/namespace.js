@@ -1,4 +1,4 @@
-var Baseball = {};
+const Baseball = {};
 
 import { AtBat } from './Model/AtBat';
 import { Field } from './Model/Field';

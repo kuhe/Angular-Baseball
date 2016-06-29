@@ -2,29 +2,15 @@ import { Game, Team } from '../Model/_models';
 import { Player } from '../Model/Player';
 import { Trainer } from '../Teams/Trainer';
 
-var samurai = new Team('no init');
+const samurai = new Team('no init');
 samurai.name = 'Japan';
 samurai.nameJ = '日本';
 
-var darvish = new Player(samurai),
-    johjima = new Player(samurai),
+const darvish = new Player(samurai), johjima = new Player(samurai), ogasawara = new Player(samurai), nishioka = new Player(samurai), kawasaki = new Player(samurai), murata = new Player(samurai), matsui = new Player(samurai), ichiro = new Player(samurai), inaba = new Player(samurai);
 
-    ogasawara = new Player(samurai),
-    nishioka = new Player(samurai),
-    kawasaki = new Player(samurai),
-    murata = new Player(samurai),
+const matsuzaka = new Player(samurai), fukudome = new Player(samurai), aoki = new Player(samurai), abe = new Player(samurai), iwamura = new Player(samurai);
 
-    matsui = new Player(samurai),
-    ichiro = new Player(samurai),
-    inaba = new Player(samurai);
-
-var matsuzaka = new Player(samurai),
-    fukudome = new Player(samurai),
-    aoki = new Player(samurai),
-    abe = new Player(samurai),
-    iwamura = new Player(samurai);
-
-var coach = new Trainer();
+const coach = new Trainer();
 
 coach.makePlayer(darvish, 'Yu', 'Darvish', 'ダルビッシュ', '有', 150, {eye: 80, power: 80, speed: 80},
     {catching: 50, fielding: 70, throwing: 100, speed: 80}, 'right', 'right', 11);
@@ -76,7 +62,7 @@ samurai.positions = {
     right: inaba
 };
 
-for (var position in samurai.positions) { if (samurai.positions.hasOwnProperty(position)) {
+for (const position in samurai.positions) { if (samurai.positions.hasOwnProperty(position)) {
     samurai.positions[position].position = position;
 }}
 
@@ -84,7 +70,7 @@ samurai.lineup = [
     ichiro, kawasaki, inaba, matsui, ogasawara, johjima, murata, nishioka, darvish
 ];
 
-samurai.lineup.map(function(player, order) {
+samurai.lineup.map((player, order) => {
     player.order = order;
 });
 

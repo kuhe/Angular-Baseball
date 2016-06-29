@@ -1,5 +1,5 @@
-var assert = require("assert");
-var colors = require('colors');
+import assert from "assert";
+import colors from 'colors';
 
 import { Baseball } from '../baseball';
 import { Animator } from '../Services/Animator';
@@ -10,22 +10,22 @@ text.mode = 'n';
 
 import { samurai } from '../Teams/TeamJapan';
 
-var seasons = 10;
+const seasons = 10;
 
-describe('Game', function() {
+describe('Game', () => {
 
-    var Game = Baseball.Game;
-    var Player = Baseball.Player;
-    var Team = Baseball.Team;
+    const Game = Baseball.Game;
+    const Player = Baseball.Player;
+    const Team = Baseball.Team;
 
-    var log = function() {
-        console.log.apply(console, arguments);
+    const log = function() {
+        console.log(...arguments);
     };
 
-    var format = function(n, digits) {
-        n = '' + Math.floor(n*1000)/1000;
+    const format = (n, digits) => {
+        n = `${Math.floor(n*1000)/1000}`;
         while (n.indexOf('.') > -1 && n.length < 5) n += '0';
-        while (n.indexOf('.') === -1 && n.length < 4) n = ' ' + n;
+        while (n.indexOf('.') === -1 && n.length < 4) n = ` ${n}`;
         return n;
     };
 
@@ -33,19 +33,15 @@ describe('Game', function() {
     Game.prototype.humanControl = 'none';
     Animator.console = true;
 
-    var game = new Game();
+    const game = new Game();
     game.gamesIntoSeason = 144;
-    var player, p;
+    let player, p;
     player = new Player(game.teams.home, false);
     //player = samurai.lineup[Math.random() * 9 | 0];
-    var asPitcher = Math.random() > 0.96;
+    const asPitcher = Math.random() > 0.96;
     p = player;
 
-    var TERRIBAD = 5,
-        AWFUL = 25,
-        MEDIOCRE = 45,
-        GOOD = 65,
-        ELITE = 88;
+    const TERRIBAD = 5, AWFUL = 25, MEDIOCRE = 45, GOOD = 65, ELITE = 88;
 
     //var offense = {
     //    eye: MEDIOCRE,
@@ -58,8 +54,8 @@ describe('Game', function() {
     //    catching: ELITE,
     //    speed: GOOD
     //};
-    var offense = player.skill.offense;
-    var defense = player.skill.defense;
+    const offense = player.skill.offense;
+    const defense = player.skill.defense;
     offense.eye += 10;
     offense.power += 10;
     offense.speed += 10;
@@ -71,16 +67,16 @@ describe('Game', function() {
     player.skill.offense = offense;
     player.resetStats(144);
 
-    var vary = function(player) {
-        var stat = ['eye', 'power', 'speed'][Math.random() * 3 | 0];
-        var o = player.skill.offense;
+    const vary = player => {
+        const stat = ['eye', 'power', 'speed'][Math.random() * 3 | 0];
+        const o = player.skill.offense;
         o[stat] -= 6;
         o.eye += 2;
         o.power += 2;
         o.speed += 2;
     };
 
-    var getStats = player => {
+    const getStats = player => {
         return {
             pa: format(player.stats.batting.pa),
             ba: format(player.stats.batting.getBA()),
@@ -117,23 +113,23 @@ describe('Game', function() {
             WHIP: format(player.stats.pitching.getWHIP())
         }
     };
-    var career = {};
-    var logPlayer = function(yr) {
+    const career = {};
+    const logPlayer = yr => {
         career[yr] = getStats(player);
     };
 
 
-    var teams = [1,2,3,4,5,6,7].map(function() {
-        var team = new Team(game);
+    const teams = [1,2,3,4,5,6,7].map(() => {
+        const team = new Team(game);
         team.wins = 0;
         team.losses = 0;
         team.ties = 0;
         return team;
     });
-    var schedule = [];
-    var createSchedule = function() {
-        for (var i = 0; i < 7; i++) {
-            for (var j = i + 1; j < 7; j++) {
+    let schedule = [];
+    const createSchedule = () => {
+        for (let i = 0; i < 7; i++) {
+            for (let j = i + 1; j < 7; j++) {
                 schedule = schedule.concat([
                     {home: i, away: j}
                 ]);
@@ -141,24 +137,22 @@ describe('Game', function() {
         }
     };
     [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map( _ => createSchedule());
-    var scheduleIndex = 0;
-    var getTeams = function() {
-        return {
-            home: teams[schedule[scheduleIndex].home],
-            away: teams[schedule[scheduleIndex].away]
-        }
-    };
+    let scheduleIndex = 0;
+    const getTeams = () => ({
+        home: teams[schedule[scheduleIndex].home],
+        away: teams[schedule[scheduleIndex].away]
+    });
 
-    var year = new Date().getFullYear() - seasons;
+    let year = new Date().getFullYear() - seasons;
 
     logPlayer((++year, 'Rkie'));
     log(asPitcher ? player.skill.pitching : player.skill.offense, player.skill.defense);
     log('------');
 
-    var runSeason = function(n) {
+    const runSeason = n => {
         game.teams.away = getTeams().away;
         game.teams.home = getTeams().home;
-        var x = 15000;
+        let x = 15000;
         game.gamesIntoSeason = 0;
         p = player;
         if (asPitcher) {
@@ -172,9 +166,9 @@ describe('Game', function() {
             vary(player);
         }
 
-        var games = 0;
+        let games = 0;
         do {
-            game.simulateInput(function(callback) {
+            game.simulateInput(callback => {
                 typeof callback == 'function' && callback();
             });
             if (game.stage == 'end') {
@@ -192,7 +186,7 @@ describe('Game', function() {
 
                 game.teams.away = getTeams().away;
                 p.fatigue = 0;
-                Iterator.each(game.teams.away.positions, function(key, player) {
+                Iterator.each(game.teams.away.positions, (key, player) => {
                     if (key != 'pitcher' && Math.random() > 0) {
                         game.teams.away.positions[key] = p;
                         game.teams.home.positions[key] = p;
@@ -219,7 +213,7 @@ describe('Game', function() {
         logPlayer(++year);
     };
 
-    var times = [Date.now()];
+    let times = [Date.now()];
     runSeason(2);
     times.push(Date.now());
     runSeason(3);
@@ -247,10 +241,10 @@ describe('Game', function() {
     log(asPitcher ? player.skill.pitching : player.skill.offense, player.skill.defense);
 
     (function logCareer() {
-        var statLines = {};
+        const statLines = {};
         for (var year in career) {
             if (!asPitcher || year != 'Rkie') {
-                for (var stat in career[year]) {
+                for (const stat in career[year]) {
                     if (typeof statLines[stat] === 'undefined') {
                         statLines[stat] = [];
                     }
@@ -258,10 +252,10 @@ describe('Game', function() {
                 }
             }
         }
-        var logHeaders = function() {
+        const logHeaders = () => {
             if (asPitcher) {
                 log(
-                    year + '',
+                    `${year}`,
                     ' | W   ',
                     ' | L   ',
                     ' | ERA ',
@@ -275,7 +269,7 @@ describe('Game', function() {
                 );
             } else {
                 log(
-                    year + '',
+                    `${year}`,
                     ' | PA  ',
                     ' | AV   ',
                     ' | H/2B/3B/HR      ',
@@ -295,47 +289,47 @@ describe('Game', function() {
                 );
             }
         };
-        var logYear = function(stats) {
+        const logYear = function(stats) {
             let highest = stat => {
                 return stats[stat] == Math.max.apply(this, statLines[stat]) ? stats[stat].toString().green : stats[stat]
             };
             let filter = stat => {
-                var s = highest(stat);
+                const s = highest(stat);
                 return s == Math.min.apply(this, statLines[stat]) ? s.toString().yellow : s;
             };
             if (asPitcher) {
                 log(
-                    year + '',
-                    ' | ' + filter('W'),
-                    ' | ' + filter('L'),
-                    ' | ' + filter('ERA'),
-                    ' | ' + filter('IP'),
-                    ' | ' + filter('K'),
-                    ' | ' + filter('H'),
-                    ' | ' + filter('BB'),
-                    ' | ' + filter('WHIP'),
-                    ' | ' + filter('K9'),
-                    ' | ' + filter('HR')
+                    `${year}`,
+                    ` | ${filter('W')}`,
+                    ` | ${filter('L')}`,
+                    ` | ${filter('ERA')}`,
+                    ` | ${filter('IP')}`,
+                    ` | ${filter('K')}`,
+                    ` | ${filter('H')}`,
+                    ` | ${filter('BB')}`,
+                    ` | ${filter('WHIP')}`,
+                    ` | ${filter('K9')}`,
+                    ` | ${filter('HR')}`
                 );
             } else {
                 log(
-                    year + '',
-                    ' | ' + filter('pa'),
-                    ' | ' + filter('ba'),
-                    ' | '  + filter('h') + filter('2b') + filter('3b') + filter('hr'),
-                    ' | ' + filter('bb'),
-                    ' | ' + filter('r'),
-                    ' | ' + filter('so'),
-                    ' | ' + filter('sac'),
-                    ' | ' + filter('rbi'),
-                    ' | ' + filter('obp'),
-                    ' | ' + filter('slg'),
-                    ' | ' + filter('ops'),
-                    ' | ' + filter('opsp'),
-                    ' | ' + filter('babip'),
-                    ' | ' + filter('sb'),
-                    ' | ' + filter('cs'),
-                    ' | ' + filter('fp')
+                    `${year}`,
+                    ` | ${filter('pa')}`,
+                    ` | ${filter('ba')}`,
+                    ` | ${filter('h')}${filter('2b')}${filter('3b')}${filter('hr')}`,
+                    ` | ${filter('bb')}`,
+                    ` | ${filter('r')}`,
+                    ` | ${filter('so')}`,
+                    ` | ${filter('sac')}`,
+                    ` | ${filter('rbi')}`,
+                    ` | ${filter('obp')}`,
+                    ` | ${filter('slg')}`,
+                    ` | ${filter('ops')}`,
+                    ` | ${filter('opsp')}`,
+                    ` | ${filter('babip')}`,
+                    ` | ${filter('sb')}`,
+                    ` | ${filter('cs')}`,
+                    ` | ${filter('fp')}`
                 );
             }
         };
@@ -343,12 +337,12 @@ describe('Game', function() {
         logYear(career.Rkie);
         for (year in career) {
             if (year != 'Rkie') {
-                var stats = career[year];
+                const stats = career[year];
                 logYear(stats);
             }
         }
-        var sum = (a, b) => format(parseFloat(a) + parseFloat(b));
-        var totals = {};
+        const sum = (a, b) => format(parseFloat(a) + parseFloat(b));
+        const totals = {};
         Iterator.each(statLines, (k, v) => {
             totals[k] = v.reduce(sum);
         });
@@ -367,7 +361,7 @@ describe('Game', function() {
         logYear(totals);
     })();
 
-    var byWins = function(a, b) {
+    const byWins = (a, b) => {
         a = a.wins * 10000 - a.losses * 100 - a.ties;
         b = b.wins * 10000 - b.losses * 100 - b.ties;
         if (a > b) return -1;
@@ -375,33 +369,31 @@ describe('Game', function() {
         return 0;
     };
 
-    var lpad = function(s, len) {
+    const lpad = (s, len) => {
         if (!len) len = 2;
-        s = '' + s;
+        s = `${s}`;
         while (s.length < len) {
-            s = ' ' + s;
+            s = ` ${s}`;
         }
         return s;
     };
 
     //game.debugOut();
-    it('running times', function() {
-        times = times.map(function(x, k) {
-            return times[k] - (times[k-1] || 0);
-        });
+    it('running times', () => {
+        times = times.map((x, k) => times[k] - (times[k-1] || 0));
         times.shift();
-        log(times.join('ms, ')+'ms');
-        var avg = times.reduce((a, b) => a + b)/(seasons - 1) | 0;
+        log(`${times.join('ms, ')}ms`);
+        const avg = times.reduce((a, b) => a + b)/(seasons - 1) | 0;
         log('average: ', avg, 'ms/year');
         log('');
         teams.sort(byWins);
-        teams.map(t => log(lpad(t.name, 12) + ': ' + lpad(t.wins) + ' - ' + lpad(t.losses) + ' - ' + lpad(t.ties)));
+        teams.map(t => log(`${lpad(t.name, 12)}: ${lpad(t.wins)} - ${lpad(t.losses)} - ${lpad(t.ties)}`));
         log('');
     });
-    it('このシーズンで、終わってしまうかもしれない', function () {
+    it('このシーズンで、終わってしまうかもしれない', () => {
         assert(300 < player.stats.batting.ab || 50 < player.stats.pitching.IP[0]);
     });
-    it('    - ' + player.getName() + ' (' + player.name + ')', function() {
+    it(`    - ${player.getName()} (${player.name})`, () => {
         assert(true);
     });
 });

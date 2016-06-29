@@ -11,11 +11,11 @@ class Grass extends AbstractMesh {
         }
     }
     getMesh() {
-        var material = new THREE.MeshLambertMaterial({
+        const material = new THREE.MeshLambertMaterial({
             color: this.infield ? 0x284C19: 0x284C19 //0x486D1F
         });
 
-        var mesh = new THREE.Mesh(
+        const mesh = new THREE.Mesh(
             new THREE.PlaneGeometry(
                 this.infield ? 94 : 8000,
                 this.infield ? 94 : 8000,

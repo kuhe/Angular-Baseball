@@ -2,14 +2,14 @@ import { data, text } from '../Utility/_utils';
 import { Iterator, Mathinator, Distribution } from '../Services/_services';
 import { AtBat, Team } from '../Model/_models';
 
-var Player = function(team, hero) {
+const Player = function(team, hero) {
     this.init(team, hero);
     this.resetStats(this.team.game && this.team.game.gamesIntoSeason || 0);
 };
 
 Player.prototype = {
     constructor : Player,
-    init : function(team, hero) {
+    init(team, hero) {
         this.ready = false;
         this.throws = Math.random() > 0.86 ? 'left' : 'right';
         this.bats = Math.random() > 0.75 ? 'left' : 'right';
@@ -22,12 +22,10 @@ Player.prototype = {
         this.pitching = {averaging : []};
         this.number = 0;
         this.randomizeSkills(hero || (Math.random() > 0.9));
-        var surnameKey = Math.floor(Math.random()*data.surnames.length),
-            nameKey = Math.floor(Math.random()*data.names.length);
+        const surnameKey = Math.floor(Math.random()*data.surnames.length), nameKey = Math.floor(Math.random()*data.names.length);
 
-        this.name = data.surnames[surnameKey] + ' ' + data.names[nameKey];
-        var jSurname = data.surnamesJ[surnameKey],
-            jGivenName = data.namesJ[nameKey];
+        this.name = `${data.surnames[surnameKey]} ${data.names[nameKey]}`;
+        const jSurname = data.surnamesJ[surnameKey], jGivenName = data.namesJ[nameKey];
         this.spaceName(jSurname, jGivenName);
         this.surname = data.surnames[surnameKey];
         this.surnameJ = data.surnamesJ[surnameKey];
@@ -35,31 +33,30 @@ Player.prototype = {
         this.definingBattingCharacteristic = {};
         this.definingCharacteristic = {};
     },
-    spaceName : function(jSurname, jGivenName) {
-        if (jSurname.length == 1 && jGivenName.length <= 2) jSurname += '・';
-        if (jGivenName.length == 1 && jSurname.indexOf('・') < 0 && jSurname.length <= 2) jSurname += '・';
+    spaceName(jSurname, jGivenName) {
+        if (jSurname.length === 1 && jGivenName.length <= 2) jSurname += '・';
+        if (jGivenName.length === 1 && !jSurname.includes('・') && jSurname.length <= 2) jSurname += '・';
         this.nameJ = jSurname + jGivenName;
         this.surnameJ = jSurname;
     },
-    serialize : function() {
-        var team = this.team;
+    serialize() {
+        const team = this.team;
         delete this.team;
-        var data = JSON.stringify(this);
+        const data = JSON.stringify(this);
         this.team = team;
         return data;
     },
-    fromData : function(data) {
-        var giraffe = this;
-        Iterator.each(data, function(key, value) {
+    fromData(data) {
+        const giraffe = this;
+        Iterator.each(data, (key, value) => {
             giraffe[key] = value;
         });
         delete this.atBatObjects;
         this.getAtBats();
     },
-    substitute : function(player) {
+    substitute(player) {
         if (player.team !== this.team) return false;
-        var order = player.order,
-            position = player.position;
+        const order = player.order, position = player.position;
         player.team.substituted.push(player);
         player.team.positions[position] = this;
         player.team.lineup[order] = this;
@@ -67,37 +64,35 @@ Player.prototype = {
         this.position = position;
         this.order = order;
 
-        var game = this.team.game;
+        const game = this.team.game;
         if (game.pitcher === player) game.pitcher = this;
         if (game.batter === player) game.batter = this;
         if (game.deck === player) game.deck = this;
         if (game.hole === player) game.hole = this;
 
-        var field = game.field;
+        const field = game.field;
         if (field.first === player) field.first = this;
         if (field.second === player) field.second = this;
         if (field.third === player) field.third = this;
 
-        var bench = this.team.bench,
-            bullpen = this.team.bullpen;
-        if (bench.indexOf(this) > -1) {
+        const bench = this.team.bench, bullpen = this.team.bullpen;
+        if (bench.includes(this)) {
             bench.splice(bench.indexOf(this), 1);
         }
-        if (bullpen.indexOf(this) > -1) {
+        if (bullpen.includes(this)) {
             bullpen.splice(bullpen.indexOf(this), 1);
         }
         game.log.noteSubstitution(this, player);
     },
-    resetStats : function(gamesIntoSeason = 0) {
-        var offense = this.skill.offense;
-        var defense = this.skill.defense;
-        var randBetween = function(a, b, skill) {
-            var total = 0,
-                count = 0;
+    resetStats(gamesIntoSeason=0) {
+        const offense = this.skill.offense;
+        const defense = this.skill.defense;
+        const randBetween = (a, b, skill) => {
+            let total = 0, count = 0;
             skill += '';
             if (!skill) skill = '';
-            Iterator.each(skill.split(' '), function(key, value) {
-                var skill = value;
+            Iterator.each(skill.split(' '), (key, value) => {
+                let skill = value;
                 if (offense[skill]) skill = offense[skill];
                 if (defense[skill]) skill = defense[skill];
                 if (isNaN(skill)) skill = 50;
@@ -108,7 +103,7 @@ Player.prototype = {
             skill = Math.sqrt(0.05 + Math.random()*0.95)*(total/(count * 0.97));
             return Math.floor((skill/100) * (b - a) + a);
         };
-        var IP, ER, GS, W, L;
+        let IP, ER, GS, W, L;
         if (this.skill.pitching > 65) {
             IP = (this.skill.pitching - 65)*gamesIntoSeason/20;
             ER = (IP/9)*randBetween(800, 215, this.skill.pitching)/100;
@@ -128,97 +123,97 @@ Player.prototype = {
             ER = 0;
             GS = 0; W = 0; L = 0;
         }
-        var pa = randBetween(gamesIntoSeason*3, gamesIntoSeason*5, 'speed eye');
-        var paRemaining = pa;
-        var bb = Math.floor(randBetween(0, 18, 'power eye')*paRemaining/100);
+        const pa = randBetween(gamesIntoSeason*3, gamesIntoSeason*5, 'speed eye');
+        let paRemaining = pa;
+        const bb = Math.floor(randBetween(0, 18, 'power eye')*paRemaining/100);
         paRemaining -= bb;
-        var ab = paRemaining;
-        var so = Math.floor(randBetween(25, 2, 'eye')*paRemaining/100);
+        const ab = paRemaining;
+        const so = Math.floor(randBetween(25, 2, 'eye')*paRemaining/100);
         paRemaining -= so;
-        var h = Math.floor(randBetween(185, 372, 'eye power speed')*paRemaining/1000);
+        const h = Math.floor(randBetween(185, 372, 'eye power speed')*paRemaining/1000);
         paRemaining -= h;
-        var sb = randBetween(0, (h + bb)/6, 'speed') | 0;
-        var cs = randBetween(sb, 0, 'speed eye') | 0;
+        const sb = randBetween(0, (h + bb)/6, 'speed') | 0;
+        const cs = randBetween(sb, 0, 'speed eye') | 0;
 
-        var doubles = randBetween(0, h/4, 'power speed');
-        var triples = randBetween(0, h/12, 'speed');
-        var hr = Math.max(0, randBetween(-h/20, h/5, 'power eye'));
-        var r = randBetween(h/8, (h + bb)/3, 'speed') + hr;
-        var rbi = randBetween(h/8, (h)/2, 'power eye') + hr;
-        var hbp = randBetween(0, gamesIntoSeason/25);
-        var sac = randBetween(0, gamesIntoSeason/5, 'eye');
+        const doubles = randBetween(0, h/4, 'power speed');
+        const triples = randBetween(0, h/12, 'speed');
+        const hr = Math.max(0, randBetween(-h/20, h/5, 'power eye'));
+        const r = randBetween(h/8, (h + bb)/3, 'speed') + hr;
+        const rbi = randBetween(h/8, (h)/2, 'power eye') + hr;
+        const hbp = randBetween(0, gamesIntoSeason/25);
+        const sac = randBetween(0, gamesIntoSeason/5, 'eye');
 
-        var chances = randBetween(gamesIntoSeason * 5, pa - bb - so - hr, 'fielding');
-        var E = randBetween(chances/10, 0, 'fielding');
-        var PO = chances - E;
+        const chances = randBetween(gamesIntoSeason * 5, pa - bb - so - hr, 'fielding');
+        const E = randBetween(chances/10, 0, 'fielding');
+        const PO = chances - E;
 
         this.stats = {
             pitching : {
                 pitches : 0, // in game
-                GS : GS,
-                W: W,
-                L: L,
+                GS,
+                W,
+                L,
                 strikes : 0, // in game
                 K : 0, // in game
-                getK9 : function() {
+                getK9() {
                     return this.K / (this.IP[0]/9);
                 },
-                getERA : function() {
+                getERA() {
                     return 9 * this.ER / Math.max(1/3, this.IP[0] + this.IP[1]/3);
                 },
                 ERA : null,
-                ER : ER,
+                ER,
                 H : 0, // in game
                 HR : 0, // in game
                 BB : 0, // in game
                 IP : [IP,0],
                 WHIP : 0,
-                getWHIP : function() {
+                getWHIP() {
                     return (this.H + this.BB)/(this.IP[0] ? this.IP[0] : 1);
                 }
             },
             batting : {
-                getBA : function() {
+                getBA() {
                     return this.h / (Math.max(1, this.ab));
                 },
-                getBABIP : function() {
+                getBABIP() {
                     return (this.h - this.hr) / (this.ab - this.so - this.hr + this.sac);
                 },
                 ba : null,
-                getOBP : function() {
+                getOBP() {
                     return (this.h + this.bb + this.hbp)/(this.ab + this.bb + this.hbp + this.sac);
                 },
                 obp : null,
-                getSLG : function() {
+                getSLG() {
                     return ((this.h - this['2b'] - this['3b'] - this.hr) + 2*this['2b'] + 3*this['3b'] + 4*this.hr)/this.ab;
                 },
-                getSlash : function() {
+                getSlash() {
                     this.slash = this.slash || [this.getBA() || '.---', this.getOBP(), this.getSLG()].map(x => {
-                        if (isNaN(x)) return '.---';
-                        if (x < 1) return (x+'0000').slice(1, 5);
-                        return (x+'0000').slice(0, 5);
-                    }).join('/');
+                            if (isNaN(x)) return '.---';
+                            if (x < 1) return (`${x}0000`).slice(1, 5);
+                            return (`${x}0000`).slice(0, 5);
+                        }).join('/');
                     return this.slash;
                 },
                 slg : null,
-                pa : pa,
-                ab : ab,
-                so : so,
-                bb : bb,
-                h : h,
+                pa,
+                ab,
+                so,
+                bb,
+                h,
                 '2b' : doubles,
                 '3b' : triples,
-                hr : hr,
-                r : r,
-                rbi : rbi,
-                hbp : hbp,
-                sac : sac,
-                sb : sb,
-                cs : cs
+                hr,
+                r,
+                rbi,
+                hbp,
+                sac,
+                sb,
+                cs
             },
             fielding : {
-                E : E,
-                PO : PO, // should depend on position
+                E,
+                PO, // should depend on position
                 A : Math.floor(Math.random()*5) + 1 // ehh should depend on position
             }
         };
@@ -228,27 +223,25 @@ Player.prototype = {
         this.stats.batting.ba = this.stats.batting.getBA();
     },
     atBatObjects : [],
-    getAtBats : function() {
+    getAtBats() {
         if (this.atBats.length > this.atBatObjects.length) {
-            this.atBatObjects = this.atBats.map(function(item) {
-                return new AtBat(item);
-            });
+            this.atBatObjects = this.atBats.map(item => new AtBat(item));
         }
         return this.atBatObjects;
     },
-    recordRBI : function() {
+    recordRBI() {
         this.atBats[this.atBats.length - 1] += AtBat.prototype.RBI_INDICATOR;
     },
-    recordInfieldHit : function() {
+    recordInfieldHit() {
         this.atBats[this.atBats.length - 1] += AtBat.prototype.INFIELD_HIT_INDICATOR;
     },
-    getBaseRunningTime : function() {
+    getBaseRunningTime() {
         return Mathinator.baseRunningTime(this.skill.offense.speed);
     },
-    attemptSteal : function(game, base) {
-        var pitch = game.pitchInFlight;
-        var success = Distribution.stealSuccess(pitch, game.pitcher.team.positions.catcher,
-                                                this, base, this.team.stealAttempt === Team.RUNNERS_DISCRETION);
+    attemptSteal(game, base) {
+        const pitch = game.pitchInFlight;
+        const success = Distribution.stealSuccess(pitch, game.pitcher.team.positions.catcher,
+            this, base, this.team.stealAttempt === Team.RUNNERS_DISCRETION);
         if (success) {
             game.swingResult.stoleABase = this;
             game.swingResult.caughtStealing = null;
@@ -272,15 +265,15 @@ Player.prototype = {
         game.swingResult.attemptedBase = base;
         return this;
     },
-    defensiveAverage : function() {
-        var _this = this.skill.defense;
+    defensiveAverage() {
+        const _this = this.skill.defense;
         return (_this.speed + _this.fielding + _this.throwing) / 3
     },
-    randomizeSkills : function(hero, allPitches) {
+    randomizeSkills(hero, allPitches) {
         this.hero = hero;
-        var giraffe = this;
-        var randValue = function(isPitching) {
-            var value = Math.floor(Math.pow(Math.random(), 0.75)*80 + Math.random()*20);
+        const giraffe = this;
+        const randValue = isPitching => {
+            let value = Math.floor(Math.pow(Math.random(), 0.75)*80 + Math.random()*20);
             if (hero) {
                 value += Math.floor((100 - value)*Math.max(Math.random(), isPitching ? 0 : 0.65));
             }
@@ -356,38 +349,34 @@ Player.prototype = {
                 };
             }
         }
-        this.skill.pitching = Math.floor((this.pitching.averaging.reduce(function(prev, current) {
-            return prev + current;
-        }))/this.pitching.averaging.length+this.pitching.averaging.length*3);
+        this.skill.pitching = Math.floor((this.pitching.averaging.reduce((prev, current) => prev + current))/this.pitching.averaging.length+this.pitching.averaging.length*3);
         delete this.pitching.averaging;
     },
-    getSurname : function() {
-        return text.mode == 'n' ? this.surnameJ : this.surname;
+    getSurname() {
+        return text.mode === 'n' ? this.surnameJ : this.surname;
     },
-    getName : function() {
-        return text.mode == 'n' ? this.nameJ : this.name;
+    getName() {
+        return text.mode === 'n' ? this.nameJ : this.name;
     },
-    getUniformNumber : function() {
+    getUniformNumber() {
         return text('#') + this.number;
     },
-    getOrder : function() {
+    getOrder() {
         return text([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
     },
-    getDefiningBattingCharacteristic: function() {
+    getDefiningBattingCharacteristic() {
         if (!this.definingBattingCharacteristic[text.mode]) {
             this.definingBattingCharacteristic[text.mode] = this.getDefiningCharacteristic(true);
         }
         return this.definingBattingCharacteristic[text.mode];
     },
-    getDefiningCharacteristic: function(battingOnly) {
+    getDefiningCharacteristic(battingOnly) {
         if (this.definingCharacteristic[text.mode] && !battingOnly) {
             return this.definingCharacteristic[text.mode];
         }
-        var out = '';
-        var o = this.skill.offense,
-            d = this.skill.defense,
-            pitcherRating = this.skill.pitching;
-        var p = this.pitching;
+        let out = '';
+        const o = this.skill.offense, d = this.skill.defense, pitcherRating = this.skill.pitching;
+        const p = this.pitching;
         const ELITE = 90;
         const EXCELLENT = 80;
         const GOOD = 60;
@@ -396,23 +385,21 @@ Player.prototype = {
         const BAD = 30;
         const INEPT = 20;
 
-        var skills = [o.eye, o.power, o.speed, d.fielding, d.speed, d.throwing, pitcherRating];
-        var offense = [o.eye, o.power, o.speed];
-        var defense = [d.fielding, d.speed, d.throwing];
+        const skills = [o.eye, o.power, o.speed, d.fielding, d.speed, d.throwing, pitcherRating];
+        const offense = [o.eye, o.power, o.speed];
+        const defense = [d.fielding, d.speed, d.throwing];
 
-        var sum = x => x.reduce((a,b) => a + b);
+        const sum = x => x.reduce((a,b) => a + b);
 
-        var pitching =  [0, 0, 0]; // control, speed, break
-        var pitchingKeys = Object.keys(p);
+        let pitching =  [0, 0, 0]; // control, speed, break
+        const pitchingKeys = Object.keys(p);
         pitchingKeys.map(x => {
             pitching[0] += p[x].control;
             pitching[1] += p[x].velocity;
             pitching[2] += p[x].break;
         });
-        var pitches = pitchingKeys.length;
+        const pitches = pitchingKeys.length;
         pitching = pitching.map(x => x/pitches | 0);
-
-        // var potentialPitcher = ((~this.team.bench.indexOf(this)) || (this.team.positions.pitcher === this));
 
         if (pitcherRating > 90 && !battingOnly) {
             if (pitcherRating > 105) {
@@ -461,8 +448,8 @@ Player.prototype = {
     /**
      * to ease comparison in Angular (?)
      */
-    toString : function() {
-        return this.name + ' #' + this.number;
+    toString() {
+        return `${this.name} #${this.number}`;
     },
     eye : {},
     fatigue : 0,

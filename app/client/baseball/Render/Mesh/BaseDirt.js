@@ -11,12 +11,12 @@ class BaseDirt extends AbstractMesh {
         }
     }
     getMesh() {
-        var material = new THREE.MeshLambertMaterial({
+        const material = new THREE.MeshLambertMaterial({
             color: 0xDCB096
         });
-        var home = this.base.base === 'home';
+        const home = this.base.base === 'home';
 
-        var mesh = new THREE.Mesh(
+        const mesh = new THREE.Mesh(
             new THREE.CircleGeometry(
                 home ? 18 : 12, 32
             ),
@@ -27,7 +27,7 @@ class BaseDirt extends AbstractMesh {
         mesh.rotation.y = 0;
         mesh.rotation.z = 45/180 * Math.PI;
 
-        var base = this.base.getMesh().position;
+        const base = this.base.getMesh().position;
 
         mesh.position.x = base.x * 0.9;
         mesh.position.y = AbstractMesh.WORLD_BASE_Y + 0.3;

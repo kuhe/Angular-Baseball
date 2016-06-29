@@ -11,11 +11,11 @@ class FoulLine extends AbstractMesh {
         }
     }
     getMesh() {
-        var material = new THREE.MeshLambertMaterial({
+        const material = new THREE.MeshLambertMaterial({
             color: 0xFFFFFF
         });
 
-        var mesh = new THREE.Mesh(
+        const mesh = new THREE.Mesh(
             new THREE.PlaneGeometry(
                 0.35,
                 300,
@@ -25,7 +25,7 @@ class FoulLine extends AbstractMesh {
             material
         );
 
-        var left = this.side === 'left';
+        const left = this.side === 'left';
 
         mesh.rotation.x = -90/180 * Math.PI;
         mesh.rotation.y = 0/180 * Math.PI;

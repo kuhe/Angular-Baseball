@@ -22,7 +22,7 @@ class Sun extends AbstractMesh {
         this.targetTime.m = minutes;
     }
     getMesh() {
-        var sun = new THREE.Mesh(
+        const sun = new THREE.Mesh(
             new THREE.SphereGeometry( 20000, 16, 8 ),
             new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true })
         );
@@ -39,13 +39,13 @@ class Sun extends AbstractMesh {
      * @param sky Sky
      */
     derivePosition(sky) {
-        var distance = 400000;
-        var uniforms = sky.uniforms;
+        const distance = 400000;
+        const uniforms = sky.uniforms;
 
-        var theta = Math.PI * (uniforms.inclination - 0.5);
-        var phi = 2 * Math.PI * (uniforms.azimuth - 0.5);
+        const theta = Math.PI * (uniforms.inclination - 0.5);
+        const phi = 2 * Math.PI * (uniforms.azimuth - 0.5);
 
-        var mesh = this.mesh;
+        const mesh = this.mesh;
 
         mesh.position.z = distance * Math.cos(phi);
         mesh.position.y = distance * Math.sin(phi) * Math.sin(theta);

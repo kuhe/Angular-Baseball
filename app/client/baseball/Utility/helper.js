@@ -1,4 +1,4 @@
-var helper = {
+const helper = {
     /**
      * rotation angle from 0 to 360 where 180 is a fastball's backspin and 90 is a slider's, 0 for curveball
      * in the direction (CW for righty), CCW for lefty.
@@ -20,7 +20,7 @@ var helper = {
         // change-up
         'change' :      [  0,  -10, 0.86,   -15, 1000]
     },
-    selectRandomPitch : function() {
+    selectRandomPitch() {
         return [
             '4-seam', '2-seam', 'cutter', 'sinker',
             'slider', 'fork', 'curve',

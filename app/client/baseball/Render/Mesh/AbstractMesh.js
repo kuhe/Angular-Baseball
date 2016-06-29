@@ -17,15 +17,15 @@ class AbstractMesh {
      * todo use the built in object list of the scene object
      */
     attach() {
-        var objects = this.loop.objects;
+        const objects = this.loop.objects;
         if (objects.indexOf(this) === -1) {
             objects.push(this);
         }
         this.loop.scene.add(this.mesh);
     }
     detach() {
-        var objects = this.loop.objects;
-        var index = objects.indexOf(this);
+        const objects = this.loop.objects;
+        const index = objects.indexOf(this);
         if (index !== -1) {
             this.loop.objects.splice(index, 1);
         }

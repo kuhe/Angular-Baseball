@@ -18,8 +18,8 @@ import { Animator } from '../Services/Animator';
  * the constants should be tuned so that the camera coincides with the DOM's strike zone overlay
  * @type {number}
  */
-var VERTICAL_CORRECTION = -0.2;
-var INITIAL_CAMERA_DISTANCE = 8;
+const VERTICAL_CORRECTION = -0.2;
+const INITIAL_CAMERA_DISTANCE = 8;
 
 
 if (typeof THREE !== 'undefined') {
@@ -48,7 +48,7 @@ class Loop {
     loop() {
         requestAnimationFrame(this.loop.bind(this));
         this.panToward(this.target);
-        var omt = this.overwatchMoveTarget;
+        const omt = this.overwatchMoveTarget;
         this.moveToward(this.moveTarget || {
             x: omt.x,
             y: omt.y + 12,
@@ -64,18 +64,18 @@ class Loop {
      */
     main(background) {
         this.objects = [];
-        var giraffe = this;
+        const giraffe = this;
 
         if (this.getThree()) {
 
-            var THREE = this.THREE;
+            const THREE = this.THREE;
 
-            var scene = this.scene = new THREE.Scene();
+            const scene = this.scene = new THREE.Scene();
             scene.fog = new THREE.FogExp2( 0x838888, 0.002 );
             if (this.attach()) {
                 this.lighting = lighting;
                 lighting.addTo(scene);
-                var camera = this.camera = new THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 1000000);
+                const camera = this.camera = new THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 1000000);
 
                 this.target = new THREE.Vector3(0, 0, -60.5);
                 this._target = new THREE.Vector3(0, 0, -60.5);
@@ -87,7 +87,7 @@ class Loop {
                     this.addStaticMeshes();
                 }
             } else {
-                setTimeout(function() {
+                setTimeout(() => {
                     giraffe.main(background);
                 }, 2000);
             }
@@ -99,8 +99,7 @@ class Loop {
      * @param addition
      */
     addMinutes(addition) {
-        var hours = this.timeOfDay.h,
-            minutes = this.timeOfDay.m;
+        let hours = this.timeOfDay.h, minutes = this.timeOfDay.m;
         minutes += addition;
         while (minutes >= 60) {
             minutes -= 60;
@@ -124,7 +123,7 @@ class Loop {
         if (sun) {
             sun.setTargetTime(hours, minutes);
         } else {
-            setTimeout(x => {
+            setTimeout(() => {
                 this.setTargetTimeOfDay(hours, minutes);
             }, 500);
         }
@@ -150,7 +149,7 @@ class Loop {
         if (hours < 7.5) {
             hours += 24;
         }
-        var azimuth = ((hours - 7.5)/24 + (minutes/60)/24);
+        const azimuth = ((hours - 7.5)/24 + (minutes/60)/24);
         sky.uniforms.azimuth = azimuth;
 
         //if (azimuth > 0.5) {
@@ -161,7 +160,7 @@ class Loop {
         sun.time.h = hours;
         sun.time.m = minutes;
         sun.derivePosition(sky);
-        var luminosity = (-0.5 + Math.max(Math.abs(1.25 - azimuth), Math.abs(0.25 - azimuth))) * 2;
+        const luminosity = (-0.5 + Math.max(Math.abs(1.25 - azimuth), Math.abs(0.25 - azimuth))) * 2;
         Animator.setLuminosity(0.1 + luminosity/1.4);
     }
 
@@ -174,8 +173,7 @@ class Loop {
         new Grass().join(this);
         new Grass(this, true);
         new BattersEye().join(this);
-        var sun = new Sun(),
-            sky = new Sky();
+        const sun = new Sun(), sky = new Sky();
         sun.derivePosition(sky);
         sky.join(this);
         sun.join(this);
@@ -188,10 +186,10 @@ class Loop {
         new Wall(this, 15);
         new Wall(this, 34);
 
-        var b1 = new Base(this, 'first');
-        var b2 = new Base(this, 'second');
-        var b3 = new Base(this, 'third');
-        var b4 = new Base(this, 'home');
+        const b1 = new Base(this, 'first');
+        const b2 = new Base(this, 'second');
+        const b3 = new Base(this, 'third');
+        const b4 = new Base(this, 'home');
 
         new BaseDirt(this, b1);
         new BaseDirt(this, b2);
@@ -210,9 +208,9 @@ class Loop {
      * experimental camera bobbing
      */
     breathe() {
-        var pos = this.camera.position;
-        var x = pos.x, y = pos.y, z = pos.z;
-        var rate = 0.0005 * this.bob || 1;
+        const pos = this.camera.position;
+        const x = pos.x, y = pos.y, z = pos.z;
+        const rate = 0.0005 * this.bob || 1;
         if (y > 0.6) {
             this.bob = -1;
         } else if (y < -0.6) {
@@ -236,11 +234,11 @@ class Loop {
     attach() {
         window.removeEventListener('resize', this.onResize.bind(this), false);
         window.addEventListener('resize', this.onResize.bind(this), false);
-        var element = document.getElementsByClassName(this.elementClass)[0];
+        const element = document.getElementsByClassName(this.elementClass)[0];
         if (element) {
             element.innerHTML = '';
-            var THREE = this.THREE;
-            var renderer = new THREE.WebGLRenderer({ alpha: true });
+            const THREE = this.THREE;
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
             this.setSize(renderer);
             //renderer.setClearColor(0xffffff, 0);
 
@@ -256,19 +254,19 @@ class Loop {
      * higher FOV on lower view widths
      */
     onResize() {
-        var element = document.getElementsByClassName(this.elementClass)[0];
+        const element = document.getElementsByClassName(this.elementClass)[0];
         this.camera.aspect = this.getAspect();
         this.camera.fov = Math.max(90 - 30 * (element.offsetWidth / 1200), 55);
         this.camera.updateProjectionMatrix();
         this.setSize(this.renderer);
     }
     setSize(renderer) {
-        var element = document.getElementsByClassName(this.elementClass)[0];
-        var width = element.offsetWidth;
+        const element = document.getElementsByClassName(this.elementClass)[0];
+        const width = element.offsetWidth;
         renderer.setSize(width, HEIGHT);
     }
     getAspect() {
-        var element = document.getElementsByClassName(this.elementClass)[0];
+        const element = document.getElementsByClassName(this.elementClass)[0];
         return element.offsetWidth / HEIGHT;
     }
 
@@ -277,9 +275,9 @@ class Loop {
      * @param vector
      */
     panToward(vector) {
-        var maxIncrement = this.panSpeed;
-        this.forAllLoops(function(loop) {
-            var target = loop._target;
+        const maxIncrement = this.panSpeed;
+        this.forAllLoops(loop => {
+            const target = loop._target;
             if (target) {
                 target.x = target.x + Math.max(Math.min((vector.x - target.x)/100, maxIncrement), -maxIncrement);
                 target.y = target.y + Math.max(Math.min((vector.y - target.y)/100, maxIncrement), -maxIncrement);
@@ -294,9 +292,9 @@ class Loop {
      * @param vector
      */
     moveToward(vector) {
-        var maxIncrement = this.moveSpeed;
-        this.forAllLoops(function(loop) {
-            var position = loop.camera && loop.camera.position;
+        const maxIncrement = this.moveSpeed;
+        this.forAllLoops(loop => {
+            const position = loop.camera && loop.camera.position;
             if (position) {
                 position.x += Math.max(Math.min((vector.x - position.x), maxIncrement), -maxIncrement);
                 position.y += Math.max(Math.min((vector.y - position.y), maxIncrement), -maxIncrement);
@@ -311,7 +309,7 @@ class Loop {
      * @param panSpeed
      */
     setLookTarget(vector, panSpeed) {
-        this.forAllLoops(function(loop) {
+        this.forAllLoops(loop => {
             loop.panSpeed = panSpeed || 0.9;
             loop.panning = vector !== AHEAD;
             loop.target = vector;
@@ -324,21 +322,21 @@ class Loop {
      * @param moveSpeed
      */
     setMoveTarget(vector, moveSpeed) {
-        this.forAllLoops(function(loop) {
+        this.forAllLoops(loop => {
             loop.moveSpeed = moveSpeed || 0.7;
             loop.moveTarget = vector;
             loop.overwatchMoveTarget = null;
         });
     }
     setOverwatchMoveTarget(vector, moveSpeed) {
-        this.forAllLoops(function(loop) {
+        this.forAllLoops(loop => {
             loop.moveSpeed = moveSpeed || 0.7;
             loop.overwatchMoveTarget = vector;
             loop.moveTarget = null;
         });
     }
     resetCamera() {
-        var moveSpeed = 0.5;
+        let moveSpeed = 0.5;
         if (this.camera.position.z !== INITIAL_POSITION.z) {
             moveSpeed = 2.5;
         }
@@ -349,7 +347,7 @@ class Loop {
         if (typeof x === 'object') {
             return this.moveCamera(x.x, x.y, x.z);
         }
-        this.forAllLoops(function(loop) {
+        this.forAllLoops(loop => {
             loop.camera.position.x = x;
             loop.camera.position.y = y;
             loop.camera.position.z = z;
@@ -371,12 +369,12 @@ class Loop {
     }
 
     test() {
-        var ball = new Ball();
+        const ball = new Ball();
         window.Ball = Ball;
         window.ball = ball;
         ball.setType('4-seam');
         //with (ball.mesh.rotation) {x=0,y=0,z=0}; ball.rotation = {x:0.00, y:0.00};
-        ball.animate = function() {
+        ball.animate = () => {
             ball.rotate();
         };
         ball.join(this);
@@ -384,7 +382,7 @@ class Loop {
     }
 
     testTrajectory(data) {
-        var ball = new Ball();
+        const ball = new Ball();
         window.Ball = Ball;
         window.ball = ball;
         ball.deriveTrajectory(data || {
@@ -405,9 +403,9 @@ Loop.VERTICAL_CORRECTION = VERTICAL_CORRECTION;
 Loop.INITIAL_CAMERA_DISTANCE = INITIAL_CAMERA_DISTANCE;
 Loop.prototype.THREE = {};
 Loop.prototype.constructors = {
-    Ball : Ball,
-    Mound: Mound,
-    Field: Field
+    Ball,
+    Mound,
+    Field
 };
 
 export { Loop };

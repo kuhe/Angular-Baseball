@@ -11,11 +11,11 @@ class Wall extends AbstractMesh {
         }
     }
     getMesh() {
-        var material = new THREE.MeshLambertMaterial({
+        const material = new THREE.MeshLambertMaterial({
             color: 0x3F4045
         });
 
-        var mesh = new THREE.Mesh(
+        const mesh = new THREE.Mesh(
             new THREE.BoxGeometry(
                 120,
                 15,
@@ -25,12 +25,12 @@ class Wall extends AbstractMesh {
             material
         );
 
-        var radians = this.angle / 180 * Math.PI;
+        const radians = this.angle / 180 * Math.PI;
         mesh.rotation.y = -radians;
 
-        var hypotenuse = 300;
-        var distance = Math.cos(radians) * hypotenuse;
-        var offset = Math.sin(radians) * hypotenuse;
+        const hypotenuse = 300;
+        const distance = Math.cos(radians) * hypotenuse;
+        const offset = Math.sin(radians) * hypotenuse;
 
         mesh.position.x += offset;
         mesh.position.y = AbstractMesh.WORLD_BASE_Y + 0;

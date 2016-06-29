@@ -1,11 +1,11 @@
-var Iterator = function() {
+const Iterator = () => {
 };
 
 Iterator.prototype = {
     identifier : 'Iterator',
     constructor : Iterator,
-    each : function(collection, map) {
-        var keys, i;
+    each(collection, map) {
+        let keys, i;
         if (collection instanceof Array) {
             for (i = 0; i < collection.length; i++) {
                 map(i, collection[i]);
@@ -19,7 +19,7 @@ Iterator.prototype = {
     }
 };
 
-for (var fn in Iterator.prototype) {
+for (const fn in Iterator.prototype) {
     if (Iterator.prototype.hasOwnProperty(fn)) {
         Iterator[fn] = Iterator.prototype[fn];
     }

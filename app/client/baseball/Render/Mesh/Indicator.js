@@ -4,7 +4,7 @@ import { Loop } from '../Loop';
 class Indicator extends AbstractMesh {
     constructor(loop) {
         super();
-        var n = 60;
+        let n = 60;
         this.trajectory = [];
         while (n--) {
             this.trajectory.push(1);
@@ -15,9 +15,9 @@ class Indicator extends AbstractMesh {
         }
     }
     getMesh() {
-        var THREE = window.THREE;
-        var geometry	= new THREE.CircleGeometry(0.30, 32);
-        var material	= new THREE.MeshPhongMaterial({
+        const THREE = window.THREE;
+        const geometry	= new THREE.CircleGeometry(0.30, 32);
+        const material	= new THREE.MeshPhongMaterial({
             color: 0xFFFFFF
         });
         this.mesh = new THREE.Mesh(geometry, material);
