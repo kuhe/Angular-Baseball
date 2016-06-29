@@ -122,13 +122,13 @@
                     <!--{{key}} : {{val}}-->
                     <!--</div>-->
                     <ul class="list-group pitch-record">
-                        <li class='list-group-item' *ngFor="let event of y.log.pitchRecord[mode()]">
-                            <strong *ngIf="index == 0">
+                        <li class='list-group-item' *ngFor="let event of y.log.pitchRecord[mode()]; let i = index;">
+                            <strong [hidden]='i > 0'>
                                 {{event}}
                             </strong>
-                        <span *ngIf="index">
-                            {{event}}
-                        </span>
+                            <span [hidden]='i === 0'>
+                                {{event}}
+                            </span>
                         </li>
                     </ul>
                 </div>
@@ -216,13 +216,13 @@
                 </div>
                 <div class='col-md-4 background-color visible-lg visible-md'>
                     <ul class="list-group play-record">
-                        <li class='list-group-item' *ngFor="let event of y.log.shortRecord[mode()];">
-                            <strong *ngIf="index == 0">
+                        <li class='list-group-item' *ngFor="let event of y.log.shortRecord[mode()]; let i = index;">
+                            <strong [hidden]='i > 0'>
                                 {{event}}
                             </strong>
-                        <span *ngIf="index">
-                            {{event}}
-                        </span>
+                            <span [hidden]='i === 0'>
+                                {{event}}
+                            </span>
                         </li>
                     </ul>
                 </div>

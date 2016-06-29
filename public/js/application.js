@@ -779,15 +779,16 @@ Game.prototype = {
             if ((team.stealAttempt === _Team.Team.RUNNER_GO || team.stealAttempt === _Team.Team.RUNNERS_DISCRETION) && !this.opponentConnected) {
                 var thief = field.getLeadRunner();
                 if (thief instanceof _Player.Player) {
+                    var base = void 0;
                     switch (thief) {
                         case field.first:
-                            var _base = 2;
+                            base = 2;
                             break;
                         case field.second:
-                            _base = 3;
+                            base = 3;
                             break;
                         case field.third:
-                            _base = 4;
+                            base = 4;
                     }
                     var validToSteal = true;
                     if (result.looking) {

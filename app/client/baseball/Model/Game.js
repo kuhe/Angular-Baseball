@@ -363,9 +363,10 @@ Game.prototype = {
             if ((team.stealAttempt === Team.RUNNER_GO || team.stealAttempt === Team.RUNNERS_DISCRETION) && !this.opponentConnected) {
                 const thief = field.getLeadRunner();
                 if (thief instanceof Player) {
+                    let base;
                     switch (thief) {
                         case field.first:
-                            let base = 2;
+                            base = 2;
                             break;
                         case field.second:
                             base = 3;
