@@ -1266,6 +1266,8 @@ exports.Manager = undefined;
 
 var _services = require('../Services/_services');
 
+var _Player = require('./Player');
+
 var Manager = function Manager(team) {
     this.init(team);
 };
@@ -1366,15 +1368,27 @@ Manager.prototype = {
 
     /**
      * used by the AI to substitute a fatigued pitcher
-     * @param {Number} fatigue
+     * @param {Number} fatigueAllowed
      * only execute if the pitcher's fatigue is greater than this number
      */
-    checkPitcherFatigue: function checkPitcherFatigue(fatigue) {
+    checkPitcherFatigue: function checkPitcherFatigue() {
+        var fatigueAllowed = arguments.length <= 0 || arguments[0] === undefined ? 120 : arguments[0];
+
         var team = this.team;
         var pitcher = team.positions.pitcher;
-        if (pitcher.fatigue > fatigue) {
-            var sub = this.selectForSkill(team.bench, ['pitching']);
+
+        var sub = this.selectForSkill(team.bench, ['pitching']);
+        if (!(sub instanceof _Player.Player)) {
+            return;
+        }
+
+        var replace = pitcher.fatigue - pitcher.skill.pitching;
+        var remain = fatigueAllowed - sub.skill.pitching;
+
+        if (replace > remain) {
             sub.substitute(pitcher);
+        } else {
+            team.bench.push(sub);
         }
     }
 };
@@ -1382,7 +1396,7 @@ Manager.prototype = {
 exports.Manager = Manager;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Services/_services":30,"babel/external-helpers":"babel/external-helpers"}],5:[function(require,module,exports){
+},{"../Services/_services":30,"./Player":5,"babel/external-helpers":"babel/external-helpers"}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2508,8 +2522,8 @@ Umpire.prototype = {
             game.log.noteBatter(game.batter);
         }
         //game.showPlayResultPanels(game.lastBatter);
-        if (game.humanBatting()) {
-            game.pitcher.team.manager.checkPitcherFatigue(120);
+        if (!game.humanPitching()) {
+            game.pitcher.team.manager.checkPitcherFatigue();
         }
     },
 

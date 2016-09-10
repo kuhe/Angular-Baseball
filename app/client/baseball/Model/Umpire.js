@@ -443,8 +443,8 @@ Umpire.prototype = {
             game.log.noteBatter(game.batter);
         }
         //game.showPlayResultPanels(game.lastBatter);
-        if (game.humanBatting()) {
-            game.pitcher.team.manager.checkPitcherFatigue(120);
+        if (!game.humanPitching()) {
+            game.pitcher.team.manager.checkPitcherFatigue();
         }
     },
     /**
