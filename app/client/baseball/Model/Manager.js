@@ -86,6 +86,19 @@ Manager.prototype = {
             return selection;
         }
         return 'no players available';
+    },
+    /**
+     * used by the AI to substitute a fatigued pitcher
+     * @param {Number} fatigue
+     * only execute if the pitcher's fatigue is greater than this number
+     */
+    checkPitcherFatigue(fatigue) {
+        const team = this.team;
+        const pitcher = team.positions.pitcher;
+        if (pitcher.fatigue > fatigue) {
+            const sub = this.selectForSkill(team.bench, ['pitching']);
+            sub.substitute(pitcher);
+        }
     }
 };
 

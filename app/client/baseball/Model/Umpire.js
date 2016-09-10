@@ -16,6 +16,9 @@ Umpire.prototype = {
         balls : 0,
         outs : 0
     },
+    /**
+     * starts the game by announcing it and signalling the first batter up
+     */
     playBall() {
         const game = this.game;
         game.half = 'top';
@@ -32,6 +35,10 @@ Umpire.prototype = {
             game.batter
         );
     },
+    /**
+     * makes the call based on the last pitch and swing (or no swing)
+     * @todo add margin of error to Umpire to simulate real umpiring, haha
+     */
     makeCall() {
         this.says = '';
         const game = this.game;
@@ -277,12 +284,22 @@ Umpire.prototype = {
             this.changeSides();
         }
     },
+    /**
+     * awards first base to the batter
+     */
     reachBase() {
         const game = this.game;
         game.field.first = game.batter;
         game.field.first.fatigue += 2;
         return this;
     },
+    /**
+     * advance the runners (ball in play or walk)
+     *
+     * @param isWalk {bool}
+     * @param fieldersChoice \results in an out to someone other than the batter
+     * @param sacrificeAdvances \advances on a sacrifice
+     */
     advanceRunners(isWalk, fieldersChoice, sacrificeAdvances) {
         isWalk = !!isWalk;
         const game = this.game;
@@ -395,11 +412,17 @@ Umpire.prototype = {
         }
         return this;
     },
+    /**
+     * "run scores!"
+     */
     runScores() {
         const game = this.game;
         game.scoreboard[game.half === 'top' ? 'away' : 'home'][game.inning]++;
         game.tally[game.half === 'top' ? 'away' : 'home'].R++;
     },
+    /**
+     * lets the on deck batter into the batter's box
+     */
     newBatter() {
         const game = this.game;
         game.passMinutes(2);
@@ -412,18 +435,21 @@ Umpire.prototype = {
         const team = game.half === 'bottom' ? game.teams.home : game.teams.away;
         game.lastBatter = game.batter;
         game.batter = team.lineup[(team.nowBatting + 1)%9];
-        game.batter.ready = false;
-        if (!game.humanBatting()) {
-            game.batter.ready = true;
-        }
+        game.batter.ready = !game.humanBatting();
         game.deck = team.lineup[(team.nowBatting + 2)%9];
         game.hole = team.lineup[(team.nowBatting + 3)%9];
         team.nowBatting = (team.nowBatting + 1)%9;
         if (this.count.outs < 3) {
             game.log.noteBatter(game.batter);
         }
-        game.showPlayResultPanels(game.lastBatter);
+        //game.showPlayResultPanels(game.lastBatter);
+        if (game.humanBatting()) {
+            game.pitcher.team.manager.checkPitcherFatigue(120);
+        }
     },
+    /**
+     * 3 outs
+     */
     changeSides() {
         const game = this.game;
         game.passMinutes(5);
