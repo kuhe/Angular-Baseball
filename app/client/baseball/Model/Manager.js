@@ -24,7 +24,8 @@ Manager.prototype = {
         }
         Iterator.each(this.team.bench, (key, player) => {
             if (!player.number) {
-                player.number = jerseyNumber++;
+                jerseyNumber += 1 + (Math.random() * 5 | 0);
+                player.number = jerseyNumber;
             }
         });
         this.team.positions.short = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');

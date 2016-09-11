@@ -16,8 +16,7 @@ var _Log = require('../Utility/Log');
  * e.g. "HR++" (HR and 2 extra runs), "SO" strikeout, "FO" flyout
  *
  */
-
-var AtBat = (function () {
+var AtBat = function () {
     function AtBat(text) {
         babelHelpers.classCallCheck(this, AtBat);
 
@@ -41,7 +40,7 @@ var AtBat = (function () {
         }
     }]);
     return AtBat;
-})();
+}();
 
 AtBat.prototype.constructor = AtBat;
 AtBat.prototype.identifier = 'AtBat';
@@ -123,8 +122,8 @@ Field.prototype = {
         if (['first', 'second', 'short', 'third'].includes(swing.fielder)) {
             landingDistance = Math.min(landingDistance, 110); // stopped by infielder
         } else {
-                landingDistance = Math.max(landingDistance, 150); // rolled past infielder
-            }
+            landingDistance = Math.max(landingDistance, 150); // rolled past infielder
+        }
         swing.travelDistance = landingDistance;
         swing.flyAngle = flyAngle;
         /**
@@ -178,7 +177,7 @@ Field.prototype = {
                 swing.thrownOut = false; // default value
                 var fieldingReturnDelay = _services.Mathinator.fielderReturnDelay(swing.travelDistance, throwingEase, fieldingEase, interceptRating);
                 swing.fieldingDelay = fieldingReturnDelay;
-                swing.outfielder = ({ 'left': 1, 'center': 1, 'right': 1 })[swing.fielder] === 1;
+                swing.outfielder = { 'left': 1, 'center': 1, 'right': 1 }[swing.fielder] === 1;
                 var speed = game.batter.skill.offense.speed;
                 var baseRunningTime = _services.Mathinator.baseRunningTime(speed);
 
@@ -250,11 +249,11 @@ Field.prototype = {
                         //    console.log('omg dp', additionalOuts);
                         //}
                     } else {
-                            delete swing.additionalOuts;
-                            delete swing.firstOut;
-                            delete swing.doublePlay;
-                            delete swing.fieldersChoice;
-                        }
+                        delete swing.additionalOuts;
+                        delete swing.firstOut;
+                        delete swing.doublePlay;
+                        delete swing.fieldersChoice;
+                    }
                 }
                 swing.thrownOut = swing.bases == 0;
                 if (swing.thrownOut) {
@@ -309,7 +308,7 @@ Field.prototype = {
     findFielder: function findFielder(splayAngle, landingDistance, power, flyAngle) {
         var angle = splayAngle; // 0 is up the middle, clockwise increasing
 
-        var fielder = undefined;
+        var fielder = void 0;
 
         if (Math.abs(angle) > 50) return false; // foul
         if (landingDistance < 10 && landingDistance > -20) {
@@ -499,8 +498,8 @@ Game.prototype = {
      */
     end: function end() {
         this.stage = 'end';
-        var e = undefined,
-            n = undefined;
+        var e = void 0,
+            n = void 0;
         e = this.tally.home.R > this.tally.away.R ? 'Home team wins!' : this.tally.home.R === this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!';
         n = this.tally.home.R > this.tally.away.R ? this.teams.home.getName() + 'の勝利' : this.tally.home.R === this.tally.away.R ? '引き分け' : this.teams.away.getName() + 'の勝利';
         if (this.tally.home.R > this.tally.away.R) {
@@ -646,8 +645,8 @@ Game.prototype = {
         var giraffe = this;
         var bonus = this.batter.eye.bonus || 0;
         var eye = this.batter.skill.offense.eye + 6 * (this.umpire.count.balls + this.umpire.count.strikes) + bonus;
-        var convergence = undefined;
-        var convergenceSum = undefined;
+        var convergence = void 0;
+        var convergenceSum = void 0;
 
         var x = _services.Distribution.centralizedNumber(),
             y = _services.Distribution.centralizedNumber();
@@ -867,7 +866,7 @@ Game.prototype = {
             if ((team.stealAttempt === _Team.Team.RUNNER_GO || team.stealAttempt === _Team.Team.RUNNERS_DISCRETION) && !this.opponentConnected) {
                 var thief = field.getLeadRunner();
                 if (thief instanceof _Player.Player) {
-                    var base = undefined;
+                    var base = void 0;
                     switch (thief) {
                         case field.first:
                             base = 2;
@@ -1291,7 +1290,8 @@ Manager.prototype = {
         }
         _services.Iterator.each(this.team.bench, function (key, player) {
             if (!player.number) {
-                player.number = jerseyNumber++;
+                jerseyNumber += 1 + (Math.random() * 5 | 0);
+                player.number = jerseyNumber;
             }
         });
         this.team.positions.short = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
@@ -1332,7 +1332,7 @@ Manager.prototype = {
         var _this = this;
 
         if (this.team.bench.length || pool === this.team.positions) {
-            var _ret = (function () {
+            var _ret = function () {
                 var selection = _this.team.bench[0];
                 var rating = 0;
                 var index = 0;
@@ -1359,7 +1359,7 @@ Manager.prototype = {
                 return {
                     v: selection
                 };
-            })();
+            }();
 
             if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
         }
@@ -1428,6 +1428,7 @@ Player.prototype = {
      * @see {Player}
      */
     init: function init(team, hero) {
+        this.position = 'bench';
         this.ready = false;
         this.fatigue = 0;
         this.throws = Math.random() > 0.86 ? 'left' : 'right';
@@ -1490,6 +1491,7 @@ Player.prototype = {
         delete this.atBatObjects;
         this.getAtBats();
     },
+
 
     /**
      *
@@ -1558,11 +1560,11 @@ Player.prototype = {
             skill = Math.sqrt(0.05 + Math.random() * 0.95) * (total / (count * 0.97));
             return Math.floor(skill / 100 * (b - a) + a);
         };
-        var IP = undefined,
-            ER = undefined,
-            GS = undefined,
-            W = undefined,
-            L = undefined;
+        var IP = void 0,
+            ER = void 0,
+            GS = void 0,
+            W = void 0,
+            L = void 0;
         if (this.skill.pitching > 65) {
             IP = (this.skill.pitching - 65) * gamesIntoSeason / 20;
             ER = IP / 9 * randBetween(800, 215, this.skill.pitching) / 100;
@@ -2422,71 +2424,71 @@ Umpire.prototype = {
                 // no one on first
             }
         } else {
-                if (fieldersChoice) {
-                    game.field[fieldersChoice] = null;
-                    first = game.field.first;
-                    second = game.field.second;
-                    third = game.field.third;
-                }
-                var canAdvance = function canAdvance() {
-                    return true;
+            if (fieldersChoice) {
+                game.field[fieldersChoice] = null;
+                first = game.field.first;
+                second = game.field.second;
+                third = game.field.third;
+            }
+            var canAdvance = function canAdvance() {
+                return true;
+            };
+            if (sacrificeAdvances) {
+                canAdvance = function canAdvance(position) {
+                    switch (position) {
+                        case 'first':
+                            return sacrificeAdvances.includes('first') && !game.field.second;
+                        case 'second':
+                            return sacrificeAdvances.includes('second') && !game.field.third;
+                        case 'third':
+                            return sacrificeAdvances.includes('third');
+                    }
                 };
-                if (sacrificeAdvances) {
-                    canAdvance = function canAdvance(position) {
-                        switch (position) {
-                            case 'first':
-                                return sacrificeAdvances.includes('first') && !game.field.second;
-                            case 'second':
-                                return sacrificeAdvances.includes('second') && !game.field.third;
-                            case 'third':
-                                return sacrificeAdvances.includes('third');
-                        }
-                    };
-                }
-                var arm = 0;
-                if (swing.fielder) {
-                    var fielder = game.pitcher.team.positions[swing.fielder];
-                    if (['left', 'center', 'right'].includes(fielder.position)) {
-                        arm = fielder.skill.defense.throwing;
-                    } else {
-                        arm = fielder.skill.defense.throwing + 120; // very rare extra bases on infield BIP
-                    }
-                }
-                if (third && canAdvance('third')) {
-                    // run scored
-                    this.runScores();
-                    if (game.batter != third) {
-                        game.batter.recordRBI();
-                        third.atBats.push(_utils.Log.prototype.RUN);
-                    }
-                    game.batter.stats.batting.rbi++;
-                    third.stats.batting.r++;
-                    game.pitcher.stats.pitching.ER++;
-                    game.field.third = null;
-                }
-                if (second && canAdvance('second')) {
-                    game.field.third = second;
-                    game.field.second = null;
-                    if (second != game.batter && !sacrificeAdvances && Math.random() * (second.skill.offense.speed + 120) > arm + 50) {
-
-                        this.runScores();
-                        if (game.batter != second) {
-                            game.batter.recordRBI();
-                            second.atBats.push(_utils.Log.prototype.RUN);
-                        }
-                        game.field.third = null;
-                    }
-                }
-                if (first && canAdvance('first')) {
-                    game.field.second = first;
-                    game.field.first = null;
-                    if (first != game.batter && !game.field.third && !sacrificeAdvances && Math.random() * (first.skill.offense.speed + 120) > arm + 60) {
-
-                        game.field.third = first;
-                        game.field.second = null;
-                    }
+            }
+            var arm = 0;
+            if (swing.fielder) {
+                var fielder = game.pitcher.team.positions[swing.fielder];
+                if (['left', 'center', 'right'].includes(fielder.position)) {
+                    arm = fielder.skill.defense.throwing;
+                } else {
+                    arm = fielder.skill.defense.throwing + 120; // very rare extra bases on infield BIP
                 }
             }
+            if (third && canAdvance('third')) {
+                // run scored
+                this.runScores();
+                if (game.batter != third) {
+                    game.batter.recordRBI();
+                    third.atBats.push(_utils.Log.prototype.RUN);
+                }
+                game.batter.stats.batting.rbi++;
+                third.stats.batting.r++;
+                game.pitcher.stats.pitching.ER++;
+                game.field.third = null;
+            }
+            if (second && canAdvance('second')) {
+                game.field.third = second;
+                game.field.second = null;
+                if (second != game.batter && !sacrificeAdvances && Math.random() * (second.skill.offense.speed + 120) > arm + 50) {
+
+                    this.runScores();
+                    if (game.batter != second) {
+                        game.batter.recordRBI();
+                        second.atBats.push(_utils.Log.prototype.RUN);
+                    }
+                    game.field.third = null;
+                }
+            }
+            if (first && canAdvance('first')) {
+                game.field.second = first;
+                game.field.first = null;
+                if (first != game.batter && !game.field.third && !sacrificeAdvances && Math.random() * (first.skill.offense.speed + 120) > arm + 60) {
+
+                    game.field.third = first;
+                    game.field.second = null;
+                }
+            }
+        }
         return this;
     },
 
@@ -2541,8 +2543,8 @@ Umpire.prototype = {
             e: [],
             n: []
         };
-        var offense = undefined,
-            defense = undefined;
+        var offense = void 0,
+            defense = void 0;
         game.field.first = null;
         game.field.second = null;
         game.field.third = null;
@@ -2668,7 +2670,7 @@ if (typeof THREE !== 'undefined') {
  * manager for the rendering loop
  */
 
-var Loop = (function () {
+var Loop = function () {
     function Loop(elementClass, background) {
         babelHelpers.classCallCheck(this, Loop);
 
@@ -2685,6 +2687,7 @@ var Loop = (function () {
     /**
      * individual objects<AbstractMesh> can attach and detach to the manager to be rendered
      */
+
 
     babelHelpers.createClass(Loop, [{
         key: 'loop',
@@ -3100,7 +3103,7 @@ var Loop = (function () {
         }
     }]);
     return Loop;
-})();
+}();
 
 var HEIGHT = 700;
 Loop.VERTICAL_CORRECTION = VERTICAL_CORRECTION;
@@ -3207,8 +3210,7 @@ var _Loop = require('../Loop');
  *
  * For static meshes the animate method will do nothing, leaving the mesh permanently attached.
  */
-
-var AbstractMesh = (function () {
+var AbstractMesh = function () {
     function AbstractMesh() {
         babelHelpers.classCallCheck(this, AbstractMesh);
     }
@@ -3250,13 +3252,14 @@ var AbstractMesh = (function () {
         value: function animate() {}
     }]);
     return AbstractMesh;
-})();
+}();
 
 /**
  * since we are using (0, 0, 0) vector for the center of the strike zone, the actual ground level will be offset
  * downward
  * @type {number}
  */
+
 
 AbstractMesh.WORLD_BASE_Y = -4;
 
@@ -3292,7 +3295,7 @@ var SCALE = 2.1 / 100;
 
 var INDICATOR_DEPTH = -5;
 
-var Ball = (function (_AbstractMesh) {
+var Ball = function (_AbstractMesh) {
     babelHelpers.inherits(Ball, _AbstractMesh);
 
     /**
@@ -3301,7 +3304,6 @@ var Ball = (function (_AbstractMesh) {
      * @param trajectory {Array<Vector3>} incremental vectors applied each frame
      * e.g. for 1 second of flight time there should be 60 incremental vectors
      */
-
     function Ball(loop, trajectory) {
         babelHelpers.classCallCheck(this, Ball);
 
@@ -3623,7 +3625,7 @@ var Ball = (function (_AbstractMesh) {
         }
     }]);
     return Ball;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 Ball.prototype.DEFAULT_RPM = 1000;
 Ball.prototype.RPM = 1000;
@@ -3650,7 +3652,7 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Base = (function (_AbstractMesh) {
+var Base = function (_AbstractMesh) {
     babelHelpers.inherits(Base, _AbstractMesh);
 
     function Base(loop, base) {
@@ -3709,7 +3711,7 @@ var Base = (function (_AbstractMesh) {
         value: function animate() {}
     }]);
     return Base;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Base = Base;
 
@@ -3727,7 +3729,7 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var BaseDirt = (function (_AbstractMesh) {
+var BaseDirt = function (_AbstractMesh) {
     babelHelpers.inherits(BaseDirt, _AbstractMesh);
 
     function BaseDirt(loop, base) {
@@ -3771,7 +3773,7 @@ var BaseDirt = (function (_AbstractMesh) {
         value: function animate() {}
     }]);
     return BaseDirt;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.BaseDirt = BaseDirt;
 
@@ -3789,7 +3791,7 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var BattersEye = (function (_AbstractMesh) {
+var BattersEye = function (_AbstractMesh) {
     babelHelpers.inherits(BattersEye, _AbstractMesh);
 
     function BattersEye(loop) {
@@ -3824,7 +3826,7 @@ var BattersEye = (function (_AbstractMesh) {
         value: function animate() {}
     }]);
     return BattersEye;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.BattersEye = BattersEye;
 
@@ -3842,7 +3844,7 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Field = (function (_AbstractMesh) {
+var Field = function (_AbstractMesh) {
     babelHelpers.inherits(Field, _AbstractMesh);
 
     function Field(loop) {
@@ -3882,7 +3884,7 @@ var Field = (function (_AbstractMesh) {
         value: function animate() {}
     }]);
     return Field;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Field = Field;
 
@@ -3900,7 +3902,7 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var FoulLine = (function (_AbstractMesh) {
+var FoulLine = function (_AbstractMesh) {
     babelHelpers.inherits(FoulLine, _AbstractMesh);
 
     function FoulLine(loop, side) {
@@ -3949,7 +3951,7 @@ var FoulLine = (function (_AbstractMesh) {
         value: function animate() {}
     }]);
     return FoulLine;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.FoulLine = FoulLine;
 
@@ -3967,7 +3969,7 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var FoulPole = (function (_AbstractMesh) {
+var FoulPole = function (_AbstractMesh) {
     babelHelpers.inherits(FoulPole, _AbstractMesh);
 
     function FoulPole(loop, side) {
@@ -4011,7 +4013,7 @@ var FoulPole = (function (_AbstractMesh) {
         value: function animate() {}
     }]);
     return FoulPole;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.FoulPole = FoulPole;
 
@@ -4029,7 +4031,7 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Grass = (function (_AbstractMesh) {
+var Grass = function (_AbstractMesh) {
     babelHelpers.inherits(Grass, _AbstractMesh);
 
     function Grass(loop, infield) {
@@ -4080,7 +4082,7 @@ var Grass = (function (_AbstractMesh) {
         value: function animate() {}
     }]);
     return Grass;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Grass = Grass;
 
@@ -4098,7 +4100,7 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Indicator = (function (_AbstractMesh) {
+var Indicator = function (_AbstractMesh) {
     babelHelpers.inherits(Indicator, _AbstractMesh);
 
     function Indicator(loop) {
@@ -4140,7 +4142,7 @@ var Indicator = (function (_AbstractMesh) {
         }
     }]);
     return Indicator;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Indicator = Indicator;
 
@@ -4158,7 +4160,7 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Mound = (function (_AbstractMesh) {
+var Mound = function (_AbstractMesh) {
     babelHelpers.inherits(Mound, _AbstractMesh);
 
     function Mound(loop) {
@@ -4198,7 +4200,7 @@ var Mound = (function (_AbstractMesh) {
         value: function animate() {}
     }]);
     return Mound;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Mound = Mound;
 
@@ -4216,7 +4218,7 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Sky = (function (_AbstractMesh) {
+var Sky = function (_AbstractMesh) {
     babelHelpers.inherits(Sky, _AbstractMesh);
 
     function Sky(loop) {
@@ -4275,7 +4277,7 @@ var Sky = (function (_AbstractMesh) {
         value: function animate() {}
     }]);
     return Sky;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Sky = Sky;
 
@@ -4293,7 +4295,7 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Sun = (function (_AbstractMesh) {
+var Sun = function (_AbstractMesh) {
     babelHelpers.inherits(Sun, _AbstractMesh);
 
     function Sun(loop) {
@@ -4373,7 +4375,7 @@ var Sun = (function (_AbstractMesh) {
         }
     }]);
     return Sun;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Sun = Sun;
 
@@ -4391,7 +4393,7 @@ var _AbstractMesh2 = require('./AbstractMesh');
 
 var _Loop = require('../Loop');
 
-var Wall = (function (_AbstractMesh) {
+var Wall = function (_AbstractMesh) {
     babelHelpers.inherits(Wall, _AbstractMesh);
 
     function Wall(loop, angle) {
@@ -4435,7 +4437,7 @@ var Wall = (function (_AbstractMesh) {
         value: function animate() {}
     }]);
     return Wall;
-})(_AbstractMesh2.AbstractMesh);
+}(_AbstractMesh2.AbstractMesh);
 
 exports.Wall = Wall;
 
@@ -4847,8 +4849,8 @@ Distribution.prototype = {
      * @returns {{x: number, y: number}}
      */
     pitchLocation: function pitchLocation(count) {
-        var x = undefined,
-            y = undefined;
+        var x = void 0,
+            y = void 0;
         if (random() < 0.5) {
             x = 50 + floor(random() * 90) - floor(random() * 30);
         } else {
@@ -5021,8 +5023,8 @@ Iterator.prototype = {
     identifier: 'Iterator',
     constructor: Iterator,
     each: function each(collection, map) {
-        var keys = undefined,
-            i = undefined;
+        var keys = void 0,
+            i = void 0;
         if (collection instanceof Array) {
             for (i = 0; i < collection.length; i++) {
                 map(i, collection[i]);
@@ -5129,10 +5131,10 @@ Mathinator.prototype = {
         var apexHeight = Mathinator.prototype.memory.apexHeight,
             distance = Mathinator.prototype.memory.distance,
             splay = Mathinator.prototype.memory.splay;
-        var bottom = undefined,
-            left = undefined,
-            padding = undefined,
-            borderWidth = undefined;
+        var bottom = void 0,
+            left = void 0,
+            padding = void 0,
+            borderWidth = void 0;
         var bounding = Mathinator.prototype.memory.bounding,
             radian = this.RADIAN;
 
@@ -5185,10 +5187,10 @@ Mathinator.prototype = {
             distance = memory.distance,
             splay = memory.splay,
             origin = memory.origin;
-        var top = undefined,
-            left = undefined,
-            padding = undefined,
-            borderWidth = undefined;
+        var top = void 0,
+            left = void 0,
+            padding = void 0,
+            borderWidth = void 0;
         var bounding = Mathinator.prototype.memory.bounding,
             radian = this.RADIAN;
 
@@ -5228,8 +5230,8 @@ Mathinator.prototype = {
      */
     translateSwingResultToStylePosition: function translateSwingResultToStylePosition(swingResult) {
         // CF HR bottom: 95px, centerline: left: 190px;
-        var bottom = undefined,
-            left = undefined;
+        var bottom = void 0,
+            left = void 0;
 
         bottom = Math.cos(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95 / 300;
         left = Math.sin(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95 / 300 + this.SPLAY_INDICATOR_LEFT;
@@ -5261,8 +5263,8 @@ Mathinator.prototype = {
          * @returns {{top: number, left: number, padding: string, borderWidth: string, transform: string, delay: number, ease: *}}
          */
         return function (percent, step, breakTop, breakLeft) {
-            var _top = undefined,
-                _left = undefined;
+            var _top = void 0,
+                _left = void 0;
             _top = breakTop || top;
             _left = breakLeft || left;
             _top = originTop + Mathinator.square(percent / 100) * (_top - originTop);
@@ -5296,10 +5298,10 @@ Mathinator.prototype = {
      */
     fielderReturnDelay: function fielderReturnDelay(distance, throwing, fielding, intercept) {
         return distance / 90 // bip distance (up to 3s+)
-         + 5 * (distance / 310) // worst case time to reach the ball,
-         * Math.min(intercept - 120, 0) / -240 // a good intercept rating will cut the base down to 0
-         + 1 - (0.2 + fielding * 0.8) // gather time (up to 0.8s)
-         + distance / 90 / (0.5 + throwing / 2); // throwing distance (up to 2s)
+        + 5 * (distance / 310) // worst case time to reach the ball,
+        * Math.min(intercept - 120, 0) / -240 // a good intercept rating will cut the base down to 0
+        + 1 - (0.2 + fielding * 0.8) // gather time (up to 0.8s)
+        + distance / 90 / (0.5 + throwing / 2); // throwing distance (up to 2s)
     },
 
     /**
@@ -5395,7 +5397,7 @@ exports.Provider = undefined;
 
 var _TeamJapan = require('./TeamJapan');
 
-var Provider = (function () {
+var Provider = function () {
     function Provider() {
         babelHelpers.classCallCheck(this, Provider);
     }
@@ -5409,7 +5411,7 @@ var Provider = (function () {
         }
     }]);
     return Provider;
-})();
+}();
 
 Provider.prototype.teams = {
     TeamJapan: _TeamJapan.samurai
@@ -5514,7 +5516,7 @@ exports.Trainer = undefined;
 
 var _Iterator = require('../Services/Iterator');
 
-var Trainer = (function () {
+var Trainer = function () {
     function Trainer() {
         babelHelpers.classCallCheck(this, Trainer);
     }
@@ -5553,7 +5555,7 @@ var Trainer = (function () {
         }
     }]);
     return Trainer;
-})();
+}();
 
 exports.Trainer = Trainer;
 
@@ -5652,7 +5654,7 @@ Log.prototype = {
     },
     getBatter: function getBatter(batter) {
         var order = batter.team.nowBatting;
-        order = ({
+        order = {
             0: (0, _text.text)(' 1st'),
             1: (0, _text.text)(' 2nd'),
             2: (0, _text.text)(' 3rd'),
@@ -5662,14 +5664,14 @@ Log.prototype = {
             6: (0, _text.text)(' 7th'),
             7: (0, _text.text)(' 8th'),
             8: (0, _text.text)(' 9th')
-        })[order];
+        }[order];
         var positions = this.longFormFielder();
         return (0, _text.text)('Now batting') + order + _text.text.comma() + positions[batter.position] + _text.text.comma() + batter.getUniformNumber() + _text.text.comma() + batter.getName();
     },
     noteBatter: function noteBatter(batter) {
         var m = _text.text.mode;
-        var record = undefined;
-        var recordJ = undefined;
+        var record = void 0;
+        var recordJ = void 0;
         _text.text.mode = 'e';
         record = this.getBatter(batter);
         _text.text.mode = 'n';
@@ -5729,8 +5731,8 @@ Log.prototype = {
     },
     notePitch: function notePitch(pitchInFlight, batter) {
         var m = _text.text.mode;
-        var record = undefined;
-        var recordJ = undefined;
+        var record = void 0;
+        var recordJ = void 0;
         _text.text.mode = 'e';
         record = this.getPitchLocationDescription(pitchInFlight, batter.bats == 'left');
         this.pitchRecord.e.unshift(record);
@@ -5823,8 +5825,8 @@ Log.prototype = {
     },
     noteSwing: function noteSwing(swingResult) {
         var m = _text.text.mode;
-        var record = undefined;
-        var recordJ = undefined;
+        var record = void 0;
+        var recordJ = void 0;
         var pitchRecord = this.pitchRecord;
         var stabilized = this.stabilized.pitchRecord;
         _text.text.mode = 'e';
@@ -5889,7 +5891,7 @@ Log.prototype = {
             if (r.contact) {
                 var fielder = r.fielder,
                     bases = r.bases,
-                    outBy = undefined;
+                    outBy = void 0;
                 if (r.caught) {
                     if (r.flyAngle < 15) {
                         outBy = 'line';
@@ -5904,51 +5906,51 @@ Log.prototype = {
                     if (r.foul) {
                         // not possible to end PA on foul?
                     } else {
-                            if (r.error) {
-                                bases = 1;
-                                outBy = 'error';
-                            } else {
-                                if (r.thrownOut) {
-                                    if (Math.random() < 0.5) {
-                                        outBy = 'ground';
-                                    } else {
-                                        outBy = 'thrown';
-                                    }
+                        if (r.error) {
+                            bases = 1;
+                            outBy = 'error';
+                        } else {
+                            if (r.thrownOut) {
+                                if (Math.random() < 0.5) {
+                                    outBy = 'ground';
                                 } else {
-                                    switch (r.bases) {
-                                        case 1:
-                                        case 2:
-                                        case 3:
-                                            bases = r.bases;
-                                            break;
-                                        case 4:
-                                            bases = 4;
-                                            if (r.splay < -15) {
-                                                fielder = 'left';
-                                            } else if (r.splay < 15) {
-                                                fielder = 'center';
-                                            } else {
-                                                fielder = 'right';
-                                            }
-                                            break;
-                                    }
+                                    outBy = 'thrown';
                                 }
-                                if (r.firstOut) {
-                                    out = out.concat(r.additionalOuts.filter(function (runner) {
-                                        return runner !== 'batter';
-                                    }));
-                                    out.doublePlay = r.doublePlay;
+                            } else {
+                                switch (r.bases) {
+                                    case 1:
+                                    case 2:
+                                    case 3:
+                                        bases = r.bases;
+                                        break;
+                                    case 4:
+                                        bases = 4;
+                                        if (r.splay < -15) {
+                                            fielder = 'left';
+                                        } else if (r.splay < 15) {
+                                            fielder = 'center';
+                                        } else {
+                                            fielder = 'right';
+                                        }
+                                        break;
                                 }
-                                if (r.fieldersChoice) {
-                                    out.push(r.fieldersChoice);
-                                    if (r.outs == 3) {
-                                        outBy = 'ground';
-                                    } else {
-                                        outBy = 'fieldersChoice';
-                                    }
+                            }
+                            if (r.firstOut) {
+                                out = out.concat(r.additionalOuts.filter(function (runner) {
+                                    return runner !== 'batter';
+                                }));
+                                out.doublePlay = r.doublePlay;
+                            }
+                            if (r.fieldersChoice) {
+                                out.push(r.fieldersChoice);
+                                if (r.outs == 3) {
+                                    outBy = 'ground';
+                                } else {
+                                    outBy = 'fieldersChoice';
                                 }
                             }
                         }
+                    }
                 }
                 record = _text.text.contactResult(batter, fielder, bases, outBy, r.outs === 3 ? [] : r.sacrificeAdvances, out);
             } else {
@@ -5962,7 +5964,7 @@ Log.prototype = {
             prevJ = (0, _text.text)('Previous: ', 'n'),
             prev = (0, _text.text)('Previous: ', 'e');
 
-        var statement = undefined;
+        var statement = void 0;
         var record = this.record;
         var pitchRecord = this.pitchRecord;
         var stabilized = this.stabilized.pitchRecord;
@@ -6118,7 +6120,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 var text = function text(phrase, override) {
     if (!text.mode) text.mode = 'e';
-    var string = ({
+    var string = {
         n: {
             empty: '-',
             ' 1st': '1番',
@@ -6270,8 +6272,6 @@ var text = function text(phrase, override) {
             'Range': 'レンジ',
             'Strong throw': '肩強い'
         },
-        //'' : '',
-        //'' : '',
         e: {
             empty: '-',
             'Season': 'Season',
@@ -6281,14 +6281,14 @@ var text = function text(phrase, override) {
             Power: 'Pow',
             Speed: 'Spd'
         }
-    })[override ? override : text.mode][phrase];
+    }[override ? override : text.mode][phrase];
     return string ? string : phrase;
 };
 
 text.substitution = function (sub, player, mode) {
     var originalMode = text.mode;
     mode = mode || text.mode;
-    var order = ({
+    var order = {
         0: text(' 1st', mode),
         1: text(' 2nd', mode),
         2: text(' 3rd', mode),
@@ -6298,7 +6298,7 @@ text.substitution = function (sub, player, mode) {
         6: text(' 7th', mode),
         7: text(' 8th', mode),
         8: text(' 9th', mode)
-    })[player.order];
+    }[player.order];
     var position = text.fielderShortName(player.position, mode);
 
     if (mode === 'n') {
@@ -6322,7 +6322,7 @@ text.getBattersEye = function (game) {
 
 text.baseShortName = function (base) {
     if (text.mode == 'n') {
-        return ({
+        return {
             '1st': '一',
             '2nd': '二',
             '3rd': '三',
@@ -6332,7 +6332,7 @@ text.baseShortName = function (base) {
             'left': '左',
             'center': '中',
             'right': '右'
-        })[base];
+        }[base];
     }
     return base;
 };
@@ -6340,7 +6340,7 @@ text.baseShortName = function (base) {
 text.fielderShortName = function (fielder, override) {
     var mode = override || text.mode;
     if (mode === 'n') {
-        return ({
+        return {
             'first': '一',
             'second': '二',
             'third': '三',
@@ -6350,7 +6350,7 @@ text.fielderShortName = function (fielder, override) {
             'left': '左',
             'center': '中',
             'right': '右'
-        })[fielder];
+        }[fielder];
     }
     return fielder;
 };
@@ -6364,7 +6364,7 @@ text.slash = function () {
 
 text.fielderLongName = function (fielder) {
     if (text.mode == 'n') {
-        return ({
+        return {
             'first': 'ファースト',
             'second': 'セカンド',
             'third': 'サード',
@@ -6374,9 +6374,9 @@ text.fielderLongName = function (fielder) {
             'left': 'レフト',
             'center': 'センター',
             'right': 'ライト'
-        })[fielder];
+        }[fielder];
     }
-    return ({
+    return {
         first: text('first baseman'),
         second: text('second baseman'),
         third: text('third baseman'),
@@ -6386,17 +6386,17 @@ text.fielderLongName = function (fielder) {
         left: text('left fielder'),
         center: text('center fielder'),
         right: text('right fielder')
-    })[fielder];
+    }[fielder];
 };
 
 text.comma = function () {
-    return ({ n: '、', e: ', ' })[text.mode];
+    return { n: '、', e: ', ' }[text.mode];
 };
 text.space = function () {
-    return ({ n: '', e: ' ' })[text.mode];
+    return { n: '', e: ' ' }[text.mode];
 };
 text.stop = function () {
-    return ({ n: '。', e: '. ' })[text.mode];
+    return { n: '。', e: '. ' }[text.mode];
 };
 
 text.namePitch = function (pitch) {
@@ -6627,12 +6627,13 @@ arguments[4][30][0].apply(exports,arguments)
 },{"../Services/Animator":26,"../Services/Distribution":27,"../Services/Iterator":28,"../Services/Mathinator":29,"dup":30}],"babel/external-helpers":[function(require,module,exports){
 var global = {}; (function (global) {
   var babelHelpers = global.babelHelpers = {};
-
-  babelHelpers.typeof = function (obj) {
-    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
   };
 
-  babelHelpers.jsx = (function () {
+  babelHelpers.jsx = function () {
     var REACT_ELEMENT_TYPE = typeof Symbol === "function" && Symbol.for && Symbol.for("react.element") || 0xeac7;
     return function createRawReactElement(type, props, key, children) {
       var defaultProps = type && type.defaultProps;
@@ -6673,15 +6674,12 @@ var global = {}; (function (global) {
         _owner: null
       };
     };
-  })();
+  }();
 
   babelHelpers.asyncToGenerator = function (fn) {
     return function () {
       var gen = fn.apply(this, arguments);
       return new Promise(function (resolve, reject) {
-        var callNext = step.bind(null, "next");
-        var callThrow = step.bind(null, "throw");
-
         function step(key, arg) {
           try {
             var info = gen[key](arg);
@@ -6694,11 +6692,15 @@ var global = {}; (function (global) {
           if (info.done) {
             resolve(value);
           } else {
-            Promise.resolve(value).then(callNext, callThrow);
+            return Promise.resolve(value).then(function (value) {
+              return step("next", value);
+            }, function (err) {
+              return step("throw", err);
+            });
           }
         }
 
-        callNext();
+        return step("next");
       });
     };
   };
@@ -6709,7 +6711,7 @@ var global = {}; (function (global) {
     }
   };
 
-  babelHelpers.createClass = (function () {
+  babelHelpers.createClass = function () {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -6725,7 +6727,7 @@ var global = {}; (function (global) {
       if (staticProps) defineProperties(Constructor, staticProps);
       return Constructor;
     };
-  })();
+  }();
 
   babelHelpers.defineEnumerableProperties = function (obj, descs) {
     for (var key in descs) {
@@ -6908,7 +6910,7 @@ var global = {}; (function (global) {
     return value;
   };
 
-  babelHelpers.slicedToArray = (function () {
+  babelHelpers.slicedToArray = function () {
     function sliceIterator(arr, i) {
       var _arr = [];
       var _n = true;
@@ -6944,7 +6946,7 @@ var global = {}; (function (global) {
         throw new TypeError("Invalid attempt to destructure non-iterable instance");
       }
     };
-  })();
+  }();
 
   babelHelpers.slicedToArrayLoose = function (arr, i) {
     if (Array.isArray(arr)) {

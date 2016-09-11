@@ -7,7 +7,7 @@
     "test": "mocha testCareerSpec.js --compilers js:babel/register"
   },
   "author": "George Fu (george.jing.fu@gmail.com)",
-  "license": "GNU",
+  "license": "MIT",
   "devDependencies": {
   },
   "directories": {

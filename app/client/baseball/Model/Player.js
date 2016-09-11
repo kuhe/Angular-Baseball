@@ -20,6 +20,7 @@ Player.prototype = {
      * @see {Player}
      */
     init(team, hero) {
+        this.position = 'bench';
         this.ready = false;
         this.fatigue = 0;
         this.throws = Math.random() > 0.86 ? 'left' : 'right';
