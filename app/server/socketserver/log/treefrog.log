@@ -1,0 +1,6 @@
+2016-09-13 11:36:46 INFO  [3360291] TreeFrog Framework version 1.12.0
+2016-09-13 11:36:46 INFO  [3360291] Qt 5.7.0 / Mac OS X 10.10 Yosemite
+2016-09-13 11:36:46 INFO  [3360291] TreeFrog application servers started up.
+2016-09-13 11:37:17 WARN  [3360893] Reading a socket timed out after 10 seconds. Descriptor:18
+2016-09-13 11:39:43 INFO  [3360291] TreeFrog application servers shutting down
+2016-09-13 11:39:43 INFO  [3360291] TreeFrog application servers shutdown completed
