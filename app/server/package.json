@@ -8,8 +8,8 @@
     "start": "nodemon"
   },
   "author": "kuhe",
-  "license": "GNU",
+  "license": "MIT",
   "dependencies": {
-    "socket.io": "^1.3.6"
+    "socket.io": "^1.4.8"
   }
 }

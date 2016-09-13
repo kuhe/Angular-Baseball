@@ -9,7 +9,7 @@
     "baseball",
     "yakyuu"
   ],
-  "license": "GNU",
+  "license": "MIT",
   "dependencies": {
     "es5-shim": "4.0.5",
     "html5shiv": "3.7.2",
