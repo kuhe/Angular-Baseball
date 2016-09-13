@@ -1,5 +1,10 @@
 import { Log } from '../Utility/Log';
 
+/**
+ *
+ * e.g. "HR++" (HR and 2 extra runs), "SO" strikeout, "FO" flyout
+ *
+ */
 class AtBat {
     constructor(text) {
         this.infield = text.includes(AtBat.prototype.INFIELD_HIT_INDICATOR) ? AtBat.prototype.INFIELD_HIT_INDICATOR : '';

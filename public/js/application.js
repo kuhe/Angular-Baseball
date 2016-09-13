@@ -11,6 +11,11 @@ exports.AtBat = undefined;
 
 var _Log = require('../Utility/Log');
 
+/**
+ *
+ * e.g. "HR++" (HR and 2 extra runs), "SO" strikeout, "FO" flyout
+ *
+ */
 var AtBat = function () {
     function AtBat(text) {
         babelHelpers.classCallCheck(this, AtBat);
@@ -459,6 +464,10 @@ Game.prototype = {
     getInning: function getInning() {
         return _utils.text.mode === 'n' ? this.inning + (this.half === 'top' ? 'オモテ' : 'ウラ') : this.half.toUpperCase() + ' ' + this.inning;
     },
+
+    /**
+     * @returns {boolean} is a human player is batting
+     */
     humanBatting: function humanBatting() {
         var humanControl = this.humanControl;
         if (humanControl === 'none') return false;
@@ -469,6 +478,10 @@ Game.prototype = {
                 return humanControl === 'both' || humanControl === 'home';
         }
     },
+
+    /**
+     * @returns {boolean}
+     */
     humanPitching: function humanPitching() {
         var humanControl = this.humanControl;
         if (humanControl === 'none') return false;
@@ -479,6 +492,10 @@ Game.prototype = {
                 return humanControl === 'both' || humanControl === 'away';
         }
     },
+
+    /**
+     * ends the game
+     */
     end: function end() {
         this.stage = 'end';
         var e = void 0,
@@ -497,6 +514,10 @@ Game.prototype = {
     },
 
     stage: 'pitch', //pitch, swing
+    /**
+     * advances an AI turn (response to the previous action) by pitching or swinging
+     * @param callback
+     */
     simulateInput: function simulateInput(callback) {
         var stage = this.stage,
             pitchTarget = this.pitchTarget;
@@ -512,6 +533,11 @@ Game.prototype = {
             this.autoSwing(this.pitchTarget.x, this.pitchTarget.y, callback);
         }
     },
+
+    /**
+     * usually for spectator mode in which the AI plays against itself
+     * @param callback
+     */
     simulatePitchAndSwing: function simulatePitchAndSwing(callback) {
         if (this.stage === 'end') {
             return;
@@ -547,6 +573,12 @@ Game.prototype = {
             this.theSwing(x, y, callback);
         }
     },
+
+    /**
+     * select a pitch for the AI
+     * @todo use an out pitch at 2 strikes?
+     * @todo use more fastballs against weak batters?
+     */
     autoPitchSelect: function autoPitchSelect() {
         var pitchNames = Object.keys(this.pitcher.pitching);
         var pitchName = pitchNames[Math.random() * pitchNames.length | 0];
@@ -554,6 +586,11 @@ Game.prototype = {
         pitch.name = pitchName;
         this.pitchInFlight = pitch;
     },
+
+    /**
+     * AI pitcher winds up and throws
+     * @param callback \usually a function to resolve the animations resulting from the pitch
+     */
     autoPitch: function autoPitch(callback) {
         var _this = this;
 
@@ -591,6 +628,19 @@ Game.prototype = {
             })();
         }
     },
+
+    /**
+     * AI batter decides whether to swing
+     *
+     * The "deceptive" location is the apparent trajectory. If the batter has good eyes, they will see the
+     * actual trajectory instead.
+     *
+     * Hitting the ball, of course, is another matter.
+     *
+     * @param deceptiveX \the apparent X target of the pitch
+     * @param deceptiveY \the apparent Y target of the pitch
+     * @param callback
+     */
     autoSwing: function autoSwing(deceptiveX, deceptiveY, callback) {
         var giraffe = this;
         var bonus = this.batter.eye.bonus || 0;
@@ -632,9 +682,12 @@ Game.prototype = {
         });
     },
 
+    /**
+     * websocket opponent is connected
+     */
     opponentConnected: false,
     /**
-     * variable for what to do when the batter becomes ready for a pitch
+     * variable function for what to do when the batter becomes ready for a pitch (overwritten many times)
      */
     onBatterReady: function onBatterReady() {},
 
@@ -656,6 +709,12 @@ Game.prototype = {
 
     batterReadyTimeout: -1,
     waitingCallback: function waitingCallback() {},
+
+    /**
+     * signals readiness for the next pitch. This behavior varies depending on whether AI or human is pitching
+     * @param callback
+     * @param swingResult
+     */
     awaitPitch: function awaitPitch(callback, swingResult) {
         var giraffe = this;
         if (this.opponentConnected) {
@@ -675,6 +734,16 @@ Game.prototype = {
             }
         }
     },
+
+    /**
+     * Signals readiness for the batter's response to a pitch in flight.
+     * In case of a human pitching to AI, the AI batter is automatically ready.
+     * @param x
+     * @param y
+     * @param callback
+     * @param pitchInFlight
+     * @param pitchTarget
+     */
     awaitSwing: function awaitSwing(x, y, callback, pitchInFlight, pitchTarget) {
         if (this.opponentConnected) {
             this.waitingCallback = callback;
@@ -686,6 +755,14 @@ Game.prototype = {
             this.autoSwing(x, y, callback);
         }
     },
+
+    /**
+     * triggers a pitch to aspirational target (x,y) from the current pitcher on the mound.
+     * @param x \coordinate X in the strike zone (0, 200)
+     * @param y \coordinate Y (0, 200), origin being bottom left.
+     * @param callback \typically to resolve animations and move to the next step (batting this pitch)
+     * @param override \a websocket opponent will override the engine's pitch location calculations with their actual
+     */
     thePitch: function thePitch(x, y, callback, override) {
         var pitch = this.pitchInFlight;
         if (this.stage === 'pitch') {
@@ -724,10 +801,20 @@ Game.prototype = {
         }
     },
 
+    /**
+     * language sensitive string describing what kind of pitch the batter sees
+     */
     battersEye: {
         e: '',
         n: ''
     },
+    /**
+     * makes an aspirational swing to (x,y) by the current player in the batter's box
+     * @param x
+     * @param y
+     * @param callback \resolves animations
+     * @param override
+     */
     theSwing: function theSwing(x, y, callback, override) {
         var pitch = this.pitchInFlight;
         if (this.stage === 'swing') {
@@ -832,6 +919,13 @@ Game.prototype = {
             }
         }
     },
+
+    /**
+     * for CSS
+     * @param x
+     * @param y
+     * @returns {*|number}
+     */
     setBatAngle: function setBatAngle(x, y) {
         var giraffe = this,
             pitchInFlight = this.pitchInFlight,
@@ -936,6 +1030,10 @@ Game.prototype = {
         console.table(this.scoreboard);
         console.table(this.tally);
     },
+
+    /**
+     * for websocket serialization
+     */
     toData: function toData() {
         var data = {};
         data.half = this.half;
@@ -1048,19 +1146,21 @@ Game.prototype = {
         batter: '',
         fielder: ''
     },
-    showPlayResultPanels: function showPlayResultPanels(batter) {
-        var batterOutcomes = {};
-        var atBat = batter.atBats.slice(0).pop();
-        var fielderOutcomes = {};
-        var n = function n() {
-            var n = Math.floor(Math.random() * 3);
-            return n ? n : '';
-        };
-        this.playResult = {
-            batter: 'B_placeholder' + n() || batterOutcomes[atBat] || 'batter/' + atBat,
-            fielder: 'F_placeholder' + n() || fielderOutcomes[atBat] || 'fielder/' + atBat
-        };
-    },
+    //showPlayResultPanels(batter) {
+    //    const batterOutcomes = {
+    //    };
+    //    const atBat = batter.atBats.slice(0).pop();
+    //    const fielderOutcomes = {
+    //    };
+    //    const n = () => {
+    //        const n = Math.floor(Math.random()*3);
+    //        return n ? n : '';
+    //    };
+    //    this.playResult = {
+    //        batter: `B_placeholder${n()}` || batterOutcomes[atBat] || `batter/${atBat}`,
+    //        fielder: `F_placeholder${n()}` || fielderOutcomes[atBat] || `fielder/${atBat}`
+    //    };
+    //},
     pitchSelect: function pitchSelect() {},
 
     field: null,
@@ -1165,6 +1265,8 @@ exports.Manager = undefined;
 
 var _services = require('../Services/_services');
 
+var _Player = require('./Player');
+
 var Manager = function Manager(team) {
     this.init(team);
 };
@@ -1188,7 +1290,8 @@ Manager.prototype = {
         }
         _services.Iterator.each(this.team.bench, function (key, player) {
             if (!player.number) {
-                player.number = jerseyNumber++;
+                jerseyNumber += 1 + (Math.random() * 5 | 0);
+                player.number = jerseyNumber;
             }
         });
         this.team.positions.short = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
@@ -1261,13 +1364,39 @@ Manager.prototype = {
             if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
         }
         return 'no players available';
+    },
+
+    /**
+     * used by the AI to substitute a fatigued pitcher
+     * @param {Number} fatigueAllowed
+     * only execute if the pitcher's fatigue is greater than this number
+     */
+    checkPitcherFatigue: function checkPitcherFatigue() {
+        var fatigueAllowed = arguments.length <= 0 || arguments[0] === undefined ? 120 : arguments[0];
+
+        var team = this.team;
+        var pitcher = team.positions.pitcher;
+
+        var sub = this.selectForSkill(team.bench, ['pitching']);
+        if (!(sub instanceof _Player.Player)) {
+            return;
+        }
+
+        var replace = pitcher.fatigue - pitcher.skill.pitching;
+        var remain = fatigueAllowed - sub.skill.pitching;
+
+        if (replace > remain) {
+            sub.substitute(pitcher);
+        } else {
+            team.bench.push(sub);
+        }
     }
 };
 
 exports.Manager = Manager;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Services/_services":30,"babel/external-helpers":"babel/external-helpers"}],5:[function(require,module,exports){
+},{"../Services/_services":30,"./Player":5,"babel/external-helpers":"babel/external-helpers"}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1281,6 +1410,13 @@ var _services = require('../Services/_services');
 
 var _models = require('../Model/_models');
 
+/**
+ *
+ * @param team \the team to assign the player to (bench)
+ * @param hero \whether the player should be generated with elite skills
+ * @constructor
+ *
+ */
 var Player = function Player(team, hero) {
     this.init(team, hero);
     this.resetStats(this.team.game && this.team.game.gamesIntoSeason || 0);
@@ -1288,8 +1424,13 @@ var Player = function Player(team, hero) {
 
 Player.prototype = {
     constructor: Player,
+    /**
+     * @see {Player}
+     */
     init: function init(team, hero) {
+        this.position = 'bench';
         this.ready = false;
+        this.fatigue = 0;
         this.throws = Math.random() > 0.86 ? 'left' : 'right';
         this.bats = Math.random() > 0.75 ? 'left' : 'right';
         this.team = team;
@@ -1314,12 +1455,22 @@ Player.prototype = {
         this.definingBattingCharacteristic = {};
         this.definingCharacteristic = {};
     },
+
+    /**
+     * inserts the Japanese middle dot at the correct position, allowing a 4-width
+     * @param jSurname
+     * @param jGivenName
+     */
     spaceName: function spaceName(jSurname, jGivenName) {
         if (jSurname.length === 1 && jGivenName.length <= 2) jSurname += '・';
         if (jGivenName.length === 1 && !jSurname.includes('・') && jSurname.length <= 2) jSurname += '・';
         this.nameJ = jSurname + jGivenName;
         this.surnameJ = jSurname;
     },
+
+    /**
+     * for websocket transfer
+     */
     serialize: function serialize() {
         var team = this.team;
         delete this.team;
@@ -1327,6 +1478,11 @@ Player.prototype = {
         this.team = team;
         return data;
     },
+
+    /**
+     * @param data
+     * inverts @see #serialize()
+     */
     fromData: function fromData(data) {
         var giraffe = this;
         _services.Iterator.each(data, function (key, value) {
@@ -1335,6 +1491,15 @@ Player.prototype = {
         delete this.atBatObjects;
         this.getAtBats();
     },
+
+
+    /**
+     *
+     * take over the other player's position and batting order immediately, sending him/her to the bench
+     * @param {Player} player
+     * @returns {boolean}
+     *
+     */
     substitute: function substitute(player) {
         if (player.team !== this.team) return false;
         var order = player.order,
@@ -1367,6 +1532,12 @@ Player.prototype = {
         }
         game.log.noteSubstitution(this, player);
     },
+
+    /**
+     * resets the player's statistics
+     * @param gamesIntoSeason
+     * @returns {*}
+     */
     resetStats: function resetStats() {
         var gamesIntoSeason = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
 
@@ -1517,6 +1688,9 @@ Player.prototype = {
         this.stats.batting.ba = this.stats.batting.getBA();
     },
 
+    /**
+     * a list of at bat results {AtBat[]}
+     */
     atBatObjects: [],
     getAtBats: function getAtBats() {
         if (this.atBats.length > this.atBatObjects.length) {
@@ -1532,9 +1706,20 @@ Player.prototype = {
     recordInfieldHit: function recordInfieldHit() {
         this.atBats[this.atBats.length - 1] += _models.AtBat.prototype.INFIELD_HIT_INDICATOR;
     },
+
+    /**
+     * @returns {number}
+     */
     getBaseRunningTime: function getBaseRunningTime() {
         return _services.Mathinator.baseRunningTime(this.skill.offense.speed);
     },
+
+    /**
+     * live game steal
+     * @param game
+     * @param base
+     * @returns {Player.attemptSteal}
+     */
     attemptSteal: function attemptSteal(game, base) {
         var pitch = game.pitchInFlight;
         var success = _services.Distribution.stealSuccess(pitch, game.pitcher.team.positions.catcher, this, base, this.team.stealAttempt === _models.Team.RUNNERS_DISCRETION);
@@ -1561,10 +1746,21 @@ Player.prototype = {
         game.swingResult.attemptedBase = base;
         return this;
     },
+
+    /**
+     * used for other calculations/orderings
+     * @returns {number}
+     */
     defensiveAverage: function defensiveAverage() {
         var _this = this.skill.defense;
         return (_this.speed + _this.fielding + _this.throwing) / 3;
     },
+
+    /**
+     * randomizes the player's skills, usually called at init
+     * @param hero
+     * @param allPitches
+     */
     randomizeSkills: function randomizeSkills(hero, allPitches) {
         this.hero = hero;
         var giraffe = this;
@@ -1650,24 +1846,50 @@ Player.prototype = {
         }) / this.pitching.averaging.length + this.pitching.averaging.length * 3);
         delete this.pitching.averaging;
     },
+
+    /**
+     * language-sensitive
+     * @returns {String}
+     */
     getSurname: function getSurname() {
         return _utils.text.mode === 'n' ? this.surnameJ : this.surname;
     },
+
+    /**
+     * language-sensitive
+     * @returns {String}
+     */
     getName: function getName() {
         return _utils.text.mode === 'n' ? this.nameJ : this.name;
     },
     getUniformNumber: function getUniformNumber() {
         return (0, _utils.text)('#') + this.number;
     },
+
+    /**
+     * language-sensitive, for text representation of batting order
+     * @returns {String}
+     */
     getOrder: function getOrder() {
         return (0, _utils.text)([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
     },
+
+    /**
+     * a localized description of this player's defining batting characteristic e.g. "contact hitter"
+     * @returns {*}
+     */
     getDefiningBattingCharacteristic: function getDefiningBattingCharacteristic() {
         if (!this.definingBattingCharacteristic[_utils.text.mode]) {
             this.definingBattingCharacteristic[_utils.text.mode] = this.getDefiningCharacteristic(true);
         }
         return this.definingBattingCharacteristic[_utils.text.mode];
     },
+
+    /**
+     * a localized phrase describing a strong trait of this player e.g. "ace" or "power hitter"
+     * @param battingOnly \only return their defining batting characteristic
+     * @returns {*}
+     */
     getDefiningCharacteristic: function getDefiningCharacteristic(battingOnly) {
         if (this.definingCharacteristic[_utils.text.mode] && !battingOnly) {
             return this.definingCharacteristic[_utils.text.mode];
@@ -1757,14 +1979,7 @@ Player.prototype = {
      */
     toString: function toString() {
         return this.name + ' #' + this.number;
-    },
-
-    eye: {},
-    fatigue: 0,
-    name: '',
-    number: 0,
-    position: '',
-    atBats: []
+    }
 };
 
 exports.Player = Player;
@@ -1880,6 +2095,9 @@ Umpire.prototype = {
         balls: 0,
         outs: 0
     },
+    /**
+     * starts the game by announcing it and signalling the first batter up
+     */
     playBall: function playBall() {
         var game = this.game;
         game.half = 'top';
@@ -1895,6 +2113,11 @@ Umpire.prototype = {
         game.batter.ready = true;
         game.log.noteBatter(game.batter);
     },
+
+    /**
+     * makes the call based on the last pitch and swing (or no swing)
+     * @todo add margin of error to Umpire to simulate real umpiring, haha
+     */
     makeCall: function makeCall() {
         this.says = '';
         var game = this.game;
@@ -2140,12 +2363,24 @@ Umpire.prototype = {
             this.changeSides();
         }
     },
+
+    /**
+     * awards first base to the batter
+     */
     reachBase: function reachBase() {
         var game = this.game;
         game.field.first = game.batter;
         game.field.first.fatigue += 2;
         return this;
     },
+
+    /**
+     * advance the runners (ball in play or walk)
+     *
+     * @param isWalk {bool}
+     * @param fieldersChoice \results in an out to someone other than the batter
+     * @param sacrificeAdvances \advances on a sacrifice
+     */
     advanceRunners: function advanceRunners(isWalk, fieldersChoice, sacrificeAdvances) {
         isWalk = !!isWalk;
         var game = this.game;
@@ -2256,11 +2491,19 @@ Umpire.prototype = {
         }
         return this;
     },
+
+    /**
+     * "run scores!"
+     */
     runScores: function runScores() {
         var game = this.game;
         game.scoreboard[game.half === 'top' ? 'away' : 'home'][game.inning]++;
         game.tally[game.half === 'top' ? 'away' : 'home'].R++;
     },
+
+    /**
+     * lets the on deck batter into the batter's box
+     */
     newBatter: function newBatter() {
         var game = this.game;
         game.passMinutes(2);
@@ -2273,18 +2516,22 @@ Umpire.prototype = {
         var team = game.half === 'bottom' ? game.teams.home : game.teams.away;
         game.lastBatter = game.batter;
         game.batter = team.lineup[(team.nowBatting + 1) % 9];
-        game.batter.ready = false;
-        if (!game.humanBatting()) {
-            game.batter.ready = true;
-        }
+        game.batter.ready = !game.humanBatting();
         game.deck = team.lineup[(team.nowBatting + 2) % 9];
         game.hole = team.lineup[(team.nowBatting + 3) % 9];
         team.nowBatting = (team.nowBatting + 1) % 9;
         if (this.count.outs < 3) {
             game.log.noteBatter(game.batter);
         }
-        game.showPlayResultPanels(game.lastBatter);
+        //game.showPlayResultPanels(game.lastBatter);
+        if (!game.humanPitching()) {
+            game.pitcher.team.manager.checkPitcherFatigue();
+        }
     },
+
+    /**
+     * 3 outs
+     */
     changeSides: function changeSides() {
         var game = this.game;
         game.passMinutes(5);
@@ -2871,7 +3118,77 @@ Loop.prototype.constructors = {
 exports.Loop = Loop;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Services/Animator":26,"./Shaders/SkyShader":24,"./mesh/Ball":11,"./mesh/Base":12,"./mesh/BaseDirt":13,"./mesh/BattersEye":14,"./mesh/Field":15,"./mesh/FoulLine":16,"./mesh/FoulPole":17,"./mesh/Grass":18,"./mesh/Mound":20,"./mesh/Sky":21,"./mesh/Sun":22,"./mesh/Wall":23,"./scene/lighting":25,"babel/external-helpers":"babel/external-helpers"}],10:[function(require,module,exports){
+},{"../Services/Animator":26,"./Shaders/SkyShader":10,"./mesh/Ball":12,"./mesh/Base":13,"./mesh/BaseDirt":14,"./mesh/BattersEye":15,"./mesh/Field":16,"./mesh/FoulLine":17,"./mesh/FoulPole":18,"./mesh/Grass":19,"./mesh/Mound":21,"./mesh/Sky":22,"./mesh/Sun":23,"./mesh/Wall":24,"./scene/lighting":25,"babel/external-helpers":"babel/external-helpers"}],10:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+            value: true
+});
+/**
+ * @author zz85 / https://github.com/zz85
+ *
+ * Based on "A Practical Analytic Model for Daylight"
+ * aka The Preetham Model, the de facto standard analytic skydome model
+ * http://www.cs.utah.edu/~shirley/papers/sunsky/sunsky.pdf
+ *
+ * First implemented by Simon Wallner
+ * http://www.simonwallner.at/projects/atmospheric-scattering
+ *
+ * Improved by Martin Upitis
+ * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
+ *
+ * Three.js integration by zz85 http://twitter.com/blurspline
+ */
+
+var loadSkyShader = function loadSkyShader() {
+            THREE.ShaderLib['sky'] = {
+
+                        uniforms: {
+                                    luminance: { type: "f", value: 1 },
+                                    turbidity: { type: "f", value: 2 },
+                                    reileigh: { type: "f", value: 1 },
+                                    mieCoefficient: { type: "f", value: 0.005 },
+                                    mieDirectionalG: { type: "f", value: 0.8 },
+                                    sunPosition: { type: "v3", value: new THREE.Vector3() }
+                        },
+
+                        vertexShader: ["varying vec3 vWorldPosition;", "void main() {", "vec4 worldPosition = modelMatrix * vec4( position, 1.0 );", "vWorldPosition = worldPosition.xyz;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
+
+                        fragmentShader: ["uniform sampler2D skySampler;", "uniform vec3 sunPosition;", "varying vec3 vWorldPosition;", "vec3 cameraPos = vec3(0., 0., 0.);", "// uniform sampler2D sDiffuse;", "// const float turbidity = 10.0; //", "// const float reileigh = 2.; //", "// const float luminance = 1.0; //", "// const float mieCoefficient = 0.005;", "// const float mieDirectionalG = 0.8;", "uniform float luminance;", "uniform float turbidity;", "uniform float reileigh;", "uniform float mieCoefficient;", "uniform float mieDirectionalG;", "// constants for atmospheric scattering", "const float e = 2.71828182845904523536028747135266249775724709369995957;", "const float pi = 3.141592653589793238462643383279502884197169;", "const float n = 1.0003; // refractive index of air", "const float N = 2.545E25; // number of molecules per unit volume for air at", "// 288.15K and 1013mb (sea level -45 celsius)", "const float pn = 0.035;	// depolatization factor for standard air", "// wavelength of used primaries, according to preetham", "const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);", "// mie stuff", "// K coefficient for the primaries", "const vec3 K = vec3(0.686, 0.678, 0.666);", "const float v = 4.0;", "// optical length at zenith for molecules", "const float rayleighZenithLength = 8.4E3;", "const float mieZenithLength = 1.25E3;", "const vec3 up = vec3(0.0, 1.0, 0.0);", "const float EE = 1000.0;", "const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;", "// 66 arc seconds -> degrees, and the cosine of that", "// earth shadow hack", "const float cutoffAngle = pi/1.95;", "const float steepness = 1.5;", "vec3 totalRayleigh(vec3 lambda)", "{", "return (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn));", "}",
+
+                        // see http://blenderartists.org/forum/showthread.php?321110-Shaders-and-Skybox-madness
+                        "// A simplied version of the total Reayleigh scattering to works on browsers that use ANGLE", "vec3 simplifiedRayleigh()", "{", "return 0.0005 / vec3(94, 40, 18);",
+                        // return 0.00054532832366 / (3.0 * 2.545E25 * pow(vec3(680E-9, 550E-9, 450E-9), vec3(4.0)) * 6.245);
+                        "}", "float rayleighPhase(float cosTheta)", "{	 ", "return (3.0 / (16.0*pi)) * (1.0 + pow(cosTheta, 2.0));", "//	return (1.0 / (3.0*pi)) * (1.0 + pow(cosTheta, 2.0));", "//	return (3.0 / 4.0) * (1.0 + pow(cosTheta, 2.0));", "}", "vec3 totalMie(vec3 lambda, vec3 K, float T)", "{", "float c = (0.2 * T ) * 10E-18;", "return 0.434 * c * pi * pow((2.0 * pi) / lambda, vec3(v - 2.0)) * K;", "}", "float hgPhase(float cosTheta, float g)", "{", "return (1.0 / (4.0*pi)) * ((1.0 - pow(g, 2.0)) / pow(1.0 - 2.0*g*cosTheta + pow(g, 2.0), 1.5));", "}", "float sunIntensity(float zenithAngleCos)", "{", "return EE * max(0.0, 1.0 - exp(-((cutoffAngle - acos(zenithAngleCos))/steepness)));", "}", "// float logLuminance(vec3 c)", "// {", "// 	return log(c.r * 0.2126 + c.g * 0.7152 + c.b * 0.0722);", "// }", "// Filmic ToneMapping http://filmicgames.com/archives/75", "float A = 0.15;", "float B = 0.50;", "float C = 0.10;", "float D = 0.20;", "float E = 0.02;", "float F = 0.30;", "float W = 1000.0;", "vec3 Uncharted2Tonemap(vec3 x)", "{", "return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;", "}", "void main() ", "{", "float sunfade = 1.0-clamp(1.0-exp((sunPosition.y/450000.0)),0.0,1.0);", "// luminance =  1.0 ;// vWorldPosition.y / 450000. + 0.5; //sunPosition.y / 450000. * 1. + 0.5;", "// gl_FragColor = vec4(sunfade, sunfade, sunfade, 1.0);", "float reileighCoefficient = reileigh - (1.0* (1.0-sunfade));", "vec3 sunDirection = normalize(sunPosition);", "float sunE = sunIntensity(dot(sunDirection, up));", "// extinction (absorbtion + out scattering) ", "// rayleigh coefficients",
+
+                        // "vec3 betaR = totalRayleigh(lambda) * reileighCoefficient;",
+                        "vec3 betaR = simplifiedRayleigh() * reileighCoefficient;", "// mie coefficients", "vec3 betaM = totalMie(lambda, K, turbidity) * mieCoefficient;", "// optical length", "// cutoff angle at 90 to avoid singularity in next formula.", "float zenithAngle = acos(max(0.0, dot(up, normalize(vWorldPosition - cameraPos))));", "float sR = rayleighZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));", "float sM = mieZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));", "// combined extinction factor	", "vec3 Fex = exp(-(betaR * sR + betaM * sM));", "// in scattering", "float cosTheta = dot(normalize(vWorldPosition - cameraPos), sunDirection);", "float rPhase = rayleighPhase(cosTheta*0.5+0.5);", "vec3 betaRTheta = betaR * rPhase;", "float mPhase = hgPhase(cosTheta, mieDirectionalG);", "vec3 betaMTheta = betaM * mPhase;", "vec3 Lin = pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * (1.0 - Fex),vec3(1.5));", "Lin *= mix(vec3(1.0),pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * Fex,vec3(1.0/2.0)),clamp(pow(1.0-dot(up, sunDirection),5.0),0.0,1.0));", "//nightsky", "vec3 direction = normalize(vWorldPosition - cameraPos);", "float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]", "float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]", "vec2 uv = vec2(phi, theta) / vec2(2.0*pi, pi) + vec2(0.5, 0.0);", "// vec3 L0 = texture2D(skySampler, uv).rgb+0.1 * Fex;", "vec3 L0 = vec3(0.1) * Fex;", "// composition + solar disc", "//if (cosTheta > sunAngularDiameterCos)", "float sundisk = smoothstep(sunAngularDiameterCos,sunAngularDiameterCos+0.00002,cosTheta);", "// if (normalize(vWorldPosition - cameraPos).y>0.0)", "L0 += (sunE * 19000.0 * Fex)*sundisk;", "vec3 whiteScale = 1.0/Uncharted2Tonemap(vec3(W));", "vec3 texColor = (Lin+L0);   ", "texColor *= 0.04 ;", "texColor += vec3(0.0,0.001,0.0025)*0.3;", "float g_fMaxLuminance = 1.0;", "float fLumScaled = 0.1 / luminance;     ", "float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (g_fMaxLuminance * g_fMaxLuminance)))) / (1.0 + fLumScaled); ", "float ExposureBias = fLumCompressed;", "vec3 curr = Uncharted2Tonemap((log2(2.0/pow(luminance,4.0)))*texColor);", "vec3 color = curr*whiteScale;", "vec3 retColor = pow(color,vec3(1.0/(1.2+(1.2*sunfade))));", "gl_FragColor.rgb = retColor;", "gl_FragColor.a = 1.0;", "}"].join("\n")
+            };
+
+            THREE.Sky = function () {
+
+                        var skyShader = THREE.ShaderLib["sky"];
+                        var skyUniforms = THREE.UniformsUtils.clone(skyShader.uniforms);
+
+                        var skyMat = new THREE.ShaderMaterial({
+                                    fragmentShader: skyShader.fragmentShader,
+                                    vertexShader: skyShader.vertexShader,
+                                    uniforms: skyUniforms,
+                                    side: THREE.BackSide
+                        });
+
+                        var skyGeo = new THREE.SphereBufferGeometry(450000, 32, 15);
+                        var skyMesh = new THREE.Mesh(skyGeo, skyMat);
+
+                        // Expose variables
+                        this.mesh = skyMesh;
+                        this.uniforms = skyUniforms;
+            };
+};
+
+exports.loadSkyShader = loadSkyShader;
+
+},{}],11:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -2893,7 +3210,6 @@ var _Loop = require('../Loop');
  *
  * For static meshes the animate method will do nothing, leaving the mesh permanently attached.
  */
-
 var AbstractMesh = function () {
     function AbstractMesh() {
         babelHelpers.classCallCheck(this, AbstractMesh);
@@ -2950,7 +3266,7 @@ AbstractMesh.WORLD_BASE_Y = -4;
 exports.AbstractMesh = AbstractMesh;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"babel/external-helpers":"babel/external-helpers"}],11:[function(require,module,exports){
+},{"../Loop":9,"babel/external-helpers":"babel/external-helpers"}],12:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -2988,11 +3304,10 @@ var Ball = function (_AbstractMesh) {
      * @param trajectory {Array<Vector3>} incremental vectors applied each frame
      * e.g. for 1 second of flight time there should be 60 incremental vectors
      */
-
     function Ball(loop, trajectory) {
         babelHelpers.classCallCheck(this, Ball);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Ball).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (Ball.__proto__ || Object.getPrototypeOf(Ball)).call(this));
 
         if (!(loop instanceof _Loop.Loop) && loop instanceof Array) {
             trajectory = loop;
@@ -3324,7 +3639,7 @@ Ball.prototype.rotation = {
 exports.Ball = Ball;
 
 }).call(this,require("babel/external-helpers"))
-},{"../../Services/Mathinator":29,"../../Utility/helper":37,"../Loop":9,"./AbstractMesh":10,"./Indicator":19,"babel/external-helpers":"babel/external-helpers"}],12:[function(require,module,exports){
+},{"../../Services/Mathinator":29,"../../Utility/helper":37,"../Loop":9,"./AbstractMesh":11,"./Indicator":20,"babel/external-helpers":"babel/external-helpers"}],13:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -3343,7 +3658,7 @@ var Base = function (_AbstractMesh) {
     function Base(loop, base) {
         babelHelpers.classCallCheck(this, Base);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Base).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (Base.__proto__ || Object.getPrototypeOf(Base)).call(this));
 
         _this.base = base;
         _this.getMesh();
@@ -3401,7 +3716,7 @@ var Base = function (_AbstractMesh) {
 exports.Base = Base;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],13:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"babel/external-helpers":"babel/external-helpers"}],14:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -3420,7 +3735,7 @@ var BaseDirt = function (_AbstractMesh) {
     function BaseDirt(loop, base) {
         babelHelpers.classCallCheck(this, BaseDirt);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BaseDirt).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (BaseDirt.__proto__ || Object.getPrototypeOf(BaseDirt)).call(this));
 
         _this.base = base;
         _this.getMesh();
@@ -3463,7 +3778,7 @@ var BaseDirt = function (_AbstractMesh) {
 exports.BaseDirt = BaseDirt;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],14:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"babel/external-helpers":"babel/external-helpers"}],15:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -3482,7 +3797,7 @@ var BattersEye = function (_AbstractMesh) {
     function BattersEye(loop) {
         babelHelpers.classCallCheck(this, BattersEye);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BattersEye).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (BattersEye.__proto__ || Object.getPrototypeOf(BattersEye)).call(this));
 
         _this.getMesh();
         if (loop instanceof _Loop.Loop) {
@@ -3516,7 +3831,7 @@ var BattersEye = function (_AbstractMesh) {
 exports.BattersEye = BattersEye;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],15:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"babel/external-helpers":"babel/external-helpers"}],16:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -3535,7 +3850,7 @@ var Field = function (_AbstractMesh) {
     function Field(loop) {
         babelHelpers.classCallCheck(this, Field);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Field).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (Field.__proto__ || Object.getPrototypeOf(Field)).call(this));
 
         _this.getMesh();
         if (loop instanceof _Loop.Loop) {
@@ -3574,7 +3889,7 @@ var Field = function (_AbstractMesh) {
 exports.Field = Field;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],16:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"babel/external-helpers":"babel/external-helpers"}],17:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -3593,7 +3908,7 @@ var FoulLine = function (_AbstractMesh) {
     function FoulLine(loop, side) {
         babelHelpers.classCallCheck(this, FoulLine);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(FoulLine).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (FoulLine.__proto__ || Object.getPrototypeOf(FoulLine)).call(this));
 
         _this.side = side;
         _this.getMesh();
@@ -3641,7 +3956,7 @@ var FoulLine = function (_AbstractMesh) {
 exports.FoulLine = FoulLine;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],17:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"babel/external-helpers":"babel/external-helpers"}],18:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -3660,7 +3975,7 @@ var FoulPole = function (_AbstractMesh) {
     function FoulPole(loop, side) {
         babelHelpers.classCallCheck(this, FoulPole);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(FoulPole).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (FoulPole.__proto__ || Object.getPrototypeOf(FoulPole)).call(this));
 
         _this.side = side;
         _this.getMesh();
@@ -3703,7 +4018,7 @@ var FoulPole = function (_AbstractMesh) {
 exports.FoulPole = FoulPole;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],18:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"babel/external-helpers":"babel/external-helpers"}],19:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -3722,7 +4037,7 @@ var Grass = function (_AbstractMesh) {
     function Grass(loop, infield) {
         babelHelpers.classCallCheck(this, Grass);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Grass).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (Grass.__proto__ || Object.getPrototypeOf(Grass)).call(this));
 
         _this.infield = infield;
         _this.getMesh();
@@ -3772,7 +4087,7 @@ var Grass = function (_AbstractMesh) {
 exports.Grass = Grass;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],19:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"babel/external-helpers":"babel/external-helpers"}],20:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -3791,7 +4106,7 @@ var Indicator = function (_AbstractMesh) {
     function Indicator(loop) {
         babelHelpers.classCallCheck(this, Indicator);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Indicator).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (Indicator.__proto__ || Object.getPrototypeOf(Indicator)).call(this));
 
         var n = 60;
         _this.trajectory = [];
@@ -3832,7 +4147,7 @@ var Indicator = function (_AbstractMesh) {
 exports.Indicator = Indicator;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],20:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"babel/external-helpers":"babel/external-helpers"}],21:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -3851,7 +4166,7 @@ var Mound = function (_AbstractMesh) {
     function Mound(loop) {
         babelHelpers.classCallCheck(this, Mound);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Mound).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (Mound.__proto__ || Object.getPrototypeOf(Mound)).call(this));
 
         _this.getMesh();
         if (loop instanceof _Loop.Loop) {
@@ -3890,7 +4205,7 @@ var Mound = function (_AbstractMesh) {
 exports.Mound = Mound;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],21:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"babel/external-helpers":"babel/external-helpers"}],22:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -3909,7 +4224,7 @@ var Sky = function (_AbstractMesh) {
     function Sky(loop) {
         babelHelpers.classCallCheck(this, Sky);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Sky).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (Sky.__proto__ || Object.getPrototypeOf(Sky)).call(this));
 
         _this.getMesh();
         if (loop instanceof _Loop.Loop) {
@@ -3967,7 +4282,7 @@ var Sky = function (_AbstractMesh) {
 exports.Sky = Sky;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],22:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"babel/external-helpers":"babel/external-helpers"}],23:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -3986,7 +4301,7 @@ var Sun = function (_AbstractMesh) {
     function Sun(loop) {
         babelHelpers.classCallCheck(this, Sun);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Sun).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (Sun.__proto__ || Object.getPrototypeOf(Sun)).call(this));
 
         _this.getMesh();
         if (loop instanceof _Loop.Loop) {
@@ -4065,7 +4380,7 @@ var Sun = function (_AbstractMesh) {
 exports.Sun = Sun;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],23:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"babel/external-helpers":"babel/external-helpers"}],24:[function(require,module,exports){
 (function (babelHelpers){
 'use strict';
 
@@ -4084,7 +4399,7 @@ var Wall = function (_AbstractMesh) {
     function Wall(loop, angle) {
         babelHelpers.classCallCheck(this, Wall);
 
-        var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Wall).call(this));
+        var _this = babelHelpers.possibleConstructorReturn(this, (Wall.__proto__ || Object.getPrototypeOf(Wall)).call(this));
 
         _this.angle = angle;
         _this.getMesh();
@@ -4127,77 +4442,7 @@ var Wall = function (_AbstractMesh) {
 exports.Wall = Wall;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Loop":9,"./AbstractMesh":10,"babel/external-helpers":"babel/external-helpers"}],24:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-/**
- * @author zz85 / https://github.com/zz85
- *
- * Based on "A Practical Analytic Model for Daylight"
- * aka The Preetham Model, the de facto standard analytic skydome model
- * http://www.cs.utah.edu/~shirley/papers/sunsky/sunsky.pdf
- *
- * First implemented by Simon Wallner
- * http://www.simonwallner.at/projects/atmospheric-scattering
- *
- * Improved by Martin Upitis
- * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
- *
- * Three.js integration by zz85 http://twitter.com/blurspline
- */
-
-var loadSkyShader = function loadSkyShader() {
-    THREE.ShaderLib['sky'] = {
-
-        uniforms: {
-            luminance: { type: "f", value: 1 },
-            turbidity: { type: "f", value: 2 },
-            reileigh: { type: "f", value: 1 },
-            mieCoefficient: { type: "f", value: 0.005 },
-            mieDirectionalG: { type: "f", value: 0.8 },
-            sunPosition: { type: "v3", value: new THREE.Vector3() }
-        },
-
-        vertexShader: ["varying vec3 vWorldPosition;", "void main() {", "vec4 worldPosition = modelMatrix * vec4( position, 1.0 );", "vWorldPosition = worldPosition.xyz;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
-
-        fragmentShader: ["uniform sampler2D skySampler;", "uniform vec3 sunPosition;", "varying vec3 vWorldPosition;", "vec3 cameraPos = vec3(0., 0., 0.);", "// uniform sampler2D sDiffuse;", "// const float turbidity = 10.0; //", "// const float reileigh = 2.; //", "// const float luminance = 1.0; //", "// const float mieCoefficient = 0.005;", "// const float mieDirectionalG = 0.8;", "uniform float luminance;", "uniform float turbidity;", "uniform float reileigh;", "uniform float mieCoefficient;", "uniform float mieDirectionalG;", "// constants for atmospheric scattering", "const float e = 2.71828182845904523536028747135266249775724709369995957;", "const float pi = 3.141592653589793238462643383279502884197169;", "const float n = 1.0003; // refractive index of air", "const float N = 2.545E25; // number of molecules per unit volume for air at", "// 288.15K and 1013mb (sea level -45 celsius)", "const float pn = 0.035;	// depolatization factor for standard air", "// wavelength of used primaries, according to preetham", "const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);", "// mie stuff", "// K coefficient for the primaries", "const vec3 K = vec3(0.686, 0.678, 0.666);", "const float v = 4.0;", "// optical length at zenith for molecules", "const float rayleighZenithLength = 8.4E3;", "const float mieZenithLength = 1.25E3;", "const vec3 up = vec3(0.0, 1.0, 0.0);", "const float EE = 1000.0;", "const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;", "// 66 arc seconds -> degrees, and the cosine of that", "// earth shadow hack", "const float cutoffAngle = pi/1.95;", "const float steepness = 1.5;", "vec3 totalRayleigh(vec3 lambda)", "{", "return (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn));", "}",
-
-        // see http://blenderartists.org/forum/showthread.php?321110-Shaders-and-Skybox-madness
-        "// A simplied version of the total Reayleigh scattering to works on browsers that use ANGLE", "vec3 simplifiedRayleigh()", "{", "return 0.0005 / vec3(94, 40, 18);",
-        // return 0.00054532832366 / (3.0 * 2.545E25 * pow(vec3(680E-9, 550E-9, 450E-9), vec3(4.0)) * 6.245);
-        "}", "float rayleighPhase(float cosTheta)", "{	 ", "return (3.0 / (16.0*pi)) * (1.0 + pow(cosTheta, 2.0));", "//	return (1.0 / (3.0*pi)) * (1.0 + pow(cosTheta, 2.0));", "//	return (3.0 / 4.0) * (1.0 + pow(cosTheta, 2.0));", "}", "vec3 totalMie(vec3 lambda, vec3 K, float T)", "{", "float c = (0.2 * T ) * 10E-18;", "return 0.434 * c * pi * pow((2.0 * pi) / lambda, vec3(v - 2.0)) * K;", "}", "float hgPhase(float cosTheta, float g)", "{", "return (1.0 / (4.0*pi)) * ((1.0 - pow(g, 2.0)) / pow(1.0 - 2.0*g*cosTheta + pow(g, 2.0), 1.5));", "}", "float sunIntensity(float zenithAngleCos)", "{", "return EE * max(0.0, 1.0 - exp(-((cutoffAngle - acos(zenithAngleCos))/steepness)));", "}", "// float logLuminance(vec3 c)", "// {", "// 	return log(c.r * 0.2126 + c.g * 0.7152 + c.b * 0.0722);", "// }", "// Filmic ToneMapping http://filmicgames.com/archives/75", "float A = 0.15;", "float B = 0.50;", "float C = 0.10;", "float D = 0.20;", "float E = 0.02;", "float F = 0.30;", "float W = 1000.0;", "vec3 Uncharted2Tonemap(vec3 x)", "{", "return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;", "}", "void main() ", "{", "float sunfade = 1.0-clamp(1.0-exp((sunPosition.y/450000.0)),0.0,1.0);", "// luminance =  1.0 ;// vWorldPosition.y / 450000. + 0.5; //sunPosition.y / 450000. * 1. + 0.5;", "// gl_FragColor = vec4(sunfade, sunfade, sunfade, 1.0);", "float reileighCoefficient = reileigh - (1.0* (1.0-sunfade));", "vec3 sunDirection = normalize(sunPosition);", "float sunE = sunIntensity(dot(sunDirection, up));", "// extinction (absorbtion + out scattering) ", "// rayleigh coefficients",
-
-        // "vec3 betaR = totalRayleigh(lambda) * reileighCoefficient;",
-        "vec3 betaR = simplifiedRayleigh() * reileighCoefficient;", "// mie coefficients", "vec3 betaM = totalMie(lambda, K, turbidity) * mieCoefficient;", "// optical length", "// cutoff angle at 90 to avoid singularity in next formula.", "float zenithAngle = acos(max(0.0, dot(up, normalize(vWorldPosition - cameraPos))));", "float sR = rayleighZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));", "float sM = mieZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));", "// combined extinction factor	", "vec3 Fex = exp(-(betaR * sR + betaM * sM));", "// in scattering", "float cosTheta = dot(normalize(vWorldPosition - cameraPos), sunDirection);", "float rPhase = rayleighPhase(cosTheta*0.5+0.5);", "vec3 betaRTheta = betaR * rPhase;", "float mPhase = hgPhase(cosTheta, mieDirectionalG);", "vec3 betaMTheta = betaM * mPhase;", "vec3 Lin = pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * (1.0 - Fex),vec3(1.5));", "Lin *= mix(vec3(1.0),pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * Fex,vec3(1.0/2.0)),clamp(pow(1.0-dot(up, sunDirection),5.0),0.0,1.0));", "//nightsky", "vec3 direction = normalize(vWorldPosition - cameraPos);", "float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]", "float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]", "vec2 uv = vec2(phi, theta) / vec2(2.0*pi, pi) + vec2(0.5, 0.0);", "// vec3 L0 = texture2D(skySampler, uv).rgb+0.1 * Fex;", "vec3 L0 = vec3(0.1) * Fex;", "// composition + solar disc", "//if (cosTheta > sunAngularDiameterCos)", "float sundisk = smoothstep(sunAngularDiameterCos,sunAngularDiameterCos+0.00002,cosTheta);", "// if (normalize(vWorldPosition - cameraPos).y>0.0)", "L0 += (sunE * 19000.0 * Fex)*sundisk;", "vec3 whiteScale = 1.0/Uncharted2Tonemap(vec3(W));", "vec3 texColor = (Lin+L0);   ", "texColor *= 0.04 ;", "texColor += vec3(0.0,0.001,0.0025)*0.3;", "float g_fMaxLuminance = 1.0;", "float fLumScaled = 0.1 / luminance;     ", "float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (g_fMaxLuminance * g_fMaxLuminance)))) / (1.0 + fLumScaled); ", "float ExposureBias = fLumCompressed;", "vec3 curr = Uncharted2Tonemap((log2(2.0/pow(luminance,4.0)))*texColor);", "vec3 color = curr*whiteScale;", "vec3 retColor = pow(color,vec3(1.0/(1.2+(1.2*sunfade))));", "gl_FragColor.rgb = retColor;", "gl_FragColor.a = 1.0;", "}"].join("\n")
-    };
-
-    THREE.Sky = function () {
-
-        var skyShader = THREE.ShaderLib["sky"];
-        var skyUniforms = THREE.UniformsUtils.clone(skyShader.uniforms);
-
-        var skyMat = new THREE.ShaderMaterial({
-            fragmentShader: skyShader.fragmentShader,
-            vertexShader: skyShader.vertexShader,
-            uniforms: skyUniforms,
-            side: THREE.BackSide
-        });
-
-        var skyGeo = new THREE.SphereBufferGeometry(450000, 32, 15);
-        var skyMesh = new THREE.Mesh(skyGeo, skyMat);
-
-        // Expose variables
-        this.mesh = skyMesh;
-        this.uniforms = skyUniforms;
-    };
-};
-
-exports.loadSkyShader = loadSkyShader;
-
-},{}],25:[function(require,module,exports){
+},{"../Loop":9,"./AbstractMesh":11,"babel/external-helpers":"babel/external-helpers"}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4535,7 +4780,7 @@ for (var fn in Animator.prototype) {
 exports.Animator = Animator;
 
 }).call(this,require("babel/external-helpers"))
-},{"../Render/Loop":9,"../Utility/helper":37,"../services/_services":30,"babel/external-helpers":"babel/external-helpers"}],27:[function(require,module,exports){
+},{"../Render/Loop":9,"../Utility/helper":37,"../services/_services":41,"babel/external-helpers":"babel/external-helpers"}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6377,7 +6622,9 @@ Baseball.teams.Provider = _Provider.Provider;
 
 exports.Baseball = Baseball;
 
-},{"./Model/AtBat":1,"./Model/Field":2,"./Model/Game":3,"./Model/Manager":4,"./Model/Player":5,"./Model/Team":6,"./Model/Umpire":7,"./Services/_services":30,"./Teams/Provider":31,"./Utility/_utils":35}],"babel/external-helpers":[function(require,module,exports){
+},{"./Model/AtBat":1,"./Model/Field":2,"./Model/Game":3,"./Model/Manager":4,"./Model/Player":5,"./Model/Team":6,"./Model/Umpire":7,"./Services/_services":30,"./Teams/Provider":31,"./Utility/_utils":35}],41:[function(require,module,exports){
+arguments[4][30][0].apply(exports,arguments)
+},{"../Services/Animator":26,"../Services/Distribution":27,"../Services/Iterator":28,"../Services/Mathinator":29,"dup":30}],"babel/external-helpers":[function(require,module,exports){
 var global = {}; (function (global) {
   var babelHelpers = global.babelHelpers = {};
   babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {

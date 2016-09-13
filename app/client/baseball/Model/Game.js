@@ -63,6 +63,9 @@ Game.prototype = {
     getInning() {
         return text.mode === 'n' ? (this.inning + (this.half === 'top' ? 'オモテ' : 'ウラ')) : `${this.half.toUpperCase()} ${this.inning}`;
     },
+    /**
+     * @returns {boolean} is a human player is batting
+     */
     humanBatting() {
         const humanControl = this.humanControl;
         if (humanControl === 'none') return false;
@@ -73,6 +76,9 @@ Game.prototype = {
                 return humanControl === 'both' || humanControl === 'home';
         }
     },
+    /**
+     * @returns {boolean}
+     */
     humanPitching() {
         const humanControl = this.humanControl;
         if (humanControl === 'none') return false;
@@ -83,6 +89,9 @@ Game.prototype = {
                 return humanControl === 'both' || humanControl === 'away';
         }
     },
+    /**
+     * ends the game
+     */
     end() {
         this.stage = 'end';
         let e, n;
@@ -101,6 +110,10 @@ Game.prototype = {
         this.log.note('Reload to play again', 'リロるは次の試合へ');
     },
     stage : 'pitch', //pitch, swing
+    /**
+     * advances an AI turn (response to the previous action) by pitching or swinging
+     * @param callback
+     */
     simulateInput(callback) {
         const stage = this.stage, pitchTarget = this.pitchTarget;
         if (stage === 'end') {
@@ -115,6 +128,10 @@ Game.prototype = {
             this.autoSwing(this.pitchTarget.x, this.pitchTarget.y, callback);
         }
     },
+    /**
+     * usually for spectator mode in which the AI plays against itself
+     * @param callback
+     */
     simulatePitchAndSwing(callback) {
         if (this.stage === 'end') {
             return;
@@ -147,6 +164,11 @@ Game.prototype = {
             this.theSwing(x, y, callback);
         }
     },
+    /**
+     * select a pitch for the AI
+     * @todo use an out pitch at 2 strikes?
+     * @todo use more fastballs against weak batters?
+     */
     autoPitchSelect() {
         const pitchNames = Object.keys(this.pitcher.pitching);
         const pitchName = pitchNames[Math.random() * pitchNames.length | 0];
@@ -154,6 +176,10 @@ Game.prototype = {
         pitch.name = pitchName;
         this.pitchInFlight = pitch;
     },
+    /**
+     * AI pitcher winds up and throws
+     * @param callback \usually a function to resolve the animations resulting from the pitch
+     */
     autoPitch(callback) {
         const pitcher = this.pitcher, giraffe = this;
 
@@ -181,6 +207,18 @@ Game.prototype = {
             }
         }
     },
+    /**
+     * AI batter decides whether to swing
+     *
+     * The "deceptive" location is the apparent trajectory. If the batter has good eyes, they will see the
+     * actual trajectory instead.
+     *
+     * Hitting the ball, of course, is another matter.
+     *
+     * @param deceptiveX \the apparent X target of the pitch
+     * @param deceptiveY \the apparent Y target of the pitch
+     * @param callback
+     */
     autoSwing(deceptiveX, deceptiveY, callback) {
         const giraffe = this;
         const bonus = this.batter.eye.bonus || 0;
@@ -218,9 +256,12 @@ Game.prototype = {
             giraffe.theSwing(x, y);
         });
     },
+    /**
+     * websocket opponent is connected
+     */
     opponentConnected : false,
     /**
-     * variable for what to do when the batter becomes ready for a pitch
+     * variable function for what to do when the batter becomes ready for a pitch (overwritten many times)
      */
     onBatterReady() {},
     /**
@@ -240,6 +281,11 @@ Game.prototype = {
     },
     batterReadyTimeout : -1,
     waitingCallback() {},
+    /**
+     * signals readiness for the next pitch. This behavior varies depending on whether AI or human is pitching
+     * @param callback
+     * @param swingResult
+     */
     awaitPitch(callback, swingResult) {
         const giraffe = this;
         if (this.opponentConnected) {
@@ -259,6 +305,15 @@ Game.prototype = {
             }
         }
     },
+    /**
+     * Signals readiness for the batter's response to a pitch in flight.
+     * In case of a human pitching to AI, the AI batter is automatically ready.
+     * @param x
+     * @param y
+     * @param callback
+     * @param pitchInFlight
+     * @param pitchTarget
+     */
     awaitSwing(x, y, callback, pitchInFlight, pitchTarget) {
         if (this.opponentConnected) {
             this.waitingCallback = callback;
@@ -270,6 +325,13 @@ Game.prototype = {
             this.autoSwing(x, y, callback);
         }
     },
+    /**
+     * triggers a pitch to aspirational target (x,y) from the current pitcher on the mound.
+     * @param x \coordinate X in the strike zone (0, 200)
+     * @param y \coordinate Y (0, 200), origin being bottom left.
+     * @param callback \typically to resolve animations and move to the next step (batting this pitch)
+     * @param override \a websocket opponent will override the engine's pitch location calculations with their actual
+     */
     thePitch(x, y, callback, override) {
         const pitch = this.pitchInFlight;
         if (this.stage === 'pitch') {
@@ -307,10 +369,20 @@ Game.prototype = {
             }
         }
     },
+    /**
+     * language sensitive string describing what kind of pitch the batter sees
+     */
     battersEye : {
         e: '',
         n: ''
     },
+    /**
+     * makes an aspirational swing to (x,y) by the current player in the batter's box
+     * @param x
+     * @param y
+     * @param callback \resolves animations
+     * @param override
+     */
     theSwing(x, y, callback, override) {
         const pitch = this.pitchInFlight;
         if (this.stage === 'swing') {
@@ -416,6 +488,12 @@ Game.prototype = {
             }
         }
     },
+    /**
+     * for CSS
+     * @param x
+     * @param y
+     * @returns {*|number}
+     */
     setBatAngle(x, y) {
         const giraffe = this, pitchInFlight = this.pitchInFlight, swingResult = this.swingResult;
         const origin = {
@@ -485,6 +563,9 @@ Game.prototype = {
         console.table(this.scoreboard);
         console.table(this.tally);
     },
+    /**
+     * for websocket serialization
+     */
     toData() {
         const data = {};
         data.half = this.half;
@@ -594,21 +675,21 @@ Game.prototype = {
         batter: '',
         fielder: ''
     },
-    showPlayResultPanels(batter) {
-        const batterOutcomes = {
-        };
-        const atBat = batter.atBats.slice(0).pop();
-        const fielderOutcomes = {
-        };
-        const n = () => {
-            const n = Math.floor(Math.random()*3);
-            return n ? n : '';
-        };
-        this.playResult = {
-            batter: `B_placeholder${n()}` || batterOutcomes[atBat] || `batter/${atBat}`,
-            fielder: `F_placeholder${n()}` || fielderOutcomes[atBat] || `fielder/${atBat}`
-        };
-    },
+    //showPlayResultPanels(batter) {
+    //    const batterOutcomes = {
+    //    };
+    //    const atBat = batter.atBats.slice(0).pop();
+    //    const fielderOutcomes = {
+    //    };
+    //    const n = () => {
+    //        const n = Math.floor(Math.random()*3);
+    //        return n ? n : '';
+    //    };
+    //    this.playResult = {
+    //        batter: `B_placeholder${n()}` || batterOutcomes[atBat] || `batter/${atBat}`,
+    //        fielder: `F_placeholder${n()}` || fielderOutcomes[atBat] || `fielder/${atBat}`
+    //    };
+    //},
     pitchSelect() {
 
     },

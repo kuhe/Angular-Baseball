@@ -2,6 +2,13 @@ import { data, text } from '../Utility/_utils';
 import { Iterator, Mathinator, Distribution } from '../Services/_services';
 import { AtBat, Team } from '../Model/_models';
 
+/**
+ *
+ * @param team \the team to assign the player to (bench)
+ * @param hero \whether the player should be generated with elite skills
+ * @constructor
+ *
+ */
 const Player = function(team, hero) {
     this.init(team, hero);
     this.resetStats(this.team.game && this.team.game.gamesIntoSeason || 0);
@@ -9,8 +16,13 @@ const Player = function(team, hero) {
 
 Player.prototype = {
     constructor : Player,
+    /**
+     * @see {Player}
+     */
     init(team, hero) {
+        this.position = 'bench';
         this.ready = false;
+        this.fatigue = 0;
         this.throws = Math.random() > 0.86 ? 'left' : 'right';
         this.bats = Math.random() > 0.75 ? 'left' : 'right';
         this.team = team;
@@ -33,12 +45,20 @@ Player.prototype = {
         this.definingBattingCharacteristic = {};
         this.definingCharacteristic = {};
     },
+    /**
+     * inserts the Japanese middle dot at the correct position, allowing a 4-width
+     * @param jSurname
+     * @param jGivenName
+     */
     spaceName(jSurname, jGivenName) {
         if (jSurname.length === 1 && jGivenName.length <= 2) jSurname += '・';
         if (jGivenName.length === 1 && !jSurname.includes('・') && jSurname.length <= 2) jSurname += '・';
         this.nameJ = jSurname + jGivenName;
         this.surnameJ = jSurname;
     },
+    /**
+     * for websocket transfer
+     */
     serialize() {
         const team = this.team;
         delete this.team;
@@ -46,6 +66,10 @@ Player.prototype = {
         this.team = team;
         return data;
     },
+    /**
+     * @param data
+     * inverts @see #serialize()
+     */
     fromData(data) {
         const giraffe = this;
         Iterator.each(data, (key, value) => {
@@ -54,6 +78,14 @@ Player.prototype = {
         delete this.atBatObjects;
         this.getAtBats();
     },
+
+    /**
+     *
+     * take over the other player's position and batting order immediately, sending him/her to the bench
+     * @param {Player} player
+     * @returns {boolean}
+     *
+     */
     substitute(player) {
         if (player.team !== this.team) return false;
         const order = player.order, position = player.position;
@@ -84,6 +116,11 @@ Player.prototype = {
         }
         game.log.noteSubstitution(this, player);
     },
+    /**
+     * resets the player's statistics
+     * @param gamesIntoSeason
+     * @returns {*}
+     */
     resetStats(gamesIntoSeason=0) {
         const offense = this.skill.offense;
         const defense = this.skill.defense;
@@ -222,6 +259,9 @@ Player.prototype = {
         this.stats.pitching.WHIP = this.stats.pitching.getWHIP();
         this.stats.batting.ba = this.stats.batting.getBA();
     },
+    /**
+     * a list of at bat results {AtBat[]}
+     */
     atBatObjects : [],
     getAtBats() {
         if (this.atBats.length > this.atBatObjects.length) {
@@ -235,9 +275,18 @@ Player.prototype = {
     recordInfieldHit() {
         this.atBats[this.atBats.length - 1] += AtBat.prototype.INFIELD_HIT_INDICATOR;
     },
+    /**
+     * @returns {number}
+     */
     getBaseRunningTime() {
         return Mathinator.baseRunningTime(this.skill.offense.speed);
     },
+    /**
+     * live game steal
+     * @param game
+     * @param base
+     * @returns {Player.attemptSteal}
+     */
     attemptSteal(game, base) {
         const pitch = game.pitchInFlight;
         const success = Distribution.stealSuccess(pitch, game.pitcher.team.positions.catcher,
@@ -265,10 +314,19 @@ Player.prototype = {
         game.swingResult.attemptedBase = base;
         return this;
     },
+    /**
+     * used for other calculations/orderings
+     * @returns {number}
+     */
     defensiveAverage() {
         const _this = this.skill.defense;
         return (_this.speed + _this.fielding + _this.throwing) / 3
     },
+    /**
+     * randomizes the player's skills, usually called at init
+     * @param hero
+     * @param allPitches
+     */
     randomizeSkills(hero, allPitches) {
         this.hero = hero;
         const giraffe = this;
@@ -352,24 +410,45 @@ Player.prototype = {
         this.skill.pitching = Math.floor((this.pitching.averaging.reduce((prev, current) => prev + current))/this.pitching.averaging.length+this.pitching.averaging.length*3);
         delete this.pitching.averaging;
     },
+    /**
+     * language-sensitive
+     * @returns {String}
+     */
     getSurname() {
         return text.mode === 'n' ? this.surnameJ : this.surname;
     },
+    /**
+     * language-sensitive
+     * @returns {String}
+     */
     getName() {
         return text.mode === 'n' ? this.nameJ : this.name;
     },
     getUniformNumber() {
         return text('#') + this.number;
     },
+    /**
+     * language-sensitive, for text representation of batting order
+     * @returns {String}
+     */
     getOrder() {
         return text([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
     },
+    /**
+     * a localized description of this player's defining batting characteristic e.g. "contact hitter"
+     * @returns {*}
+     */
     getDefiningBattingCharacteristic() {
         if (!this.definingBattingCharacteristic[text.mode]) {
             this.definingBattingCharacteristic[text.mode] = this.getDefiningCharacteristic(true);
         }
         return this.definingBattingCharacteristic[text.mode];
     },
+    /**
+     * a localized phrase describing a strong trait of this player e.g. "ace" or "power hitter"
+     * @param battingOnly \only return their defining batting characteristic
+     * @returns {*}
+     */
     getDefiningCharacteristic(battingOnly) {
         if (this.definingCharacteristic[text.mode] && !battingOnly) {
             return this.definingCharacteristic[text.mode];
@@ -450,13 +529,7 @@ Player.prototype = {
      */
     toString() {
         return `${this.name} #${this.number}`;
-    },
-    eye : {},
-    fatigue : 0,
-    name : '',
-    number : 0,
-    position : '',
-    atBats : []
+    }
 };
 
 export { Player }

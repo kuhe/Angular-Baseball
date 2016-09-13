@@ -1,4 +1,5 @@
 import { Iterator } from '../Services/_services';
+import { Player } from './Player';
 
 const Manager = function(team) {
     this.init(team);
@@ -23,7 +24,8 @@ Manager.prototype = {
         }
         Iterator.each(this.team.bench, (key, player) => {
             if (!player.number) {
-                player.number = jerseyNumber++;
+                jerseyNumber += 1 + (Math.random() * 5 | 0);
+                player.number = jerseyNumber;
             }
         });
         this.team.positions.short = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
@@ -86,6 +88,29 @@ Manager.prototype = {
             return selection;
         }
         return 'no players available';
+    },
+    /**
+     * used by the AI to substitute a fatigued pitcher
+     * @param {Number} fatigueAllowed
+     * only execute if the pitcher's fatigue is greater than this number
+     */
+    checkPitcherFatigue(fatigueAllowed = 120) {
+        const team = this.team;
+        const pitcher = team.positions.pitcher;
+
+        const sub = this.selectForSkill(team.bench, ['pitching']);
+        if (!(sub instanceof Player)) {
+            return;
+        }
+
+        const replace = pitcher.fatigue - pitcher.skill.pitching;
+        const remain = fatigueAllowed - sub.skill.pitching;
+
+        if (replace > remain) {
+            sub.substitute(pitcher);
+        } else {
+            team.bench.push(sub);
+        }
     }
 };
 
