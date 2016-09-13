@@ -17,6 +17,8 @@ public slots:
     void staticInitialize();
     void staticRelease();
 
+    void index();
+
 protected:
     virtual bool preFilter();
 };

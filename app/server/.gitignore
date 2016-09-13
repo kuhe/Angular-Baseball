@@ -1,6 +1,10 @@
 node_modules
 
 *.qmake.stash
+socketserver/lib
+socketserver/db
+socketserver/tmp
+socketserver/log
 
 # Prerequisites
 *.d

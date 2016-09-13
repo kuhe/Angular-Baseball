@@ -18,6 +18,10 @@ void ApplicationController::staticInitialize()
 void ApplicationController::staticRelease()
 { }
 
+void ApplicationController::index() {
+    renderText("hello, world");
+}
+
 bool ApplicationController::preFilter()
 {
     return true;
