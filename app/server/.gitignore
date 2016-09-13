@@ -1,6 +1,7 @@
 node_modules
 
-*.qmake.stash
+socketserver/.qmake.stash
+socketserver/Makefile
 socketserver/lib
 socketserver/db
 socketserver/tmp
