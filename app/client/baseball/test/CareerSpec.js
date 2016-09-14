@@ -7,7 +7,7 @@ const Baseball = require('../baseball').Baseball;
 const Animator = require('../Services/Animator').Animator;
 const Iterator = require('../Services/Iterator').Iterator;
 const text = require('../Utility/text').text;
-text.mode = 'e';
+text.mode = 'n';
 const samurai = require('../Teams/TeamJapan').samurai;
 const seasons = 10;
 
@@ -38,8 +38,8 @@ player = new Player(game.teams.home, false);
 const asPitcher = Math.random() > 0.96;
 p = player;
 
-log(`Let me tell you the story of ${player.getName()}, who was a legendary ${player.getDefiningCharacteristic() || '... something'}.`);
-log('He played for ten years, and then said...');
+log(`昔話をしてあげましょう。${player.getName()}選手がその伝説の「${player.getDefiningCharacteristic() || '... なんだっけ'}」`);
+log('と呼ばれて、10年間も次々の挑戦を向かってきた。');
 
 const TERRIBAD = 5, AWFUL = 25, MEDIOCRE = 45, GOOD = 65, ELITE = 88;
 
@@ -339,6 +339,6 @@ const avg = times.reduce((a, b) => a + b)/(seasons - 1) | 0;
 log('average: ', avg, 'ms/year');
 log('');
 
-log('このシーズンで、終わってしまうかもしれない');
-log(`    - ${player.getName()} (#${player.number} ${player.position} ${player.bats}/${player.throws})`);
-log('after which he promptly retired.');
+log('だがある日に「人は産まれる瞬間から死と言う事に近づいてくわけですから、ひょっとしたらも、このシーズンで、終わってしまうかもしれない」');
+log(`    - ${player.getName()}　（${player.name}） (#${player.number} ${player.position} ${player.bats}/${player.throws})`);
+log('と語り、すぐあとに引退をした。');
