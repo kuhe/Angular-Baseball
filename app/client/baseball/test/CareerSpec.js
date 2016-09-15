@@ -144,23 +144,22 @@ const runSeason = n => {
     if (asPitcher) {
         game.teams.home.positions.pitcher = p;
         game.teams.away.positions.pitcher = p;
-        p.resetStats();
     } else {
-        player.resetStats();
         game.teams.home.lineup = [p,p,p,p,p,p,p,p,p];
         game.teams.away.lineup = [p,p,p,p,p,p,p,p,p];
         vary(player);
     }
+    player.resetStats();
 
     let games = 0;
     do {
         game.simulateInput(callback => {
-            typeof callback == 'function' && callback();
+            typeof callback === 'function' && callback();
         });
-        if (game.stage == 'end') {
+        if (game.stage === 'end') {
             p.fatigue = 0;
             Iterator.each(game.teams.away.positions, (key, player) => {
-                if (key != 'pitcher' && Math.random() > 0) {
+                if (key != 'pitcher' && Math.random() > 0.5) {
                     game.teams.away.positions[key] = p;
                     game.teams.home.positions[key] = p;
                 }
@@ -174,8 +173,9 @@ const runSeason = n => {
             game.resetTally();
             games++;
         }
-        if (!asPitcher && player.stats.batting.pa % 6 == 0) {
+        if (!asPitcher && player.stats.batting.pa % 6 === 0) {
             game.teams.away.positions.pitcher = new Player(game.teams.away, true);
+            game.teams.home.positions.pitcher = new Player(game.teams.home, true);
         }
     } while (games < 144/18 && x--);
     logPlayer(++year);
