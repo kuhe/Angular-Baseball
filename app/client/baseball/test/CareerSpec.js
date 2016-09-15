@@ -157,7 +157,6 @@ const runSeason = n => {
             typeof callback === 'function' && callback();
         });
         if (game.stage === 'end') {
-            p.fatigue = 0;
             Iterator.each(game.teams.away.positions, (key, player) => {
                 if (key != 'pitcher' && Math.random() > 0.5) {
                     game.teams.away.positions[key] = p;
@@ -174,6 +173,7 @@ const runSeason = n => {
             games++;
         }
         if (!asPitcher && player.stats.batting.pa % 6 === 0) {
+            p.fatigue = 0;
             game.teams.away.positions.pitcher = new Player(game.teams.away, true);
             game.teams.home.positions.pitcher = new Player(game.teams.home, true);
         }
