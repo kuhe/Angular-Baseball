@@ -177,35 +177,48 @@ Game.prototype = {
         this.pitchInFlight = pitch;
     },
     /**
+     * delayed pitch
+     * @param callback {Function}
+     */
+    windupThen(callback) {
+        const pitcher = this.pitcher;
+        pitcher.windingUp = true;
+
+        if (!this.console) {
+            $('.baseball').addClass('hide');
+            var windup = $('.windup');
+            windup.css('width', '100%');
+        }
+        if (this.console) {
+            callback();
+            pitcher.windingUp = false;
+        } else {
+            if (!Animator.console) {
+                Animator.loop.resetCamera();
+            }
+            windup.animate({width: 0}, this.field.hasRunnersOn() ? Animator.TIME_FROM_SET : Animator.TIME_FROM_WINDUP, () => {
+                pitcher.windingUp = false;
+                callback();
+            });
+        }
+    },
+    /**
      * AI pitcher winds up and throws
      * @param callback \usually a function to resolve the animations resulting from the pitch
      */
     autoPitch(callback) {
-        const pitcher = this.pitcher, giraffe = this;
+        this.autoPitchSelect();
 
-        if (this.stage === 'pitch') {
-            this.autoPitchSelect();
-            pitcher.windingUp = true;
-            if (!this.console) {
-                $('.baseball').addClass('hide');
-                var windup = $('.windup');
-                windup.css('width', '100%');
-            }
-            const count = this.umpire.count;
-            const pitch = Distribution.pitchLocation(count), x = pitch.x, y = pitch.y;
-            if (this.console) {
-                this.thePitch(x, y, callback);
-            } else {
-                if (!Animator.console) {
-                    Animator.loop.resetCamera();
-                }
-                windup.animate({width: 0}, this.field.hasRunnersOn() ? Animator.TIME_FROM_SET : Animator.TIME_FROM_WINDUP, () => {
-                    !giraffe.console && $('.baseball.pitch').removeClass('hide');
-                    giraffe.thePitch(x, y, callback);
-                    pitcher.windingUp = false;
-                });
-            }
-        }
+        const count = this.umpire.count;
+        let x, y, pitch;
+        pitch = Distribution.pitchLocation(count);
+        x = pitch.x;
+        y = pitch.y;
+
+        this.windupThen(() => {
+            !this.console && $('.baseball.pitch').removeClass('hide');
+            this.thePitch(x, y, callback);
+        });
     },
     /**
      * AI batter decides whether to swing
@@ -333,11 +346,15 @@ Game.prototype = {
      * @param override \a websocket opponent will override the engine's pitch location calculations with their actual
      */
     thePitch(x, y, callback, override) {
+        if (override) {
+            this.pitchInFlight = override.inFlight;
+            this.pitchTarget = override.target;
+        }
+
         const pitch = this.pitchInFlight;
+
         if (this.stage === 'pitch') {
             if (override) {
-                this.pitchInFlight = override.inFlight;
-                this.pitchTarget = override.target;
                 callback = this.waitingCallback;
             } else {
                 this.pitcher.fatigue++;
@@ -362,9 +379,12 @@ Game.prototype = {
             this.log.notePitch(pitch, this.batter);
 
             this.stage = 'swing';
-            if (this.humanControl !== 'none' && (this.humanControl === 'both' || this.humanBatting())) {
+            if (this.humanBatting()) {
                 callback();
             } else {
+                if (this.opponentConnected && this.humanPitching()) {
+                    this.windupThen(() => {});
+                }
                 this.awaitSwing(x, y, callback, pitch, this.pitchTarget);
             }
         }
@@ -468,16 +488,16 @@ Game.prototype = {
 
             const half = this.half;
             this.umpire.makeCall();
-            emit = false;
-            if (half != this.half) {
+            let lastPlayOfHalfInning = false;
+            if (half !== this.half) {
                 callback = this.startOpponentPitching;
-                var emit = !override;
+                lastPlayOfHalfInning = !override;
             }
 
             if (typeof callback === 'function') {
-                if (this.humanControl !== 'none' && (this.humanControl === 'both' || this.teams[this.humanControl] === this.pitcher.team)) {
+                if (this.humanPitching()) {
                     callback();
-                    if (emit) {
+                    if (lastPlayOfHalfInning) {
                         if (this.opponentService && this.opponentConnected) {
                             this.opponentService.emitSwing(result);
                         }

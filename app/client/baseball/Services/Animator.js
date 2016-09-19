@@ -161,7 +161,7 @@ Animator.prototype = {
         const $baseballs = $('.baseball');
         $baseballs.addClass('hide');
 
-        if (game.humanBatting() && !game.humanPitching()) {
+        if (game.humanBatting()) {
             $scope.holdUpTimeouts.push(setTimeout(() => {
                 $scope.holdUp();
             }, (flightSpeed + Animator.HOLD_UP_ALLOWANCE) * 1000));

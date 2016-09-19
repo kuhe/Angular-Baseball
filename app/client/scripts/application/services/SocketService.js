@@ -1,5 +1,6 @@
 var SocketService = function() {
     var Service = function() {};
+    var LOG_TRAFFIC = false;
     var game, socket, NO_OPERATION = function() {},
         animator = Baseball.service.Animator;
     Service.prototype = {
@@ -27,13 +28,17 @@ var SocketService = function() {
                 giraffe.connected = false;
             });
             socket.on('pitch', function(pitch) {
-                //console.log('receive', 'pitch', pitch);
-                game.thePitch(0, 0, NO_OPERATION, pitch);
-                var scope = window.s;
-                animator.updateFlightPath.bind(scope)();
+                if (LOG_TRAFFIC) console.log('receive', 'pitch', pitch);
+                game.windupThen(function() {
+
+                    game.thePitch(0, 0, NO_OPERATION, pitch);
+                    var scope = window.s;
+                    animator.updateFlightPath.bind(scope)();
+
+                });
             });
             socket.on('swing', function(swing) {
-                //console.log('receive', 'swing', swing);
+                if (LOG_TRAFFIC) console.log('receive', 'swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
                 var scope = window.s;
                 animator.updateFlightPath.bind(scope)(function() {
@@ -64,7 +69,7 @@ var SocketService = function() {
             });
             socket.on('partner_connect', function() {
                 game.opponentConnected = true;
-                var scope = window.s;
+                //var scope = window.s;
                 //scope.$digest();
             });
             socket.on('opponent_taking_field', function() {
@@ -89,11 +94,11 @@ var SocketService = function() {
             socket.on('register', NO_OPERATION);
         },
         emitPitch : function(pitch) {
-            //console.log('emit', 'pitch', pitch);
+            if (LOG_TRAFFIC) console.log('emit', 'pitch', pitch);
             socket.emit('pitch', pitch);
         },
         emitSwing : function(swing) {
-            //console.log('emit', 'swing', swing);
+            if (LOG_TRAFFIC) console.log('emit', 'swing', swing);
             socket.emit('swing', swing);
         },
         swing : function() {

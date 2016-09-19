@@ -136,7 +136,7 @@
                     <div class='opponent-indicator' *ngIf='y.opponentConnected'>
                         <em>{{ t('Opponent connected') }}</em>
                     </div>
-                    <div class='windup' *ngIf='!y.opponentConnected' [ngClass]='{winding: y.humanControl == "none" || (y.humanBatting() && !y.humanPitching())}'>
+                    <div class='windup' [ngClass]='{winding: y.humanControl == "none" || y.humanBatting() || y.opponentConnected}'>
                     </div>
                     <div class="no-swing">
                         <div class='input-area' (click)='indicate($event)'>

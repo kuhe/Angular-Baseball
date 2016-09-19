@@ -588,45 +588,53 @@ Game.prototype = {
     },
 
     /**
+     * delayed pitch
+     * @param callback {Function}
+     */
+    windupThen: function windupThen(callback) {
+        var pitcher = this.pitcher;
+        pitcher.windingUp = true;
+
+        if (!this.console) {
+            $('.baseball').addClass('hide');
+            var windup = $('.windup');
+            windup.css('width', '100%');
+        }
+        if (this.console) {
+            callback();
+            pitcher.windingUp = false;
+        } else {
+            if (!_services.Animator.console) {
+                _services.Animator.loop.resetCamera();
+            }
+            windup.animate({ width: 0 }, this.field.hasRunnersOn() ? _services.Animator.TIME_FROM_SET : _services.Animator.TIME_FROM_WINDUP, function () {
+                pitcher.windingUp = false;
+                callback();
+            });
+        }
+    },
+
+    /**
      * AI pitcher winds up and throws
      * @param callback \usually a function to resolve the animations resulting from the pitch
      */
     autoPitch: function autoPitch(callback) {
         var _this = this;
 
-        var pitcher = this.pitcher,
-            giraffe = this;
+        this.autoPitchSelect();
 
-        if (this.stage === 'pitch') {
-            var windup;
+        var count = this.umpire.count;
+        var x = void 0,
+            y = void 0,
+            pitch = void 0;
+        pitch = _services.Distribution.pitchLocation(count);
+        x = pitch.x;
+        y = pitch.y;
 
-            (function () {
-                _this.autoPitchSelect();
-                pitcher.windingUp = true;
-                if (!_this.console) {
-                    $('.baseball').addClass('hide');
-                    windup = $('.windup');
-
-                    windup.css('width', '100%');
-                }
-                var count = _this.umpire.count;
-                var pitch = _services.Distribution.pitchLocation(count),
-                    x = pitch.x,
-                    y = pitch.y;
-                if (_this.console) {
-                    _this.thePitch(x, y, callback);
-                } else {
-                    if (!_services.Animator.console) {
-                        _services.Animator.loop.resetCamera();
-                    }
-                    windup.animate({ width: 0 }, _this.field.hasRunnersOn() ? _services.Animator.TIME_FROM_SET : _services.Animator.TIME_FROM_WINDUP, function () {
-                        !giraffe.console && $('.baseball.pitch').removeClass('hide');
-                        giraffe.thePitch(x, y, callback);
-                        pitcher.windingUp = false;
-                    });
-                }
-            })();
-        }
+        this.windupThen(function () {
+            !_this.console && $('.baseball.pitch').removeClass('hide');
+            _this.thePitch(x, y, callback);
+        });
     },
 
     /**
@@ -764,11 +772,15 @@ Game.prototype = {
      * @param override \a websocket opponent will override the engine's pitch location calculations with their actual
      */
     thePitch: function thePitch(x, y, callback, override) {
+        if (override) {
+            this.pitchInFlight = override.inFlight;
+            this.pitchTarget = override.target;
+        }
+
         var pitch = this.pitchInFlight;
+
         if (this.stage === 'pitch') {
             if (override) {
-                this.pitchInFlight = override.inFlight;
-                this.pitchTarget = override.target;
                 callback = this.waitingCallback;
             } else {
                 this.pitcher.fatigue++;
@@ -793,9 +805,12 @@ Game.prototype = {
             this.log.notePitch(pitch, this.batter);
 
             this.stage = 'swing';
-            if (this.humanControl !== 'none' && (this.humanControl === 'both' || this.humanBatting())) {
+            if (this.humanBatting()) {
                 callback();
             } else {
+                if (this.opponentConnected && this.humanPitching()) {
+                    this.windupThen(function () {});
+                }
                 this.awaitSwing(x, y, callback, pitch, this.pitchTarget);
             }
         }
@@ -899,16 +914,16 @@ Game.prototype = {
 
             var half = this.half;
             this.umpire.makeCall();
-            emit = false;
-            if (half != this.half) {
+            var lastPlayOfHalfInning = false;
+            if (half !== this.half) {
                 callback = this.startOpponentPitching;
-                var emit = !override;
+                lastPlayOfHalfInning = !override;
             }
 
             if (typeof callback === 'function') {
-                if (this.humanControl !== 'none' && (this.humanControl === 'both' || this.teams[this.humanControl] === this.pitcher.team)) {
+                if (this.humanPitching()) {
                     callback();
-                    if (emit) {
+                    if (lastPlayOfHalfInning) {
                         if (this.opponentService && this.opponentConnected) {
                             this.opponentService.emitSwing(result);
                         }
@@ -4647,7 +4662,7 @@ Animator.prototype = {
         var $baseballs = $('.baseball');
         $baseballs.addClass('hide');
 
-        if (game.humanBatting() && !game.humanPitching()) {
+        if (game.humanBatting()) {
             $scope.holdUpTimeouts.push(setTimeout(function () {
                 $scope.holdUp();
             }, (flightSpeed + Animator.HOLD_UP_ALLOWANCE) * 1000));
@@ -7007,6 +7022,7 @@ var global = {}; (function (global) {
 
 var SocketService = function() {
     var Service = function() {};
+    var LOG_TRAFFIC = false;
     var game, socket, NO_OPERATION = function() {},
         animator = Baseball.service.Animator;
     Service.prototype = {
@@ -7034,13 +7050,17 @@ var SocketService = function() {
                 giraffe.connected = false;
             });
             socket.on('pitch', function(pitch) {
-                //console.log('receive', 'pitch', pitch);
-                game.thePitch(0, 0, NO_OPERATION, pitch);
-                var scope = window.s;
-                animator.updateFlightPath.bind(scope)();
+                if (LOG_TRAFFIC) console.log('receive', 'pitch', pitch);
+                game.windupThen(function() {
+
+                    game.thePitch(0, 0, NO_OPERATION, pitch);
+                    var scope = window.s;
+                    animator.updateFlightPath.bind(scope)();
+
+                });
             });
             socket.on('swing', function(swing) {
-                //console.log('receive', 'swing', swing);
+                if (LOG_TRAFFIC) console.log('receive', 'swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
                 var scope = window.s;
                 animator.updateFlightPath.bind(scope)(function() {
@@ -7071,7 +7091,7 @@ var SocketService = function() {
             });
             socket.on('partner_connect', function() {
                 game.opponentConnected = true;
-                var scope = window.s;
+                //var scope = window.s;
                 //scope.$digest();
             });
             socket.on('opponent_taking_field', function() {
@@ -7096,11 +7116,11 @@ var SocketService = function() {
             socket.on('register', NO_OPERATION);
         },
         emitPitch : function(pitch) {
-            //console.log('emit', 'pitch', pitch);
+            if (LOG_TRAFFIC) console.log('emit', 'pitch', pitch);
             socket.emit('pitch', pitch);
         },
         emitSwing : function(swing) {
-            //console.log('emit', 'swing', swing);
+            if (LOG_TRAFFIC) console.log('emit', 'swing', swing);
             socket.emit('swing', swing);
         },
         swing : function() {
