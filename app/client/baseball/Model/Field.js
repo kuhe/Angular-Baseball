@@ -75,6 +75,7 @@ Field.prototype = {
 
         if (swing.fielder) {
             const fielder = (game.half === 'top' ? game.teams.home.positions[swing.fielder] : game.teams.away.positions[swing.fielder]);
+            const isOutfielder = fielder.position in { left: true, center: true, right: true };
             fielder.fatigue += 4;
             swing.error = false;
             let fieldingEase = fielder.skill.defense.fielding/100;
@@ -93,7 +94,7 @@ Field.prototype = {
                 } else {
                     fielder.stats.fielding.PO++;
                     swing.caught = true;
-                    if (game.umpire.count.outs < 2) {
+                    if (game.umpire.count.outs < 2 && isOutfielder) {
                         const sacrificeThrowInTime = Mathinator.fielderReturnDelay(
                             swing.travelDistance, throwingEase, fieldingEase, 100
                         );
