@@ -7,6 +7,8 @@ const Log = function() {
 Log.prototype = {
     game : 'instance of Game',
     init() {
+        this.lastSwing = '';
+        this.lastSwingJ = '';
         this.stabilized = {
             pitchRecord : {
                 e: ['', '', '', '', '', ''],
@@ -23,7 +25,7 @@ Log.prototype = {
         };
         this.shortRecord = {
             e: [],
-                n: []
+            n: []
         };
         this.record = {
             e: [],
@@ -225,6 +227,19 @@ Log.prototype = {
                 result += text('Ball.')
             }
         } else {
+            const timing = [
+                'Very late',
+                'Late',
+                '',
+                'Early',
+                'Very Early'
+            ][Math.max(0, Math.min(4,
+                ((swingResult.timing|0) + 175)/70 | 0
+            ))];
+            if (timing) {
+                result += '('+text(timing)+')' + text.space();
+            }
+
             if (swingResult.contact) {
                 if (swingResult.foul) {
                     result += text('Fouled off.')
@@ -273,6 +288,10 @@ Log.prototype = {
         recordJ = stabilized.n[0];
         record = stabilized.e[0];
         const giraffe = this;
+
+        this.lastSwing = record;
+        this.lastSwingJ = recordJ;
+
         record.indexOf('Previous') !== 0 && this.async(() => {
             if (record.indexOf('In play') > -1 && record.indexOf('struck out') > -1) {
                 if (text.mode === 'n') {
@@ -399,14 +418,14 @@ Log.prototype = {
         text.mode = 'e';
         const result = this.getPlateAppearanceResult(game);
         record.e.unshift(result);
-        statement = prev + result;
+        statement = prev + this.lastSwing + text.space() + result;
         pitchRecord.e = [statement];
         stabilized.e = [statement, '', '', '', '', ''];
 
         text.mode = 'n';
         const resultJ = this.getPlateAppearanceResult(game);
         record.n.unshift(resultJ);
-        statement = prevJ + resultJ;
+        statement = prevJ + this.lastSwingJ + text.space() + resultJ;
         pitchRecord.n = [statement];
         stabilized.n = [statement, '', '', '', '', ''];
 

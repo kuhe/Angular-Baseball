@@ -3423,6 +3423,7 @@ button.btn.disabled {
 }
 .main-area .list-group-item strong {
   font-size: 140%;
+  line-height: 1.1em;
 }
 .main-area .pitch-record {
   text-align: right;

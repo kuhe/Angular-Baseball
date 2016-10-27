@@ -435,6 +435,13 @@ Player.prototype = {
         return text([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
     },
     /**
+     * Where positive is an early swing and negative is a late swing.
+     * @returns {Number} in milliseconds between -200ms and 200ms
+     */
+    getAISwingTiming() {
+        return (Math.random() - 0.5) * 280 * (60 / (60 + this.skill.offense.eye));
+    },
+    /**
      * a localized description of this player's defining batting characteristic e.g. "contact hitter"
      * @returns {*}
      */

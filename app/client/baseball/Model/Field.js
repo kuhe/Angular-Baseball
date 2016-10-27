@@ -35,14 +35,19 @@ Field.prototype = {
         if (this.third) this.third.fatigue += 4;
 
         const x = swing.x, y = swing.y;
-        const eye = this.game.batter.skill.offense.eye;
+        const game = this.game;
+        const eye = game.batter.skill.offense.eye;
         /**
          * The initial splay angle is 90 degrees for hitting up the middle and 0
          * for a hard foul left, 180 is a foul right. Depending on the angle of the bat,
          * a y-axis displacement which would otherwise pop or ground the ball can instead
          * increase the left/right effect.
          */
-        const angles = Mathinator.getSplayAndFlyAngle(x, y, swing.angle, eye);
+        const angles = Mathinator.getSplayAndFlyAngle(
+            x, y, swing.angle, eye,
+            swing.timing,
+            game.batter.bats === 'left'
+        );
         const splayAngle = angles.splay;
 
         const flyAngle = angles.fly;
@@ -51,7 +56,6 @@ Field.prototype = {
         if (flyAngle < 0 && landingDistance > 95) {
             landingDistance = (landingDistance - 95)/4 + 95;
         }
-        const game = this.game;
 
         if (Math.abs(splayAngle) > 50) swing.foul = true;
         swing.fielder = this.findFielder(splayAngle, landingDistance, power, flyAngle);

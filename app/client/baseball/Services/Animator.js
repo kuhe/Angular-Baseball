@@ -142,6 +142,8 @@ Animator.prototype = {
               flightSpeed = Mathinator.getFlightTime(game.pitchInFlight.velocity,
                   helper.pitchDefinitions[game.pitchInFlight.name][2]);
 
+        game.expectedSwingTiming = Date.now() + flightSpeed * 1000;
+
         if (!this.loop) {
             this.beginRender();
         }

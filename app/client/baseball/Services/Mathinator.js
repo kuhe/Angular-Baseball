@@ -252,15 +252,21 @@ Mathinator.prototype = {
      *   fly: 0, flat, to 90, vertical pop up
      * }
      * @param eye {Number} 0 - 100 skill rating
+     * @param timing {Number} milliseconds early
+     * @param lefty {Boolean} whether the batter is lefty
      * @returns {{splay: number, fly: number}}
      */
-    getSplayAndFlyAngle(x, y, angle, eye) {
+    getSplayAndFlyAngle(x, y, angle, eye, timing, lefty) {
 
-        let splay = -1.5*x - (y * angle / 20);
-        const direction = splay > 0 ? 1 : -1;
-        // additional random splay
-        // todo make it pull only
-        splay += direction * Math.random() * 40 * (100/(50 + eye));
+        const pullDirection = lefty ? 1 : -1;
+        // Let's say that you have a 100ms window in which to hit the ball fair, with an additional 40ms for
+        // playing this game interface.
+        // With this formula, 140ms early will pull the ball by ~50 degrees
+        let pull = pullDirection * ((50/140 * timing) + (Math.random() * 10 * (100/(50 + eye))));
+
+        pull /= Math.abs(100 / (100 + angle)); // diluted by angle
+
+        let splay = -1.5*x - (y * angle / 20) + pull;
 
         return {
             splay,

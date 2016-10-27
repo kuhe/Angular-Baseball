@@ -21,6 +21,7 @@ Game.prototype = {
     pitcher : {}, // Player&
     batter : {}, // Player&
     init(m) {
+        this.expectedSwingTiming = 0;
         this.reset();
         this.startTime = {
             h: Math.random() * 6 + 11 | 0,
@@ -411,6 +412,10 @@ Game.prototype = {
                 callback = this.waitingCallback;
             } else {
                 this.swingResult = result = {};
+
+                result.timing = this.humanBatting() ? this.expectedSwingTiming - Date.now() : this.batter.getAISwingTiming();
+                const inTime = Math.abs(result.timing) < 140;
+
                 const bonus = this.batter.eye.bonus || 0, eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
 
                 if (x >= 0 && x <= 200) {
@@ -429,7 +434,7 @@ Game.prototype = {
                     //log(recalculation.y, precision);
 
                     result.looking = false;
-                    if (Math.abs(result.x) < 60 && Math.abs(result.y) < 35) {
+                    if (Math.abs(result.x) < 60 && Math.abs(result.y) < 35 && inTime) {
                         result.contact = true;
                         this.field.determineSwingContactResult(result);
                         // log(result.flyAngle, Math.floor(result.x), Math.floor(result.y));

@@ -99,14 +99,15 @@ Field.prototype = {
 
         var x = swing.x,
             y = swing.y;
-        var eye = this.game.batter.skill.offense.eye;
+        var game = this.game;
+        var eye = game.batter.skill.offense.eye;
         /**
          * The initial splay angle is 90 degrees for hitting up the middle and 0
          * for a hard foul left, 180 is a foul right. Depending on the angle of the bat,
          * a y-axis displacement which would otherwise pop or ground the ball can instead
          * increase the left/right effect.
          */
-        var angles = _services.Mathinator.getSplayAndFlyAngle(x, y, swing.angle, eye);
+        var angles = _services.Mathinator.getSplayAndFlyAngle(x, y, swing.angle, eye, swing.timing, game.batter.bats === 'left');
         var splayAngle = angles.splay;
 
         var flyAngle = angles.fly;
@@ -115,7 +116,6 @@ Field.prototype = {
         if (flyAngle < 0 && landingDistance > 95) {
             landingDistance = (landingDistance - 95) / 4 + 95;
         }
-        var game = this.game;
 
         if (Math.abs(splayAngle) > 50) swing.foul = true;
         swing.fielder = this.findFielder(splayAngle, landingDistance, power, flyAngle);
@@ -422,6 +422,7 @@ Game.prototype = {
     pitcher: {}, // Player&
     batter: {}, // Player&
     init: function init(m) {
+        this.expectedSwingTiming = 0;
         this.reset();
         this.startTime = {
             h: Math.random() * 6 + 11 | 0,
@@ -838,6 +839,10 @@ Game.prototype = {
                 callback = this.waitingCallback;
             } else {
                 this.swingResult = result = {};
+
+                result.timing = this.humanBatting() ? this.expectedSwingTiming - Date.now() : this.batter.getAISwingTiming();
+                var inTime = Math.abs(result.timing) < 140;
+
                 var bonus = this.batter.eye.bonus || 0,
                     eye = this.batter.skill.offense.eye + 6 * (this.umpire.count.balls + this.umpire.count.strikes) + bonus;
 
@@ -857,7 +862,7 @@ Game.prototype = {
                     //log(recalculation.y, precision);
 
                     result.looking = false;
-                    if (Math.abs(result.x) < 60 && Math.abs(result.y) < 35) {
+                    if (Math.abs(result.x) < 60 && Math.abs(result.y) < 35 && inTime) {
                         result.contact = true;
                         this.field.determineSwingContactResult(result);
                         // log(result.flyAngle, Math.floor(result.x), Math.floor(result.y));
@@ -1887,6 +1892,14 @@ Player.prototype = {
      */
     getOrder: function getOrder() {
         return (0, _utils.text)([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
+    },
+
+    /**
+     * Where positive is an early swing and negative is a late swing.
+     * @returns {Number} in milliseconds between -200ms and 200ms
+     */
+    getAISwingTiming: function getAISwingTiming() {
+        return (Math.random() - 0.5) * 280 * (60 / (60 + this.skill.offense.eye));
     },
 
     /**
@@ -4643,6 +4656,8 @@ Animator.prototype = {
         var game = $scope.y,
             flightSpeed = _services.Mathinator.getFlightTime(game.pitchInFlight.velocity, _helper.helper.pitchDefinitions[game.pitchInFlight.name][2]);
 
+        game.expectedSwingTiming = Date.now() + flightSpeed * 1000;
+
         if (!this.loop) {
             this.beginRender();
         }
@@ -5346,15 +5361,21 @@ Mathinator.prototype = {
      *   fly: 0, flat, to 90, vertical pop up
      * }
      * @param eye {Number} 0 - 100 skill rating
+     * @param timing {Number} milliseconds early
+     * @param lefty {Boolean} whether the batter is lefty
      * @returns {{splay: number, fly: number}}
      */
-    getSplayAndFlyAngle: function getSplayAndFlyAngle(x, y, angle, eye) {
+    getSplayAndFlyAngle: function getSplayAndFlyAngle(x, y, angle, eye, timing, lefty) {
 
-        var splay = -1.5 * x - y * angle / 20;
-        var direction = splay > 0 ? 1 : -1;
-        // additional random splay
-        // todo make it pull only
-        splay += direction * Math.random() * 40 * (100 / (50 + eye));
+        var pullDirection = lefty ? 1 : -1;
+        // Let's say that you have a 100ms window in which to hit the ball fair, with an additional 40ms for
+        // playing this game interface.
+        // With this formula, 140ms early will pull the ball by ~50 degrees
+        var pull = pullDirection * (50 / 140 * timing + Math.random() * 10 * (100 / (50 + eye)));
+
+        pull /= Math.abs(100 / (100 + angle)); // diluted by angle
+
+        var splay = -1.5 * x - y * angle / 20 + pull;
 
         return {
             splay: splay,
@@ -5592,6 +5613,8 @@ var Log = function Log() {
 Log.prototype = {
     game: 'instance of Game',
     init: function init() {
+        this.lastSwing = '';
+        this.lastSwingJ = '';
         this.stabilized = {
             pitchRecord: {
                 e: ['', '', '', '', '', ''],
@@ -5808,6 +5831,11 @@ Log.prototype = {
                 result += (0, _text.text)('Ball.');
             }
         } else {
+            var timing = ['Very late', 'Late', '', 'Early', 'Very Early'][Math.max(0, Math.min(4, ((swingResult.timing | 0) + 175) / 70 | 0))];
+            if (timing) {
+                result += '(' + (0, _text.text)(timing) + ')' + _text.text.space();
+            }
+
             if (swingResult.contact) {
                 if (swingResult.foul) {
                     result += (0, _text.text)('Fouled off.');
@@ -5856,6 +5884,10 @@ Log.prototype = {
         recordJ = stabilized.n[0];
         record = stabilized.e[0];
         var giraffe = this;
+
+        this.lastSwing = record;
+        this.lastSwingJ = recordJ;
+
         record.indexOf('Previous') !== 0 && this.async(function () {
             if (record.indexOf('In play') > -1 && record.indexOf('struck out') > -1) {
                 if (_text.text.mode === 'n') {
@@ -5987,14 +6019,14 @@ Log.prototype = {
         _text.text.mode = 'e';
         var result = this.getPlateAppearanceResult(game);
         record.e.unshift(result);
-        statement = prev + result;
+        statement = prev + this.lastSwing + _text.text.space() + result;
         pitchRecord.e = [statement];
         stabilized.e = [statement, '', '', '', '', ''];
 
         _text.text.mode = 'n';
         var resultJ = this.getPlateAppearanceResult(game);
         record.n.unshift(resultJ);
-        statement = prevJ + resultJ;
+        statement = prevJ + this.lastSwingJ + _text.text.space() + resultJ;
         pitchRecord.n = [statement];
         stabilized.n = [statement, '', '', '', '', ''];
 
@@ -6285,7 +6317,14 @@ var text = function text(phrase, override) {
             'Defensive wizard': '守備万能',
             'Glove': '好守',
             'Range': 'レンジ',
-            'Strong throw': '肩強い'
+            'Strong throw': '肩強い',
+            //'' : '',
+            //'' : '',
+            'Very late': 'とても遅め',
+            'Late': '遅め',
+            '': '',
+            'Early': '早め',
+            'Very Early': 'とても早め'
         },
         e: {
             empty: '-',

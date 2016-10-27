@@ -153,6 +153,11 @@ const text = (phrase, override) => {
             'Strong throw' : '肩強い',
             //'' : '',
             //'' : '',
+            'Very late': 'とても遅め',
+            'Late': '遅め',
+            '': '',
+            'Early': '早め',
+            'Very Early': 'とても早め'
         },
         e : {
             empty: '-',
