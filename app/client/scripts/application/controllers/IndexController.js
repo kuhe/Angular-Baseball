@@ -57,9 +57,9 @@ IndexController = function($scope, socket) {
     };
 
     $scope.sim = function() {$scope.proceedToGame(1, 1);};
-    $scope.seventh = function() {$scope.proceedToGame(7);};
+    $scope.seventh = function() {$scope.proceedToGame(7, 1);};
     $scope.playball = function() {$scope.proceedToGame();};
-    $scope.spectate = function() {$scope.proceedToGame(0,1);};
+    $scope.spectate = function() {$scope.proceedToGame(0, 1);};
 
     $scope.proceedToGame = function(quickMode, spectateCpu) {
         $scope.begin = true;
@@ -80,7 +80,7 @@ IndexController = function($scope, socket) {
         bindMethods();
         $('.blocking').remove();
         $('.play-begins').show();
-        if (game.humanControl == 'none' && game.console) {
+        if (game.humanControl === 'none' && game.console) {
             var n = 0;
             Animator.console = true;
             game.console = true;
@@ -89,21 +89,11 @@ IndexController = function($scope, socket) {
                 game.simulateInput(function(callback) {
                     typeof callback == 'function' && callback();
                 });
-            } while (game.stage != 'end' && n < 500);
+            } while (game.stage !== 'end' && n < 500);
             Animator.console = game.console = false;
             log('sim ended');
             game.debugOut();
-        } else if (game.humanControl == 'none') {
-            var scalar = game.console ? 0.05 : 1;
-            var auto = setInterval(function() {
-                if (game.stage == 'end') {
-                    clearInterval(auto);
-                }
-                game.simulatePitchAndSwing(function(callback) {
-                    $scope.updateFlightPath(callback);
-                });
-            }, scalar*(game.field.hasRunnersOn() ? Animator.TIME_FROM_SET + 2000 : Animator.TIME_FROM_WINDUP + 2000));
-        } else if (quickMode === 7 && spectateCpu === undefined) {
+        } else if (quickMode === 7 && spectateCpu === 1) {
             Animator.console = game.console = true;
             do {
                 game.simulateInput(function(callback) {
@@ -116,6 +106,17 @@ IndexController = function($scope, socket) {
             game.stage = 'pitch';
             game.half = 'top';
             game.humanControl = 'home';
+            game.umpire.onSideChange();
+        } else if (game.humanControl === 'none') {
+            var scalar = game.console ? 0.05 : 1;
+            var auto = setInterval(function() {
+                if (game.stage === 'end') {
+                    clearInterval(auto);
+                }
+                game.simulatePitchAndSwing(function(callback) {
+                    $scope.updateFlightPath(callback);
+                });
+            }, scalar*(game.field.hasRunnersOn() ? Animator.TIME_FROM_SET + 2000 : Animator.TIME_FROM_WINDUP + 2000));
         }
         if (game.humanControl === 'away') {
             game.simulateInput(function(callback) {
