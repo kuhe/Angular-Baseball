@@ -360,7 +360,7 @@ Player.prototype = {
             'break' : randValue(true),
             control : randValue(true)
         };
-        if (Math.random() < 0.17 || allPitches) {
+        if (Math.random() < 0.85 || allPitches) {
             // can pitch!
             if (Math.random() > 0.6 || allPitches) {
                 this.pitching['2-seam'] = {
