@@ -4092,11 +4092,41 @@ footer {
   box-shadow: 0 0 10px -1px #3c3c3c;
   width: 30px;
   height: 20px;
-  background-size: 100%;
+  background-size: 101%;
   background-position: center;
   background-repeat: no-repeat;
   margin: 0 6px 0 3px;
   float: left;
+}
+.lineup.at_bat {
+  background-color: #f2f2f2;
+}
+.stat-abbrev {
+  font-size: 80%;
+}
+.battery-component .era {
+  display: inline-block;
+  margin: 0 20px;
+}
+.battery-component .pitch-count {
+  opacity: 0.5;
+  font-style: italic;
+  font-weight: normal;
+}
+.battery-component .pitch-count.focus {
+  opacity: 1.0;
+  color: black;
+  font-weight: bold;
+}
+.battery-component .pitch-count .secondary-battery-stats {
+  margin: 0 50px 0 0;
+}
+.battery-component .pitch-count .secondary-battery-stats.__right {
+  margin: 0 0 0 50px;
+}
+.batters-component .slash {
+  display: inline-block;
+  margin: 0 20px;
 }
 .rating-block {
   margin: 0 6px -1px;
@@ -4153,4 +4183,7 @@ footer {
 }
 .pitch-selection .pitch-selection-label {
   font-size: 80%;
+}
+.pitch-selection button {
+  background: #5d0e10;
 }

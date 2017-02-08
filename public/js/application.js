@@ -416,7 +416,7 @@ var Game = function Game(m) {
 
 Game.prototype = {
     constructor: Game,
-    gamesIntoSeason: 0,
+    gamesIntoSeason: 72,
     humanControl: 'home', //home, away, both, none
     console: false,
     debug: [],
@@ -434,7 +434,7 @@ Game.prototype = {
             m: 0
         }; // @see {Loop} for time initialization
         if (m) _utils.text.mode = m;
-        this.gamesIntoSeason = 5 + Math.floor(Math.random() * 133);
+        this.gamesIntoSeason = 72 + Math.floor(Math.random() * 72);
         this.field = new _Field.Field(this);
         this.teams.away = new _Team.Team(this);
         this.teams.home = new _Team.Team(this);
@@ -1440,7 +1440,7 @@ var _models = require('../Model/_models');
  */
 var Player = function Player(team, hero) {
     this.init(team, hero);
-    this.resetStats(this.team.game && this.team.game.gamesIntoSeason || 0);
+    this.resetStats(this.team.game && this.team.game.gamesIntoSeason || 72);
 };
 
 Player.prototype = {
@@ -1474,6 +1474,7 @@ Player.prototype = {
         this.surnameJ = _utils.data.surnamesJ[surnameKey];
         this.atBats = [];
         this.definingBattingCharacteristic = {};
+        this.definingPitchingCharacteristic = {};
         this.definingCharacteristic = {};
     },
 
@@ -1560,7 +1561,7 @@ Player.prototype = {
      * @returns {*}
      */
     resetStats: function resetStats() {
-        var gamesIntoSeason = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+        var gamesIntoSeason = arguments.length <= 0 || arguments[0] === undefined ? 72 : arguments[0];
 
         var offense = this.skill.offense;
         var defense = this.skill.defense;
@@ -1641,7 +1642,8 @@ Player.prototype = {
                     return this.K / (this.IP[0] / 9);
                 },
                 getERA: function getERA() {
-                    return 9 * this.ER / Math.max(1 / 3, this.IP[0] + this.IP[1] / 3);
+                    var val = 9 * this.ER / Math.max(1 / 3, this.IP[0] + this.IP[1] / 3);
+                    return (val + '00').slice(0, 4);
                 },
 
                 ERA: null,
@@ -1862,9 +1864,15 @@ Player.prototype = {
                 };
             }
         }
-        this.skill.pitching = Math.floor(this.pitching.averaging.reduce(function (prev, current) {
-            return prev + current;
-        }) / this.pitching.averaging.length + this.pitching.averaging.length * 3);
+
+        var averages = this.pitching.averaging.sort(function (a, b) {
+            return b - a;
+        }).slice(0, 4);
+        var pitchingAverage = averages.reduce(function (a, b) {
+            return a + b;
+        }) / 4;
+
+        this.skill.pitching = Math.floor(pitchingAverage);
         delete this.pitching.averaging;
     },
 
@@ -1905,7 +1913,7 @@ Player.prototype = {
 
     /**
      * a localized description of this player's defining batting characteristic e.g. "contact hitter"
-     * @returns {*}
+     * @returns {string}
      */
     getDefiningBattingCharacteristic: function getDefiningBattingCharacteristic() {
         if (!this.definingBattingCharacteristic[_utils.text.mode]) {
@@ -1915,11 +1923,23 @@ Player.prototype = {
     },
 
     /**
-     * a localized phrase describing a strong trait of this player e.g. "ace" or "power hitter"
-     * @param battingOnly \only return their defining batting characteristic
-     * @returns {*}
+     * a localized description of this player's defining pitching characteristic e.g. "control pitcher"
+     * @returns {string}
      */
-    getDefiningCharacteristic: function getDefiningCharacteristic(battingOnly) {
+    getDefiningPitchingCharacteristic: function getDefiningPitchingCharacteristic() {
+        if (!this.definingPitchingCharacteristic[_utils.text.mode]) {
+            this.definingPitchingCharacteristic[_utils.text.mode] = this.getDefiningCharacteristic(false, true);
+        }
+        return this.definingPitchingCharacteristic[_utils.text.mode];
+    },
+
+    /**
+     * a localized phrase describing a strong trait of this player e.g. "ace" or "power hitter".
+     * @param battingOnly to return only their defining batting characteristic.
+     * @param {boolean} pitchingOnly to return only a pitching characteristic.
+     * @returns {string}
+     */
+    getDefiningCharacteristic: function getDefiningCharacteristic(battingOnly, pitchingOnly) {
         if (this.definingCharacteristic[_utils.text.mode] && !battingOnly) {
             return this.definingCharacteristic[_utils.text.mode];
         }
@@ -1958,8 +1978,8 @@ Player.prototype = {
             return x / pitches | 0;
         });
 
-        if (pitcherRating > 90 && !battingOnly) {
-            if (pitcherRating > 105) {
+        if (pitchingOnly || pitcherRating > 90 && !battingOnly) {
+            if (pitcherRating > 94) {
                 out = (0, _utils.text)('Ace');
             } else if (pitching[0] > EXCELLENT) {
                 out = (0, _utils.text)('Control pitcher');
@@ -1999,7 +2019,7 @@ Player.prototype = {
                 }
             }
         }
-        if (battingOnly) return out;
+        if (battingOnly || pitchingOnly) return out;
         return this.definingCharacteristic[_utils.text.mode] = out;
     },
 
@@ -6250,6 +6270,10 @@ var text = function text(phrase, override) {
             'R': '得点',
             'BB': '四球',
             'SO': '三振',
+
+            'ERA': '防御率',
+            'W': '勝',
+            'K': '三振',
 
             'first': 'ファースト',
             'second': 'セカンド',

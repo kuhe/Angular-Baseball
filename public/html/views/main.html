@@ -270,12 +270,13 @@
         </ul>
         <hr/>
         <div class='row'>
+            <section class='col-xs-12 centered'>
+                <battery-data [y]='y' [t]='t' class='pitcher-data'></battery-data>
+            </section>
             <section class='col-xs-12'>
-                <batters-data [y]='y' [t]='t' class='batter-data col-sm-6' *ngIf='y.half === "top"'></batters-data>
-                <battery-data [y]='y' [t]='t' class='pitcher-data col-sm-6' *ngIf='y.half === "top"'></battery-data>
-
-                <battery-data [y]='y' [t]='t' class='pitcher-data col-sm-6' *ngIf='y.half === "bottom"'></battery-data>
-                <batters-data [y]='y' [t]='t' class='batter-data col-sm-6' *ngIf='y.half === "bottom"'></batters-data>
+                <div class='col-sm-6' *ngIf='y.half === "bottom"'></div>
+                <batters-data [y]='y' [t]='t' class='batter-data col-sm-6'></batters-data>
+                <div class='col-sm-6' *ngIf='y.half === "top"'></div>
             </section>
         </div>
         <hr/>
@@ -300,6 +301,9 @@
                     {{team.getName()}}
                 </li>
                 <li class='list-group-item pointer lineup' *ngFor="let player of team.lineup"
+                    [ngClass]='{
+                        at_bat: player.team.lineup.indexOf(player) === player.team.nowBatting
+                    }'
                     (click)='clickLineup(player)'>
                     {{abbreviatePosition(player.position)}}
                     <!--<rating-block [rating]='player.defensiveAverage()'></rating-block>-->
@@ -307,7 +311,7 @@
                     <strong>{{player.getName()}}</strong>
                     ({{'#'+player.number}})
                     <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>
-                    <em>{{ player.team.lineup.indexOf(player) == player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
+                    <em>{{ player.team.lineup.indexOf(player) === player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
 
                     <span class='pull-right'>
                         <span class='defining'>

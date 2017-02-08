@@ -11,7 +11,7 @@ import { AtBat, Team } from '../Model/_models';
  */
 const Player = function(team, hero) {
     this.init(team, hero);
-    this.resetStats(this.team.game && this.team.game.gamesIntoSeason || 0);
+    this.resetStats(this.team.game && this.team.game.gamesIntoSeason || 72);
 };
 
 Player.prototype = {
@@ -43,6 +43,7 @@ Player.prototype = {
         this.surnameJ = data.surnamesJ[surnameKey];
         this.atBats = [];
         this.definingBattingCharacteristic = {};
+        this.definingPitchingCharacteristic = {};
         this.definingCharacteristic = {};
     },
     /**
@@ -121,7 +122,7 @@ Player.prototype = {
      * @param gamesIntoSeason
      * @returns {*}
      */
-    resetStats(gamesIntoSeason=0) {
+    resetStats(gamesIntoSeason=72) {
         const offense = this.skill.offense;
         const defense = this.skill.defense;
         const randBetween = (a, b, skill) => {
@@ -196,7 +197,8 @@ Player.prototype = {
                     return this.K / (this.IP[0]/9);
                 },
                 getERA() {
-                    return 9 * this.ER / Math.max(1/3, this.IP[0] + this.IP[1]/3);
+                    const val = 9 * this.ER / Math.max(1/3, this.IP[0] + this.IP[1]/3);
+                    return (val + '00').slice(0, 4);
                 },
                 ERA : null,
                 ER,
@@ -407,7 +409,11 @@ Player.prototype = {
                 };
             }
         }
-        this.skill.pitching = Math.floor((this.pitching.averaging.reduce((prev, current) => prev + current))/this.pitching.averaging.length+this.pitching.averaging.length*3);
+
+        const averages = this.pitching.averaging.sort((a, b) => b - a).slice(0, 4);
+        const pitchingAverage = averages.reduce((a, b) => a + b) / 4;
+
+        this.skill.pitching = Math.floor(pitchingAverage);
         delete this.pitching.averaging;
     },
     /**
@@ -443,7 +449,7 @@ Player.prototype = {
     },
     /**
      * a localized description of this player's defining batting characteristic e.g. "contact hitter"
-     * @returns {*}
+     * @returns {string}
      */
     getDefiningBattingCharacteristic() {
         if (!this.definingBattingCharacteristic[text.mode]) {
@@ -452,11 +458,22 @@ Player.prototype = {
         return this.definingBattingCharacteristic[text.mode];
     },
     /**
-     * a localized phrase describing a strong trait of this player e.g. "ace" or "power hitter"
-     * @param battingOnly \only return their defining batting characteristic
-     * @returns {*}
+     * a localized description of this player's defining pitching characteristic e.g. "control pitcher"
+     * @returns {string}
      */
-    getDefiningCharacteristic(battingOnly) {
+    getDefiningPitchingCharacteristic() {
+        if (!this.definingPitchingCharacteristic[text.mode]) {
+            this.definingPitchingCharacteristic[text.mode] = this.getDefiningCharacteristic(false, true);
+        }
+        return this.definingPitchingCharacteristic[text.mode];
+    },
+    /**
+     * a localized phrase describing a strong trait of this player e.g. "ace" or "power hitter".
+     * @param battingOnly to return only their defining batting characteristic.
+     * @param {boolean} pitchingOnly to return only a pitching characteristic.
+     * @returns {string}
+     */
+    getDefiningCharacteristic(battingOnly, pitchingOnly) {
         if (this.definingCharacteristic[text.mode] && !battingOnly) {
             return this.definingCharacteristic[text.mode];
         }
@@ -487,8 +504,8 @@ Player.prototype = {
         const pitches = pitchingKeys.length;
         pitching = pitching.map(x => x/pitches | 0);
 
-        if (pitcherRating > 90 && !battingOnly) {
-            if (pitcherRating > 105) {
+        if (pitchingOnly || (pitcherRating > 90 && !battingOnly)) {
+            if (pitcherRating > 94) {
                 out = text('Ace');
             } else if (pitching[0] > EXCELLENT) {
                 out = text('Control pitcher');
@@ -528,7 +545,7 @@ Player.prototype = {
                 }
             }
         }
-        if (battingOnly) return out;
+        if (battingOnly || pitchingOnly) return out;
         return this.definingCharacteristic[text.mode] = out;
     },
     /**

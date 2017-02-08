@@ -83,6 +83,10 @@ const text = (phrase, override) => {
             'BB' : '四球',
             'SO' : '三振',
 
+            'ERA': '防御率',
+            'W': '勝',
+            'K' : '三振',
+
             'first' : 'ファースト',
             'second' : 'セカンド',
             'third' : 'サード',

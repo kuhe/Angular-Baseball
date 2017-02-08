@@ -14,7 +14,7 @@ const Game = function(m) {
 
 Game.prototype = {
     constructor : Game,
-    gamesIntoSeason : 0,
+    gamesIntoSeason : 72,
     humanControl : 'home', //home, away, both, none
     console : false,
     debug : [],
@@ -32,7 +32,7 @@ Game.prototype = {
             m: 0
         }; // @see {Loop} for time initialization
         if (m) text.mode = m;
-        this.gamesIntoSeason = 5 + Math.floor(Math.random()*133);
+        this.gamesIntoSeason = 72 + Math.floor(Math.random() * 72);
         this.field = new Field(this);
         this.teams.away = new Team(this);
         this.teams.home = new Team(this);

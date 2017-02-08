@@ -1,31 +1,23 @@
-<div class='row'>
-    <div class='col-xs-6' *ngFor='let batter of [y.batter, y.deck]'>
+<div class='row text-center batters-component'>
+    <div class='col-xs-12' *ngFor='let batter of [y.batter, y.deck]'>
         <div>
             {{ batter === y.batter ? t('At Bat') : t('On Deck') }} &raquo;
-            <br>
+
             <strong>{{batter.getName()}}</strong>
             ({{('#')+batter.number}}) <span *ngIf='batter.hero' class='glyphicon glyphicon-chevron-up'></span>
-            <br/>
+
             <em>{{abbreviatePosition(batter.position)}}{{t.comma()}}{{batter.bats == 'left' ? t('LHB') : t('RHB')}}</em>
             <span class='defining'>
-                {{ batter.getDefiningCharacteristic() }}
+                {{ batter.getDefiningBattingCharacteristic() }}
             </span>
         </div>
-        <hr/>
         <div class='row one-line'>
             <div class='col-xs-12'>
-                {{ batter.stats.batting.getSlash() }}
-                <br>
-            </div>
-            <div class='col-xs-6'>
-                <div class='prevent-break'>
-                    <strong>{{batter.stats.batting.hr}}</strong> {{ t('HR') }}
-                </div>
-            </div>
-            <div class='col-xs-6'>
-                <div class='prevent-break'>
-                    <strong>{{batter.stats.batting.rbi}}</strong> {{ t('RBI') }}
-                </div>
+                <span class='slash'>
+                    {{ batter.stats.batting.getSlash() }}
+                </span>
+                <strong>{{batter.stats.batting.rbi}}</strong> <span class='stat-abbrev'>{{ t('RBI') }}</span>
+                <strong>{{batter.stats.batting.hr}}</strong> <span class='stat-abbrev'>{{ t('HR') }}</span>
             </div>
             <div class='col-xs-12'>
                 <span class='action-line' *ngFor='let atBat of batter.getAtBats()'
