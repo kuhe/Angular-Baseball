@@ -11,7 +11,7 @@ class Trainer {
             surname = 'JPN';
         }
 
-        player.name = `${name} ${surname}`;
+        player.name = `${surname} ${name}`;
         player.nameJ = surnameJ + nameJ;
         player.surname = surname;
         player.surnameJ = surnameJ;
