@@ -1,11 +1,22 @@
-var SocketService = function() {
-    var Service = function() {};
+var SocketService = (function() {
+    var SocketService = function(socket, game) {
+        this.game = game;
+        window.socket = this.socket = socket;
+        var reactions = {};
+        socket.on = function (key, fn) {
+            key.split(' ').forEach(function (k) {
+                reactions[k] = fn;
+            });
+        };
+        socket.emit = socket.send.bind(socket);
+        socket.onmessage = function (e) {
+            console.log('onmsg', e);
+        };
+    };
     var LOG_TRAFFIC = false;
     var game, socket, NO_OPERATION = function() {},
         animator = Baseball.service.Animator;
-    Service.prototype = {
-        socket : {},
-        game : {},
+    SocketService.prototype = {
         connected : false,
         start : function(key) {
             game = this.game;
@@ -13,7 +24,10 @@ var SocketService = function() {
             game.opponentService = this;
             this.connected = socket.connected;
             this.on();
-            socket.emit('register', key);
+            socket.onopen = function () {
+                console.log('Socket Open.');
+                socket.emit('register', key);
+            };
             socket.on('connect_failed reconnect_failed', function() {
                 console.log('connection unavailable');
             });
@@ -108,10 +122,8 @@ var SocketService = function() {
 
         }
     };
-    return Service;
-};
-
-SocketService = SocketService();
+    return SocketService;
+}());
 
 //(function(app) {
 //

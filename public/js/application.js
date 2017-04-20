@@ -7084,14 +7084,25 @@ var global = {}; (function (global) {
 })(typeof global === "undefined" ? self : global); module.exports = global.babelHelpers;
 },{}]},{},[39]);
 
-var SocketService = function() {
-    var Service = function() {};
+var SocketService = (function() {
+    var SocketService = function(socket, game) {
+        this.game = game;
+        window.socket = this.socket = socket;
+        var reactions = {};
+        socket.on = function (key, fn) {
+            key.split(' ').forEach(function (k) {
+                reactions[k] = fn;
+            });
+        };
+        socket.emit = socket.send.bind(socket);
+        socket.onmessage = function (e) {
+            console.log('onmsg', e);
+        };
+    };
     var LOG_TRAFFIC = false;
     var game, socket, NO_OPERATION = function() {},
         animator = Baseball.service.Animator;
-    Service.prototype = {
-        socket : {},
-        game : {},
+    SocketService.prototype = {
         connected : false,
         start : function(key) {
             game = this.game;
@@ -7099,7 +7110,10 @@ var SocketService = function() {
             game.opponentService = this;
             this.connected = socket.connected;
             this.on();
-            socket.emit('register', key);
+            socket.onopen = function () {
+                console.log('Socket Open.');
+                socket.emit('register', key);
+            };
             socket.on('connect_failed reconnect_failed', function() {
                 console.log('connection unavailable');
             });
@@ -7194,10 +7208,8 @@ var SocketService = function() {
 
         }
     };
-    return Service;
-};
-
-SocketService = SocketService();
+    return SocketService;
+}());
 
 //(function(app) {
 //
@@ -7413,7 +7425,7 @@ ScoreboardDirective = function() {
             }
         });
 })(window.app || (window.app = {}));
-IndexController = function($scope, socket) {
+IndexController = function($scope, SocketService) {
 
     var text = Baseball.util.text;
     var Game = Baseball.Game;
@@ -7455,7 +7467,7 @@ IndexController = function($scope, socket) {
     };
 
     $scope.abbreviatePosition = function(position) {
-        if (text.mode == 'e') {
+        if (text.mode === 'e') {
             return {
                 pitcher : 'P',
                 catcher : 'C',
@@ -7482,14 +7494,14 @@ IndexController = function($scope, socket) {
         game.humanControl = spectateCpu ? 'none' : 'home';
         game.console = !!quickMode && quickMode !== 7;
         var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random()*47);
-        if (typeof io !== 'undefined') {
-            socket.game = game;
-            $scope.socket = io(/*window.location.hostname*/'http://georgefu.info' + ':64321', {
-                reconnection: false
-            });
-            $scope.socketService = socket;
-            socket.socket = $scope.socket;
-            socket.start(field);
+        if (typeof SockJS !== 'undefined') {
+            var connect = 'http://georgefu.info' + ':64321';
+            connect = 'http://localhost:8080/match';
+            var socket = $scope.socket = new SockJS(connect);
+            var socketService = $scope.socketService = new SocketService(socket, game);
+            socketService.start(field);
+        } else {
+            console.log('no socket client');
         }
         window.location.hash = '#' + field;
         bindMethods();
@@ -7708,8 +7720,7 @@ IndexController = function($scope, socket) {
         })
         .Class({
             constructor: function() {
-                var service = new SocketService();
-                IndexController(this, service);
+                IndexController(this, SocketService);
             }
         });
 
@@ -7717,8 +7728,7 @@ IndexController = function($scope, socket) {
 if (typeof angular === 'object') {
 
     var app = angular.module('YakyuuAikoukai', ['directives'])
-        .service('socket', SocketService)
-        .controller('IndexController', ['$scope', 'socket', IndexController]);
+        .controller('IndexController', ['$scope', IndexController]);
 
     app.config(function($interpolateProvider) {
         $interpolateProvider.startSymbol('{{');
