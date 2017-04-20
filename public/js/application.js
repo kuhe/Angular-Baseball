@@ -7087,40 +7087,101 @@ var global = {}; (function (global) {
 })(typeof global === "undefined" ? self : global); module.exports = global.babelHelpers;
 },{}]},{},[39]);
 
-var SocketService = (function() {
-    var SocketService = function(socket, game) {
-        this.game = game;
-        window.socket = this.socket = socket;
-        var reactions = {};
-        socket.on = function (key, fn) {
-            key.split(' ').forEach(function (k) {
-                reactions[k] = fn;
-            });
-        };
-        socket.emit = socket.send.bind(socket);
-        socket.onmessage = function (e) {
-            console.log('onmsg', e);
-        };
+/**
+ * @typedef {Class} Stomp
+ * @property {function} over
+ */
+
+/**
+ * Provides the socket.io interface to Stomp.
+ * @param {Stomp} stomp
+ * @param {String} key (baseball) field name.
+ * @param {SocketService} service
+ * @returns {Stomp}
+ * @constructor
+ */
+var IoAdapter = function (stomp, key, service) {
+
+    var teamToken = 'Team' + (Math.random() * 100 | 0) + key;
+
+    stomp.subscribe('/matchmaker/' + teamToken, function (frame) {
+
+        var data = JSON.parse(frame.body);
+
+        service.connected = stomp.connected;
+
+        if (data.type in reactions) {
+            reactions[data.type](data);
+        }
+
+        console.log('frame received', frame);
+    });
+
+    var reactions = {};
+    stomp.on = function (key, fn) {
+        key.split(' ').forEach(function (k) {
+            reactions[k] = fn;
+        });
     };
+    stomp.emit = function (event, data) {
+        data.type = event;
+        socket.send(event, data);
+    };
+
+    return stomp;
+
+};
+
+
+/**
+ *
+ * Socket service for opponent connection.
+ *
+ */
+var SocketService = (function() {
+
+    var SocketService = function(game) {
+
+        var connect = 'http://georgefu.info' + ':64321';
+        connect = 'http://localhost:8080/match-socks';
+        var socket = new SockJS(connect);
+
+        this.game = game;
+
+        window.socket = this.socket = socket;
+        window.stomp = this.stomp = Stomp.over(socket);
+
+    };
+
     var LOG_TRAFFIC = false;
     var game, socket, NO_OPERATION = function() {},
         animator = Baseball.service.Animator;
+
     SocketService.prototype = {
+
         connected : false,
+
         start : function(key) {
             game = this.game;
             socket = this.socket;
             game.opponentService = this;
-            this.connected = socket.connected;
-            this.on();
-            socket.onopen = function () {
-                console.log('Socket Open.');
-                socket.emit('register', key);
-            };
-            socket.on('connect_failed reconnect_failed', function() {
-                console.log('connection unavailable');
+
+            var stomp = this.stomp;
+            var giraffe = this;
+
+            stomp.connect({}, function (frame) {
+
+                console.log('---', 'Socket Open', frame);
+                IoAdapter(stomp, key);
+
+                giraffe.connected = stomp.connected;
+
+                giraffe.on();
+
             });
+
         },
+
         on : function() {
             var giraffe = this;
             socket.on('register', this.register);
@@ -7168,12 +7229,9 @@ var SocketService = (function() {
                         fn();
                     });
                 }
-                //scope.$digest();
             });
             socket.on('partner_connect', function() {
                 game.opponentConnected = true;
-                //var scope = window.s;
-                //scope.$digest();
             });
             socket.on('opponent_taking_field', function() {
                 console.log('A challenger has appeared! Sending game data.');
@@ -7203,12 +7261,6 @@ var SocketService = (function() {
         emitSwing : function(swing) {
             if (LOG_TRAFFIC) console.log('emit', 'swing', swing);
             socket.emit('swing', swing);
-        },
-        swing : function() {
-
-        },
-        pitch : function() {
-
         }
     };
     return SocketService;
@@ -7498,10 +7550,7 @@ IndexController = function($scope, SocketService) {
         game.console = !!quickMode && quickMode !== 7;
         var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random()*47);
         if (typeof SockJS !== 'undefined') {
-            var connect = 'http://georgefu.info' + ':64321';
-            connect = 'http://localhost:8080/match';
-            var socket = $scope.socket = new SockJS(connect);
-            var socketService = $scope.socketService = new SocketService(socket, game);
+            var socketService = $scope.socketService = new SocketService(game);
             socketService.start(field);
         } else {
             console.log('no socket client');

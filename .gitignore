@@ -3,3 +3,6 @@
 kuhe
 app/java
 .gradle
+*.iml
+out
+matchmaker/build

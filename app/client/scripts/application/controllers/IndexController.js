@@ -68,10 +68,7 @@ IndexController = function($scope, SocketService) {
         game.console = !!quickMode && quickMode !== 7;
         var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random()*47);
         if (typeof SockJS !== 'undefined') {
-            var connect = 'http://georgefu.info' + ':64321';
-            connect = 'http://localhost:8080/match';
-            var socket = $scope.socket = new SockJS(connect);
-            var socketService = $scope.socketService = new SocketService(socket, game);
+            var socketService = $scope.socketService = new SocketService(game);
             socketService.start(field);
         } else {
             console.log('no socket client');

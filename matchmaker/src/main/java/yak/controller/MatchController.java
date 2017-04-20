@@ -1,4 +1,4 @@
-package yak;
+package yak.controller;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -8,14 +8,20 @@ import yak.message.State;
 @Controller
 public class MatchController {
 
-    @MessageMapping("/state")
-    @SendTo("/game")
-    public State response(State message) throws Exception {
-
-        Thread.sleep(1000);
+    /**
+     *
+     * @param message ...
+     * @return ...
+     *
+     */
+    @MessageMapping("/state") // Reception route for Stomp.send (prefixed).
+    @SendTo("/matchmaker/state") // Stomp client subscribes here (Step 2).
+    public State response(State message) {
 
         return new State();
 
     }
+
+
 
 }
