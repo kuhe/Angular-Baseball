@@ -1,11 +1,7 @@
 package yak.controller;
 
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import yak.annotation.TeamToken;
-import yak.annotation.Todo;
 import yak.message.Pitch;
 
 /**
@@ -14,19 +10,15 @@ import yak.message.Pitch;
  *
  */
 @Controller
-public class PitchController {
+public class PitchController extends Base {
 
-    @MessageMapping("/pitch/{team}")
-    @SendTo("/matchmaker/{team}")
-    @Todo
-    public Pitch response(
-            final @DestinationVariable @TeamToken String team,
-            final Pitch pitch
-    ) {
+    @MessageMapping("/pitch")
+    public final Pitch response(final Pitch pitch) {
 
-        // @todo send to opponent, not original sender.
+        forwardToOpponent(pitch);
 
-        return new Pitch();
+        return pitch;
+
     }
 
 }

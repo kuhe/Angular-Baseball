@@ -8,16 +8,18 @@ import yak.annotation.TeamToken;
  * A request for access to a baseball field.
  *
  */
-public class FieldRequest {
+public class FieldRequest extends Message {
+
+    public FieldRequest() {}
 
     public FieldRequest(final @FieldId String field, final @TeamToken String team) {
         this.field = field;
         this.team = team;
     }
 
-    public final @FieldId String field;
-    public final @TeamToken String team;
+    public @FieldId String field;
+    public @TeamToken String team;
 
-    public final String type = "FieldRequest";
+    public String type = "field_request";
 
 }

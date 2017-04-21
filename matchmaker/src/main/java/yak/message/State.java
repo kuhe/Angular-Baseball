@@ -1,6 +1,9 @@
 package yak.message;
 
-public class State {
+/**
+ * @deprecated
+ */
+public class State extends Message {
 
     public State() {
         status = "nominal";
@@ -12,6 +15,6 @@ public class State {
 
     public final String status;
 
-    public final String type = "State";
+    public final String type = "state";
 
 }

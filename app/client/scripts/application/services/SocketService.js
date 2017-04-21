@@ -6,20 +6,14 @@
 /**
  * Provides the socket.io interface to Stomp.
  * @param {Stomp} stomp
- * @param {String} key (baseball) field name.
- * @param {SocketService} service
+ * @param {String} teamToken
  * @returns {Stomp}
- * @constructor
  */
-var IoAdapter = function (stomp, key, service) {
-
-    var teamToken = 'Team' + (Math.random() * 100 | 0) + key;
+var IoAdapter = function (stomp, teamToken) {
 
     stomp.subscribe('/matchmaker/' + teamToken, function (frame) {
 
         var data = JSON.parse(frame.body);
-
-        service.connected = stomp.connected;
 
         if (data.type in reactions) {
             reactions[data.type](data);
@@ -35,8 +29,10 @@ var IoAdapter = function (stomp, key, service) {
         });
     };
     stomp.emit = function (event, data) {
+        data = data || {};
         data.type = event;
-        socket.send(event, data);
+        data.team = teamToken;
+        stomp.send('/action/' + event, {}, JSON.stringify(data));
     };
 
     return stomp;
@@ -50,6 +46,27 @@ var IoAdapter = function (stomp, key, service) {
  *
  */
 var SocketService = (function() {
+
+    /**
+     * @param {string} field
+     * @returns {string}
+     */
+    var teamToken = function (field) {
+
+        var tn = 'Team' + (Math.random() * 100 | 0);
+        var str = tn + Math.random() * Date.now();
+
+        var hash = 0, i, chr;
+        if (str.length === 0) return hash;
+        for (i = 0; i < str.length; i++) {
+            chr = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + chr;
+            hash |= 0;
+        }
+
+        return tn + '_' + hash + '_' + field;
+
+    };
 
     var SocketService = function(game) {
 
@@ -70,22 +87,33 @@ var SocketService = (function() {
 
     SocketService.prototype = {
 
-        connected : false,
+        /**
+         * @returns {boolean}
+         */
+        get connected() {
+            return socket.connected;
+        },
 
-        start : function(key) {
+        /**
+         * @param {string} field id e.g. Takarazuka47.
+         */
+        start : function(field) {
             game = this.game;
-            socket = this.socket;
+            socket = this.stomp;
             game.opponentService = this;
+            this.field = field;
 
-            var stomp = this.stomp;
             var giraffe = this;
+            var token = this.teamToken = teamToken(field);
 
-            stomp.connect({}, function (frame) {
+            socket.connect({}, function (frame) {
 
-                console.log('---', 'Socket Open', frame);
-                IoAdapter(stomp, key);
+                IoAdapter(stomp, token);
 
-                giraffe.connected = stomp.connected;
+                socket.emit('field_request', {
+                    team: token,
+                    field: field
+                });
 
                 giraffe.on();
 
@@ -94,14 +122,7 @@ var SocketService = (function() {
         },
 
         on : function() {
-            var giraffe = this;
             socket.on('register', this.register);
-            socket.on('connect reconnect', function() {
-                giraffe.connected = true;
-            });
-            socket.on('disconnect', function() {
-                giraffe.connected = false;
-            });
             socket.on('pitch', function(pitch) {
                 if (LOG_TRAFFIC) console.log('receive', 'pitch', pitch);
                 game.windupThen(function() {

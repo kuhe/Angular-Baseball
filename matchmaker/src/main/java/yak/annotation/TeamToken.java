@@ -5,7 +5,8 @@ import java.lang.annotation.Target;
 
 /**
  *
- * Indicate the string as a field occupant identifier.
+ * Indicate the string as a field occupant identifier: a team.
+ * Interchangeably team token, team id, team name, field occupant id.
  *
  */
 @Target(ElementType.TYPE_USE)

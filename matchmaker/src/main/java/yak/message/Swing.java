@@ -1,7 +1,7 @@
 package yak.message;
 
-public class Swing {
+public class Swing extends Message {
 
-    public final String type = "Swing";
+    public final String type = "swing";
 
 }
