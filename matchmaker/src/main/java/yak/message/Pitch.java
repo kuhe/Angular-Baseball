@@ -1,13 +1,33 @@
 package yak.message;
+import yak.annotation.Coordinate;
+import yak.annotation.Rating;
+
 import java.util.List;
 
+/**
+ * Pitch data forwarded to the opponent.
+ */
 public class Pitch extends Message {
 
+    /**
+     * Where the pitch was aimed or set up, not necessarily where it goes.
+     */
+    public class Target {
+        public @Coordinate double x;
+        public @Coordinate double y;
+    }
+
+    /**
+     * Actual pitch position, vs. Target.
+     */
     public class InFlight {
 
-        public int velocity;
+        public @Rating int velocity;
 
-        private int _break;
+        /**
+         * Severity of the breaking ball movement.
+         */
+        private @Rating int _break;
         public int getBreak() {
             return _break;
         }
@@ -15,19 +35,32 @@ public class Pitch extends Message {
             _break = b;
         }
 
-        public int control;
+        /**
+         * Precision toward actual vs target location.
+         */
+        public @Rating int control;
+
+        /**
+         * E.g. four-seam.
+         */
         public String name;
+
+        /**
+         * @deprecated
+         * Only used by the client side iterator.
+         */
         public String key;
-        public List<Integer> breakDirection = null;
-        public int x;
-        public int y;
 
-    }
+        /**
+         * Also an X, Y pair.
+         */
+        public List<@Coordinate Integer> breakDirection = null;
 
-    public class Target {
-
-        public double x;
-        public double y;
+        /**
+         * Actual location crossing the plate, contrast Target.
+         */
+        public @Coordinate int x;
+        public @Coordinate int y;
 
     }
 

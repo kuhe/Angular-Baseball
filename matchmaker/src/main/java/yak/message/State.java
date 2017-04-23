@@ -2,6 +2,7 @@ package yak.message;
 
 /**
  * @deprecated
+ * @see Message
  */
 public class State extends Message {
 

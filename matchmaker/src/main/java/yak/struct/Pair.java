@@ -1,5 +1,11 @@
 package yak.struct;
 
+/**
+ * @param <T> type one.
+ * @param <R> type two.
+ *
+ * Eh, why not. We'll have our own Pair struct.
+ */
 public class Pair<T, R> {
 
     public T first = null;
