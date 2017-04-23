@@ -24,7 +24,7 @@ public class Organizer {
      * @param fieldRequest
      */
     public boolean request(final FieldRequest fieldRequest) {
-        return assign(fieldRequest.team, fieldRequest.field);
+        return assign(fieldRequest.getTeam(), fieldRequest.field);
     }
 
     /**
@@ -61,7 +61,7 @@ public class Organizer {
         return assign(team, field(name));
     }
     public boolean assign(final FieldRequest fieldRequest) {
-        return assign(fieldRequest.team, fieldRequest.field);
+        return assign(fieldRequest.getTeam(), fieldRequest.field);
     }
     public boolean assign(final @TeamToken String team, @NotNull Field field) {
 

@@ -235,13 +235,13 @@ IndexController = function($scope, SocketService) {
             });
         };
         game.umpire.onSideChange = function() {
-            if ($scope.y.humanBatting()) {
+            if (game.humanBatting()) {
                 $('.input-area').mousemove(showBat);
             } else {
                 $('.input-area').unbind('mousemove', showBat);
                 bat.hide();
             }
-            if ($scope.y.humanPitching()) {
+            if (game.humanPitching()) {
                 $('.input-area').mousemove(showGlove);
             } else {
                 $('.input-area').unbind('mousemove', showGlove);

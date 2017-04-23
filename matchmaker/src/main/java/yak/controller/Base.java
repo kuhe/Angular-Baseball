@@ -22,18 +22,21 @@ public class Base {
 
     public void forwardToOpponent(final Message msg) {
 
-        final @TeamToken String team = msg.team;
+        final @TeamToken String team = msg.getTeam();
         final Field field = organizer.teamField(team);
 
         if (field != null) {
             final @TeamToken String opponent = field.opponent(team);
+
+            msg.setTeam(opponent);
+
             if (opponent != null) {
-                messagingTemplate.convertAndSend(routeOpponent(team), msg);
+                messagingTemplate.convertAndSend(routeSelf(opponent), msg);
             } else {
-                System.out.println("Opponent not found for " + team);
+                debug("Opponent not found for " + team);
             }
         } else {
-            System.out.println("Field not found for " + team);
+            debug("Field not found for " + team);
         }
 
     }
@@ -58,11 +61,15 @@ public class Base {
      * Statically send a simple message to msg.team.
      */
     public static void send(final Message msg) {
-        messagingTemplate.convertAndSend(routeSelf(msg.team), msg);
+        messagingTemplate.convertAndSend(routeSelf(msg.getTeam()), msg);
     }
 
     protected static SimpMessagingTemplate messagingTemplate;
 
     protected static Organizer organizer = Organizer.instance;
+
+    protected void debug(Object info) {
+        System.out.println(info);
+    }
 
 }

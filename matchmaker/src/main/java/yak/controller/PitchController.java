@@ -13,7 +13,7 @@ import yak.message.Pitch;
 public class PitchController extends Base {
 
     @MessageMapping("/pitch")
-    public final Pitch response(final Pitch pitch) {
+    public final Pitch response(Pitch pitch) {
 
         forwardToOpponent(pitch);
 

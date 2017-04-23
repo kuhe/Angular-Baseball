@@ -14,11 +14,10 @@ public class FieldRequest extends Message {
 
     public FieldRequest(final @FieldId String field, final @TeamToken String team) {
         this.field = field;
-        this.team = team;
+        setTeam(team);
     }
 
     public @FieldId String field;
-    public @TeamToken String team;
 
     public String type = "field_request";
 

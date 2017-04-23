@@ -26,4 +26,8 @@ public class Pair<T, R> {
         return size_;
     }
 
+    public static <T, R> Pair make(T t, R r) {
+        return new Pair<>(t, r);
+    }
+
 }

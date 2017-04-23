@@ -1,7 +1,7 @@
 package yak.controller;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import yak.annotation.Todo;
+import org.springframework.stereotype.Controller;
 import yak.message.Swing;
 
 /**
@@ -9,11 +9,11 @@ import yak.message.Swing;
  * Forward the swing data to the opponent (battery).
  *
  */
-@Todo
+@Controller
 public class SwingController extends Base {
 
     @MessageMapping("/swing")
-    public final Swing response(final Swing swing) {
+    public final Swing response(Swing swing) {
 
         forwardToOpponent(swing);
 

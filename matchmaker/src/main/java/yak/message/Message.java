@@ -10,8 +10,16 @@ public class Message {
         this.team = team;
     }
 
-    public @TeamToken String team;
-
     public final String type = "message";
+
+    private @TeamToken String team;
+
+    public final @TeamToken String getTeam() {
+        return team;
+    }
+
+    public void setTeam(final @TeamToken String team) {
+        this.team = team;
+    }
 
 }

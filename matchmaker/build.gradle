@@ -1,3 +1,5 @@
+// gradlew bootRepackage
+
 buildscript {
     repositories {
         mavenCentral()

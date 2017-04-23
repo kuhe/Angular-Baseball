@@ -1,44 +1,8 @@
 /**
  * @typedef {Class} Stomp
  * @property {function} over
+ * @property {function} debug
  */
-
-/**
- * Provides the socket.io interface to Stomp.
- * @param {Stomp} stomp
- * @param {String} teamToken
- * @returns {Stomp}
- */
-var IoAdapter = function (stomp, teamToken) {
-
-    stomp.subscribe('/matchmaker/' + teamToken, function (frame) {
-
-        var data = JSON.parse(frame.body);
-
-        if (data.type in reactions) {
-            reactions[data.type](data);
-        }
-
-        console.log('frame received', frame);
-    });
-
-    var reactions = {};
-    stomp.on = function (key, fn) {
-        key.split(' ').forEach(function (k) {
-            reactions[k] = fn;
-        });
-    };
-    stomp.emit = function (event, data) {
-        data = data || {};
-        data.type = event;
-        data.team = teamToken;
-        stomp.send('/action/' + event, {}, JSON.stringify(data));
-    };
-
-    return stomp;
-
-};
-
 
 /**
  *
@@ -68,16 +32,53 @@ var SocketService = (function() {
 
     };
 
+    /**
+     * Provides the socket.io interface to Stomp.
+     * @param {Stomp} stomp
+     * @param {String} teamToken
+     * @returns {Stomp}
+     */
+    var IoAdapter = function (stomp, teamToken) {
+
+        stomp.subscribe('/matchmaker/' + teamToken, function (frame) {
+
+            var data = JSON.parse(frame.body);
+
+            if (data.type in reactions) {
+                reactions[data.type](data);
+                if (LOG_TRAFFIC) console.log('socket event fired:', data.type);
+            }
+
+        });
+
+        var reactions = {};
+        stomp.on = function (key, fn) {
+            key.split(' ').forEach(function (k) {
+                reactions[k] = fn;
+            });
+        };
+        stomp.emit = function (event, data) {
+            data = data || {};
+            data.type = event;
+            data.team = teamToken;
+            stomp.send('/action/' + event, {}, JSON.stringify(data));
+        };
+
+        return stomp;
+
+    };
+
     var SocketService = function(game) {
 
-        var connect = 'http://georgefu.info' + ':64321';
-        connect = 'http://localhost:8080/match-socks';
+        // var connect = 'http://localhost:8080/match-socks';
+        var connect = 'http://default-environment.pgumpc8npq.us-east-1.elasticbeanstalk.com/match-socks';
         var socket = new SockJS(connect);
 
         this.game = game;
 
-        window.socket = this.socket = socket;
-        window.stomp = this.stomp = Stomp.over(socket);
+        this.socket = socket;
+        this.stomp = Stomp.over(socket);
+        this.stomp.debug = null;
 
     };
 
@@ -108,7 +109,7 @@ var SocketService = (function() {
 
             socket.connect({}, function (frame) {
 
-                IoAdapter(stomp, token);
+                IoAdapter(socket, token);
 
                 socket.emit('field_request', {
                     team: token,
@@ -124,6 +125,11 @@ var SocketService = (function() {
         on : function() {
             socket.on('register', this.register);
             socket.on('pitch', function(pitch) {
+
+                setTimeout(function () {
+                    game.umpire.onSideChange();
+                }, 500);
+
                 if (LOG_TRAFFIC) console.log('receive', 'pitch', pitch);
                 game.windupThen(function() {
 
@@ -134,6 +140,9 @@ var SocketService = (function() {
                 });
             });
             socket.on('swing', function(swing) {
+                if (swing.fielder === 'false') {
+                    swing.fielder = false;
+                }
                 if (LOG_TRAFFIC) console.log('receive', 'swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
                 var scope = window.s;
@@ -170,6 +179,9 @@ var SocketService = (function() {
                 socket.emit('game_data', game.toData());
             });
             socket.on('game_data', function(data) {
+                if (data.json) {
+                    data = JSON.parse(data.json);
+                }
                 game.fromData(data);
             });
             socket.on('field_in_use', function() {
@@ -180,9 +192,11 @@ var SocketService = (function() {
             socket.on('register', NO_OPERATION);
         },
         register: function(data) {
-            console.log(data);
-            if (data === 'away') {
+            console.log('registration received', data.side || data);
+            if (data === 'away' || data.side === 'away') {
                 game.humanControl = 'away';
+            } else {
+                game.humanControl = 'home';
             }
             socket.on('register', NO_OPERATION);
         },
