@@ -1,33 +1,135 @@
-var SocketService = function() {
-    var Service = function() {};
+/**
+ * @typedef {Class} Stomp
+ * @property {function} over
+ * @property {function} debug
+ */
+
+/**
+ *
+ * Socket service for opponent connection.
+ *
+ */
+var SocketService = (function() {
+
+    /**
+     * @param {string} field
+     * @returns {string}
+     */
+    var teamToken = function (field) {
+
+        var tn = 'Team' + (Math.random() * 100 | 0);
+        var str = tn + Math.random() * Date.now();
+
+        var hash = 0, i, chr;
+        if (str.length === 0) return hash;
+        for (i = 0; i < str.length; i++) {
+            chr = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + chr;
+            hash |= 0;
+        }
+
+        return tn + '_' + hash + '_' + field;
+
+    };
+
+    /**
+     * Provides the socket.io interface to Stomp.
+     * @param {Stomp} stomp
+     * @param {String} teamToken
+     * @returns {Stomp}
+     */
+    var IoAdapter = function (stomp, teamToken) {
+
+        stomp.subscribe('/matchmaker/' + teamToken, function (frame) {
+
+            var data = JSON.parse(frame.body);
+
+            if (data.type in reactions) {
+                reactions[data.type](data);
+                if (LOG_TRAFFIC) console.log('socket event fired:', data.type);
+            }
+
+        });
+
+        var reactions = {};
+        stomp.on = function (key, fn) {
+            key.split(' ').forEach(function (k) {
+                reactions[k] = fn;
+            });
+        };
+        stomp.emit = function (event, data) {
+            data = data || {};
+            data.type = event;
+            data.team = teamToken;
+            stomp.send('/action/' + event, {}, JSON.stringify(data));
+        };
+
+        return stomp;
+
+    };
+
+    var SocketService = function(game) {
+
+        // var connect = 'http://localhost:8080/match-socks';
+        var connect = 'http://default-environment.pgumpc8npq.us-east-1.elasticbeanstalk.com/match-socks';
+        var socket = new SockJS(connect);
+
+        this.game = game;
+
+        this.socket = socket;
+        this.stomp = Stomp.over(socket);
+        this.stomp.debug = null;
+
+    };
+
     var LOG_TRAFFIC = false;
     var game, socket, NO_OPERATION = function() {},
         animator = Baseball.service.Animator;
-    Service.prototype = {
-        socket : {},
-        game : {},
-        connected : false,
-        start : function(key) {
-            game = this.game;
-            socket = this.socket;
-            game.opponentService = this;
-            this.connected = socket.connected;
-            this.on();
-            socket.emit('register', key);
-            socket.on('connect_failed reconnect_failed', function() {
-                console.log('connection unavailable');
-            });
+
+    SocketService.prototype = {
+
+        /**
+         * @returns {boolean}
+         */
+        get connected() {
+            return socket.connected;
         },
-        on : function() {
+
+        /**
+         * @param {string} field id e.g. Takarazuka47.
+         */
+        start : function(field) {
+            game = this.game;
+            socket = this.stomp;
+            game.opponentService = this;
+            this.field = field;
+
             var giraffe = this;
+            var token = this.teamToken = teamToken(field);
+
+            socket.connect({}, function (frame) {
+
+                IoAdapter(socket, token);
+
+                socket.emit('field_request', {
+                    team: token,
+                    field: field
+                });
+
+                giraffe.on();
+
+            });
+
+        },
+
+        on : function() {
             socket.on('register', this.register);
-            socket.on('connect reconnect', function() {
-                giraffe.connected = true;
-            });
-            socket.on('disconnect', function() {
-                giraffe.connected = false;
-            });
             socket.on('pitch', function(pitch) {
+
+                setTimeout(function () {
+                    game.umpire.onSideChange();
+                }, 500);
+
                 if (LOG_TRAFFIC) console.log('receive', 'pitch', pitch);
                 game.windupThen(function() {
 
@@ -38,6 +140,9 @@ var SocketService = function() {
                 });
             });
             socket.on('swing', function(swing) {
+                if (swing.fielder === 'false') {
+                    swing.fielder = false;
+                }
                 if (LOG_TRAFFIC) console.log('receive', 'swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
                 var scope = window.s;
@@ -65,18 +170,18 @@ var SocketService = function() {
                         fn();
                     });
                 }
-                //scope.$digest();
             });
             socket.on('partner_connect', function() {
                 game.opponentConnected = true;
-                //var scope = window.s;
-                //scope.$digest();
             });
             socket.on('opponent_taking_field', function() {
                 console.log('A challenger has appeared! Sending game data.');
                 socket.emit('game_data', game.toData());
             });
             socket.on('game_data', function(data) {
+                if (data.json) {
+                    data = JSON.parse(data.json);
+                }
                 game.fromData(data);
             });
             socket.on('field_in_use', function() {
@@ -87,9 +192,11 @@ var SocketService = function() {
             socket.on('register', NO_OPERATION);
         },
         register: function(data) {
-            console.log(data);
-            if (data === 'away') {
+            console.log('registration received', data.side || data);
+            if (data === 'away' || data.side === 'away') {
                 game.humanControl = 'away';
+            } else {
+                game.humanControl = 'home';
             }
             socket.on('register', NO_OPERATION);
         },
@@ -100,18 +207,10 @@ var SocketService = function() {
         emitSwing : function(swing) {
             if (LOG_TRAFFIC) console.log('emit', 'swing', swing);
             socket.emit('swing', swing);
-        },
-        swing : function() {
-
-        },
-        pitch : function() {
-
         }
     };
-    return Service;
-};
-
-SocketService = SocketService();
+    return SocketService;
+}());
 
 //(function(app) {
 //

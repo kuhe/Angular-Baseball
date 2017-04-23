@@ -1,4 +1,4 @@
-IndexController = function($scope, socket) {
+IndexController = function($scope, SocketService) {
 
     var text = Baseball.util.text;
     var Game = Baseball.Game;
@@ -40,7 +40,7 @@ IndexController = function($scope, socket) {
     };
 
     $scope.abbreviatePosition = function(position) {
-        if (text.mode == 'e') {
+        if (text.mode === 'e') {
             return {
                 pitcher : 'P',
                 catcher : 'C',
@@ -67,14 +67,11 @@ IndexController = function($scope, socket) {
         game.humanControl = spectateCpu ? 'none' : 'home';
         game.console = !!quickMode && quickMode !== 7;
         var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random()*47);
-        if (typeof io !== 'undefined') {
-            socket.game = game;
-            $scope.socket = io(/*window.location.hostname*/'http://georgefu.info' + ':64321', {
-                reconnection: false
-            });
-            $scope.socketService = socket;
-            socket.socket = $scope.socket;
-            socket.start(field);
+        if (typeof SockJS !== 'undefined') {
+            var socketService = $scope.socketService = new SocketService(game);
+            socketService.start(field);
+        } else {
+            console.log('no socket client');
         }
         window.location.hash = '#' + field;
         bindMethods();
@@ -238,13 +235,13 @@ IndexController = function($scope, socket) {
             });
         };
         game.umpire.onSideChange = function() {
-            if ($scope.y.humanBatting()) {
+            if (game.humanBatting()) {
                 $('.input-area').mousemove(showBat);
             } else {
                 $('.input-area').unbind('mousemove', showBat);
                 bat.hide();
             }
-            if ($scope.y.humanPitching()) {
+            if (game.humanPitching()) {
                 $('.input-area').mousemove(showGlove);
             } else {
                 $('.input-area').unbind('mousemove', showGlove);
@@ -293,8 +290,7 @@ IndexController = function($scope, socket) {
         })
         .Class({
             constructor: function() {
-                var service = new SocketService();
-                IndexController(this, service);
+                IndexController(this, SocketService);
             }
         });
 

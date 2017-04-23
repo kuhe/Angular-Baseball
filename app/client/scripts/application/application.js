@@ -1,8 +1,7 @@
 if (typeof angular === 'object') {
 
     var app = angular.module('YakyuuAikoukai', ['directives'])
-        .service('socket', SocketService)
-        .controller('IndexController', ['$scope', 'socket', IndexController]);
+        .controller('IndexController', ['$scope', IndexController]);
 
     app.config(function($interpolateProvider) {
         $interpolateProvider.startSymbol('{{');

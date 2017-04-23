@@ -349,7 +349,7 @@ Umpire.prototype = {
                 second = game.field.second;
                 third = game.field.third;
             }
-            let canAdvance = () => true;
+            let canAdvance = (position) => true;
             if (sacrificeAdvances) {
                 canAdvance = position => {
                     switch (position) {
@@ -493,7 +493,7 @@ Umpire.prototype = {
         game.field.defense = team.positions;
         this.onSideChange();
     },
-    onSideChange() {}, // can be bound externally
+    onSideChange() {}, // will be be bound externally
     says : 'Play ball!',
     game : null
 };
