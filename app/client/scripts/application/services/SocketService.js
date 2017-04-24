@@ -145,6 +145,12 @@ var SocketService = (function() {
                 if (swing.fielder === 'false') {
                     swing.fielder = false;
                 }
+                if (swing.stoleABase === -1) {
+                    delete swing.stoleABase;
+                }
+                if (swing.caughtStealing === -1) {
+                    delete swing.caughtStealing;
+                }
                 if (LOG_TRAFFIC) console.log('receive', 'swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
                 var scope = window.s;
