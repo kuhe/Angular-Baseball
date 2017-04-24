@@ -4,10 +4,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import yak.annotation.TeamToken;
 import yak.field.Field;
-import yak.message.FieldRequest;
-import yak.message.PartnerConnect;
-import yak.message.Register;
-import yak.message.State;
+import yak.message.*;
 
 @Controller
 public class GroundsController extends Base {
@@ -27,6 +24,8 @@ public class GroundsController extends Base {
             // field request has filled the field.
             Base.send(new PartnerConnect(opponent));
             Base.send(new PartnerConnect(team));
+
+            Base.send(new OpponentTakingField(opponent));
 
             switch (field.positionOf(team)) {
                 case "away":

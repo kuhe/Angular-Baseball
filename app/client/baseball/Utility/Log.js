@@ -259,11 +259,14 @@ Log.prototype = {
             }
         }
         let steal = '';
-        if (swingResult.stoleABase) {
-            steal = this.noteStealAttempt(swingResult.stoleABase, true, swingResult.attemptedBase);
+        const lineup = this.game.batter.team.lineup;
+        if (!isNaN(swingResult.stoleABase)) {
+            const thief = lineup[swingResult.stoleABase];
+            steal = this.noteStealAttempt(thief, true, swingResult.attemptedBase);
         }
-        if (swingResult.caughtStealing) {
-            steal = this.noteStealAttempt(swingResult.caughtStealing, false, swingResult.attemptedBase);
+        if (!isNaN(swingResult.caughtStealing)) {
+            const thief = lineup[swingResult.caughtStealing];
+            steal = this.noteStealAttempt(thief, false, swingResult.attemptedBase);
         }
         if (steal) {
             this.note(steal, steal, text.mode);
@@ -332,11 +335,14 @@ Log.prototype = {
                 record = (batter + text(' walked.'));
             }
             let steal = '';
-            if (r.stoleABase) {
-                steal = this.noteStealAttempt(r.stoleABase, true, r.attemptedBase);
+            const lineup = this.game.batter.team.lineup;
+            if (!isNaN(r.stoleABase)) {
+                const thief = lineup[r.stoleABase];
+                steal = this.noteStealAttempt(thief, true, r.attemptedBase);
             }
-            if (r.caughtStealing) {
-                steal = this.noteStealAttempt(r.caughtStealing, false, r.attemptedBase);
+            if (!isNaN(r.caughtStealing)) {
+                const thief = lineup[r.caughtStealing];
+                steal = this.noteStealAttempt(thief, false, r.attemptedBase);
             }
             record += steal;
         } else {

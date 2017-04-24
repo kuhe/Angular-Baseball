@@ -78,7 +78,9 @@ var SocketService = (function() {
 
         this.socket = socket;
         this.stomp = Stomp.over(socket);
-        this.stomp.debug = null;
+        if (!LOG_TRAFFIC) {
+            this.stomp.debug = null;
+        }
 
     };
 
@@ -176,7 +178,7 @@ var SocketService = (function() {
             });
             socket.on('opponent_taking_field', function() {
                 console.log('A challenger has appeared! Sending game data.');
-                socket.emit('game_data', game.toData());
+                socket.emit('game_data', { json: JSON.stringify(game.toData()) });
             });
             socket.on('game_data', function(data) {
                 if (data.json) {

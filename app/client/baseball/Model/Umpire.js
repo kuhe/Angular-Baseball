@@ -55,8 +55,8 @@ Umpire.prototype = {
 
         game.batterRunner = game.batter;
 
-        if (result.stoleABase) {
-            var thief = result.stoleABase;
+        if (!isNaN(result.stoleABase)) {
+            var thief = game.batter.team.lineup[result.stoleABase];
             thief.atBats.push(Log.prototype.STOLEN_BASE);
             switch (thief) {
                 case field.first:
@@ -75,10 +75,10 @@ Umpire.prototype = {
             }
             thief.stats.batting.sb++;
         }
-        if (result.caughtStealing) {
+        if (!isNaN(result.caughtStealing)) {
             game.teams[game.half === 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding.PO++;
             this.count.outs++;
-            thief = result.caughtStealing;
+            thief = game.batter.team.lineup[result.caughtStealing];
             thief.stats.batting.cs++;
             thief.atBats.push(Log.prototype.CAUGHT_STEALING);
             switch (thief) {

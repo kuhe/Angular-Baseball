@@ -60,10 +60,10 @@ Player.prototype = {
     /**
      * for websocket transfer
      */
-    serialize() {
+    toData() {
         const team = this.team;
         delete this.team;
-        const data = JSON.stringify(this);
+        const data = JSON.parse(JSON.stringify(this));
         this.team = team;
         return data;
     },
@@ -294,11 +294,11 @@ Player.prototype = {
         const success = Distribution.stealSuccess(pitch, game.pitcher.team.positions.catcher,
             this, base, this.team.stealAttempt === Team.RUNNERS_DISCRETION);
         if (success) {
-            game.swingResult.stoleABase = this;
-            game.swingResult.caughtStealing = null;
+            game.swingResult.stoleABase = this.order;
+            game.swingResult.caughtStealing = undefined;
         } else {
-            game.swingResult.stoleABase = null;
-            game.swingResult.caughtStealing = this;
+            game.swingResult.stoleABase = undefined;
+            game.swingResult.caughtStealing = this.order;
         }
         switch (base) {
             case 1:

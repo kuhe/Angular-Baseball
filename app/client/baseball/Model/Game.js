@@ -625,7 +625,7 @@ Game.prototype = {
                 outs: giraffe.umpire.count.outs
             }
         };
-        data.players = players.map(player => player.serialize());
+        // data.players = players.map(player => player.toData());
         data.log = {
             pitchRecord : giraffe.log.pitchRecord,
             record : giraffe.log.record
@@ -637,21 +637,22 @@ Game.prototype = {
         this.half = data.half;
         this.inning = data.inning;
         this.tally = data.tally;
-        const giraffe = this;
-        const players = data.players.map((playerJson, index) => {
-            const playerData = JSON.parse(playerJson);
-            if (index > 8) {
-                var side = 'home';
-                index = index - 9;
-            } else {
-                side = 'away';
-            }
-            const player = giraffe.teams[side].positions[playerData.position];
-            player.fromData(playerData);
-            giraffe.teams[side].lineup[index] = player;
-            player.resetStats(data.gamesIntoSeason);
-            return player;
-        });
+        // const giraffe = this;
+        const players = data.players || this.teams.away.lineup.concat(this.teams.home.lineup);
+        //     .map((playerJson, index) => {
+        //     const playerData = (playerJson);
+        //     if (index > 8) {
+        //         var side = 'home';
+        //         index = index - 9;
+        //     } else {
+        //         side = 'away';
+        //     }
+        //     const player = giraffe.teams[side].positions[playerData.position];
+        //     player.fromData(playerData);
+        //     giraffe.teams[side].lineup[index] = player;
+        //     player.resetStats(data.gamesIntoSeason);
+        //     return player;
+        // });
         this.field.first = players[data.field.first];
         this.field.second = players[data.field.second];
         this.field.third = players[data.field.third];

@@ -1,9 +1,6 @@
 package yak.message;
 
-import yak.annotation.Coordinate;
-import yak.annotation.Degrees;
-import yak.annotation.Feet;
-import yak.annotation.Seconds;
+import yak.annotation.*;
 
 import java.util.ArrayList;
 
@@ -61,6 +58,11 @@ public class Swing extends Message {
     public boolean error;
 
     /**
+     * In strike zone if looking=true.
+     */
+    public boolean strike;
+
+    /**
      * Position name of fielder.
      */
     public String fielder;
@@ -87,8 +89,9 @@ public class Swing extends Message {
 
     /**
      * Any runners which advanced on the sacrifice.
+     * String values 'first', 'second', 'third' at most.
      */
-    public ArrayList<String> sacrificeAdvances;
+    public ArrayList<@Runner String> sacrificeAdvances;
 
     /**
      * Degree foul to foul, with -45 being the left field foul line and 45 being the right.
@@ -109,6 +112,31 @@ public class Swing extends Message {
      * Foul ball.
      */
     public boolean foul;
+
+    /**
+     * Runner stole a base.
+     */
+    public @LineupIndex int stoleABase = -1;
+
+    /**
+     * Runner caught stealing.
+     */
+    public @LineupIndex int caughtStealing = -1;
+
+    /**
+     * Runner out on fielder's choice.
+     */
+    public @Runner String fieldersChoice;
+
+    /**
+     * Runner out first in a double or triple play.
+     */
+    public @Runner String firstOut;
+
+    /**
+     * Runner(s) out after the first out on a double/triple play.
+     */
+    public ArrayList<@Runner String> additionalOuts;
 
     public final String type = "swing";
 
