@@ -16,7 +16,7 @@ public class GroundsController extends Base {
         final Field field = organizer.field(fr.field);
         final @TeamToken String team = fr.getTeam();
 
-        System.out.println(field.toString());
+        debug(field.toString());
 
         final @TeamToken String opponent = field.opponent(team);
 
