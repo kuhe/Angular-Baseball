@@ -1,3 +1,5 @@
+import ng from '@angular/core';
+
 (function(app) {
 
     app.ToIterableService = ng.core

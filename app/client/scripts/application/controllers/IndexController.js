@@ -1,4 +1,7 @@
-IndexController = function($scope, SocketService) {
+import SocketService from './../services/SocketService';
+import ng from '@angular/core';
+
+const IndexController = function($scope, SocketService) {
 
     var text = Baseball.util.text;
     var Game = Baseball.Game;
@@ -295,3 +298,5 @@ IndexController = function($scope, SocketService) {
         });
 
 })(window.app || (window.app = {}));
+
+export default IndexController;

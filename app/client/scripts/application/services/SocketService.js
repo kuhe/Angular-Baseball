@@ -1,3 +1,5 @@
+import { Baseball } from './../../../baseball/baseball'
+
 /**
  * @typedef {Class} Stomp
  * @property {function} over
@@ -233,3 +235,5 @@ var SocketService = (function() {
 //        });
 //
 //})(window.app || (window.app = {}));
+
+export default SocketService;

@@ -1,4 +1,6 @@
-FlagDirective = function() {
+import ng from '@angular/core';
+
+const FlagDirective = function() {
     return {
         scope: {
             rating: '='
@@ -24,3 +26,5 @@ FlagDirective = function() {
             }
         });
 })(window.app || (window.app = {}));
+
+export default FlagDirective;

@@ -1,4 +1,6 @@
-BattersDirective = function() {
+import ng from '@angular/core';
+
+const BattersDirective = function() {
     return {
         //scope: {
         //    game: '=',
@@ -27,3 +29,5 @@ BattersDirective = function() {
             }
         });
 })(window.app || (window.app = {}));
+
+export default BattersDirective;

@@ -1,4 +1,6 @@
-RatingBlockDirective = function() {
+import ng from '@angular/core';
+
+const RatingBlockDirective = function() {
     return {
         scope: {
             rating: '='
@@ -23,3 +25,5 @@ RatingBlockDirective = function() {
             }
         });
 })(window.app || (window.app = {}));
+
+export default RatingBlockDirective;

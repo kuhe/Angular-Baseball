@@ -1,4 +1,6 @@
-BatteryDirective = function() {
+import ng from '@angular/core';
+
+const BatteryDirective = function() {
     return {
         //scope: {
         //    game: '=',
@@ -27,3 +29,5 @@ BatteryDirective = function() {
             }
         });
 })(window.app || (window.app = {}));
+
+export default BatteryDirective;

@@ -1,4 +1,4 @@
-import { Mathinator } from '../services/_services';
+import { Mathinator } from '../Services/_services';
 import { Loop } from '../Render/Loop';
 import { helper } from '../Utility/helper';
 
@@ -49,9 +49,9 @@ Animator.prototype = {
     loadTweenMax() {
         if (this.console || typeof window !== 'object') {
             Animator.TweenMax = {
-                'set'() {},
-                'to'() {},
-                'from'() {},
+                set() {},
+                to() {},
+                from() {},
                 killAll() {}
             }
         } else {

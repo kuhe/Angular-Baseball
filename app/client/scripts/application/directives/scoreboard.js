@@ -1,4 +1,6 @@
-ScoreboardDirective = function() {
+import ng from '@angular/core';
+
+const ScoreboardDirective = function() {
     return {
         scope: {
             game: '=',
@@ -29,3 +31,5 @@ ScoreboardDirective = function() {
             }
         });
 })(window.app || (window.app = {}));
+
+export default ScoreboardDirective;

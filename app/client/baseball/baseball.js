@@ -1,6 +1,6 @@
 import { Baseball } from './namespace';
 
-if (typeof window == 'object') {
+if (typeof window === 'object') {
     window.Baseball = Baseball;
 }
 

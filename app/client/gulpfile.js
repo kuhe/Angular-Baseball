@@ -17,7 +17,7 @@ var INTERNAL_STYLE_FILES = [
     './styles/application.less'
 ];
 var EXTERNAL_STYLE_FILES = [
-    './bower_components/bootstrap/dist/css/bootstrap.min.css'
+    'node_modules/bootstrap/dist/css/bootstrap.min.css'
 ];
 var MODULAR_SCRIPT_FILES = [
     './'+name+'/**/*.js',
@@ -40,8 +40,8 @@ var BUNDLE_SCRIPT_FILES = [
     './scripts/application/application.js'
 ];
 var EXTERNAL_SCRIPT_FILES = [
-    './bower_components/jquery/dist/jquery.js',
-    //'./bower_components/angular/angular.js',
+    'node_modules/jquery/dist/jquery.js',
+    //'node_modules/angular/angular.js',
     //'node_modules/angular2/bundles/angular2-polyfills.js', come on.
 
     'node_modules/core-js/client/shim.min.js',
@@ -56,8 +56,8 @@ var EXTERNAL_SCRIPT_FILES = [
     'node_modules/@angular/platform-browser/bundles/platform-browser.umd.js',
     'node_modules/@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js',
 
-    './bower_components/gsap/src/uncompressed/TweenMax.js',
-    './bower_components/three.js/three.min.js'
+    'node_modules/gsap/src/uncompressed/TweenMax.js',
+    'node_modules/three.js/three.min.js'
 ];
 
 var STYLE_DEPLOY_DIR = '../../public/css';

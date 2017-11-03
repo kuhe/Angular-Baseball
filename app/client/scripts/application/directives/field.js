@@ -1,4 +1,6 @@
-FieldDirective = function() {
+import ng from '@angular/core';
+
+const FieldDirective = function() {
     return {
         //scope: {
         //    game: '=',
@@ -25,3 +27,5 @@ FieldDirective = function() {
             }
         });
 })(window.app || (window.app = {}));
+
+export default FieldDirective;
