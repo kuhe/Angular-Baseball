@@ -8,8 +8,7 @@
   },
   "author": "George Fu (george.jing.fu@gmail.com)",
   "license": "MIT",
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "directories": {
     "test": "test"
   },

@@ -6,7 +6,10 @@ import { Log } from '../Utility/Log';
 
 import { helper, text } from '../Utility/_utils';
 
-import { Animator, Distribution, Mathinator, Iterator } from '../Services/_services';
+import { Animator } from '../Services/Animator';
+import { Distribution } from '../Services/Distribution';
+import { Mathinator } from '../Services/Mathinator';
+import { Iterator } from '../Services/Iterator';
 
 const Game = function(m) {
     this.init(m);

@@ -1,8 +1,8 @@
 import { AbstractMesh } from './AbstractMesh';
-import { Loop } from '../Loop';
 import { Mathinator } from '../../Services/Mathinator';
 import { Indicator } from './Indicator';
 import { helper } from '../../Utility/helper';
+import { VERTICAL_CORRECTION } from './../LoopConstants';
 
 /**
  * on the DOM the pitch zone is 200x200 pixels
@@ -23,14 +23,14 @@ class Ball extends AbstractMesh {
      */
     constructor(loop, trajectory) {
         super();
-        if (!(loop instanceof Loop) && loop instanceof Array) {
+        if (!(loop && loop.loop) && loop instanceof Array) {
             trajectory = loop;
         }
         this.hasIndicator = false;
         this.trajectory = trajectory ? trajectory : [];
         this.breakingTrajectory = [];
         this.getMesh();
-        if (loop instanceof Loop) {
+        if (loop && loop.loop) {
             this.join(loop);
         }
         this.setType('4-seam', 1);
@@ -151,12 +151,12 @@ class Ball extends AbstractMesh {
         const ARC_APPROXIMATION_Y_ADDITIVE = 38; // made up number
         const terminus = {
             x: (left - 100) * scale,
-            y: (100 - top + 2 * ARC_APPROXIMATION_Y_ADDITIVE) * scale + Loop.VERTICAL_CORRECTION,
+            y: (100 - top + 2 * ARC_APPROXIMATION_Y_ADDITIVE) * scale + VERTICAL_CORRECTION,
             z: INDICATOR_DEPTH
         };
         const breakingTerminus = {
             x: (breakLeft - 100) * scale,
-            y: (100 - breakTop) * scale + Loop.VERTICAL_CORRECTION,
+            y: (100 - breakTop) * scale + VERTICAL_CORRECTION,
             z: INDICATOR_DEPTH
         };
 

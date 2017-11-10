@@ -12,15 +12,7 @@ import { Sky } from './mesh/Sky';
 import { Sun } from './mesh/Sun';
 import { lighting } from './scene/lighting';
 import { loadSkyShader } from './Shaders/SkyShader';
-import { Animator } from '../Services/Animator';
-
-/**
- * the constants should be tuned so that the camera coincides with the DOM's strike zone overlay
- * @type {number}
- */
-const VERTICAL_CORRECTION = -0.2;
-const INITIAL_CAMERA_DISTANCE = 8;
-
+import { VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE } from './LoopConstants';
 
 if (typeof THREE !== 'undefined') {
     var AHEAD = new THREE.Vector3(0, VERTICAL_CORRECTION, -60.5);
@@ -31,7 +23,14 @@ if (typeof THREE !== 'undefined') {
  * manager for the rendering loop
  */
 class Loop {
-    constructor(elementClass, background) {
+
+    /**
+     * @param {string} elementClass
+     * @param {boolean} background
+     * @param {Class} Animator
+     */
+    constructor(elementClass, background, Animator) {
+        this.Animator = Animator;
         loadSkyShader();
         this.elementClass = elementClass;
         window.loop = this;
@@ -161,7 +160,9 @@ class Loop {
         sun.time.m = minutes;
         sun.derivePosition(sky);
         const luminosity = (-0.5 + Math.max(Math.abs(1.25 - azimuth), Math.abs(0.25 - azimuth))) * 2;
-        Animator.setLuminosity(0.1 + luminosity/1.4);
+        if (this.Animator) {
+            this.Animator.setLuminosity(0.1 + luminosity/1.4);
+        }
     }
 
     /**
@@ -399,8 +400,7 @@ class Loop {
 }
 
 var HEIGHT = 700;
-Loop.VERTICAL_CORRECTION = VERTICAL_CORRECTION;
-Loop.INITIAL_CAMERA_DISTANCE = INITIAL_CAMERA_DISTANCE;
+
 Loop.prototype.THREE = {};
 Loop.prototype.constructors = {
     Ball,

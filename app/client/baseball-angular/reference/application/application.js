@@ -13,8 +13,8 @@ import '@angular/compiler/bundles/compiler.umd';
 import '@angular/platform-browser/bundles/platform-browser.umd';
 import '@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd';
 
-import 'gsap/src/uncompressed/TweenMax';
-import 'three';
+import TweenMax from 'gsap/src/uncompressed/TweenMax';
+import Three from 'three';
 
 import IndexController from './controllers/IndexController';
 import BattersDirective from './directives/battersData';

@@ -1,12 +1,11 @@
 import { AbstractMesh } from './AbstractMesh';
-import { Loop } from '../Loop';
 
 class BaseDirt extends AbstractMesh {
     constructor(loop, base) {
         super();
         this.base = base;
         this.getMesh();
-        if (loop instanceof Loop) {
+        if (loop && loop.loop) {
             this.join(loop);
         }
     }

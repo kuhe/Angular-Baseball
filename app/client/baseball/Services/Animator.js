@@ -1,4 +1,4 @@
-import { Mathinator } from '../Services/_services';
+import { Mathinator } from '../Services/Mathinator';
 import { Loop } from '../Render/Loop';
 import { helper } from '../Utility/helper';
 
@@ -30,8 +30,8 @@ Animator.prototype = {
      * @returns {Loop}
      */
     beginRender() {
-        this.background = new Loop('webgl-bg-container', true);
-        this.loop = new Loop('webgl-container');
+        this.background = new Loop('webgl-bg-container', true, Animator);
+        this.loop = new Loop('webgl-container', false, Animator);
 
         this.loop.background = this.background;
         this.background.foreground = this.loop;

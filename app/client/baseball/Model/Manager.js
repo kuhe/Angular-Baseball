@@ -1,5 +1,4 @@
-import { Iterator } from '../Services/_services';
-import { Player } from './Player';
+import { Iterator } from '../Services/Iterator';
 
 const Manager = function(team) {
     this.init(team);
@@ -99,7 +98,7 @@ Manager.prototype = {
         const pitcher = team.positions.pitcher;
 
         const sub = this.selectForSkill(team.bench, ['pitching']);
-        if (!(sub instanceof Player)) {
+        if (!(sub && sub.substitute)) {
             return;
         }
 

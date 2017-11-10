@@ -3,13 +3,15 @@ import { Manager } from '../Model/Manager';
 
 import { data, text } from '../Utility/_utils';
 
+import k from './TeamConstants';
+
 const Team = function(game, heroRate) {
     this.init(game, heroRate);
 };
 
-Team.RUNNERS_DISCRETION = 'runnersDiscretion';
-Team.RUNNER_GO = 'go';
-Team.RUNNER_HOLD = 'hold';
+k.RUNNERS_DISCRETION = 'runnersDiscretion';
+k.RUNNER_GO = 'go';
+k.RUNNER_HOLD = 'hold';
 
 Team.prototype = {
     constructor : Team,
@@ -51,7 +53,7 @@ Team.prototype = {
     getName() {
         return text.mode === 'n' ? this.nameJ : this.name;
     },
-    stealAttempt : Team.RUNNERS_DISCRETION,
+    stealAttempt : k.RUNNERS_DISCRETION,
     lineup : [],
     positions : {},
     manager : null,

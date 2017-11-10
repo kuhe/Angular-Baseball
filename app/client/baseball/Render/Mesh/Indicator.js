@@ -1,5 +1,4 @@
 import { AbstractMesh } from './AbstractMesh';
-import { Loop } from '../Loop';
 
 class Indicator extends AbstractMesh {
     constructor(loop) {
@@ -10,7 +9,7 @@ class Indicator extends AbstractMesh {
             this.trajectory.push(1);
         }
         this.getMesh();
-        if (loop instanceof Loop) {
+        if (loop && loop.loop) {
             this.join(loop);
         }
     }

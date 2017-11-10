@@ -9,7 +9,11 @@ import { Team } from './Model/Team';
 import { Umpire } from './Model/Umpire';
 
 import { text, Log } from './Utility/_utils';
-import { Animator, Distribution, Iterator, Mathinator } from './Services/_services';
+import { abbreviatePosition } from './Utility/text';
+import { Distribution } from './Services/Distribution';
+import { Mathinator } from './Services/Mathinator';
+import { Animator } from './Services/Animator';
+import { Iterator } from './Services/Iterator';
 
 import { Provider } from './Teams/Provider';
 
@@ -27,8 +31,15 @@ Baseball.service.Mathinator = Mathinator;
 Baseball.util = {};
 Baseball.util.text = text;
 Baseball.util.Log = Log;
+Baseball.util.text.abbreviatePosition = abbreviatePosition;
 
 Baseball.teams = {};
 Baseball.teams.Provider = Provider;
 
+export default Baseball;
 export { Baseball }
+
+export { Game, Player, Team, AtBat, Field, Manager, Umpire }
+export { Animator, Distribution, Iterator, Mathinator }
+export { text, abbreviatePosition, Log }
+export { Provider }

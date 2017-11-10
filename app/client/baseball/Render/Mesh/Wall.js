@@ -1,12 +1,11 @@
 import { AbstractMesh } from './AbstractMesh';
-import { Loop } from '../Loop';
 
 class Wall extends AbstractMesh {
     constructor(loop, angle) {
         super();
         this.angle = angle;
         this.getMesh();
-        if (loop instanceof Loop) {
+        if (loop && loop.loop) {
             this.join(loop);
         }
     }

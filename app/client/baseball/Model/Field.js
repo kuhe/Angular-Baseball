@@ -1,5 +1,7 @@
 import { Player } from '../Model/Player';
-import { Distribution, Mathinator, Animator } from '../Services/_services';
+import { Distribution } from '../Services/Distribution';
+import { Mathinator } from '../Services/Mathinator';
+import { Animator } from '../Services/Animator';
 
 /**
  * The baseball field tracks the ball's movement, fielders, and what runners are on

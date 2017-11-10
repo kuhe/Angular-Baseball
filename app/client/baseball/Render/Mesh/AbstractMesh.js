@@ -1,5 +1,3 @@
-import { Loop } from '../Loop';
-
 /**
  * Each class should adhere to this pattern.
  * When a scene object has been positioned correctly and its trajectory set,
@@ -33,7 +31,8 @@ class AbstractMesh {
     }
     join(loop) {
         this.loop = loop || this.loop;
-        if (this.loop instanceof Loop) {
+        // Non-circular typecheck for [Loop]
+        if (this.loop && this.loop.loop) {
             this.attach();
         }
     }

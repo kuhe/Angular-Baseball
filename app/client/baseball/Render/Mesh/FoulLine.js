@@ -1,12 +1,11 @@
 import { AbstractMesh } from './AbstractMesh';
-import { Loop } from '../Loop';
 
 class FoulLine extends AbstractMesh {
     constructor(loop, side) {
         super();
         this.side = side;
         this.getMesh();
-        if (loop instanceof Loop) {
+        if (loop && loop.loop) {
             this.join(loop);
         }
     }

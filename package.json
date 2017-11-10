@@ -2,6 +2,7 @@
   "scripts": {
     "test": "cd app/client && npm test",
     "career": "cd app/client && npm test",
-    "install": "cd app/client && npm i && bower i; cd ..; cd server && npm i"
+    "install": "cd app/client && npm i && bower i; cd ..; cd server && npm i",
+    "serve": "simplehttpserver ."
   }
 }

@@ -424,7 +424,7 @@ text.contactResult = (batter, fielder, bases, outBy, sacrificeAdvances, out) => 
         }
         if (sacrificeAdvances) {
             sacrificeAdvances.map(base => {
-                if (base == 'third') {
+                if (base === 'third') {
                     statement += `${stop}サードランナーホームイン`;
                 } else {
                     statement += `${stop + text(base)}ランナー進塁`;
@@ -437,3 +437,20 @@ text.contactResult = (batter, fielder, bases, outBy, sacrificeAdvances, out) => 
 };
 
 export { text }
+
+export const abbreviatePosition = function (position) {
+    if (text.mode === 'e') {
+        return {
+            pitcher : 'P',
+            catcher : 'C',
+            first : '1B',
+            second : '2B',
+            short : 'SS',
+            third : '3B',
+            left : 'LF',
+            center : 'CF',
+            right : 'RF'
+        }[position];
+    }
+    return text.fielderShortName(position);
+};

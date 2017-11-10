@@ -1,12 +1,11 @@
 import { AbstractMesh } from './AbstractMesh';
-import { Loop } from '../Loop';
 
 class Grass extends AbstractMesh {
     constructor(loop, infield) {
         super();
         this.infield = infield;
         this.getMesh();
-        if (loop instanceof Loop) {
+        if (loop && loop.loop) {
             this.join(loop);
         }
     }

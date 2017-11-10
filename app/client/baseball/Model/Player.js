@@ -1,6 +1,9 @@
 import { data, text } from '../Utility/_utils';
-import { Iterator, Mathinator, Distribution } from '../Services/_services';
-import { AtBat, Team } from '../Model/_models';
+import { Distribution } from '../Services/Distribution';
+import { Mathinator } from '../Services/Mathinator';
+import { Iterator } from '../Services/Iterator';
+import { AtBat } from '../Model/AtBat';
+import k from '../Model/TeamConstants';
 
 /**
  *
@@ -292,7 +295,7 @@ Player.prototype = {
     attemptSteal(game, base) {
         const pitch = game.pitchInFlight;
         const success = Distribution.stealSuccess(pitch, game.pitcher.team.positions.catcher,
-            this, base, this.team.stealAttempt === Team.RUNNERS_DISCRETION);
+            this, base, this.team.stealAttempt === k.RUNNERS_DISCRETION);
         if (success) {
             game.swingResult.stoleABase = this.order;
             game.swingResult.caughtStealing = undefined;

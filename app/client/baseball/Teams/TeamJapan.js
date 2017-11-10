@@ -1,4 +1,5 @@
-import { Game, Team } from '../Model/_models';
+import { Game } from '../Model/Game';
+import { Team } from '../Model/Team';
 import { Player } from '../Model/Player';
 import { Trainer } from '../Teams/Trainer';
 
