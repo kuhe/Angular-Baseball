@@ -10,6 +10,9 @@ import { FlagComponent } from './flag/flag.component';
 import { RatingBlockComponent } from './rating-block/rating-block.component';
 import { ScoreboardComponent } from './scoreboard/scoreboard.component';
 import { ToIterablePipe } from './to-iterable.pipe';
+import { LowerComponent } from './lower/lower.component';
+import { UpperComponent } from './upper/upper.component';
+import { ModeComponent } from './mode/mode.component';
 
 
 @NgModule({
@@ -21,7 +24,10 @@ import { ToIterablePipe } from './to-iterable.pipe';
         FlagComponent,
         RatingBlockComponent,
         ScoreboardComponent,
-        ToIterablePipe
+        ToIterablePipe,
+        LowerComponent,
+        UpperComponent,
+        ModeComponent
     ],
     imports: [
         BrowserModule

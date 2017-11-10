@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import Baseball from './baseball-lib';
 import SocketService from './../services/SocketService';
 import * as THREE from 'three';
@@ -272,8 +272,9 @@ const IndexController = function($scope, SocketService) {
     selector: 'application-hook',
     templateUrl: './app.component.html',
     styleUrls: [
-        './app.component.less'
-    ]
+        './app.component.css'
+    ],
+    changeDetection: ChangeDetectionStrategy.Default
 })
 export class AppComponent {
 

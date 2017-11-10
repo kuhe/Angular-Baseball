@@ -45,10 +45,20 @@ class Loop {
      * @param {Class} Animator
      */
     constructor(elementClass, background, Animator) {
+        this.overwatchMoveTarget = null;
         this.lighting = lighting;
         this.Animator = Animator;
+        this.loop = this.loop.bind(this);
+        this.onResize = this.onResize.bind(this);
         loadSkyShader();
         this.elementClass = elementClass;
+
+        /** @type {Loop} */
+        this.foreground = null;
+
+        /** @type {Loop} */
+        this.background = null;
+
         window.loop = this;
         this.timeOfDay = {
             h: 5,
@@ -58,10 +68,14 @@ class Loop {
     }
 
     /**
-     * individual objects<AbstractMesh> can attach and detach to the manager to be rendered
+     *
+     * Caution: this is the main animation loop, do activate more than one per rendering layer.
+     * Individual objects<AbstractMesh> can attach and detach to the manager to be rendered.
+     *
      */
     loop() {
-        requestAnimationFrame(this.loop.bind(this));
+        this.loop.active = true;
+        requestAnimationFrame(this.loop);
         this.panToward(this.target);
         const omt = this.overwatchMoveTarget;
         this.moveToward(this.moveTarget || {
@@ -69,7 +83,7 @@ class Loop {
             y: omt.y + 12,
             z: omt.z
         });
-        this.objects.map(i => i.animate());
+        this.objects.forEach(object => object.animate());
         //this.breathe();
         this.renderer.render(this.scene, this.camera);
     }
@@ -78,8 +92,8 @@ class Loop {
      * initialize lights, camera, action
      */
     main(background) {
+
         this.objects = [];
-        const giraffe = this;
 
         if (this.getThree()) {
 
@@ -96,13 +110,15 @@ class Loop {
                 this.moveTarget = camera.position;
 
                 this.resetCamera();
-                this.loop();
+                if (!this.loop.active) {
+                    this.loop();
+                }
                 if (background) {
                     this.addStaticMeshes();
                 }
             } else {
                 setTimeout(() => {
-                    giraffe.main(background);
+                    this.main(background);
                 }, 2000);
             }
 
@@ -248,8 +264,8 @@ class Loop {
      * @returns {THREE.WebGLRenderer|Boolean}
      */
     attach() {
-        window.removeEventListener('resize', this.onResize.bind(this), false);
-        window.addEventListener('resize', this.onResize.bind(this), false);
+        window.removeEventListener('resize', this.onResize, false);
+        window.addEventListener('resize', this.onResize, false);
         const element = document.getElementsByClassName(this.elementClass)[0];
         if (element) {
             element.innerHTML = '';
