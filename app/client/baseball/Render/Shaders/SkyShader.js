@@ -15,6 +15,7 @@
  */
 
 const loadSkyShader = () => {
+
     THREE.ShaderLib[ 'sky' ] = {
 
         uniforms: {

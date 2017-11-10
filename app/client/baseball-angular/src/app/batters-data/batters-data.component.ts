@@ -10,6 +10,9 @@ import Baseball from './../baseball-lib';
 })
 export class BattersDataComponent implements OnInit {
 
+    y: any;
+    t: Function;
+
     constructor() {
         this.abbreviatePosition = Baseball.util.text.abbreviatePosition;
     }

@@ -1,16 +1,22 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 
 @Component({
-  selector: 'app-flag',
-  templateUrl: './flag.component.html',
-  styleUrls: ['./flag.component.css'],
-  encapsulation: ViewEncapsulation.None
+    selector: 'flag',
+    templateUrl: './flag.component.html',
+    styleUrls: ['./flag.component.css'],
+    encapsulation: ViewEncapsulation.None,
+    inputs: ['team']
 })
 export class FlagComponent implements OnInit {
 
-  constructor() { }
+    team: any;
 
-  ngOnInit() {
-  }
+    constructor() {
+
+    }
+
+    ngOnInit() {
+
+    }
 
 }

@@ -9,6 +9,7 @@ import { FieldComponent } from './field/field.component';
 import { FlagComponent } from './flag/flag.component';
 import { RatingBlockComponent } from './rating-block/rating-block.component';
 import { ScoreboardComponent } from './scoreboard/scoreboard.component';
+import { ToIterablePipe } from './to-iterable.pipe';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import { ScoreboardComponent } from './scoreboard/scoreboard.component';
         FieldComponent,
         FlagComponent,
         RatingBlockComponent,
-        ScoreboardComponent
+        ScoreboardComponent,
+        ToIterablePipe
     ],
     imports: [
         BrowserModule

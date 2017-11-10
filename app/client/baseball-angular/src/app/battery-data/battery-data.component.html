@@ -1,3 +1,75 @@
-<p>
-  battery-data works!
-</p>
+<div class='row battery-component'>
+
+  <!--pitchers-->
+  <div class='col-xs-6 text-right'>
+    <div class='pitch-count' [ngClass]="{'focus': y.half === 'bottom'}">
+            <span class='secondary-battery-stats'>
+                {{y.teams.away.positions.pitcher.stats.pitching.K}}<span class='stat-abbrev'>{{ t('K') }}</span>
+                {{y.teams.away.positions.pitcher.stats.pitching.H}}<span class='stat-abbrev'>{{ t('H') }}</span>
+                {{y.teams.away.positions.pitcher.stats.pitching.BB}}<span class='stat-abbrev'>{{ t('BB') }}</span>
+            </span>
+      {{y.teams.away.positions.pitcher.stats.pitching.strikes}} - {{y.teams.away.positions.pitcher.stats.pitching.pitches}}
+    </div>
+  </div>
+  <div class='col-xs-6 text-left'>
+    <div class='pitch-count' [ngClass]="{'focus': y.half === 'top'}">
+      {{y.teams.home.positions.pitcher.stats.pitching.strikes}} - {{y.teams.home.positions.pitcher.stats.pitching.pitches}}
+
+      <span class='secondary-battery-stats __right'>
+                {{y.teams.home.positions.pitcher.stats.pitching.K}}<span class='stat-abbrev'>{{ t('K') }}</span>
+                {{y.teams.home.positions.pitcher.stats.pitching.H}}<span class='stat-abbrev'>{{ t('H') }}</span>
+                {{y.teams.home.positions.pitcher.stats.pitching.BB}}<span class='stat-abbrev'>{{ t('BB') }}</span>
+            </span>
+    </div>
+  </div>
+  <div class='col-xs-6 text-right'>
+        <span class='defining'>
+            {{ y.teams.away.positions.pitcher.getDefiningPitchingCharacteristic() }}
+        </span>
+    <em>{{y.teams.away.positions.pitcher.throws == 'right' ? t('RHP') : t('LHP')}}</em> &raquo;
+    <span *ngIf='y.teams.away.positions.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+    ({{'#'+y.teams.away.positions.pitcher.number}})
+    <strong>{{y.teams.away.positions.pitcher.getName()}}</strong>
+  </div>
+  <div class='col-xs-6 text-left'>
+    <strong>{{y.teams.home.positions.pitcher.getName()}}</strong>
+    ({{'#'+y.teams.home.positions.pitcher.number}})
+    <span *ngIf='y.teams.home.positions.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+    &laquo; <em>{{y.teams.home.positions.pitcher.throws == 'right' ? t('RHP') : t('LHP')}}</em>
+    <span class='defining'>
+            {{ y.teams.home.positions.pitcher.getDefiningPitchingCharacteristic() }}
+        </span>
+  </div>
+
+  <!--catchers-->
+  <div class='col-xs-6 text-right'>
+    <em>{{abbreviatePosition('catcher')}}</em> &raquo;
+    <span *ngIf='y.teams.away.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+    ({{'#'+y.teams.away.positions.catcher.number}})
+    <strong>{{y.teams.away.positions.catcher.getName()}}</strong>
+  </div>
+  <div class='col-xs-6 text-left'>
+    <strong>{{y.teams.home.positions.catcher.getName()}}</strong> ({{'#'+y.teams.home.positions.catcher.number}})
+    <span *ngIf='y.teams.home.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>
+    &laquo; <em>{{abbreviatePosition('catcher')}}</em>
+  </div>
+
+  <!--Stats-->
+  <div class='col-xs-6 text-right'>
+        <span class="era">
+            <strong>{{y.teams.away.positions.pitcher.stats.pitching.getERA()}}</strong>
+            <span class='stat-abbrev'>{{ t('ERA') }}</span>
+        </span>
+    <strong>{{y.teams.away.positions.pitcher.stats.pitching.W}}</strong>
+    <span class='stat-abbrev'>{{t('W')}}</span>
+  </div>
+  <div class='col-xs-6 text-left'>
+    <strong>{{y.teams.home.positions.pitcher.stats.pitching.W}}</strong>
+    <span class='stat-abbrev'>{{t('W')}}</span>
+    <span class="era">
+            <strong>{{y.teams.home.positions.pitcher.stats.pitching.getERA()}}</strong>
+            <span class='stat-abbrev'>{{ t('ERA') }}</span>
+        </span>
+  </div>
+
+</div>

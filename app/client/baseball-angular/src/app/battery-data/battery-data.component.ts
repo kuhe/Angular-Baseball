@@ -1,16 +1,24 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import Baseball from './../baseball-lib';
 
 @Component({
-  selector: 'app-battery-data',
-  templateUrl: './battery-data.component.html',
-  styleUrls: ['./battery-data.component.css'],
-  encapsulation: ViewEncapsulation.None
+    selector: 'battery-data',
+    templateUrl: './battery-data.component.html',
+    styleUrls: ['./battery-data.component.css'],
+    encapsulation: ViewEncapsulation.None,
+    inputs: ['y', 't']
 })
 export class BatteryDataComponent implements OnInit {
 
-  constructor() { }
+    y: any;
+    t: Function;
+    abbreviatePosition: Function;
 
-  ngOnInit() {
-  }
+    constructor() {
+        this.abbreviatePosition = Baseball.util.text.abbreviatePosition;
+    }
+
+    ngOnInit() {
+    }
 
 }

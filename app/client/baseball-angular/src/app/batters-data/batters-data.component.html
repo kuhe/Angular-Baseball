@@ -1,3 +1,30 @@
-<p>
-  batters-data works!
-</p>
+<div class='row text-center batters-component'>
+  <div class='col-xs-12' *ngFor='let batter of [y.batter, y.deck]'>
+    <div>
+      {{ batter === y.batter ? t('At Bat') : t('On Deck') }} &raquo;
+
+      <strong>{{batter.getName()}}</strong>
+      ({{('#')+batter.number}}) <span *ngIf='batter.hero' class='glyphicon glyphicon-chevron-up'></span>
+
+      <em>{{abbreviatePosition(batter.position)}}{{t.comma()}}{{batter.bats == 'left' ? t('LHB') : t('RHB')}}</em>
+      <span class='defining'>
+                {{ batter.getDefiningBattingCharacteristic() }}
+            </span>
+    </div>
+    <div class='row one-line'>
+      <div class='col-xs-12'>
+                <span class='slash'>
+                    {{ batter.stats.batting.getSlash() }}
+                </span>
+        <strong>{{batter.stats.batting.rbi}}</strong> <span class='stat-abbrev'>{{ t('RBI') }}</span>
+        <strong>{{batter.stats.batting.hr}}</strong> <span class='stat-abbrev'>{{ t('HR') }}</span>
+      </div>
+      <div class='col-xs-12'>
+                <span class='action-line' *ngFor='let atBat of batter.getAtBats()'
+                      [ngClass]='{beneficial: atBat.beneficial}'>
+                    {{ atBat + '' }}
+                </span>
+      </div>
+    </div>
+  </div>
+</div>
