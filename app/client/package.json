@@ -23,7 +23,10 @@
     "npm": "5.4.2 <6"
   },
   "scripts": {
-    "test": "node baseball/test/CareerSpec.js"
+    "test": "node baseball/test/CareerSpec.js",
+    "deploy": "(cd baseball-angular && ng build) && cp baseball-angular/dist/* ../../; cp baseball-angular/src/public ../../public",
+    "copy": "cp -R baseball-angular/src/public ../../public",
+    "css": "npx lessc styles/application.less > baseball-angular/src/public/application.css"
   },
   "repository": {
     "type": "git",

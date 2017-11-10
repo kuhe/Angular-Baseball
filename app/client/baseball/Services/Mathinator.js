@@ -2,8 +2,7 @@
  * For Math!
  * @constructor
  */
-const Mathinator = () => {
-};
+const Mathinator = function () {};
 
 /**
  * @param n

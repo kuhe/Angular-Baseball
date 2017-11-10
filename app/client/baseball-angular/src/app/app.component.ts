@@ -2,6 +2,10 @@ import { Component } from '@angular/core';
 import Baseball from './baseball-lib';
 import SocketService from './../services/SocketService';
 import * as THREE from 'three';
+import TweenMax from 'gsap/TweenMax';
+
+(<any>window).THREE = THREE;
+(<any>window).TweenMax = TweenMax;
 
 const $ : any = (<any>window).$;
 const log : Function = (<any>window).log;
@@ -47,22 +51,7 @@ const IndexController = function($scope, SocketService) {
         }
     };
 
-    $scope.abbreviatePosition = function(position) {
-        if (text.mode === 'e') {
-            return {
-                pitcher : 'P',
-                catcher : 'C',
-                first : '1B',
-                second : '2B',
-                short : 'SS',
-                third : '3B',
-                left : 'LF',
-                center : 'CF',
-                right : 'RF'
-            }[position];
-        }
-        return text.fielderShortName(position);
-    };
+    $scope.abbreviatePosition = Baseball.util.text.abbreviatePosition;
 
     $scope.sim = function() {$scope.proceedToGame(1, 1);};
     $scope.seventh = function() {$scope.proceedToGame(7, 1);};
@@ -282,13 +271,14 @@ const IndexController = function($scope, SocketService) {
 @Component({
     selector: 'application-hook',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+    styleUrls: [
+        './app.component.less'
+    ]
 })
 export class AppComponent {
 
     constructor() {
 
-        (<any>window).THREE = THREE;
         IndexController(this, SocketService);
 
     }

@@ -12,12 +12,27 @@ import { Sky } from './mesh/Sky';
 import { Sun } from './mesh/Sun';
 import { lighting } from './scene/lighting';
 import { loadSkyShader } from './Shaders/SkyShader';
+
 import { VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE } from './LoopConstants';
 
-if (typeof THREE !== 'undefined') {
-    var AHEAD = new THREE.Vector3(0, VERTICAL_CORRECTION, -60.5);
-    var INITIAL_POSITION = new THREE.Vector3(0, VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE);
-}
+let ahead, initialPosition;
+
+const AHEAD = () => {
+    if (ahead) {
+        return ahead;
+    }
+    if (typeof THREE !== 'undefined') {
+        return ahead = new THREE.Vector3(0, VERTICAL_CORRECTION, -60.5)
+    }
+};
+const INITIAL_POSITION = () => {
+    if (initialPosition) {
+        return initialPosition;
+    }
+    if (typeof THREE !== 'undefined') {
+        return initialPosition = new THREE.Vector3(0, VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE);
+    }
+};
 
 /**
  * manager for the rendering loop
@@ -30,6 +45,7 @@ class Loop {
      * @param {Class} Animator
      */
     constructor(elementClass, background, Animator) {
+        this.lighting = lighting;
         this.Animator = Animator;
         loadSkyShader();
         this.elementClass = elementClass;
@@ -72,7 +88,6 @@ class Loop {
             const scene = this.scene = new THREE.Scene();
             scene.fog = new THREE.FogExp2( 0x838888, 0.002 );
             if (this.attach()) {
-                this.lighting = lighting;
                 lighting.addTo(scene);
                 const camera = this.camera = new THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 1000000);
 
@@ -312,7 +327,7 @@ class Loop {
     setLookTarget(vector, panSpeed) {
         this.forAllLoops(loop => {
             loop.panSpeed = panSpeed || 0.9;
-            loop.panning = vector !== AHEAD;
+            loop.panning = vector !== AHEAD();
             loop.target = vector;
         });
     }
@@ -338,11 +353,11 @@ class Loop {
     }
     resetCamera() {
         let moveSpeed = 0.5;
-        if (this.camera.position.z !== INITIAL_POSITION.z) {
+        if (this.camera.position.z !== INITIAL_POSITION().z) {
             moveSpeed = 2.5;
         }
-        this.setLookTarget(AHEAD, moveSpeed);
-        this.setMoveTarget(INITIAL_POSITION, moveSpeed/10);
+        this.setLookTarget(AHEAD(), moveSpeed);
+        this.setMoveTarget(INITIAL_POSITION(), moveSpeed/10);
     }
     moveCamera(x, y, z) {
         if (typeof x === 'object') {
