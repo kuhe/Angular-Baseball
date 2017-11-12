@@ -28,6 +28,9 @@ export class ModeComponent implements OnInit {
     mode(set: string): string {
         if (set) {
             Baseball.util.text.mode = set;
+            if (localStorage) {
+                localStorage.__$yakyuuaikoukai_text_mode = set;
+            }
         }
         return Baseball.util.text.mode;
     }

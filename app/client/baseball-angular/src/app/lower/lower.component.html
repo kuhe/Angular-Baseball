@@ -151,13 +151,13 @@
             ({{'#'+player.number}})
             <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>
             <span class='pull-right'>
-                        <!--<span class='col-md-3'>-->
-                <!--{{ player.stats.batting.getSlash() }}-->
+                <!--<span class='col-md-3'>-->
+                    <!--{{ player.stats.batting.getSlash() }}-->
                 <!--</span>-->
-                        <span class='defining'>
-                            {{ player.getDefiningCharacteristic() }}
-                        </span>
-                    </span>
+                <span class='defining'>
+                    {{ player.getDefiningCharacteristic() }}
+                </span>
+            </span>
             <div class='row'></div>
         </li>
         <li class='list-group-item pointer substituted' *ngFor='let player of team.substituted'>
@@ -165,15 +165,15 @@
             ({{'#'+player.number}})
             <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>
             <span class='pull-right'>
-                        <span class='defining'>
-                            {{ player.getDefiningCharacteristic() }}
-                        </span>
-                        <span class='action-line' *ngFor='let atBat of player.getAtBats()'
-                              [ngClass]='{beneficial: atBat.beneficial}'>
-                            {{ atBat + '' }}
-                        </span>
-                        {{ t('Substituted') }}
-                    </span>
+                <span class='defining'>
+                    {{ player.getDefiningCharacteristic() }}
+                </span>
+                <span class='action-line' *ngFor='let atBat of player.getAtBats()'
+                      [ngClass]='{beneficial: atBat.beneficial}'>
+                    {{ atBat + '' }}
+                </span>
+                {{ t('Substituted') }}
+            </span>
             <div class='row'></div>
         </li>
     </ul>

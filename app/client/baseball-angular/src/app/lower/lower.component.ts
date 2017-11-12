@@ -30,19 +30,19 @@ export class LowerComponent extends ModeComponent implements OnInit {
         return referenceContainer.instance.showDifficultySelection;
     }
     selectPitch(...args: any[]): void {
-        referenceContainer.instance.selectPitch(...args);
+        referenceContainer.instance.y.selectPitch(...args);
     }
     selectSubstitute(...args: any[]): void {
-        referenceContainer.instance.selectSubstitute(...args);
+        referenceContainer.instance.y.selectSubstitute(...args);
     }
     clickLineup(...args: any[]): void {
-        referenceContainer.instance.clickLineup(...args);
+        referenceContainer.instance.y.clickLineup(...args);
     }
     generateTeam(...args: any[]): void {
-        referenceContainer.instance.generateTeam(...args);
+        referenceContainer.instance.y.generateTeam(...args);
     }
     teamJapan(...args: any[]): void {
-        referenceContainer.instance.teamJapan(...args);
+        referenceContainer.instance.y.teamJapan(...args);
     }
 
 }

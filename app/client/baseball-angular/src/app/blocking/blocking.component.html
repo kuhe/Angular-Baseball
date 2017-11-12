@@ -41,10 +41,10 @@
     <hr>
     <section class='row options'>
         <div class='col-md-12'>
-            <button (click)="proceedToGame(0, 0); $event.stopPropagation()" class='btn play-ball pointer'>
+            <button (click)="playball(); $event.stopPropagation()" class='btn play-ball pointer'>
                 {{ t('Play Ball!') }}
             </button>
-            <button (click)="proceedToGame(0, 1); $event.stopPropagation()" class='btn pointer'>
+            <button (click)="spectate(); $event.stopPropagation()" class='btn pointer'>
                 {{ t('Spectate the CPU') }}
             </button>
         </div>
@@ -57,10 +57,10 @@
     <section class='baseball-beginner text-left'>
         <hr/>
         <div class='col-md-12'>
-            <button (click)='proceedToGame(1, 1); $event.stopPropagation()' class='btn pointer'>
+            <button (click)='sim(); $event.stopPropagation()' class='btn pointer'>
                 {{ t('Run Fast Simulation') }} &raquo;
             </button>
-            <button (click)='proceedToGame(7, 1); $event.stopPropagation()' class='btn pointer'>
+            <button (click)='seventh(); $event.stopPropagation()' class='btn pointer'>
                 {{ t('Play from the 7th') }} &raquo;
             </button>
         </div>

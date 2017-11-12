@@ -1,6 +1,7 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {ModeComponent} from '../mode/mode.component';
 import {referenceContainer} from '../app.component';
+import SocketService from '../../services/SocketService';
 
 @Component({
     selector: 'blocking',
@@ -21,8 +22,21 @@ export class BlockingComponent extends ModeComponent implements OnInit {
     ngOnInit() {
     }
 
-    proceedToGame(...args: any[]): void {
-        referenceContainer.instance.proceedToGame(...args);
+    sim() {
+        referenceContainer.instance.y.proceedToGame(SocketService, 1, 1);
+        referenceContainer.instance.bindMethods();
+    }
+    seventh() {
+        referenceContainer.instance.y.proceedToGame(SocketService, 7, 1);
+        referenceContainer.instance.bindMethods();
+    }
+    playball() {
+        referenceContainer.instance.y.proceedToGame(SocketService);
+        referenceContainer.instance.bindMethods();
+    }
+    spectate() {
+        referenceContainer.instance.y.proceedToGame(SocketService, 0, 1);
+        referenceContainer.instance.bindMethods();
     }
 
 }
