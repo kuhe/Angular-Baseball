@@ -941,6 +941,34 @@ Game.prototype = {
             game.timeOfDay.h = game.startTime.h;
             game.timeOfDay.m = game.startTime.m;
         }
+    },
+
+    /**
+     * Proceed to the end of the current at bat.
+     */
+    simulateAtBat() {
+        const game = this;
+        Animator.console = game.console = true;
+        const batter = game.batter;
+        const control = game.humanControl;
+        game.humanControl = 'none';
+        do {
+            game.simulateInput(function (callback) {
+                typeof callback === 'function' && callback();
+            });
+        } while (game.batter === batter && this.stage !== 'end');
+        log('-- At Bat Simulated --');
+        game.humanControl = control;
+        Animator.console = game.console = false;
+        game.umpire.onSideChange(); // rebind hover UI, not actual change sides :\...
+    },
+
+    /**
+     * @returns {boolean}
+     */
+    allowSimAtBat() {
+        if (this.opponentConnected) return false;
+        return true;
     }
 
 };

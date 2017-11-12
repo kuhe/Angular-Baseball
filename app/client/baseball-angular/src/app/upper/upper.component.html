@@ -10,6 +10,10 @@
             <button class='btn small' (click)='mode("n")' [ngClass]='{disabled: mode() != "n"}'>
                 <strong class='pointer'>日本語</strong>
             </button>
+            <br>
+            <button class='btn pointer small' (click)='y.simulateAtBat()' *ngIf='y.allowSimAtBat()'>
+                <strong class='pointer'><em>{{ t('Sim At Bat') }}</em></strong>
+            </button>
             <br/>
             <br/>
             <!--<p>-->

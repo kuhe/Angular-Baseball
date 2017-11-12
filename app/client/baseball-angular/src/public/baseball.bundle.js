@@ -234,7 +234,9 @@ const text_text = (phrase, override) => {
             'Late': '遅め',
             '': '',
             'Early': '早め',
-            'Very Early': 'とても早め'
+            'Very Early': 'とても早め',
+
+            'Sim At Bat': '自動打撃'
         },
         e : {
             empty: '-',
@@ -4269,7 +4271,6 @@ class Loop_Loop {
         const { element } = this;
         if (element) {
             element.innerHTML = '';
-            console.log('attaching!');
             const THREE = this.THREE;
             const renderer = new THREE.WebGLRenderer({ alpha: true });
             this.setSize(renderer);
@@ -5280,11 +5281,11 @@ Umpire.prototype = {
     init(game) {
         this.game = game;
         this.playBall();
-    },
-    count : {
-        strikes : 0,
-        balls : 0,
-        outs : 0
+        this.count = {
+            strikes : 0,
+            balls : 0,
+            outs : 0
+        };
     },
     /**
      * starts the game by announcing it and signalling the first batter up
@@ -5566,12 +5567,12 @@ Umpire.prototype = {
     /**
      * advance the runners (ball in play or walk)
      *
-     * @param isWalk {bool}
+     * @param isWalk {boolean}
      * @param fieldersChoice \results in an out to someone other than the batter
      * @param sacrificeAdvances \advances on a sacrifice
      */
     advanceRunners(isWalk, fieldersChoice, sacrificeAdvances) {
-        isWalk = !!isWalk;
+        isWalk = Boolean(isWalk);
         const game = this.game;
         let first = game.field.first;
         let second = game.field.second;
@@ -6713,6 +6714,34 @@ Game.prototype = {
             game.timeOfDay.h = game.startTime.h;
             game.timeOfDay.m = game.startTime.m;
         }
+    },
+
+    /**
+     * Proceed to the end of the current at bat.
+     */
+    simulateAtBat() {
+        const game = this;
+        Animator_Animator.console = game.console = true;
+        const batter = game.batter;
+        const control = game.humanControl;
+        game.humanControl = 'none';
+        do {
+            game.simulateInput(function (callback) {
+                typeof callback === 'function' && callback();
+            });
+        } while (game.batter === batter && this.stage !== 'end');
+        log('-- At Bat Simulated --');
+        game.humanControl = control;
+        Animator_Animator.console = game.console = false;
+        game.umpire.onSideChange(); // rebind hover UI, not actual change sides :\...
+    },
+
+    /**
+     * @returns {boolean}
+     */
+    allowSimAtBat() {
+        if (this.opponentConnected) return false;
+        return true;
     }
 
 };

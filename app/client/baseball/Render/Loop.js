@@ -282,7 +282,6 @@ class Loop {
         const { element } = this;
         if (element) {
             element.innerHTML = '';
-            console.log('attaching!');
             const THREE = this.THREE;
             const renderer = new THREE.WebGLRenderer({ alpha: true });
             this.setSize(renderer);

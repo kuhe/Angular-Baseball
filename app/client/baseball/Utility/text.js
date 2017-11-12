@@ -161,7 +161,9 @@ const text = (phrase, override) => {
             'Late': '遅め',
             '': '',
             'Early': '早め',
-            'Very Early': 'とても早め'
+            'Very Early': 'とても早め',
+
+            'Sim At Bat': '自動打撃'
         },
         e : {
             empty: '-',

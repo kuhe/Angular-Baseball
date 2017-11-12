@@ -10,11 +10,11 @@ Umpire.prototype = {
     init(game) {
         this.game = game;
         this.playBall();
-    },
-    count : {
-        strikes : 0,
-        balls : 0,
-        outs : 0
+        this.count = {
+            strikes : 0,
+            balls : 0,
+            outs : 0
+        };
     },
     /**
      * starts the game by announcing it and signalling the first batter up
@@ -296,12 +296,12 @@ Umpire.prototype = {
     /**
      * advance the runners (ball in play or walk)
      *
-     * @param isWalk {bool}
+     * @param isWalk {boolean}
      * @param fieldersChoice \results in an out to someone other than the batter
      * @param sacrificeAdvances \advances on a sacrifice
      */
     advanceRunners(isWalk, fieldersChoice, sacrificeAdvances) {
-        isWalk = !!isWalk;
+        isWalk = Boolean(isWalk);
         const game = this.game;
         let first = game.field.first;
         let second = game.field.second;
