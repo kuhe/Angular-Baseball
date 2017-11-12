@@ -297,8 +297,15 @@ export class AppComponent {
 
     }
 
+    showDifficultySelection: boolean;
+
     proceedToGame: Function;
     selectPitch: Function;
+    selectSubstitute: Function;
+    clickLineup: Function;
+
+    generateTeam: Function;
+    teamJapan: Function;
 
 }
 

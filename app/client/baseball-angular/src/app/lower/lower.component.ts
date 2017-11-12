@@ -21,8 +21,28 @@ export class LowerComponent extends ModeComponent implements OnInit {
     ngOnInit() {
     }
 
+    /* Forwarded methods section */
+
+    set showDifficultySelection(value: boolean) {
+        referenceContainer.instance.showDifficultySelection = value;
+    }
+    get showDifficultySelection(): boolean {
+        return referenceContainer.instance.showDifficultySelection;
+    }
     selectPitch(...args: any[]): void {
         referenceContainer.instance.selectPitch(...args);
+    }
+    selectSubstitute(...args: any[]): void {
+        referenceContainer.instance.selectSubstitute(...args);
+    }
+    clickLineup(...args: any[]): void {
+        referenceContainer.instance.clickLineup(...args);
+    }
+    generateTeam(...args: any[]): void {
+        referenceContainer.instance.generateTeam(...args);
+    }
+    teamJapan(...args: any[]): void {
+        referenceContainer.instance.teamJapan(...args);
     }
 
 }

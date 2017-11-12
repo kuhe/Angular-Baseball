@@ -53634,7 +53634,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/blocking/blocking.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div class='blocking instructions'>\n    <section class='row'>\n        <div class='col-md-4'></div>\n        <div class='col-md-4 language-select'>\n            <button class='btn pointer' (click)='mode(\"e\"); $event.stopPropagation()'>\n                English\n            </button>\n            <button class='btn pointer' (click)='mode(\"n\"); $event.stopPropagation()'>\n                日本語\n            </button>\n        </div>\n        <div class='col-md-4'></div>\n    </section>\n    <br/>\n    <div class='row'>\n        <div class='col-md-4'>\n        </div>\n        <div class=\"col-md-4\">\n            <div class=\"target swing\">\n                <div class='indicator baseball pitch' style='top:70px;left:55px;padding:2px;'></div>\n                <div class='indicator baseball pitch' style='top:74px;left:50px;padding:3px;'></div>\n                <div class='indicator baseball pitch' style='top:82px;left:48px;padding:4px;'></div>\n                <div class='indicator baseball pitch' style='top:94px;left:55px;padding:6px;'></div>\n                <div class='indicator baseball pitch' style='top:110px;left:80px;padding:8px;'></div>\n                <div class='indicator baseball pitch' style='top:130px;left:100px;padding:10px;'></div>\n                <div class='indicator baseball break' style='top:145px;left:125px;padding:12px;'></div>\n                <div class='strikezone'></div>\n            </div>\n        </div>\n        <div class='col-md-4'>\n        </div>\n    </div>\n    <div class='row'>\n        <div class='col-md-4'>\n        </div>\n        <div class=\"col-md-4\">\n        </div>\n        <div class='col-md-4'>\n        </div>\n    </div>\n    <hr>\n    <section class='row options'>\n        <div class='col-md-12'>\n            <button (click)=\"proceedToGame(0, 0); $event.stopPropagation()\" class='btn play-ball pointer'>\n                {{ t('Play Ball!') }}\n            </button>\n            <button (click)=\"proceedToGame(0, 1); $event.stopPropagation()\" class='btn pointer'>\n                {{ t('Spectate the CPU') }}\n            </button>\n        </div>\n        <p style='text-align: center; max-width: 340px; margin: auto;'>\n            Supposing the matchmaking server hasn't crashed, you can\n            share your URL (including hash) after clicking 'Play Ball!'\n            to play with a live opponent.\n        </p>\n    </section>\n    <section class='baseball-beginner text-left'>\n        <hr/>\n        <div class='col-md-12'>\n            <button (click)='proceedToGame(1, 1); $event.stopPropagation()' class='btn pointer'>\n                {{ t('Run Fast Simulation') }} &raquo;\n            </button>\n            <button (click)='proceedToGame(7, 1); $event.stopPropagation()' class='btn pointer'>\n                {{ t('Play from the 7th') }} &raquo;\n            </button>\n        </div>\n    </section>\n</div>\n"
+module.exports = "<div class='blocking instructions'>\r\n    <section class='row'>\r\n        <div class='col-md-4'></div>\r\n        <div class='col-md-4 language-select'>\r\n            <button class='btn pointer' (click)='mode(\"e\"); $event.stopPropagation()'>\r\n                English\r\n            </button>\r\n            <button class='btn pointer' (click)='mode(\"n\"); $event.stopPropagation()'>\r\n                日本語\r\n            </button>\r\n        </div>\r\n        <div class='col-md-4'></div>\r\n    </section>\r\n    <br/>\r\n    <div class='row'>\r\n        <div class='col-md-4'>\r\n        </div>\r\n        <div class=\"col-md-4\">\r\n            <div class=\"target swing\">\r\n                <div class='indicator baseball pitch' style='top:70px;left:55px;padding:2px;'></div>\r\n                <div class='indicator baseball pitch' style='top:74px;left:50px;padding:3px;'></div>\r\n                <div class='indicator baseball pitch' style='top:82px;left:48px;padding:4px;'></div>\r\n                <div class='indicator baseball pitch' style='top:94px;left:55px;padding:6px;'></div>\r\n                <div class='indicator baseball pitch' style='top:110px;left:80px;padding:8px;'></div>\r\n                <div class='indicator baseball pitch' style='top:130px;left:100px;padding:10px;'></div>\r\n                <div class='indicator baseball break' style='top:145px;left:125px;padding:12px;'></div>\r\n                <div class='strikezone'></div>\r\n            </div>\r\n        </div>\r\n        <div class='col-md-4'>\r\n        </div>\r\n    </div>\r\n    <div class='row'>\r\n        <div class='col-md-4'>\r\n        </div>\r\n        <div class=\"col-md-4\">\r\n        </div>\r\n        <div class='col-md-4'>\r\n        </div>\r\n    </div>\r\n    <hr>\r\n    <section class='row options'>\r\n        <div class='col-md-12'>\r\n            <button (click)=\"proceedToGame(0, 0); $event.stopPropagation()\" class='btn play-ball pointer'>\r\n                {{ t('Play Ball!') }}\r\n            </button>\r\n            <button (click)=\"proceedToGame(0, 1); $event.stopPropagation()\" class='btn pointer'>\r\n                {{ t('Spectate the CPU') }}\r\n            </button>\r\n        </div>\r\n        <p style='text-align: center; max-width: 340px; margin: auto;'>\r\n            Supposing the matchmaking server hasn't crashed, you can\r\n            share your URL (including hash) after clicking 'Play Ball!'\r\n            to play with a live opponent.\r\n        </p>\r\n    </section>\r\n    <section class='baseball-beginner text-left'>\r\n        <hr/>\r\n        <div class='col-md-12'>\r\n            <button (click)='proceedToGame(1, 1); $event.stopPropagation()' class='btn pointer'>\r\n                {{ t('Run Fast Simulation') }} &raquo;\r\n            </button>\r\n            <button (click)='proceedToGame(7, 1); $event.stopPropagation()' class='btn pointer'>\r\n                {{ t('Play from the 7th') }} &raquo;\r\n            </button>\r\n        </div>\r\n    </section>\r\n</div>\r\n"
 
 /***/ }),
 
@@ -53888,12 +53888,55 @@ var LowerComponent = (function (_super) {
     }
     LowerComponent.prototype.ngOnInit = function () {
     };
+    Object.defineProperty(LowerComponent.prototype, "showDifficultySelection", {
+        get: function () {
+            return __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.showDifficultySelection;
+        },
+        /* Forwarded methods section */
+        set: function (value) {
+            __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.showDifficultySelection = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
     LowerComponent.prototype.selectPitch = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
         (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance).selectPitch.apply(_a, args);
+        var _a;
+    };
+    LowerComponent.prototype.selectSubstitute = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance).selectSubstitute.apply(_a, args);
+        var _a;
+    };
+    LowerComponent.prototype.clickLineup = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance).clickLineup.apply(_a, args);
+        var _a;
+    };
+    LowerComponent.prototype.generateTeam = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance).generateTeam.apply(_a, args);
+        var _a;
+    };
+    LowerComponent.prototype.teamJapan = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance).teamJapan.apply(_a, args);
         var _a;
     };
     LowerComponent = __decorate([
@@ -53939,7 +53982,14 @@ var ModeComponent = (function () {
     ModeComponent.prototype.abbreviatePosition = function (pos) {
         return __WEBPACK_IMPORTED_MODULE_1__baseball_lib__["a" /* default */].util.text.abbreviatePosition(pos);
     };
-    ModeComponent.prototype.mode = function () {
+    /**
+     * Set the language mode 'e': english or 'n': japanese.
+     * @param {string} set
+     */
+    ModeComponent.prototype.mode = function (set) {
+        if (set) {
+            __WEBPACK_IMPORTED_MODULE_1__baseball_lib__["a" /* default */].util.text.mode = set;
+        }
         return __WEBPACK_IMPORTED_MODULE_1__baseball_lib__["a" /* default */].util.text.mode;
     };
     ModeComponent = __decorate([

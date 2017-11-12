@@ -21,7 +21,14 @@ export class ModeComponent implements OnInit {
         return Baseball.util.text.abbreviatePosition(pos);
     }
 
-    mode() {
+    /**
+     * Set the language mode 'e': english or 'n': japanese.
+     * @param {string} set
+     */
+    mode(set: string): string {
+        if (set) {
+            Baseball.util.text.mode = set;
+        }
         return Baseball.util.text.mode;
     }
 
