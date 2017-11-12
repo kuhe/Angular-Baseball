@@ -50,8 +50,13 @@ class Loop {
         this.Animator = Animator;
         this.loop = this.loop.bind(this);
         this.onResize = this.onResize.bind(this);
-        loadSkyShader();
+
         this.elementClass = elementClass;
+
+        /** @type {HTMLElement} */
+        this.element = null;
+
+        loadSkyShader();
 
         /** @type {Loop} */
         this.foreground = null;
@@ -76,6 +81,7 @@ class Loop {
     loop() {
         this.loop.active = true;
         requestAnimationFrame(this.loop);
+
         this.panToward(this.target);
         const omt = this.overwatchMoveTarget;
         this.moveToward(this.moveTarget || {
@@ -83,6 +89,10 @@ class Loop {
             y: omt.y + 12,
             z: omt.z
         });
+
+        this.moveSpeed = 0.05;
+        this.panSpeed = 0.3;
+
         this.objects.forEach(object => object.animate());
         //this.breathe();
         this.renderer.render(this.scene, this.camera);
@@ -266,9 +276,13 @@ class Loop {
     attach() {
         window.removeEventListener('resize', this.onResize, false);
         window.addEventListener('resize', this.onResize, false);
-        const element = document.getElementsByClassName(this.elementClass)[0];
+
+        this.element = document.getElementsByClassName(this.elementClass)[0];
+
+        const { element } = this;
         if (element) {
             element.innerHTML = '';
+            console.log('attaching!');
             const THREE = this.THREE;
             const renderer = new THREE.WebGLRenderer({ alpha: true });
             this.setSize(renderer);
@@ -286,19 +300,19 @@ class Loop {
      * higher FOV on lower view widths
      */
     onResize() {
-        const element = document.getElementsByClassName(this.elementClass)[0];
+        const element = this.element;
         this.camera.aspect = this.getAspect();
         this.camera.fov = Math.max(90 - 30 * (element.offsetWidth / 1200), 55);
         this.camera.updateProjectionMatrix();
         this.setSize(this.renderer);
     }
     setSize(renderer) {
-        const element = document.getElementsByClassName(this.elementClass)[0];
+        const element = this.element;
         const width = element.offsetWidth;
         renderer.setSize(width, HEIGHT);
     }
     getAspect() {
-        const element = document.getElementsByClassName(this.elementClass)[0];
+        const element = this.element;
         return element.offsetWidth / HEIGHT;
     }
 
@@ -342,7 +356,7 @@ class Loop {
      */
     setLookTarget(vector, panSpeed) {
         this.forAllLoops(loop => {
-            loop.panSpeed = panSpeed || 0.9;
+            loop.panSpeed = panSpeed;
             loop.panning = vector !== AHEAD();
             loop.target = vector;
         });
@@ -355,14 +369,14 @@ class Loop {
      */
     setMoveTarget(vector, moveSpeed) {
         this.forAllLoops(loop => {
-            loop.moveSpeed = moveSpeed || 0.7;
+            loop.moveSpeed = moveSpeed;
             loop.moveTarget = vector;
             loop.overwatchMoveTarget = null;
         });
     }
     setOverwatchMoveTarget(vector, moveSpeed) {
         this.forAllLoops(loop => {
-            loop.moveSpeed = moveSpeed || 0.7;
+            loop.moveSpeed = moveSpeed;
             loop.overwatchMoveTarget = vector;
             loop.moveTarget = null;
         });

@@ -1,5 +1,6 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {ModeComponent} from '../mode/mode.component';
+import {referenceContainer} from '../app.component';
 
 @Component({
     selector: 'lower',
@@ -18,6 +19,10 @@ export class LowerComponent extends ModeComponent implements OnInit {
     }
 
     ngOnInit() {
+    }
+
+    selectPitch(...args: any[]): void {
+        referenceContainer.instance.selectPitch(...args);
     }
 
 }

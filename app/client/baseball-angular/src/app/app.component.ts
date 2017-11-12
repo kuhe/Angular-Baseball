@@ -298,6 +298,7 @@ export class AppComponent {
     }
 
     proceedToGame: Function;
+    selectPitch: Function;
 
 }
 

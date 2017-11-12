@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <script>
-    window.log = function() {
+    window.log = function () {
         console.log.apply(console, arguments);
     };
 </script>
@@ -12,13 +12,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/sockjs/1/sockjs.min.js"></script>
+    <script>
+        window.exports = {};
+    </script>
+    <script src="/public/baseball.bundle.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="yakk.ico">
     <link rel="stylesheet" href="/public/application.css">
+
 </head>
 <body class='blue' id='override'>
+
 <application-hook></application-hook>
+
 <footer style='margin-bottom: 30px;'></footer>
 <script type="text/javascript" src="inline.bundle.js"></script><script type="text/javascript" src="polyfills.bundle.js"></script><script type="text/javascript" src="styles.bundle.js"></script><script type="text/javascript" src="vendor.bundle.js"></script><script type="text/javascript" src="main.bundle.js"></script></body>
 </html>

@@ -1,6 +1,7 @@
 import { Mathinator } from '../Services/Mathinator';
 import { Loop } from '../Render/Loop';
 import { helper } from '../Utility/helper';
+import { INITIAL_CAMERA_DISTANCE } from './../Render/LoopConstants';
 
 const Animator = function() {
     this.init();
@@ -284,19 +285,19 @@ Animator.prototype = {
             if ((Math.random() < 0.15 && ball.airTime > 1.5)
                 ||
                 (Math.random() < 0.50 && ball.airTime > 2.5)) {
-                //var scale = 1;
-                //if (result.splay > 0) {
-                //    scale = -1;
-                //}
+                var scale = 1;
+                if (result.splay > 0) {
+                   scale = -1;
+                }
                 this.loop.setLookTarget(ball.mesh.position, 0.3);
-                this.loop.setOverwatchMoveTarget(ball.mesh.position, 0.16);
+                this.loop.setOverwatchMoveTarget(ball.mesh.position, 0.32);
             } else {
                 this.loop.setLookTarget(ball.mesh.position, 0.5);
-                this.loop.setMoveTarget({x: 0, y: 6, z: Loop.INITIAL_CAMERA_DISTANCE}, 0.05);
+                this.loop.setMoveTarget({x: 0, y: 6, z: INITIAL_CAMERA_DISTANCE}, 0.05);
             }
         } else if (Math.abs(result.splay) < 60) {
             this.loop.setLookTarget(ball.mesh.position, 0.5);
-            this.loop.setMoveTarget({x: 0, y: 6, z: Loop.INITIAL_CAMERA_DISTANCE}, 0.05);
+            this.loop.setMoveTarget({x: 0, y: 6, z: INITIAL_CAMERA_DISTANCE}, 0.05);
         }
 
         return game.swingResult;
