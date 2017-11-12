@@ -4,4 +4,4 @@ if (typeof window === 'object') {
     window.Baseball = Baseball;
 }
 
-export { Baseball }
+export default Baseball;

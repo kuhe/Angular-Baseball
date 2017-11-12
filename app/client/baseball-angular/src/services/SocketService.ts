@@ -11,7 +11,7 @@ import Baseball from './../app/baseball-lib';
  * Socket service for opponent connection.
  *
  */
-var SocketService = (function() {
+var SocketService = (function () {
 
     /**
      * @param {string} field
@@ -70,7 +70,7 @@ var SocketService = (function() {
 
     };
 
-    var SocketService = function(game) {
+    var SocketService = function (game) {
 
         // var connect = 'http://localhost:8080/match-socks';
         var connect = 'http://default-environment.pgumpc8npq.us-east-1.elasticbeanstalk.com/match-socks';
@@ -87,7 +87,8 @@ var SocketService = (function() {
     };
 
     var LOG_TRAFFIC = false;
-    var game, socket, NO_OPERATION = function() {},
+    var game, socket, NO_OPERATION = function () {
+        },
         animator = Baseball.service.Animator;
 
     SocketService.prototype = {
@@ -102,7 +103,7 @@ var SocketService = (function() {
         /**
          * @param {string} field id e.g. Takarazuka47.
          */
-        start : function(field) {
+        start: function (field) {
             game = this.game;
             socket = this.stomp;
             game.opponentService = this;
@@ -126,16 +127,16 @@ var SocketService = (function() {
 
         },
 
-        on : function() {
+        on: function () {
             socket.on('register', this.register);
-            socket.on('pitch', function(pitch) {
+            socket.on('pitch', function (pitch) {
 
                 setTimeout(function () {
                     game.umpire.onSideChange();
                 }, 500);
 
                 if (LOG_TRAFFIC) console.log('receive', 'pitch', pitch);
-                game.windupThen(function() {
+                game.windupThen(function () {
 
                     game.thePitch(0, 0, NO_OPERATION, pitch);
                     var scope = (<any>window).s;
@@ -143,7 +144,7 @@ var SocketService = (function() {
 
                 });
             });
-            socket.on('swing', function(swing) {
+            socket.on('swing', function (swing) {
                 if (swing.fielder === 'false') {
                     swing.fielder = false;
                 }
@@ -156,52 +157,52 @@ var SocketService = (function() {
                 if (LOG_TRAFFIC) console.log('receive', 'swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
                 var scope = (<any>window).s;
-                animator.updateFlightPath.bind(scope)(function() {
+                animator.updateFlightPath.bind(scope)(function () {
                     if (swing.contact) {
                         animator.animateFieldingTrajectory(game);
                     }
                 });
             });
-            socket.on('partner_disconnect', function() {
+            socket.on('partner_disconnect', function () {
                 console.log('The opponent has disconnected');
                 var scope = (<any>window).s;
                 game.opponentConnected = false;
                 game.batter.ready = false;
                 if (game.stage === 'pitch' && game.humanBatting()) {
-                    game.onBatterReady = function() {
-                        game.autoPitch(function(callback) {
+                    game.onBatterReady = function () {
+                        game.autoPitch(function (callback) {
                             scope.updateFlightPath(callback);
                         });
                     };
                     game.batterReady();
                 }
                 if (game.stage === 'swing' && game.humanPitching()) {
-                    game.autoSwing(-20, 0, function(fn) {
+                    game.autoSwing(-20, 0, function (fn) {
                         fn();
                     });
                 }
             });
-            socket.on('partner_connect', function() {
+            socket.on('partner_connect', function () {
                 game.opponentConnected = true;
             });
-            socket.on('opponent_taking_field', function() {
+            socket.on('opponent_taking_field', function () {
                 console.log('A challenger has appeared! Sending game data.');
-                socket.emit('game_data', { json: JSON.stringify(game.toData()) });
+                socket.emit('game_data', {json: JSON.stringify(game.toData())});
             });
-            socket.on('game_data', function(data) {
+            socket.on('game_data', function (data) {
                 if (data.json) {
                     data = JSON.parse(data.json);
                 }
                 game.fromData(data);
             });
-            socket.on('field_in_use', function() {
+            socket.on('field_in_use', function () {
                 game.opponentConnected = false;
             });
         },
-        off : function() {
+        off: function () {
             socket.on('register', NO_OPERATION);
         },
-        register: function(data) {
+        register: function (data) {
             console.log('registration received', data.side || data);
             if (data === 'away' || data.side === 'away') {
                 game.humanControl = 'away';
@@ -210,11 +211,11 @@ var SocketService = (function() {
             }
             socket.on('register', NO_OPERATION);
         },
-        emitPitch : function(pitch) {
+        emitPitch: function (pitch) {
             if (LOG_TRAFFIC) console.log('emit', 'pitch', pitch);
             socket.emit('pitch', pitch);
         },
-        emitSwing : function(swing) {
+        emitSwing: function (swing) {
             if (LOG_TRAFFIC) console.log('emit', 'swing', swing);
             socket.emit('swing', swing);
         }

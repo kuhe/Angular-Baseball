@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 
 @Component({
     selector: 'scoreboard',
@@ -9,10 +9,11 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 })
 export class ScoreboardComponent implements OnInit {
 
-    t : Function;
-    y : any;
+    t: Function;
+    y: any;
 
-    constructor() { }
+    constructor() {
+    }
 
     ngOnInit() {
 

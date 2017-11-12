@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import Baseball from './../baseball-lib';
 
 @Component({
@@ -6,7 +6,7 @@ import Baseball from './../baseball-lib';
     templateUrl: './batters-data.component.html',
     styleUrls: ['./batters-data.component.css'],
     encapsulation: ViewEncapsulation.None,
-    inputs : ['y', 't']
+    inputs: ['y', 't']
 })
 export class BattersDataComponent implements OnInit {
 

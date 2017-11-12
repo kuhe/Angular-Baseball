@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({
     name: 'toIterable'
@@ -9,7 +9,7 @@ export class ToIterablePipe implements PipeTransform {
         if (typeof value === 'object') {
             const keys = Object.keys(value);
             const primitive = window;
-            return keys.map(function(key) {
+            return keys.map(function (key) {
                 let val = value[key];
                 if (val instanceof Object) {
 

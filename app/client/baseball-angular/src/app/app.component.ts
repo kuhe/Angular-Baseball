@@ -7,10 +7,10 @@ import TweenMax from 'gsap/TweenMax';
 (<any>window).THREE = THREE;
 (<any>window).TweenMax = TweenMax;
 
-const $ : any = (<any>window).$;
-const log : Function = (<any>window).log;
+const $: any = (<any>window).$;
+const log: Function = (<any>window).log;
 
-const IndexController = function($scope, SocketService) {
+const IndexController = function ($scope, SocketService) {
 
     var text = Baseball.util.text;
     var Game = Baseball.Game;
@@ -21,7 +21,7 @@ const IndexController = function($scope, SocketService) {
 
     $scope.y = new Game();
 
-    $scope.mode = function(setMode) {
+    $scope.mode = function (setMode) {
         if (setMode) {
             text.mode = setMode;
             if (localStorage) {
@@ -38,7 +38,7 @@ const IndexController = function($scope, SocketService) {
         }
     }
 
-    $scope.teamJapan = function() {
+    $scope.teamJapan = function () {
         var provider = new Baseball.teams.Provider;
         provider.assignTeam($scope.y, 'TeamJapan', 'away');
         var game = $scope.y;
@@ -53,17 +53,29 @@ const IndexController = function($scope, SocketService) {
 
     $scope.abbreviatePosition = Baseball.util.text.abbreviatePosition;
 
-    $scope.sim = function() {$scope.proceedToGame(1, 1);};
-    $scope.seventh = function() {$scope.proceedToGame(7, 1);};
-    $scope.playball = function() {$scope.proceedToGame();};
-    $scope.spectate = function() {$scope.proceedToGame(0, 1);};
+    $scope.sim = function () {
+        $scope.proceedToGame(1, 1);
+    };
+    $scope.seventh = function () {
+        $scope.proceedToGame(7, 1);
+    };
+    $scope.playball = function () {
+        $scope.proceedToGame();
+    };
+    $scope.spectate = function () {
+        $scope.proceedToGame(0, 1);
+    };
 
-    $scope.proceedToGame = function(quickMode, spectateCpu) {
+    /**
+     * @param {boolean|number} quickMode - 7 for playing from the 7th inning.
+     * @param {boolean} spectateCpu
+     */
+    $scope.proceedToGame = function (quickMode, spectateCpu) {
         $scope.begin = true;
         var game = $scope.y;
         game.humanControl = spectateCpu ? 'none' : 'home';
         game.console = !!quickMode && quickMode !== 7;
-        var field = (<any>window).location.hash ? (<any>window).location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random()*47);
+        var field = (<any>window).location.hash ? (<any>window).location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random() * 47);
         if (typeof (<any>window).SockJS !== 'undefined') {
             var socketService = $scope.socketService = new SocketService(game);
             socketService.start(field);
@@ -80,7 +92,7 @@ const IndexController = function($scope, SocketService) {
             game.console = true;
             do {
                 n++;
-                game.simulateInput(function(callback) {
+                game.simulateInput(function (callback) {
                     typeof callback == 'function' && callback();
                 });
             } while (game.stage !== 'end' && n < 500);
@@ -90,7 +102,7 @@ const IndexController = function($scope, SocketService) {
         } else if (quickMode === 7 && spectateCpu === 1) {
             Animator.console = game.console = true;
             do {
-                game.simulateInput(function(callback) {
+                game.simulateInput(function (callback) {
                     typeof callback == 'function' && callback();
                 });
             } while (game.inning < 7);
@@ -103,17 +115,17 @@ const IndexController = function($scope, SocketService) {
             game.umpire.onSideChange();
         } else if (game.humanControl === 'none') {
             var scalar = game.console ? 0.05 : 1;
-            var auto = setInterval(function() {
+            var auto = setInterval(function () {
                 if (game.stage === 'end') {
                     clearInterval(auto);
                 }
-                game.simulatePitchAndSwing(function(callback) {
+                game.simulatePitchAndSwing(function (callback) {
                     $scope.updateFlightPath(callback);
                 });
-            }, scalar*(game.field.hasRunnersOn() ? Animator.TIME_FROM_SET + 2000 : Animator.TIME_FROM_WINDUP + 2000));
+            }, scalar * (game.field.hasRunnersOn() ? Animator.TIME_FROM_SET + 2000 : Animator.TIME_FROM_WINDUP + 2000));
         }
         if (game.humanControl === 'away') {
-            game.simulateInput(function(callback) {
+            game.simulateInput(function (callback) {
                 $scope.updateFlightPath(callback);
             });
         }
@@ -127,7 +139,7 @@ const IndexController = function($scope, SocketService) {
         }
     };
 
-    var bindMethods = function() {
+    var bindMethods = function () {
         var game = $scope.y;
         $scope.holdUpTimeouts = [];
         $scope.expandScoreboard = false;
@@ -135,18 +147,18 @@ const IndexController = function($scope, SocketService) {
 
         // avoid scope cycles, any other easy way?
         var bat = $('.target .swing.stance-indicator');
-        var showBat = function(event) {
+        var showBat = function (event) {
             if (game.humanBatting()) {
                 var offset = $('.target').offset();
                 var relativeOffset = {
-                    x : event.pageX - offset.left,
-                    y : 200 - (event.pageY - offset.top)
+                    x: event.pageX - offset.left,
+                    y: 200 - (event.pageY - offset.top)
                 };
                 var angle = game.setBatAngle(relativeOffset.x, relativeOffset.y);
                 bat.css({
-                    top: 200-relativeOffset.y + "px",
+                    top: 200 - relativeOffset.y + "px",
                     left: relativeOffset.x + "px",
-                    transform: "rotate(" + angle + "deg) rotateY("+(game.batter.bats == "left" ? 0 : -0)+"deg)"
+                    transform: "rotate(" + angle + "deg) rotateY(" + (game.batter.bats == "left" ? 0 : -0) + "deg)"
                 });
                 if (relativeOffset.x > 200 || relativeOffset.x < 0 || relativeOffset.y > 200 || relativeOffset.y < 0) {
                     bat.hide();
@@ -156,15 +168,15 @@ const IndexController = function($scope, SocketService) {
             }
         };
         var glove = $('.target .glove.stance-indicator');
-        var showGlove = function(event) {
+        var showGlove = function (event) {
             if (game.humanPitching()) {
                 var offset = $('.target').offset();
                 var relativeOffset = {
-                    x : event.pageX - offset.left,
-                    y : 200 - (event.pageY - offset.top)
+                    x: event.pageX - offset.left,
+                    y: 200 - (event.pageY - offset.top)
                 };
                 glove.css({
-                    top: 200-relativeOffset.y + "px",
+                    top: 200 - relativeOffset.y + "px",
                     left: relativeOffset.x + "px"
                 });
                 if (relativeOffset.x > 200 || relativeOffset.x < 0 || relativeOffset.y > 200 || relativeOffset.y < 0) {
@@ -175,10 +187,10 @@ const IndexController = function($scope, SocketService) {
             }
         };
 
-        $scope.generateTeam = function(heroRate) {
+        $scope.generateTeam = function (heroRate) {
             $scope.y.teams.away = new Baseball.model.Team($scope.y, heroRate);
         };
-        $scope.clickLineup = function(player) {
+        $scope.clickLineup = function (player) {
             if (player.team.sub !== player.team.noSubstituteSelected) {
                 var sub = player.team.sub;
                 player.team.sub = null;
@@ -186,13 +198,13 @@ const IndexController = function($scope, SocketService) {
             }
             player.team.expanded = (player.team.expanded == player ? null : player);
         };
-        $scope.selectSubstitute = function(player) {
+        $scope.selectSubstitute = function (player) {
             if (game.humanControl === 'home' && player.team !== game.teams.home) return;
             if (game.humanControl === 'away' && player.team !== game.teams.away) return;
             player.team.sub = (player.team.sub === player ? player.team.noSubstituteSelected : player);
         };
 
-        $scope.selectPitch = function(pitchName) {
+        $scope.selectPitch = function (pitchName) {
             if (game.stage == 'pitch') {
                 game.pitchInFlight = $.extend({}, game.pitcher.pitching[pitchName]);
                 game.pitchInFlight.name = pitchName;
@@ -200,13 +212,13 @@ const IndexController = function($scope, SocketService) {
             }
         };
         $scope.allowInput = true;
-        $scope.holdUp = function() {
+        $scope.holdUp = function () {
             $('.input-area').click();
         };
-        game.startOpponentPitching = function(callback) {
+        game.startOpponentPitching = function (callback) {
             $scope.updateFlightPath(callback);
         };
-        $scope.indicate = function($event) {
+        $scope.indicate = function ($event) {
             if (!$scope.allowInput) {
                 return;
             }
@@ -219,19 +231,19 @@ const IndexController = function($scope, SocketService) {
             }
             var offset = $('.target').offset();
             var relativeOffset = {
-                x : $event.pageX - offset.left,
-                y : 200 - ($event.pageY - offset.top)
+                x: $event.pageX - offset.left,
+                y: 200 - ($event.pageY - offset.top)
             };
             clearTimeout($scope.lastTimeout);
             while ($scope.holdUpTimeouts.length) {
                 clearTimeout($scope.holdUpTimeouts.shift());
             }
             $scope.showMessage = false;
-            game.receiveInput(relativeOffset.x, relativeOffset.y, function(callback) {
+            game.receiveInput(relativeOffset.x, relativeOffset.y, function (callback) {
                 $scope.updateFlightPath(callback);
             });
         };
-        game.umpire.onSideChange = function() {
+        game.umpire.onSideChange = function () {
             if (game.humanBatting()) {
                 $('.input-area').mousemove(showBat);
             } else {
@@ -281,7 +293,14 @@ export class AppComponent {
     constructor() {
 
         IndexController(this, SocketService);
+        referenceContainer.instance = this;
 
     }
 
+    proceedToGame: Function;
+
 }
+
+export const referenceContainer: { instance: AppComponent } = {
+    instance: null
+};

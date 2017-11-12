@@ -16,6 +16,7 @@ import { Animator } from './Services/Animator';
 import { Iterator } from './Services/Iterator';
 
 import { Provider } from './Teams/Provider';
+import { samurai } from './Teams/TeamJapan';
 
 Baseball.model = {};
 Baseball.model.Game = Baseball.Game = Game;
@@ -35,6 +36,7 @@ Baseball.util.text.abbreviatePosition = abbreviatePosition;
 
 Baseball.teams = {};
 Baseball.teams.Provider = Provider;
+Baseball.teams.Japan = samurai;
 
 export default Baseball;
 export { Baseball }

@@ -1,49 +1,52 @@
 <scoreboard [y]='y' [t]='t'></scoreboard>
-<hr class='under-canvas' />
+<hr class='under-canvas'/>
 <div class='diamond-display row'>
-  <div class='col-md-4 language-select'>
-    <div class='pull-right'>
-      <button class='btn small' (click)='mode("e")' [ngClass]='{disabled: mode() != "e"}'>
-        <strong class='pointer' >English</strong>
-      </button>
-      <br>
-      <button class='btn small' (click)='mode("n")' [ngClass]='{disabled: mode() != "n"}'>
-        <strong class='pointer'>日本語</strong>
-      </button>
-      <br/>
-      <br/>
-      <!--<p>-->
-      <!--{{ y.timeOfDay.h }}:{{ y.timeOfDay.m }}-->
-      <!--</p>-->
+    <div class='col-md-4 language-select'>
+        <div class='pull-right'>
+            <button class='btn small' (click)='mode("e")' [ngClass]='{disabled: mode() != "e"}'>
+                <strong class='pointer'>English</strong>
+            </button>
+            <br>
+            <button class='btn small' (click)='mode("n")' [ngClass]='{disabled: mode() != "n"}'>
+                <strong class='pointer'>日本語</strong>
+            </button>
+            <br/>
+            <br/>
+            <!--<p>-->
+            <!--{{ y.timeOfDay.h }}:{{ y.timeOfDay.m }}-->
+            <!--</p>-->
+        </div>
     </div>
-  </div>
-  <div class='col-md-4'>
-    <div class='splay-indicator-wrapper'>
-      <div class='splay-indicator'>
-        <div class='splay-indicator-ball' *ngIf='y.swingResult.contact'
-             [ngStyle]='{
+    <div class='col-md-4'>
+        <div class='splay-indicator-wrapper'>
+            <div class='splay-indicator'>
+                <div class='splay-indicator-ball' *ngIf='y.swingResult.contact'
+                     [ngStyle]='{
                                     bottom: y.swingResult.bottom + "px",
                                     left: y.swingResult.left + "px"
                                 }'>
+                </div>
+            </div>
         </div>
-      </div>
+        <div class='text-center steal-controls'
+             *ngIf='y.humanBatting() && y.field.getLeadRunner() && !y.opponentConnected'>
+            <button class='btn pointer small' (click)='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNER_GO'
+                    [ngClass]='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNER_GO}'>
+                {{ t('Steal') }}
+            </button>
+            <button class='btn pointer small'
+                    (click)='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNERS_DISCRETION'
+                    [ngClass]='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNERS_DISCRETION}'>
+                {{ t('Opportunistic') }}
+            </button>
+            <button class='btn pointer small'
+                    (click)='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNER_HOLD'
+                    [ngClass]='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNER_HOLD}'>
+                {{ t('Hold') }}
+            </button>
+        </div>
     </div>
-    <div class='text-center steal-controls' *ngIf='y.humanBatting() && y.field.getLeadRunner() && !y.opponentConnected'>
-      <button class='btn pointer small' (click)='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNER_GO'
-              [ngClass]='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNER_GO}'>
-        {{ t('Steal') }}
-      </button>
-      <button class='btn pointer small' (click)='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNERS_DISCRETION'
-              [ngClass]='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNERS_DISCRETION}'>
-        {{ t('Opportunistic') }}
-      </button>
-      <button class='btn pointer small' (click)='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNER_HOLD'
-              [ngClass]='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNER_HOLD}'>
-        {{ t('Hold') }}
-      </button>
+    <div class='col-md-4'>
     </div>
-  </div>
-  <div class='col-md-4'>
-  </div>
 </div>
-<hr class='under-canvas' />
+<hr class='under-canvas'/>

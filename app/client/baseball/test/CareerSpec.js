@@ -1,14 +1,13 @@
-require('babel-register')({
-    presets: []
-});
+const B = require('./../../baseball-angular/src/public/baseball.bundle');
+const Baseball = B.Baseball || B.default || B;
 
 require('colors');
-const Baseball = require('../baseball').Baseball;
-const Animator = require('../Services/Animator').Animator;
-const Iterator = require('../Services/Iterator').Iterator;
-const text = require('../Utility/text').text;
+
+const { Animator, Iterator } = Baseball.service;
+const text = Baseball.util.text;
+const samurai = Baseball.teams.Japan;
+
 text.mode = 'n';
-const samurai = require('../Teams/TeamJapan').samurai;
 const seasons = 10;
 
 const Game = Baseball.model.Game;

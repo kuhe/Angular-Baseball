@@ -1,6 +1,5 @@
 // code snippet excised from CareerSpec
 
-
 const teams = [1,2,3,4,5,6,7].map(() => {
     const team = new Team(game);
     team.wins = 0;

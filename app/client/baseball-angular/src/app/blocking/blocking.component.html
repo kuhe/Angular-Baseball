@@ -1,0 +1,68 @@
+<div class='blocking instructions'>
+    <section class='row'>
+        <div class='col-md-4'></div>
+        <div class='col-md-4 language-select'>
+            <button class='btn pointer' (click)='mode("e"); $event.stopPropagation()'>
+                English
+            </button>
+            <button class='btn pointer' (click)='mode("n"); $event.stopPropagation()'>
+                日本語
+            </button>
+        </div>
+        <div class='col-md-4'></div>
+    </section>
+    <br/>
+    <div class='row'>
+        <div class='col-md-4'>
+        </div>
+        <div class="col-md-4">
+            <div class="target swing">
+                <div class='indicator baseball pitch' style='top:70px;left:55px;padding:2px;'></div>
+                <div class='indicator baseball pitch' style='top:74px;left:50px;padding:3px;'></div>
+                <div class='indicator baseball pitch' style='top:82px;left:48px;padding:4px;'></div>
+                <div class='indicator baseball pitch' style='top:94px;left:55px;padding:6px;'></div>
+                <div class='indicator baseball pitch' style='top:110px;left:80px;padding:8px;'></div>
+                <div class='indicator baseball pitch' style='top:130px;left:100px;padding:10px;'></div>
+                <div class='indicator baseball break' style='top:145px;left:125px;padding:12px;'></div>
+                <div class='strikezone'></div>
+            </div>
+        </div>
+        <div class='col-md-4'>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-md-4'>
+        </div>
+        <div class="col-md-4">
+        </div>
+        <div class='col-md-4'>
+        </div>
+    </div>
+    <hr>
+    <section class='row options'>
+        <div class='col-md-12'>
+            <button (click)="proceedToGame(0, 0); $event.stopPropagation()" class='btn play-ball pointer'>
+                {{ t('Play Ball!') }}
+            </button>
+            <button (click)="proceedToGame(0, 1); $event.stopPropagation()" class='btn pointer'>
+                {{ t('Spectate the CPU') }}
+            </button>
+        </div>
+        <p style='text-align: center; max-width: 340px; margin: auto;'>
+            Supposing the matchmaking server hasn't crashed, you can
+            share your URL (including hash) after clicking 'Play Ball!'
+            to play with a live opponent.
+        </p>
+    </section>
+    <section class='baseball-beginner text-left'>
+        <hr/>
+        <div class='col-md-12'>
+            <button (click)='proceedToGame(1, 1); $event.stopPropagation()' class='btn pointer'>
+                {{ t('Run Fast Simulation') }} &raquo;
+            </button>
+            <button (click)='proceedToGame(7, 1); $event.stopPropagation()' class='btn pointer'>
+                {{ t('Play from the 7th') }} &raquo;
+            </button>
+        </div>
+    </section>
+</div>
