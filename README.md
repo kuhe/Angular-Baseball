@@ -10,8 +10,6 @@ Hosted at [kuhe.github.io](http://kuhe.github.io)
 
 todo :
 
-    スイングタイミング
-
     送りバント
     
     観客席やら
@@ -21,39 +19,42 @@ todo :
 
     app (development source code)
         / client
-            / baseball : game engine (ES6)
-                / test : mocha unit (ES6)
-            / scripts : framework-specific js (ES5)
+            / baseball : game engine (ES6/ESM)
+                / test : unit (ES6)
+            / baseball-angular : TypeScript/Angular5 rendering front end
             / styles : less
-            / tests : protractor E2E (unused, sadly)
-            gulpfile.js : build control
         / server
             the websocket server for live head-2-head play
-    public (server assets)
-        / js
-        / css
-        / html
-        / images
+    public (end user runtime)
         index.html : the home page
 
 
 ## Development
 
-Install npm, bower
+Install npm somehow.
 
-Install dependencies
+Install dependencies in each folder that contains a `package.json` file.
 
     > npm run install
-
-This will run the start the file watchers. Use gulp build to just build once.
-
-    app/client> gulp
-
 
 ## Test development
 
 Incidentally, this is the CLI mode, and will run a test simulating the 10-year career of a random player.
 
-See app\client\baseball\test\CareerSpec.js (es6)
+See `app\client\baseball\test\CareerSpec.js` (es6)
 
     > npm test
+
+Or simply run the file in Node.
+
+## Project history
+
+In iirc 2014 I began writing this as a baseball simulator using Angular 1.x, hence the name.
+I have since stopped using Angular in my day job, but I upgraded this to use Angular 2 (and then 5)
+regardless, to stay true to its roots. And also because the core baseball simulation did not care what was
+being used to render it.
+
+However, as much as I like TypeScript and Angular, it's been kind of a pain to integrate the ESM portion of the
+baseball engine to an `angular-cli` project.
+
+OH WELL
