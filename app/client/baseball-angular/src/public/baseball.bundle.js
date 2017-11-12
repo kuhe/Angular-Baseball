@@ -4460,7 +4460,12 @@ Animator_Animator.prototype = {
     /**
      * console mode disables most animator functions
      */
-    console : false,
+    get console() {
+        return Animator_Animator.console;
+    },
+    set console(value) {
+        Animator_Animator.console = value;
+    },
     TweenMax : {},
     THREE : {},
     /**
@@ -5784,6 +5789,8 @@ Umpire.prototype = {
 
 
 
+const Game_$ = typeof window === 'object' ? window.$ : () => {};
+
 /**
  * Apologies for the godclass here.
  * @param m - language mode.
@@ -5792,7 +5799,6 @@ Umpire.prototype = {
 const Game = function(m) {
     this.gamesIntoSeason = 72;
     this.humanControl = 'home'; //home, away, both, none
-    this.console = false;
     this.debug = [];
     this.pitcher = null; // Player&
     this.batter = null; // Player&
@@ -5915,6 +5921,12 @@ Game.prototype = {
         this.autoPitchSelect();
         Animator_Animator.init();
         this.passMinutes(5);
+    },
+    get console() {
+        return Animator_Animator.console;
+    },
+    set console(value) {
+        Animator_Animator.console = value;
     },
     passMinutes(minutes) {
         const time = this.timeOfDay;
@@ -6049,12 +6061,12 @@ Game.prototype = {
         const pitcher = this.pitcher;
         pitcher.windingUp = true;
 
-        if (!this.console) {
-            $('.baseball').addClass('hide');
-            var windup = $('.windup');
+        if (!Animator_Animator.console) {
+            Game_$('.baseball').addClass('hide');
+            var windup = Game_$('.windup');
             windup.css('width', '100%');
         }
-        if (this.console) {
+        if (Animator_Animator.console) {
             callback();
             pitcher.windingUp = false;
         } else {
@@ -6081,7 +6093,7 @@ Game.prototype = {
         y = pitch.y;
 
         this.windupThen(() => {
-            !this.console && $('.baseball.pitch').removeClass('hide');
+            !Animator_Animator.console && Game_$('.baseball.pitch').removeClass('hide');
             this.thePitch(x, y, callback);
         });
     },
@@ -6169,7 +6181,7 @@ Game.prototype = {
             giraffe.onBatterReady = () => {
                 giraffe.autoPitch(callback);
             };
-            if (this.console) {
+            if (Animator_Animator.console) {
                 giraffe.batterReady();
             } else {
                 this.batterReadyTimeout = setTimeout(() => {
@@ -6604,10 +6616,9 @@ Game.prototype = {
      * @param {string} pitchName
      */
     selectPitch (pitchName) {
-        const $ = window.$;
         const game = this;
         if (game.stage === 'pitch') {
-            game.pitchInFlight = $.extend({}, game.pitcher.pitching[pitchName]);
+            game.pitchInFlight = Game_$.extend({}, game.pitcher.pitching[pitchName]);
             game.pitchInFlight.name = pitchName;
             game.swingResult.looking = true;
         }
@@ -6649,7 +6660,6 @@ Game.prototype = {
      * @param {boolean|number} spectateCpu
      */
     proceedToGame(SocketService, quickMode, spectateCpu) {
-        const $ = window.$;
         const game = this;
         game.humanControl = spectateCpu ? 'none' : 'home';
         game.console = !!quickMode && quickMode !== 7;
@@ -6661,8 +6671,8 @@ Game.prototype = {
             console.log('no socket client');
         }
         window.location.hash = '#' + field;
-        $('.blocking').remove();
-        $('.play-begins').show();
+        Game_$('.blocking').remove();
+        Game_$('.play-begins').show();
         if (game.humanControl === 'none' && game.console) {
             let n = 0;
             Animator_Animator.console = true;
@@ -6731,7 +6741,13 @@ Game.prototype = {
             });
         } while (game.batter === batter && this.stage !== 'end');
         log('-- At Bat Simulated --');
-        game.humanControl = control;
+        if (this.stage === 'end') {
+            return;
+        }
+        if (game.humanControl === 'none') {
+            game.humanControl = control;
+        }
+        game.stage = 'pitch';
         Animator_Animator.console = game.console = false;
         game.umpire.onSideChange(); // rebind hover UI, not actual change sides :\...
     },

@@ -14,7 +14,12 @@ Animator.prototype = {
     /**
      * console mode disables most animator functions
      */
-    console : false,
+    get console() {
+        return Animator.console;
+    },
+    set console(value) {
+        Animator.console = value;
+    },
     TweenMax : {},
     THREE : {},
     /**

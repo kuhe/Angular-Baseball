@@ -53083,10 +53083,20 @@ module.exports = "<div class='container'>\r\n    <blocking [y]='y' [t]='t'></blo
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return referenceContainer; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/esm5/core.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__baseball_lib__ = __webpack_require__("../../../../../src/app/baseball-lib.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_SocketService__ = __webpack_require__("../../../../../src/services/SocketService.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_three__ = __webpack_require__("../../../../../../node_modules/three/build/three.module.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_gsap_TweenMax__ = __webpack_require__("../../../../../../node_modules/gsap/TweenMax.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_gsap_TweenMax___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_gsap_TweenMax__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_three__ = __webpack_require__("../../../../../../node_modules/three/build/three.module.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_gsap_TweenMax__ = __webpack_require__("../../../../../../node_modules/gsap/TweenMax.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_gsap_TweenMax___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_gsap_TweenMax__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mode_mode_component__ = __webpack_require__("../../../../../src/app/mode/mode.component.ts");
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -53101,138 +53111,48 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-window.THREE = __WEBPACK_IMPORTED_MODULE_3_three__;
-window.TweenMax = __WEBPACK_IMPORTED_MODULE_4_gsap_TweenMax___default.a;
+window.THREE = __WEBPACK_IMPORTED_MODULE_2_three__;
+window.TweenMax = __WEBPACK_IMPORTED_MODULE_3_gsap_TweenMax___default.a;
 var $ = window.$;
-var log = window.log;
-var IndexController = function ($scope, SocketService) {
+/**
+ *
+ * Shoe-horn angular1 code into angular5 :).
+ * @param $scope
+ *
+ */
+var IndexController = function ($scope) {
     var text = __WEBPACK_IMPORTED_MODULE_1__baseball_lib__["a" /* default */].util.text;
     var Game = __WEBPACK_IMPORTED_MODULE_1__baseball_lib__["a" /* default */].Game;
-    var Animator = __WEBPACK_IMPORTED_MODULE_1__baseball_lib__["a" /* default */].service.Animator;
     window.s = $scope;
     $scope.t = text;
     $scope.y = new Game();
-    $scope.mode = function (setMode) {
-        if (setMode) {
-            text.mode = setMode;
-            if (localStorage) {
-                localStorage.__$yakyuuaikoukai_text_mode = setMode;
-            }
-        }
-        return text.mode;
-    };
     if (localStorage) {
         var storedMode = localStorage.__$yakyuuaikoukai_text_mode;
         if (storedMode === 'e' || storedMode === 'n') {
             $scope.mode(storedMode);
         }
     }
-    $scope.teamJapan = function () {
-        var provider = new __WEBPACK_IMPORTED_MODULE_1__baseball_lib__["a" /* default */].teams.Provider;
-        provider.assignTeam($scope.y, 'TeamJapan', 'away');
-        var game = $scope.y;
-        if (game.half === 'top') {
-            game.batter = game.teams.away.lineup[game.batter.order];
-            game.deck = game.teams.away.lineup[(game.batter.order + 1) % 9];
-            game.hole = game.teams.away.lineup[(game.batter.order + 2) % 9];
-        }
-        else {
-            game.pitcher = game.teams.away.positions.pitcher;
-        }
-    };
     $scope.abbreviatePosition = __WEBPACK_IMPORTED_MODULE_1__baseball_lib__["a" /* default */].util.text.abbreviatePosition;
-    $scope.sim = function () {
-        $scope.proceedToGame(1, 1);
-    };
-    $scope.seventh = function () {
-        $scope.proceedToGame(7, 1);
-    };
-    $scope.playball = function () {
-        $scope.proceedToGame();
-    };
-    $scope.spectate = function () {
-        $scope.proceedToGame(0, 1);
-    };
+};
+var AppComponent = (function (_super) {
+    __extends(AppComponent, _super);
+    function AppComponent() {
+        var _this = _super.call(this) || this;
+        IndexController(_this);
+        referenceContainer.instance = _this;
+        return _this;
+    }
     /**
-     * @param {boolean|number} quickMode - 7 for playing from the 7th inning.
-     * @param {boolean} spectateCpu
+     * Carryover from angular 1 code.
      */
-    $scope.proceedToGame = function (quickMode, spectateCpu) {
+    AppComponent.prototype.bindMethods = function () {
+        var $scope = this;
+        var Animator = __WEBPACK_IMPORTED_MODULE_1__baseball_lib__["a" /* default */].service.Animator;
         $scope.begin = true;
-        var game = $scope.y;
-        game.humanControl = spectateCpu ? 'none' : 'home';
-        game.console = !!quickMode && quickMode !== 7;
-        var field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random() * 47);
-        if (typeof window.SockJS !== 'undefined') {
-            var socketService = $scope.socketService = new SocketService(game);
-            socketService.start(field);
-        }
-        else {
-            console.log('no socket client');
-        }
-        window.location.hash = '#' + field;
-        bindMethods();
-        $('.blocking').remove();
-        $('.play-begins').show();
-        if (game.humanControl === 'none' && game.console) {
-            var n = 0;
-            Animator.console = true;
-            game.console = true;
-            do {
-                n++;
-                game.simulateInput(function (callback) {
-                    typeof callback == 'function' && callback();
-                });
-            } while (game.stage !== 'end' && n < 500);
-            Animator.console = game.console = false;
-            log('sim ended');
-            game.debugOut();
-        }
-        else if (quickMode === 7 && spectateCpu === 1) {
-            Animator.console = game.console = true;
-            do {
-                game.simulateInput(function (callback) {
-                    typeof callback == 'function' && callback();
-                });
-            } while (game.inning < 7);
-            log('sim halted in 7th');
-            game.debugOut();
-            Animator.console = game.console = false;
-            game.stage = 'pitch';
-            game.half = 'top';
-            game.humanControl = 'home';
-            game.umpire.onSideChange();
-        }
-        else if (game.humanControl === 'none') {
-            var scalar = game.console ? 0.05 : 1;
-            var auto = setInterval(function () {
-                if (game.stage === 'end') {
-                    clearInterval(auto);
-                }
-                game.simulatePitchAndSwing(function (callback) {
-                    $scope.updateFlightPath(callback);
-                });
-            }, scalar * (game.field.hasRunnersOn() ? Animator.TIME_FROM_SET + 2000 : Animator.TIME_FROM_WINDUP + 2000));
-        }
-        if (game.humanControl === 'away') {
-            game.simulateInput(function (callback) {
-                $scope.updateFlightPath(callback);
-            });
-        }
-        if (game.humanControl === 'home') {
-            $scope.showMessage = true;
-        }
-        if (!quickMode || quickMode === 7) {
-            Animator.loop.setTargetTimeOfDay(game.startTime.h, game.startTime.m);
-            game.timeOfDay.h = game.startTime.h;
-            game.timeOfDay.m = game.startTime.m;
-        }
-    };
-    var bindMethods = function () {
         var game = $scope.y;
         $scope.holdUpTimeouts = [];
         $scope.expandScoreboard = false;
-        $scope.updateFlightPath = Animator.updateFlightPath.bind($scope);
+        game.updateFlightPath = $scope.updateFlightPath = Animator.updateFlightPath.bind($scope);
         // avoid scope cycles, any other easy way?
         var bat = $('.target .swing.stance-indicator');
         var showBat = function (event) {
@@ -53274,31 +53194,6 @@ var IndexController = function ($scope, SocketService) {
                 else {
                     glove.show();
                 }
-            }
-        };
-        $scope.generateTeam = function (heroRate) {
-            $scope.y.teams.away = new __WEBPACK_IMPORTED_MODULE_1__baseball_lib__["a" /* default */].model.Team($scope.y, heroRate);
-        };
-        $scope.clickLineup = function (player) {
-            if (player.team.sub !== player.team.noSubstituteSelected) {
-                var sub = player.team.sub;
-                player.team.sub = null;
-                return sub.substitute(player);
-            }
-            player.team.expanded = (player.team.expanded == player ? null : player);
-        };
-        $scope.selectSubstitute = function (player) {
-            if (game.humanControl === 'home' && player.team !== game.teams.home)
-                return;
-            if (game.humanControl === 'away' && player.team !== game.teams.away)
-                return;
-            player.team.sub = (player.team.sub === player ? player.team.noSubstituteSelected : player);
-        };
-        $scope.selectPitch = function (pitchName) {
-            if (game.stage == 'pitch') {
-                game.pitchInFlight = $.extend({}, game.pitcher.pitching[pitchName]);
-                game.pitchInFlight.name = pitchName;
-                game.swingResult.looking = true;
             }
         };
         $scope.allowInput = true;
@@ -53350,31 +53245,7 @@ var IndexController = function ($scope, SocketService) {
             }
         };
         game.umpire.onSideChange();
-        //var aside = {
-        //    left: $('aside.image-panel.left'),
-        //    right: $('aside.image-panel.right')
-        //};
-        //$scope.$watch('y.playResult', function() {
-        //    aside.left.hide();
-        //    aside.right.hide();
-        //    aside.left.fadeIn(1000, function() {
-        //        aside.left.fadeOut(1000);
-        //        aside.right.fadeIn(1000, function() {
-        //            aside.right.fadeOut(1000);
-        //        })
-        //    });
-        //    $scope.imagePanel = {
-        //        left: 'url(./public/images/' + $scope.y.playResult.batter + '.png)',
-        //        right: 'url(./public/images/' + $scope.y.playResult.fielder + '.png)'
-        //    };
-        //});
     };
-};
-var AppComponent = (function () {
-    function AppComponent() {
-        IndexController(this, __WEBPACK_IMPORTED_MODULE_2__services_SocketService__["a" /* default */]);
-        referenceContainer.instance = this;
-    }
     AppComponent = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
             selector: 'application-hook',
@@ -53385,7 +53256,7 @@ var AppComponent = (function () {
         __metadata("design:paramtypes", [])
     ], AppComponent);
     return AppComponent;
-}());
+}(__WEBPACK_IMPORTED_MODULE_4__mode_mode_component__["a" /* ModeComponent */]));
 
 var referenceContainer = {
     instance: null
@@ -53568,7 +53439,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/battery-data/battery-data.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div class='row battery-component'>\r\n\r\n    <!--pitchers-->\r\n    <div class='col-xs-6 text-right'>\r\n        <div class='pitch-count' [ngClass]=\"{'focus': y.half === 'bottom'}\">\r\n            <span class='secondary-battery-stats'>\r\n                {{y.teams.away.positions.pitcher.stats.pitching.K}}<span class='stat-abbrev'>{{ t('K') }}</span>\r\n                {{y.teams.away.positions.pitcher.stats.pitching.H}}<span class='stat-abbrev'>{{ t('H') }}</span>\r\n                {{y.teams.away.positions.pitcher.stats.pitching.BB}}<span class='stat-abbrev'>{{ t('BB') }}</span>\r\n            </span>\r\n            {{y.teams.away.positions.pitcher.stats.pitching.strikes}} -\r\n            {{y.teams.away.positions.pitcher.stats.pitching.pitches}}\r\n        </div>\r\n    </div>\r\n    <div class='col-xs-6 text-left'>\r\n        <div class='pitch-count' [ngClass]=\"{'focus': y.half === 'top'}\">\r\n            {{y.teams.home.positions.pitcher.stats.pitching.strikes}} -\r\n            {{y.teams.home.positions.pitcher.stats.pitching.pitches}}\r\n\r\n            <span class='secondary-battery-stats __right'>\r\n                {{y.teams.home.positions.pitcher.stats.pitching.K}}<span class='stat-abbrev'>{{ t('K') }}</span>\r\n                {{y.teams.home.positions.pitcher.stats.pitching.H}}<span class='stat-abbrev'>{{ t('H') }}</span>\r\n                {{y.teams.home.positions.pitcher.stats.pitching.BB}}<span class='stat-abbrev'>{{ t('BB') }}</span>\r\n            </span>\r\n        </div>\r\n    </div>\r\n    <div class='col-xs-6 text-right'>\r\n        <span class='defining'>\r\n            {{ y.teams.away.positions.pitcher.getDefiningPitchingCharacteristic() }}\r\n        </span>\r\n        <em>{{y.teams.away.positions.pitcher.throws == 'right' ? t('RHP') : t('LHP')}}</em> &raquo;\r\n        <span *ngIf='y.teams.away.positions.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n        ({{'#'+y.teams.away.positions.pitcher.number}})\r\n        <strong>{{y.teams.away.positions.pitcher.getName()}}</strong>\r\n    </div>\r\n    <div class='col-xs-6 text-left'>\r\n        <strong>{{y.teams.home.positions.pitcher.getName()}}</strong>\r\n        ({{'#'+y.teams.home.positions.pitcher.number}})\r\n        <span *ngIf='y.teams.home.positions.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n        &laquo; <em>{{y.teams.home.positions.pitcher.throws == 'right' ? t('RHP') : t('LHP')}}</em>\r\n        <span class='defining'>\r\n            {{ y.teams.home.positions.pitcher.getDefiningPitchingCharacteristic() }}\r\n        </span>\r\n    </div>\r\n\r\n    <!--catchers-->\r\n    <div class='col-xs-6 text-right'>\r\n        <em>{{abbreviatePosition('catcher')}}</em> &raquo;\r\n        <span *ngIf='y.teams.away.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n        ({{'#'+y.teams.away.positions.catcher.number}})\r\n        <strong>{{y.teams.away.positions.catcher.getName()}}</strong>\r\n    </div>\r\n    <div class='col-xs-6 text-left'>\r\n        <strong>{{y.teams.home.positions.catcher.getName()}}</strong> ({{'#'+y.teams.home.positions.catcher.number}})\r\n        <span *ngIf='y.teams.home.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n        &laquo; <em>{{abbreviatePosition('catcher')}}</em>\r\n    </div>\r\n\r\n    <!--Stats-->\r\n    <div class='col-xs-6 text-right'>\r\n        <span class=\"era\">\r\n            <strong>{{y.teams.away.positions.pitcher.stats.pitching.getERA()}}</strong>\r\n            <span class='stat-abbrev'>{{ t('ERA') }}</span>\r\n        </span>\r\n        <strong>{{y.teams.away.positions.pitcher.stats.pitching.W}}</strong>\r\n        <span class='stat-abbrev'>{{t('W')}}</span>\r\n    </div>\r\n    <div class='col-xs-6 text-left'>\r\n        <strong>{{y.teams.home.positions.pitcher.stats.pitching.W}}</strong>\r\n        <span class='stat-abbrev'>{{t('W')}}</span>\r\n        <span class=\"era\">\r\n            <strong>{{y.teams.home.positions.pitcher.stats.pitching.getERA()}}</strong>\r\n            <span class='stat-abbrev'>{{ t('ERA') }}</span>\r\n        </span>\r\n    </div>\r\n\r\n</div>\r\n"
+module.exports = "<div class='row battery-component'>\r\n\r\n    <!--pitchers-->\r\n    <div class='col-xs-6 text-right'>\r\n        <div class='pitch-count' [ngClass]=\"{'focus': y.half === 'bottom'}\">\r\n            <span class='secondary-battery-stats'>\r\n                {{y.teams.away.positions.pitcher.stats.pitching.K}}<span class='stat-abbrev'>{{ t('K') }}</span>\r\n                {{y.teams.away.positions.pitcher.stats.pitching.H}}<span class='stat-abbrev'>{{ t('H') }}</span>\r\n                {{y.teams.away.positions.pitcher.stats.pitching.BB}}<span class='stat-abbrev'>{{ t('BB') }}</span>\r\n            </span>\r\n            {{y.teams.away.positions.pitcher.stats.pitching.strikes}} -\r\n            {{y.teams.away.positions.pitcher.stats.pitching.pitches}}\r\n        </div>\r\n    </div>\r\n    <div class='col-xs-6 text-left'>\r\n        <div class='pitch-count' [ngClass]=\"{'focus': y.half === 'top'}\">\r\n            {{y.teams.home.positions.pitcher.stats.pitching.strikes}} -\r\n            {{y.teams.home.positions.pitcher.stats.pitching.pitches}}\r\n\r\n            <span class='secondary-battery-stats __right'>\r\n                {{y.teams.home.positions.pitcher.stats.pitching.K}}<span class='stat-abbrev'>{{ t('K') }}</span>\r\n                {{y.teams.home.positions.pitcher.stats.pitching.H}}<span class='stat-abbrev'>{{ t('H') }}</span>\r\n                {{y.teams.home.positions.pitcher.stats.pitching.BB}}<span class='stat-abbrev'>{{ t('BB') }}</span>\r\n            </span>\r\n        </div>\r\n    </div>\r\n\r\n    <div class='col-xs-6 text-right' [ngClass]=\"{'unfocus': y.half === 'top'}\">\r\n        <span class='defining'>\r\n            {{ y.teams.away.positions.pitcher.getDefiningPitchingCharacteristic() }}\r\n        </span>\r\n        <em>{{y.teams.away.positions.pitcher.throws == 'right' ? t('RHP') : t('LHP')}}</em> &raquo;\r\n        <span *ngIf='y.teams.away.positions.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n        ({{'#'+y.teams.away.positions.pitcher.number}})\r\n        <strong>{{y.teams.away.positions.pitcher.getName()}}</strong>\r\n    </div>\r\n    <div class='col-xs-6 text-left' [ngClass]=\"{'unfocus': y.half === 'bottom'}\">\r\n        <strong>{{y.teams.home.positions.pitcher.getName()}}</strong>\r\n        ({{'#'+y.teams.home.positions.pitcher.number}})\r\n        <span *ngIf='y.teams.home.positions.pitcher.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n        &laquo; <em>{{y.teams.home.positions.pitcher.throws == 'right' ? t('RHP') : t('LHP')}}</em>\r\n        <span class='defining'>\r\n            {{ y.teams.home.positions.pitcher.getDefiningPitchingCharacteristic() }}\r\n        </span>\r\n    </div>\r\n\r\n    <!--catchers-->\r\n    <div class='col-xs-6 text-right' [ngClass]=\"{'unfocus': y.half === 'top'}\">\r\n        <em>{{abbreviatePosition('catcher')}}</em> &raquo;\r\n        <span *ngIf='y.teams.away.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n        ({{'#'+y.teams.away.positions.catcher.number}})\r\n        <strong>{{y.teams.away.positions.catcher.getName()}}</strong>\r\n    </div>\r\n    <div class='col-xs-6 text-left' [ngClass]=\"{'unfocus': y.half === 'bottom'}\">\r\n        <strong>{{y.teams.home.positions.catcher.getName()}}</strong> ({{'#'+y.teams.home.positions.catcher.number}})\r\n        <span *ngIf='y.teams.home.positions.catcher.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n        &laquo; <em>{{abbreviatePosition('catcher')}}</em>\r\n    </div>\r\n\r\n    <!--Stats-->\r\n    <div class='col-xs-6 text-right' [ngClass]=\"{'unfocus': y.half === 'top'}\">\r\n        <span class=\"era\">\r\n            <strong>{{y.teams.away.positions.pitcher.stats.pitching.getERA()}}</strong>\r\n            <span class='stat-abbrev'>{{ t('ERA') }}</span>\r\n        </span>\r\n        <strong>{{y.teams.away.positions.pitcher.stats.pitching.W}}</strong>\r\n        <span class='stat-abbrev'>{{t('W')}}</span>\r\n    </div>\r\n    <div class='col-xs-6 text-left' [ngClass]=\"{'unfocus': y.half === 'bottom'}\">\r\n        <strong>{{y.teams.home.positions.pitcher.stats.pitching.W}}</strong>\r\n        <span class='stat-abbrev'>{{t('W')}}</span>\r\n        <span class=\"era\">\r\n            <strong>{{y.teams.home.positions.pitcher.stats.pitching.getERA()}}</strong>\r\n            <span class='stat-abbrev'>{{ t('ERA') }}</span>\r\n        </span>\r\n    </div>\r\n\r\n</div>\r\n"
 
 /***/ }),
 
@@ -53634,7 +53505,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/blocking/blocking.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div class='blocking instructions'>\r\n    <section class='row'>\r\n        <div class='col-md-4'></div>\r\n        <div class='col-md-4 language-select'>\r\n            <button class='btn pointer' (click)='mode(\"e\"); $event.stopPropagation()'>\r\n                English\r\n            </button>\r\n            <button class='btn pointer' (click)='mode(\"n\"); $event.stopPropagation()'>\r\n                日本語\r\n            </button>\r\n        </div>\r\n        <div class='col-md-4'></div>\r\n    </section>\r\n    <br/>\r\n    <div class='row'>\r\n        <div class='col-md-4'>\r\n        </div>\r\n        <div class=\"col-md-4\">\r\n            <div class=\"target swing\">\r\n                <div class='indicator baseball pitch' style='top:70px;left:55px;padding:2px;'></div>\r\n                <div class='indicator baseball pitch' style='top:74px;left:50px;padding:3px;'></div>\r\n                <div class='indicator baseball pitch' style='top:82px;left:48px;padding:4px;'></div>\r\n                <div class='indicator baseball pitch' style='top:94px;left:55px;padding:6px;'></div>\r\n                <div class='indicator baseball pitch' style='top:110px;left:80px;padding:8px;'></div>\r\n                <div class='indicator baseball pitch' style='top:130px;left:100px;padding:10px;'></div>\r\n                <div class='indicator baseball break' style='top:145px;left:125px;padding:12px;'></div>\r\n                <div class='strikezone'></div>\r\n            </div>\r\n        </div>\r\n        <div class='col-md-4'>\r\n        </div>\r\n    </div>\r\n    <div class='row'>\r\n        <div class='col-md-4'>\r\n        </div>\r\n        <div class=\"col-md-4\">\r\n        </div>\r\n        <div class='col-md-4'>\r\n        </div>\r\n    </div>\r\n    <hr>\r\n    <section class='row options'>\r\n        <div class='col-md-12'>\r\n            <button (click)=\"proceedToGame(0, 0); $event.stopPropagation()\" class='btn play-ball pointer'>\r\n                {{ t('Play Ball!') }}\r\n            </button>\r\n            <button (click)=\"proceedToGame(0, 1); $event.stopPropagation()\" class='btn pointer'>\r\n                {{ t('Spectate the CPU') }}\r\n            </button>\r\n        </div>\r\n        <p style='text-align: center; max-width: 340px; margin: auto;'>\r\n            Supposing the matchmaking server hasn't crashed, you can\r\n            share your URL (including hash) after clicking 'Play Ball!'\r\n            to play with a live opponent.\r\n        </p>\r\n    </section>\r\n    <section class='baseball-beginner text-left'>\r\n        <hr/>\r\n        <div class='col-md-12'>\r\n            <button (click)='proceedToGame(1, 1); $event.stopPropagation()' class='btn pointer'>\r\n                {{ t('Run Fast Simulation') }} &raquo;\r\n            </button>\r\n            <button (click)='proceedToGame(7, 1); $event.stopPropagation()' class='btn pointer'>\r\n                {{ t('Play from the 7th') }} &raquo;\r\n            </button>\r\n        </div>\r\n    </section>\r\n</div>\r\n"
+module.exports = "<div class='blocking instructions'>\r\n    <section class='row'>\r\n        <div class='col-md-4'></div>\r\n        <div class='col-md-4 language-select'>\r\n            <button class='btn pointer' (click)='mode(\"e\"); $event.stopPropagation()'>\r\n                English\r\n            </button>\r\n            <button class='btn pointer' (click)='mode(\"n\"); $event.stopPropagation()'>\r\n                日本語\r\n            </button>\r\n        </div>\r\n        <div class='col-md-4'></div>\r\n    </section>\r\n    <br/>\r\n    <div class='row'>\r\n        <div class='col-md-4'>\r\n        </div>\r\n        <div class=\"col-md-4\">\r\n            <div class=\"target swing\">\r\n                <div class='indicator baseball pitch' style='top:70px;left:55px;padding:2px;'></div>\r\n                <div class='indicator baseball pitch' style='top:74px;left:50px;padding:3px;'></div>\r\n                <div class='indicator baseball pitch' style='top:82px;left:48px;padding:4px;'></div>\r\n                <div class='indicator baseball pitch' style='top:94px;left:55px;padding:6px;'></div>\r\n                <div class='indicator baseball pitch' style='top:110px;left:80px;padding:8px;'></div>\r\n                <div class='indicator baseball pitch' style='top:130px;left:100px;padding:10px;'></div>\r\n                <div class='indicator baseball break' style='top:145px;left:125px;padding:12px;'></div>\r\n                <div class='strikezone'></div>\r\n            </div>\r\n        </div>\r\n        <div class='col-md-4'>\r\n        </div>\r\n    </div>\r\n    <div class='row'>\r\n        <div class='col-md-4'>\r\n        </div>\r\n        <div class=\"col-md-4\">\r\n        </div>\r\n        <div class='col-md-4'>\r\n        </div>\r\n    </div>\r\n    <hr>\r\n    <section class='row options'>\r\n        <div class='col-md-12'>\r\n            <button (click)=\"playball(); $event.stopPropagation()\" class='btn play-ball pointer'>\r\n                {{ t('Play Ball!') }}\r\n            </button>\r\n            <button (click)=\"spectate(); $event.stopPropagation()\" class='btn pointer'>\r\n                {{ t('Spectate the CPU') }}\r\n            </button>\r\n        </div>\r\n        <p style='text-align: center; max-width: 340px; margin: auto;'>\r\n            Supposing the matchmaking server hasn't crashed, you can\r\n            share your URL (including hash) after clicking 'Play Ball!'\r\n            to play with a live opponent.\r\n        </p>\r\n    </section>\r\n    <section class='baseball-beginner text-left'>\r\n        <hr/>\r\n        <div class='col-md-12'>\r\n            <button (click)='sim(); $event.stopPropagation()' class='btn pointer'>\r\n                {{ t('Run Fast Simulation') }} &raquo;\r\n            </button>\r\n            <button (click)='seventh(); $event.stopPropagation()' class='btn pointer'>\r\n                {{ t('Play from the 7th') }} &raquo;\r\n            </button>\r\n        </div>\r\n    </section>\r\n</div>\r\n"
 
 /***/ }),
 
@@ -53646,6 +53517,7 @@ module.exports = "<div class='blocking instructions'>\r\n    <section class='row
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/esm5/core.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mode_mode_component__ = __webpack_require__("../../../../../src/app/mode/mode.component.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_component__ = __webpack_require__("../../../../../src/app/app.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_SocketService__ = __webpack_require__("../../../../../src/services/SocketService.ts");
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -53668,6 +53540,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var BlockingComponent = (function (_super) {
     __extends(BlockingComponent, _super);
     function BlockingComponent() {
@@ -53675,13 +53548,21 @@ var BlockingComponent = (function (_super) {
     }
     BlockingComponent.prototype.ngOnInit = function () {
     };
-    BlockingComponent.prototype.proceedToGame = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance).proceedToGame.apply(_a, args);
-        var _a;
+    BlockingComponent.prototype.sim = function () {
+        __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.y.proceedToGame(__WEBPACK_IMPORTED_MODULE_3__services_SocketService__["a" /* default */], 1, 1);
+        __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.bindMethods();
+    };
+    BlockingComponent.prototype.seventh = function () {
+        __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.y.proceedToGame(__WEBPACK_IMPORTED_MODULE_3__services_SocketService__["a" /* default */], 7, 1);
+        __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.bindMethods();
+    };
+    BlockingComponent.prototype.playball = function () {
+        __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.y.proceedToGame(__WEBPACK_IMPORTED_MODULE_3__services_SocketService__["a" /* default */]);
+        __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.bindMethods();
+    };
+    BlockingComponent.prototype.spectate = function () {
+        __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.y.proceedToGame(__WEBPACK_IMPORTED_MODULE_3__services_SocketService__["a" /* default */], 0, 1);
+        __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.bindMethods();
     };
     BlockingComponent = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
@@ -53847,7 +53728,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/lower/lower.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<hr class='under-canvas'/>\r\n<div class='visible-sm visible-xs centered'>\r\n    {{ y.log.pitchRecord[mode()][0] }}\r\n</div>\r\n<!--<div class=\"umpire centered\">-->\r\n<!--Umpire: {{y.umpire.says}}-->\r\n<!--</div>-->\r\n<hr class='visible-sm visible-xs centered'>\r\n<ul class='centered list-inline pitch-selection' *ngIf='y.humanPitching()'>\r\n    <li class='pointer' *ngFor='let pitch of y.pitcher.pitching | toIterable;' (click)=\"selectPitch(pitch.__key)\">\r\n            <span>\r\n                <button class='pointer btn small' [ngClass]='{disabled: y.pitchInFlight.name !== pitch.__key}'>\r\n                    {{ t(pitch.__key) }}\r\n                </button>\r\n                <br>\r\n                <rating-block [rating]='pitch.control'></rating-block>\r\n                <rating-block [rating]='pitch.velocity'></rating-block>\r\n                <rating-block [rating]='pitch.break'></rating-block>\r\n            </span>\r\n    </li>\r\n    <br class='visible-xs'/>\r\n    <li class='pitch-selection-label'>\r\n        {{ t('Control') }} / {{ t('Velocity') }} / {{ t('Break') }}\r\n    </li>\r\n</ul>\r\n<ul class='centered list-inline pitch-selection' *ngIf='!y.humanPitching()'>\r\n    <li class='pointer' *ngFor='let pitch of y.pitcher.pitching | toIterable;'>\r\n                <span class='pointer'>\r\n                    {{ t(pitch.__key) }}\r\n                </span>\r\n        <br>\r\n        <rating-block [rating]='pitch.control'></rating-block>\r\n        <rating-block [rating]='pitch.velocity'></rating-block>\r\n        <rating-block [rating]='pitch.break'></rating-block>\r\n    </li>\r\n    <br class='visible-xs'/>\r\n    <li class='pitch-selection-label'>\r\n        {{ t('Control') }} / {{ t('Velocity') }} / {{ t('Break') }}\r\n    </li>\r\n</ul>\r\n<hr/>\r\n<div class='row'>\r\n    <section class='col-xs-12 centered'>\r\n        <battery-data [y]='y' [t]='t' class='pitcher-data'></battery-data>\r\n    </section>\r\n    <section class='col-xs-12'>\r\n        <div class='col-sm-6' *ngIf='y.half === \"bottom\"'></div>\r\n        <batters-data [y]='y' [t]='t' class='batter-data col-sm-6'></batters-data>\r\n        <div class='col-sm-6' *ngIf='y.half === \"top\"'></div>\r\n    </section>\r\n</div>\r\n<hr/>\r\n<div class='block stabilized col-lg-12 hidden-lg hidden-md'>\r\n    <ul class=\"list-group pitch-record col-xs-6\">\r\n        <li class='list-group-item' *ngFor=\"let event of y.log.stabilized.pitchRecord[mode()]\">\r\n            {{event}}\r\n        </li>\r\n    </ul>\r\n    <ul class=\"list-group pitch-record col-xs-6\">\r\n        <li class='list-group-item' *ngFor=\"let event of y.log.stabilized.shortRecord[mode()]\">\r\n            {{event}}\r\n        </li>\r\n    </ul>\r\n    <hr/>\r\n</div>\r\n<div class='clear'></div>\r\n<div class='col-lg-12 batting-lines'>\r\n    <ul class='list-group col-lg-6' *ngFor='let team of [y.teams.away, y.teams.home]'\r\n        [ngClass]='{ click_to_sub: team.sub !== team.noSubstituteSelected }'>\r\n        <li class='list-group-item team-name'>\r\n            <flag [team]='team'></flag>\r\n            {{team.getName()}}\r\n        </li>\r\n        <li class='list-group-item pointer lineup' *ngFor=\"let player of team.lineup\"\r\n            [ngClass]='{\r\n                        at_bat: player.team.lineup.indexOf(player) === player.team.nowBatting\r\n                    }'\r\n            (click)='clickLineup(player)'>\r\n            {{abbreviatePosition(player.position)}}\r\n            <!--<rating-block [rating]='player.defensiveAverage()'></rating-block>-->\r\n            &raquo;\r\n            <strong>{{player.getName()}}</strong>\r\n            ({{'#'+player.number}})\r\n            <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n            <em>{{ player.team.lineup.indexOf(player) === player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>\r\n\r\n            <span class='pull-right'>\r\n                        <span class='defining'>\r\n                            {{ player.getDefiningCharacteristic() }}\r\n                        </span>\r\n                        <span class='action-line' *ngFor='let atBat of player.getAtBats()'\r\n                              [ngClass]='{beneficial: atBat.beneficial}'>\r\n                            {{ atBat + '' }}\r\n                        </span>\r\n                    </span>\r\n            <div class='row'></div>\r\n            <section *ngIf='player.team.expanded === player'>\r\n                <hr>\r\n                <div class='visible-md-inline visible-lg-inline col-xs-12'>\r\n                    {{ t('Throws/Bats') }} {{t(player.throws == 'left' ? 'L' : 'R ')}}{{t.slash()}}\r\n                    {{t(player.bats == 'left' ? ' L ' : ' R ')}}\r\n                </div>\r\n                <ul class='list-inline personal-stats row'>\r\n                    <li class='col-md-1'></li>\r\n                    <li class='col-md-3 header'>{{ t('BA') }} <br>\r\n                        {{ player.stats.batting.getBA() | number:'1.3' }}\r\n                        ({{ player.stats.batting.ba | number:'1.3' }})\r\n                    </li>\r\n                    <li class='col-md-1 header'>{{ t('OBP') }} <br> {{ player.stats.batting.getOBP() | number:'1.3' }}\r\n                    </li>\r\n                    <li class='col-md-1 header'>{{ t('SLG') }} <br> {{ player.stats.batting.getSLG() | number:'1.3' }}\r\n                    </li>\r\n                    <li class='col-md-1 header'>{{ t('PA') }} <br> {{ player.stats.batting.pa }}</li>\r\n                </ul>\r\n                <hr/>\r\n                <ul class='list-inline personal-stats row'>\r\n                    <li class='col-md-1'></li>\r\n                    <li class='col-md-3 header'>{{ t('H 2B 3B HR') }} <br>\r\n                        {{ player.stats.batting.h }}\r\n                        - {{ player.stats.batting['2b'] }}\r\n                        - {{ player.stats.batting['3b'] }}\r\n                        - {{ player.stats.batting.hr }}\r\n                    </li>\r\n                    <li class='col-md-1 header'>{{ t('RBI') }} <br> {{ player.stats.batting.rbi }}</li>\r\n                    <li class='col-md-1 header'>{{ t('R') }} <br> {{ player.stats.batting.r }}</li>\r\n                    <li class='col-md-1 header'>{{ t('BB') }} <br> {{ player.stats.batting.bb }}</li>\r\n                    <li class='col-md-1 header'>{{ t('SO') }} <br> {{ player.stats.batting.so }}</li>\r\n                </ul>\r\n                <hr>\r\n                <div class='col-xs-12'>\r\n                            <span>\r\n                                {{ t('Eye') }} <rating-block [rating]='player.skill.offense.eye'></rating-block>\r\n                            </span>\r\n                    <span>\r\n                                {{ t('Power') }} <rating-block [rating]='player.skill.offense.power'></rating-block>\r\n                            </span>\r\n                    <span>\r\n                                {{ t('Speed') }} <rating-block [rating]='player.skill.offense.speed'></rating-block>\r\n                            </span>\r\n                </div>\r\n                <div class='row'></div>\r\n            </section>\r\n        </li>\r\n        <li class='list-group-item team-name'>\r\n            <flag [team]='team'></flag>\r\n            {{ team.getName() + t.space() + t('Bench') }}\r\n        </li>\r\n        <li class='list-group-item pointer bench' *ngFor='let player of team.bench'\r\n            (click)='selectSubstitute(player)' [ngClass]='{selected_sub: team.sub?.toString() === player.toString()}'>\r\n            <strong>{{player.getName()}}</strong>\r\n            ({{'#'+player.number}})\r\n            <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n            <span class='pull-right'>\r\n                        <!--<span class='col-md-3'>-->\r\n                <!--{{ player.stats.batting.getSlash() }}-->\r\n                <!--</span>-->\r\n                        <span class='defining'>\r\n                            {{ player.getDefiningCharacteristic() }}\r\n                        </span>\r\n                    </span>\r\n            <div class='row'></div>\r\n        </li>\r\n        <li class='list-group-item pointer substituted' *ngFor='let player of team.substituted'>\r\n            <strong>{{player.getName()}}</strong>\r\n            ({{'#'+player.number}})\r\n            <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n            <span class='pull-right'>\r\n                        <span class='defining'>\r\n                            {{ player.getDefiningCharacteristic() }}\r\n                        </span>\r\n                        <span class='action-line' *ngFor='let atBat of player.getAtBats()'\r\n                              [ngClass]='{beneficial: atBat.beneficial}'>\r\n                            {{ atBat + '' }}\r\n                        </span>\r\n                        {{ t('Substituted') }}\r\n                    </span>\r\n            <div class='row'></div>\r\n        </li>\r\n    </ul>\r\n</div>\r\n<div class='block col-lg-12' *ngIf='y.stage == \"end\"'>\r\n    <ul class=\"list-group pitch-record col-xs-12\">\r\n        <li class='list-group-item' *ngFor=\"let event of y.log.record[mode()]\">\r\n            {{event}}\r\n        </li>\r\n    </ul>\r\n</div>\r\n<hr>\r\n<section class='difficulty-select col-xs-12' *ngIf='!y.opponentConnected'>\r\n    <h4 *ngIf='mode() === \"e\"' (click)='showDifficultySelection = !showDifficultySelection' class='pointer'>\r\n        <a>\r\n            Opponent Selection &raquo;\r\n        </a>\r\n    </h4>\r\n    <h4 *ngIf='mode() === \"n\"' (click)='showDifficultySelection = !showDifficultySelection' class='pointer'>\r\n        <a>\r\n            挑戦 &raquo;\r\n        </a>\r\n    </h4>\r\n    <div [hidden]='!showDifficultySelection'>\r\n        <div class='team'>\r\n            <button (click)='generateTeam(0.03)' class='btn pull-left pointer'>\r\n                {{ t('Amateur Baseball Club') }}\r\n            </button>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"e\"'>\r\n                (Easy)\r\n            </div>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"n\"'>\r\n                （栗鼠）\r\n            </div>\r\n        </div>\r\n        <div class='team'>\r\n            <button (click)='generateTeam(0.12)' class='btn pull-left pointer'>\r\n                {{ t('Amateur Baseball Team') }}\r\n            </button>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"e\"'>\r\n                (Easy)\r\n            </div>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"n\"'>\r\n                （猫）\r\n            </div>\r\n        </div>\r\n        <div class='team'>\r\n            <button (click)='generateTeam(0.24)' class='btn pull-left pointer'>\r\n                {{ t('College Team') }}\r\n            </button>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"e\"'>\r\n                (Moderate)\r\n            </div>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"n\"'>\r\n                （馬）\r\n            </div>\r\n        </div>\r\n        <div class='team'>\r\n            <button (click)='generateTeam(0.48)' class='btn pull-left pointer'>\r\n                {{ t('Industrial League Team') }}\r\n            </button>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"e\"'>\r\n                (Hard)\r\n            </div>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"n\"'>\r\n                （牛）\r\n            </div>\r\n        </div>\r\n        <div class='team'>\r\n            <button (click)='generateTeam(0.75)' class='btn pull-left pointer'>\r\n                {{ t('Training Squad') }}\r\n            </button>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"e\"'>\r\n                (Hard)\r\n            </div>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"n\"'>\r\n                （象）\r\n            </div>\r\n        </div>\r\n        <div class='team'>\r\n            <button (click)='teamJapan()' class='btn pull-left pointer'>\r\n                {{ t('Team Japan') }}\r\n            </button>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"e\"'>\r\n                (Merciless)\r\n            </div>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"n\"'>\r\n                （獅子）\r\n            </div>\r\n        </div>\r\n    </div>\r\n</section>\r\n<aside class='mousehover' *ngIf='message'>\r\n    {{ message }}\r\n</aside>\r\n"
+module.exports = "<hr class='under-canvas'/>\r\n<div class='visible-sm visible-xs centered'>\r\n    {{ y.log.pitchRecord[mode()][0] }}\r\n</div>\r\n<!--<div class=\"umpire centered\">-->\r\n<!--Umpire: {{y.umpire.says}}-->\r\n<!--</div>-->\r\n<hr class='visible-sm visible-xs centered'>\r\n<ul class='centered list-inline pitch-selection' *ngIf='y.humanPitching()'>\r\n    <li class='pointer' *ngFor='let pitch of y.pitcher.pitching | toIterable;' (click)=\"selectPitch(pitch.__key)\">\r\n        <span>\r\n            <button class='pointer btn small' [ngClass]='{disabled: y.pitchInFlight.name !== pitch.__key}'>\r\n                {{ t(pitch.__key) }}\r\n            </button>\r\n            <br>\r\n            <rating-block [rating]='pitch.control'></rating-block>\r\n            <rating-block [rating]='pitch.velocity'></rating-block>\r\n            <rating-block [rating]='pitch.break'></rating-block>\r\n        </span>\r\n    </li>\r\n    <br class='visible-xs'/>\r\n    <li class='pitch-selection-label'>\r\n        {{ t('Control') }} / {{ t('Velocity') }} / {{ t('Break') }}\r\n    </li>\r\n</ul>\r\n<ul class='centered list-inline pitch-selection' *ngIf='!y.humanPitching()'>\r\n    <li class='pointer' *ngFor='let pitch of y.pitcher.pitching | toIterable;'>\r\n                <span class='pointer'>\r\n                    {{ t(pitch.__key) }}\r\n                </span>\r\n        <br>\r\n        <rating-block [rating]='pitch.control'></rating-block>\r\n        <rating-block [rating]='pitch.velocity'></rating-block>\r\n        <rating-block [rating]='pitch.break'></rating-block>\r\n    </li>\r\n    <br class='visible-xs'/>\r\n    <li class='pitch-selection-label'>\r\n        {{ t('Control') }} / {{ t('Velocity') }} / {{ t('Break') }}\r\n    </li>\r\n</ul>\r\n<hr/>\r\n<div class='row'>\r\n    <section class='col-xs-12 centered'>\r\n        <battery-data [y]='y' [t]='t' class='pitcher-data'></battery-data>\r\n    </section>\r\n    <section class='col-xs-12'>\r\n        <div class='col-sm-6' *ngIf='y.half === \"bottom\"'></div>\r\n        <batters-data [y]='y' [t]='t' class='batter-data col-sm-6'></batters-data>\r\n        <div class='col-sm-6' *ngIf='y.half === \"top\"'></div>\r\n    </section>\r\n</div>\r\n<hr/>\r\n<div class='block stabilized col-lg-12 hidden-lg hidden-md'>\r\n    <ul class=\"list-group pitch-record col-xs-6\">\r\n        <li class='list-group-item' *ngFor=\"let event of y.log.stabilized.pitchRecord[mode()]\">\r\n            {{event}}\r\n        </li>\r\n    </ul>\r\n    <ul class=\"list-group pitch-record col-xs-6\">\r\n        <li class='list-group-item' *ngFor=\"let event of y.log.stabilized.shortRecord[mode()]\">\r\n            {{event}}\r\n        </li>\r\n    </ul>\r\n    <hr/>\r\n</div>\r\n<div class='clear'></div>\r\n<div class='col-lg-12 batting-lines'>\r\n    <ul class='list-group col-lg-6' *ngFor='let team of [y.teams.away, y.teams.home]'\r\n        [ngClass]='{ click_to_sub: team.sub !== team.noSubstituteSelected }'>\r\n        <li class='list-group-item team-name'>\r\n            <flag [team]='team'></flag>\r\n            {{team.getName()}}\r\n        </li>\r\n        <li class='list-group-item pointer lineup' *ngFor=\"let player of team.lineup\"\r\n            [ngClass]='{\r\n                        at_bat: player.team.lineup.indexOf(player) === player.team.nowBatting\r\n                    }'\r\n            (click)='clickLineup(player)'>\r\n            {{abbreviatePosition(player.position)}}\r\n            <!--<rating-block [rating]='player.defensiveAverage()'></rating-block>-->\r\n            &raquo;\r\n            <strong>{{player.getName()}}</strong>\r\n            ({{'#'+player.number}})\r\n            <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n            <em>{{ player.team.lineup.indexOf(player) === player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>\r\n\r\n            <span class='pull-right'>\r\n                        <span class='defining'>\r\n                            {{ player.getDefiningCharacteristic() }}\r\n                        </span>\r\n                        <span class='action-line' *ngFor='let atBat of player.getAtBats()'\r\n                              [ngClass]='{beneficial: atBat.beneficial}'>\r\n                            {{ atBat + '' }}\r\n                        </span>\r\n                    </span>\r\n            <div class='row'></div>\r\n            <section *ngIf='player.team.expanded === player'>\r\n                <hr>\r\n                <div class='visible-md-inline visible-lg-inline col-xs-12'>\r\n                    {{ t('Throws/Bats') }} {{t(player.throws == 'left' ? 'L' : 'R ')}}{{t.slash()}}\r\n                    {{t(player.bats == 'left' ? ' L ' : ' R ')}}\r\n                </div>\r\n                <ul class='list-inline personal-stats row'>\r\n                    <li class='col-md-1'></li>\r\n                    <li class='col-md-3 header'>{{ t('BA') }} <br>\r\n                        {{ player.stats.batting.getBA() | number:'1.3' }}\r\n                        ({{ player.stats.batting.ba | number:'1.3' }})\r\n                    </li>\r\n                    <li class='col-md-1 header'>{{ t('OBP') }} <br> {{ player.stats.batting.getOBP() | number:'1.3' }}\r\n                    </li>\r\n                    <li class='col-md-1 header'>{{ t('SLG') }} <br> {{ player.stats.batting.getSLG() | number:'1.3' }}\r\n                    </li>\r\n                    <li class='col-md-1 header'>{{ t('PA') }} <br> {{ player.stats.batting.pa }}</li>\r\n                </ul>\r\n                <hr/>\r\n                <ul class='list-inline personal-stats row'>\r\n                    <li class='col-md-1'></li>\r\n                    <li class='col-md-3 header'>{{ t('H 2B 3B HR') }} <br>\r\n                        {{ player.stats.batting.h }}\r\n                        - {{ player.stats.batting['2b'] }}\r\n                        - {{ player.stats.batting['3b'] }}\r\n                        - {{ player.stats.batting.hr }}\r\n                    </li>\r\n                    <li class='col-md-1 header'>{{ t('RBI') }} <br> {{ player.stats.batting.rbi }}</li>\r\n                    <li class='col-md-1 header'>{{ t('R') }} <br> {{ player.stats.batting.r }}</li>\r\n                    <li class='col-md-1 header'>{{ t('BB') }} <br> {{ player.stats.batting.bb }}</li>\r\n                    <li class='col-md-1 header'>{{ t('SO') }} <br> {{ player.stats.batting.so }}</li>\r\n                </ul>\r\n                <hr>\r\n                <div class='col-xs-12'>\r\n                            <span>\r\n                                {{ t('Eye') }} <rating-block [rating]='player.skill.offense.eye'></rating-block>\r\n                            </span>\r\n                    <span>\r\n                                {{ t('Power') }} <rating-block [rating]='player.skill.offense.power'></rating-block>\r\n                            </span>\r\n                    <span>\r\n                                {{ t('Speed') }} <rating-block [rating]='player.skill.offense.speed'></rating-block>\r\n                            </span>\r\n                </div>\r\n                <div class='row'></div>\r\n            </section>\r\n        </li>\r\n        <li class='list-group-item team-name'>\r\n            <flag [team]='team'></flag>\r\n            {{ team.getName() + t.space() + t('Bench') }}\r\n        </li>\r\n        <li class='list-group-item pointer bench' *ngFor='let player of team.bench'\r\n            (click)='selectSubstitute(player)' [ngClass]='{selected_sub: team.sub?.toString() === player.toString()}'>\r\n            <strong>{{player.getName()}}</strong>\r\n            ({{'#'+player.number}})\r\n            <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n            <span class='pull-right'>\r\n                <!--<span class='col-md-3'>-->\r\n                    <!--{{ player.stats.batting.getSlash() }}-->\r\n                <!--</span>-->\r\n                <span class='defining'>\r\n                    {{ player.getDefiningCharacteristic() }}\r\n                </span>\r\n            </span>\r\n            <div class='row'></div>\r\n        </li>\r\n        <li class='list-group-item pointer substituted' *ngFor='let player of team.substituted'>\r\n            <strong>{{player.getName()}}</strong>\r\n            ({{'#'+player.number}})\r\n            <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>\r\n            <span class='pull-right'>\r\n                <span class='defining'>\r\n                    {{ player.getDefiningCharacteristic() }}\r\n                </span>\r\n                <span class='action-line' *ngFor='let atBat of player.getAtBats()'\r\n                      [ngClass]='{beneficial: atBat.beneficial}'>\r\n                    {{ atBat + '' }}\r\n                </span>\r\n                {{ t('Substituted') }}\r\n            </span>\r\n            <div class='row'></div>\r\n        </li>\r\n    </ul>\r\n</div>\r\n<div class='block col-lg-12' *ngIf='y.stage == \"end\"'>\r\n    <ul class=\"list-group pitch-record col-xs-12\">\r\n        <li class='list-group-item' *ngFor=\"let event of y.log.record[mode()]\">\r\n            {{event}}\r\n        </li>\r\n    </ul>\r\n</div>\r\n<hr>\r\n<section class='difficulty-select col-xs-12' *ngIf='!y.opponentConnected'>\r\n    <h4 *ngIf='mode() === \"e\"' (click)='showDifficultySelection = !showDifficultySelection' class='pointer'>\r\n        <a>\r\n            Opponent Selection &raquo;\r\n        </a>\r\n    </h4>\r\n    <h4 *ngIf='mode() === \"n\"' (click)='showDifficultySelection = !showDifficultySelection' class='pointer'>\r\n        <a>\r\n            挑戦 &raquo;\r\n        </a>\r\n    </h4>\r\n    <div [hidden]='!showDifficultySelection'>\r\n        <div class='team'>\r\n            <button (click)='generateTeam(0.03)' class='btn pull-left pointer'>\r\n                {{ t('Amateur Baseball Club') }}\r\n            </button>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"e\"'>\r\n                (Easy)\r\n            </div>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"n\"'>\r\n                （栗鼠）\r\n            </div>\r\n        </div>\r\n        <div class='team'>\r\n            <button (click)='generateTeam(0.12)' class='btn pull-left pointer'>\r\n                {{ t('Amateur Baseball Team') }}\r\n            </button>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"e\"'>\r\n                (Easy)\r\n            </div>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"n\"'>\r\n                （猫）\r\n            </div>\r\n        </div>\r\n        <div class='team'>\r\n            <button (click)='generateTeam(0.24)' class='btn pull-left pointer'>\r\n                {{ t('College Team') }}\r\n            </button>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"e\"'>\r\n                (Moderate)\r\n            </div>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"n\"'>\r\n                （馬）\r\n            </div>\r\n        </div>\r\n        <div class='team'>\r\n            <button (click)='generateTeam(0.48)' class='btn pull-left pointer'>\r\n                {{ t('Industrial League Team') }}\r\n            </button>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"e\"'>\r\n                (Hard)\r\n            </div>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"n\"'>\r\n                （牛）\r\n            </div>\r\n        </div>\r\n        <div class='team'>\r\n            <button (click)='generateTeam(0.75)' class='btn pull-left pointer'>\r\n                {{ t('Training Squad') }}\r\n            </button>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"e\"'>\r\n                (Hard)\r\n            </div>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"n\"'>\r\n                （象）\r\n            </div>\r\n        </div>\r\n        <div class='team'>\r\n            <button (click)='teamJapan()' class='btn pull-left pointer'>\r\n                {{ t('Team Japan') }}\r\n            </button>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"e\"'>\r\n                (Merciless)\r\n            </div>\r\n            <div class='pull-left difficulty-indicator' *ngIf='mode() === \"n\"'>\r\n                （獅子）\r\n            </div>\r\n        </div>\r\n    </div>\r\n</section>\r\n<aside class='mousehover' *ngIf='message'>\r\n    {{ message }}\r\n</aside>\r\n"
 
 /***/ }),
 
@@ -53904,7 +53785,7 @@ var LowerComponent = (function (_super) {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance).selectPitch.apply(_a, args);
+        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.y).selectPitch.apply(_a, args);
         var _a;
     };
     LowerComponent.prototype.selectSubstitute = function () {
@@ -53912,7 +53793,7 @@ var LowerComponent = (function (_super) {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance).selectSubstitute.apply(_a, args);
+        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.y).selectSubstitute.apply(_a, args);
         var _a;
     };
     LowerComponent.prototype.clickLineup = function () {
@@ -53920,7 +53801,7 @@ var LowerComponent = (function (_super) {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance).clickLineup.apply(_a, args);
+        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.y).clickLineup.apply(_a, args);
         var _a;
     };
     LowerComponent.prototype.generateTeam = function () {
@@ -53928,7 +53809,7 @@ var LowerComponent = (function (_super) {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance).generateTeam.apply(_a, args);
+        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.y).generateTeam.apply(_a, args);
         var _a;
     };
     LowerComponent.prototype.teamJapan = function () {
@@ -53936,7 +53817,7 @@ var LowerComponent = (function (_super) {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance).teamJapan.apply(_a, args);
+        (_a = __WEBPACK_IMPORTED_MODULE_2__app_component__["b" /* referenceContainer */].instance.y).teamJapan.apply(_a, args);
         var _a;
     };
     LowerComponent = __decorate([
@@ -53989,6 +53870,9 @@ var ModeComponent = (function () {
     ModeComponent.prototype.mode = function (set) {
         if (set) {
             __WEBPACK_IMPORTED_MODULE_1__baseball_lib__["a" /* default */].util.text.mode = set;
+            if (localStorage) {
+                localStorage.__$yakyuuaikoukai_text_mode = set;
+            }
         }
         return __WEBPACK_IMPORTED_MODULE_1__baseball_lib__["a" /* default */].util.text.mode;
     };
@@ -54205,7 +54089,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/upper/upper.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<scoreboard [y]='y' [t]='t'></scoreboard>\r\n<hr class='under-canvas'/>\r\n<div class='diamond-display row'>\r\n    <div class='col-md-4 language-select'>\r\n        <div class='pull-right'>\r\n            <button class='btn small' (click)='mode(\"e\")' [ngClass]='{disabled: mode() != \"e\"}'>\r\n                <strong class='pointer'>English</strong>\r\n            </button>\r\n            <br>\r\n            <button class='btn small' (click)='mode(\"n\")' [ngClass]='{disabled: mode() != \"n\"}'>\r\n                <strong class='pointer'>日本語</strong>\r\n            </button>\r\n            <br/>\r\n            <br/>\r\n            <!--<p>-->\r\n            <!--{{ y.timeOfDay.h }}:{{ y.timeOfDay.m }}-->\r\n            <!--</p>-->\r\n        </div>\r\n    </div>\r\n    <div class='col-md-4'>\r\n        <div class='splay-indicator-wrapper'>\r\n            <div class='splay-indicator'>\r\n                <div class='splay-indicator-ball' *ngIf='y.swingResult.contact'\r\n                     [ngStyle]='{\r\n                                    bottom: y.swingResult.bottom + \"px\",\r\n                                    left: y.swingResult.left + \"px\"\r\n                                }'>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <div class='text-center steal-controls'\r\n             *ngIf='y.humanBatting() && y.field.getLeadRunner() && !y.opponentConnected'>\r\n            <button class='btn pointer small' (click)='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNER_GO'\r\n                    [ngClass]='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNER_GO}'>\r\n                {{ t('Steal') }}\r\n            </button>\r\n            <button class='btn pointer small'\r\n                    (click)='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNERS_DISCRETION'\r\n                    [ngClass]='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNERS_DISCRETION}'>\r\n                {{ t('Opportunistic') }}\r\n            </button>\r\n            <button class='btn pointer small'\r\n                    (click)='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNER_HOLD'\r\n                    [ngClass]='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNER_HOLD}'>\r\n                {{ t('Hold') }}\r\n            </button>\r\n        </div>\r\n    </div>\r\n    <div class='col-md-4'>\r\n    </div>\r\n</div>\r\n<hr class='under-canvas'/>\r\n"
+module.exports = "<scoreboard [y]='y' [t]='t'></scoreboard>\r\n<hr class='under-canvas'/>\r\n<div class='diamond-display row'>\r\n    <div class='col-md-4 language-select'>\r\n        <div class='pull-right'>\r\n            <button class='btn small' (click)='mode(\"e\")' [ngClass]='{disabled: mode() != \"e\"}'>\r\n                <strong class='pointer'>English</strong>\r\n            </button>\r\n            <br>\r\n            <button class='btn small' (click)='mode(\"n\")' [ngClass]='{disabled: mode() != \"n\"}'>\r\n                <strong class='pointer'>日本語</strong>\r\n            </button>\r\n            <br>\r\n            <button class='btn pointer small' (click)='y.simulateAtBat()' *ngIf='y.allowSimAtBat()'>\r\n                <strong class='pointer'><em>{{ t('Sim At Bat') }}</em></strong>\r\n            </button>\r\n            <br/>\r\n            <br/>\r\n            <!--<p>-->\r\n            <!--{{ y.timeOfDay.h }}:{{ y.timeOfDay.m }}-->\r\n            <!--</p>-->\r\n        </div>\r\n    </div>\r\n    <div class='col-md-4'>\r\n        <div class='splay-indicator-wrapper'>\r\n            <div class='splay-indicator'>\r\n                <div class='splay-indicator-ball' *ngIf='y.swingResult.contact'\r\n                     [ngStyle]='{\r\n                                    bottom: y.swingResult.bottom + \"px\",\r\n                                    left: y.swingResult.left + \"px\"\r\n                                }'>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <div class='text-center steal-controls'\r\n             *ngIf='y.humanBatting() && y.field.getLeadRunner() && !y.opponentConnected'>\r\n            <button class='btn pointer small' (click)='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNER_GO'\r\n                    [ngClass]='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNER_GO}'>\r\n                {{ t('Steal') }}\r\n            </button>\r\n            <button class='btn pointer small'\r\n                    (click)='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNERS_DISCRETION'\r\n                    [ngClass]='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNERS_DISCRETION}'>\r\n                {{ t('Opportunistic') }}\r\n            </button>\r\n            <button class='btn pointer small'\r\n                    (click)='y.batter.team.stealAttempt = y.batter.team.constructor.RUNNER_HOLD'\r\n                    [ngClass]='{disabled: y.batter.team.stealAttempt != y.batter.team.constructor.RUNNER_HOLD}'>\r\n                {{ t('Hold') }}\r\n            </button>\r\n        </div>\r\n    </div>\r\n    <div class='col-md-4'>\r\n    </div>\r\n</div>\r\n<hr class='under-canvas'/>\r\n"
 
 /***/ }),
 

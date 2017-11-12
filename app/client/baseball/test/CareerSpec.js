@@ -27,7 +27,6 @@ const format = (n, digits) => {
 
 Game.prototype.console = true;
 Game.prototype.humanControl = 'none';
-Animator.console = true;
 
 const game = new Game();
 game.gamesIntoSeason = 144;

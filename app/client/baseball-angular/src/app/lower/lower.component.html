@@ -8,15 +8,15 @@
 <hr class='visible-sm visible-xs centered'>
 <ul class='centered list-inline pitch-selection' *ngIf='y.humanPitching()'>
     <li class='pointer' *ngFor='let pitch of y.pitcher.pitching | toIterable;' (click)="selectPitch(pitch.__key)">
-            <span>
-                <button class='pointer btn small' [ngClass]='{disabled: y.pitchInFlight.name !== pitch.__key}'>
-                    {{ t(pitch.__key) }}
-                </button>
-                <br>
-                <rating-block [rating]='pitch.control'></rating-block>
-                <rating-block [rating]='pitch.velocity'></rating-block>
-                <rating-block [rating]='pitch.break'></rating-block>
-            </span>
+        <span>
+            <button class='pointer btn small' [ngClass]='{disabled: y.pitchInFlight.name !== pitch.__key}'>
+                {{ t(pitch.__key) }}
+            </button>
+            <br>
+            <rating-block [rating]='pitch.control'></rating-block>
+            <rating-block [rating]='pitch.velocity'></rating-block>
+            <rating-block [rating]='pitch.break'></rating-block>
+        </span>
     </li>
     <br class='visible-xs'/>
     <li class='pitch-selection-label'>

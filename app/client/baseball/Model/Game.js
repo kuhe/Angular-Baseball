@@ -11,6 +11,8 @@ import { Distribution } from '../Services/Distribution';
 import { Mathinator } from '../Services/Mathinator';
 import { Iterator } from '../Services/Iterator';
 
+const $ = typeof window === 'object' ? window.$ : () => {};
+
 /**
  * Apologies for the godclass here.
  * @param m - language mode.
@@ -19,7 +21,6 @@ import { Iterator } from '../Services/Iterator';
 const Game = function(m) {
     this.gamesIntoSeason = 72;
     this.humanControl = 'home'; //home, away, both, none
-    this.console = false;
     this.debug = [];
     this.pitcher = null; // Player&
     this.batter = null; // Player&
@@ -142,6 +143,12 @@ Game.prototype = {
         this.autoPitchSelect();
         Animator.init();
         this.passMinutes(5);
+    },
+    get console() {
+        return Animator.console;
+    },
+    set console(value) {
+        Animator.console = value;
     },
     passMinutes(minutes) {
         const time = this.timeOfDay;
@@ -276,12 +283,12 @@ Game.prototype = {
         const pitcher = this.pitcher;
         pitcher.windingUp = true;
 
-        if (!this.console) {
+        if (!Animator.console) {
             $('.baseball').addClass('hide');
             var windup = $('.windup');
             windup.css('width', '100%');
         }
-        if (this.console) {
+        if (Animator.console) {
             callback();
             pitcher.windingUp = false;
         } else {
@@ -308,7 +315,7 @@ Game.prototype = {
         y = pitch.y;
 
         this.windupThen(() => {
-            !this.console && $('.baseball.pitch').removeClass('hide');
+            !Animator.console && $('.baseball.pitch').removeClass('hide');
             this.thePitch(x, y, callback);
         });
     },
@@ -396,7 +403,7 @@ Game.prototype = {
             giraffe.onBatterReady = () => {
                 giraffe.autoPitch(callback);
             };
-            if (this.console) {
+            if (Animator.console) {
                 giraffe.batterReady();
             } else {
                 this.batterReadyTimeout = setTimeout(() => {
@@ -831,7 +838,6 @@ Game.prototype = {
      * @param {string} pitchName
      */
     selectPitch (pitchName) {
-        const $ = window.$;
         const game = this;
         if (game.stage === 'pitch') {
             game.pitchInFlight = $.extend({}, game.pitcher.pitching[pitchName]);
@@ -876,7 +882,6 @@ Game.prototype = {
      * @param {boolean|number} spectateCpu
      */
     proceedToGame(SocketService, quickMode, spectateCpu) {
-        const $ = window.$;
         const game = this;
         game.humanControl = spectateCpu ? 'none' : 'home';
         game.console = !!quickMode && quickMode !== 7;
@@ -958,7 +963,13 @@ Game.prototype = {
             });
         } while (game.batter === batter && this.stage !== 'end');
         log('-- At Bat Simulated --');
-        game.humanControl = control;
+        if (this.stage === 'end') {
+            return;
+        }
+        if (game.humanControl === 'none') {
+            game.humanControl = control;
+        }
+        game.stage = 'pitch';
         Animator.console = game.console = false;
         game.umpire.onSideChange(); // rebind hover UI, not actual change sides :\...
     },
