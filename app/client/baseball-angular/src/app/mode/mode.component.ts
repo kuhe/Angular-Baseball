@@ -25,7 +25,7 @@ export class ModeComponent implements OnInit {
      * Set the language mode 'e': english or 'n': japanese.
      * @param {string} set
      */
-    mode(set: string): string {
+    mode(set: string = null): string {
         if (set) {
             Baseball.util.text.mode = set;
             if (localStorage) {

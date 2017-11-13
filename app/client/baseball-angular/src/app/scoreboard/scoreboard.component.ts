@@ -12,6 +12,8 @@ export class ScoreboardComponent implements OnInit {
     t: Function;
     y: any;
 
+    expandScoreboard: boolean = false;
+
     constructor() {
     }
 

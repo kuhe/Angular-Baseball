@@ -47,6 +47,7 @@ const IndexController = function ($scope) {
 export class AppComponent extends ModeComponent {
 
     y: any; // {Baseball.model.Game}
+    t: Function;
 
     constructor() {
 

@@ -14,6 +14,8 @@ export class LowerComponent extends ModeComponent implements OnInit {
     y: any;
     t: any;
 
+    message: string = '';
+
     constructor() {
         super();
     }
