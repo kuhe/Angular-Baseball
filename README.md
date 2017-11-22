@@ -27,7 +27,9 @@ todo :
             / baseball-angular : TypeScript/Angular5 rendering front end
             / styles : less
         / server
-            the websocket server for live head-2-head play
+            the websocket server for live head-2-head play (NodeJS service is deprecated)
+    matchmaker
+        a Java implementation of the websocket service (active)
     public (end user runtime)
         index.html : the home page
 
