@@ -21,7 +21,7 @@
   },
   "scripts": {
     "test": "node baseball/test/CareerSpec.js",
-    "deploy": "(cd baseball-angular && ng build) && cp baseball-angular/dist/* ../../; cp baseball-angular/src/public ../../public",
+    "deploy": "(cd baseball-angular && ng build --prod) && cp -R baseball-angular/dist/* ../../;",
     "copy": "cp -R baseball-angular/src/public ../../public",
     "css": "npx lessc styles/application.less > baseball-angular/src/public/application.css"
   },

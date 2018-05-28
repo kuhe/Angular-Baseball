@@ -45,6 +45,7 @@ Install dependencies in each folder that contains a `package.json` file.
 ## Test development
 
 Incidentally, this is the CLI mode, and will run a test simulating the 10-year career of a random player.
+The test is: do the stats look realistic? If yes, then the baseball engine is functioning correctly :P.
 
 See `app\client\baseball\test\CareerSpec.js` (es6)
 

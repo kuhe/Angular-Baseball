@@ -1019,6 +1019,7 @@ Log.prototype = {
 };
 
 
+
 // CONCATENATED MODULE: ./Model/AtBat.js
 
 
@@ -1639,18 +1640,17 @@ const helper = {
 
 const pitchDefinitions = helper.pitchDefinitions;
 
+const { random, min, max, floor, ceil, abs, pow, sqrt } = Math;
+
 /**
  * For Probability!
  * @constructor
  */
-const Distribution = () => {
-};
+const DistributionCtor = function () {};
 
-const random = Math.random, min = Math.min, max = Math.max, floor = Math.floor, ceil = Math.ceil, abs = Math.abs, pow = Math.pow, sqrt = Math.sqrt;
-
-Distribution.prototype = {
+const Distribution = Object.assign(DistributionCtor, {
     identifier : 'Distribution',
-    constructor : Distribution,
+    constructor : DistributionCtor,
     /**
      * @param scale {number}
      * @returns {number}
@@ -1706,7 +1706,7 @@ Distribution.prototype = {
         return {x, y};
     },
     /**
-     * swing centering basis
+     * swing centering basis, gives number near 100.
      * @returns {number}
      */
     centralizedNumber() {
@@ -1716,19 +1716,107 @@ Distribution.prototype = {
      * @param eye {Player.skill.offense.eye}
      * @param x
      * @param y
-     * @param umpire {Umpire}
+     * @param {Umpire} umpire
+     * @param {number} certainty - -100 to 100 relative certainty of pitch location by the batter.
+     *                             negative indicates wrongful certainty (fooled).
+     * @returns {number} on scale of 100.
      */
-    swingLikelihood(eye, x, y, umpire) {
-        let swingLikelihood = (200 - abs(100 - x) - abs(100 - y))/2;
-        if (x < 60 || x > 140 || y < 50 || y > 150) { // ball
-            /** 138 based on avg O-Swing of 30% + 8% for fun, decreased by better eye */
-            swingLikelihood = (swingLikelihood + 138 - eye)/2 - 15*umpire.count.balls;
-        } else {
-            /** avg Swing rate of 65% - 8% for laughs, increased by better eye */
-            swingLikelihood = (57 + (2*swingLikelihood + eye)/3)/2;
+    swingLikelihood: function (eye, x, y, umpire, certainty = 50) {
+
+        /**
+         * Initially the batter may have planned on whether or not to swing
+         * before seeing the pitch, depending on the count, for example.
+         * @type {number} scale to 1.
+         */
+        let planToSwing = 30;
+        const count = String(umpire.count.balls) + String(umpire.count.strikes);
+        switch (count) {
+            case '01':
+                planToSwing = 65;
+                break; // saw a pitch, ready to swing.
+            case '02':
+                planToSwing = 70;
+                break; // expecting a waste pitch.
+            case '10':
+                planToSwing = 55;
+                break; // saw a pitch, ready to swing.
+            case '11':
+                planToSwing = 70;
+                break; // no particular strategy.
+            case '12':
+                planToSwing = 90;
+                break; // defensive on 2 strikes, but maybe waste pitch.
+            case '20':
+                planToSwing = 50;
+                break; // waiting on a strike, ahead in count.
+            case '21':
+                planToSwing = 60;
+                break; // no particular strategy.
+            case '22':
+                planToSwing = 110;
+                break; // defensive on 2 strikes.
+            case '30':
+                planToSwing = 10;
+                break; // expecting a walk.
+            case '31':
+                planToSwing = 40;
+                break; // waiting for a good pitch.
+            case '32':
+                planToSwing = 130;
+                break; // all in.
+            case '00':
+            default:
+                planToSwing = 33;
+                break;
         }
-        // higher late in the count
-        return swingLikelihood - 35 + 2*(umpire.count.balls + 8*umpire.count.strikes);
+
+        // @todo consider number of outs or runners in position.
+
+        if (umpire.game.field.second || umpire.game.field.third) {
+            planToSwing += 20; // RISP increases desire to swing.
+        }
+
+        /**
+         * Positional likelihood based on where the pitch location is perceived to be.
+         * @type {number}
+         */
+        const positionalLikelihood = (180 - abs(100 - x) - abs(100 - y)) / 2;
+
+        const inStrikezone = Distribution.inStrikezone(x, y);
+
+        if (!inStrikezone) { // ball
+            /** based on avg O-Swing of 30%, decreased by better eye */
+            var eyeEvaluatedSwingLikelihood = 30 - (eye * 0.30);
+        } else {
+            /** based on avg Z-Swing of 65%, increased by better eye */
+            eyeEvaluatedSwingLikelihood = 65 + (eye * 0.30);
+        }
+
+        const swingLikelihood = (
+            positionalLikelihood * 30 +
+            eyeEvaluatedSwingLikelihood * 40 +
+            planToSwing * 20 +
+            abs(certainty) * 10
+        ) / 100;
+
+        const reflex = random() * 100 < eye;
+        let finalSwingLikelihood = swingLikelihood;
+
+        if (reflex) { // Roll reflex to be able to override the initial impulse, making a purely reflexive decision to swing.
+            if ((eyeEvaluatedSwingLikelihood > planToSwing && inStrikezone) ||
+                (eyeEvaluatedSwingLikelihood < planToSwing && !inStrikezone)) {
+
+                // the planning (guess) component is removed from the swing decision.
+
+                finalSwingLikelihood = (
+                    positionalLikelihood * 20 +
+                    eyeEvaluatedSwingLikelihood * 70 +
+                    abs(certainty) * 10
+                ) / 100;
+            }
+        }
+
+        return finalSwingLikelihood;
     },
     /**
      * @param target {number} 0-200
@@ -1766,6 +1854,15 @@ Distribution.prototype = {
     cpuSwing(target, actual, eye) {
         eye = min(eye, 100); // higher eye would overcompensate here
         return 100 + (target - 100)*(0.5+random()*eye/200) - actual;
+    },
+    /**
+     * @param {number} x - 0-200.
+     * @param {number} y - 0-200.
+     * @returns {boolean}
+     */
+    inStrikezone(x, y) {
+        return x > 50 && x < 150
+            && y > 35 && y < 165;
     },
     /**
      * Determine the swing scalar
@@ -1811,13 +1908,7 @@ Distribution.prototype = {
         if (base == 4) return false;
         return (random() < 0.15) && this.stealSuccess(pitch, catcher, thief, base, false) && (random() < 0.5);
     }
-};
-
-for (const fn in Distribution.prototype) {
-    if (Distribution.prototype.hasOwnProperty(fn)) {
-        Distribution[fn] = Distribution.prototype[fn];
-    }
-}
+});
 
 Distribution.main = () => {
     const ump = {
@@ -1844,6 +1935,7 @@ Distribution.main = () => {
         ump.count.strikes = 0;
     }
 };
+
 
 
 // CONCATENATED MODULE: ./Services/Mathinator.js
@@ -2225,6 +2317,7 @@ Player.prototype = {
         this.definingBattingCharacteristic = {};
         this.definingPitchingCharacteristic = {};
         this.definingCharacteristic = {};
+        this.lastPitchCertainty = 0;
     },
     /**
      * inserts the Japanese middle dot at the correct position, allowing a 4-width
@@ -2365,6 +2458,11 @@ Player.prototype = {
         const E = randBetween(chances/10, 0, 'fielding');
         const PO = chances - E;
 
+        const oSwings = randBetween(gamesIntoSeason * 9, gamesIntoSeason, 'eye');
+        const zSwings = randBetween(gamesIntoSeason, gamesIntoSeason * 6, 'eye');
+        const ps = randBetween(2 * pa, 4.2 * pa, 'eye'); // pitches seen.
+        const swings = oSwings + zSwings;
+
         this.stats = {
             pitching : {
                 pitches : 0, // in game
@@ -2428,7 +2526,23 @@ Player.prototype = {
                 hbp,
                 sac,
                 sb,
-                cs
+                cs,
+                getPPA() {
+                    return this.ps / this.pa;
+                },
+                ps,
+                oSwings,
+                getOSwing() {
+                    return this.oSwings / this.swings;
+                },
+                zSwings,
+                getZSwing() {
+                    return this.zSwings / this.swings;
+                },
+                swings,
+                getSwing() {
+                    return this.swings / this.ps;
+                }
             },
             fielding : {
                 E,
@@ -2622,10 +2736,12 @@ Player.prototype = {
     },
     /**
      * Where positive is an early swing and negative is a late swing.
-     * @returns {Number} in milliseconds between -200ms and 200ms
+     * @returns {number} in milliseconds between -200ms and 200ms
      */
     getAISwingTiming() {
-        return (Math.random() - 0.5) * 280 * (60 / (60 + this.skill.offense.eye));
+        return (Math.random() - 0.5) * 280
+            * (60 / (60 + this.skill.offense.eye))
+            * (((200 - this.lastPitchCertainty) / (200 + this.lastPitchCertainty)) || 1);
     },
     /**
      * a localized description of this player's defining batting characteristic e.g. "contact hitter"
@@ -2649,8 +2765,8 @@ Player.prototype = {
     },
     /**
      * a localized phrase describing a strong trait of this player e.g. "ace" or "power hitter".
-     * @param battingOnly to return only their defining batting characteristic.
-     * @param {boolean} pitchingOnly to return only a pitching characteristic.
+     * @param {boolean} [battingOnly] to return only their defining batting characteristic.
+     * @param {boolean} [pitchingOnly] to return only a pitching characteristic.
      * @returns {string}
      */
     getDefiningCharacteristic(battingOnly, pitchingOnly) {
@@ -2735,6 +2851,7 @@ Player.prototype = {
         return `${this.name} #${this.number}`;
     }
 };
+
 
 
 // CONCATENATED MODULE: ./Render/mesh/AbstractMesh.js
@@ -5277,6 +5394,7 @@ Team.prototype = {
 
 
 
+
 const Umpire = function(game) {
     this.init(game);
 };
@@ -5377,6 +5495,11 @@ Umpire.prototype = {
         }
 
         pitcher.stats.pitching.pitches++;
+
+        const inStrikezone = Distribution.inStrikezone(game.pitchInFlight.x, game.pitchInFlight.y);
+
+        batter.stats.batting.ps++;
+
         if (result.looking) {
             if (result.strike) {
                 this.count.strikes++;
@@ -5385,6 +5508,12 @@ Umpire.prototype = {
                 this.count.balls++;
             }
         } else {
+            batter.stats.batting.swings++;
+            if (inStrikezone) {
+                batter.stats.batting.zSwings++;
+            } else {
+                batter.stats.batting.oSwings++;
+            }
             pitcher.stats.pitching.strikes++;
             if (result.contact) {
                 game.passMinutes(1);
@@ -5775,6 +5904,7 @@ Umpire.prototype = {
 };
 
 
+
 // CONCATENATED MODULE: ./Model/Game.js
 
 
@@ -6116,18 +6246,28 @@ Game.prototype = {
         let convergence;
         let convergenceSum;
 
+        // if swinging blindly, aim at the center.
         let x = Distribution.centralizedNumber(), y = Distribution.centralizedNumber();
+        /**
+         * @type {number} -100 to 100 negative: fooled on pitch, positive: certain of pitch location.
+         */
+        let certainty = Math.random() * -100 / ((100 + eye) / 100);
 
-        if (100*Math.random() < eye) { // identified the break
+        if (100 * Math.random() < eye) { // identified the break, now swinging at the real location.
             deceptiveX = this.pitchInFlight.x;
             deceptiveY = this.pitchInFlight.y;
+            certainty = (certainty + 200) / 3;
+        } else {
+            certainty = (certainty - 50) / 2;
         }
 
-        if (100*Math.random() < eye) { // identified the location
+        if (100 * Math.random() < eye) { // identified the location more precisely, making a larger adjustment.
             convergence = eye/25;
             convergenceSum = 1 + convergence;
+            certainty = (certainty + 300) / 4;
         } else {
             convergence = eye/100;
+            certainty = (certainty - 50) / 2;
             convergenceSum = 1 + convergence;
         }
 
@@ -6137,7 +6277,9 @@ Game.prototype = {
         this.swingResult.x = Distribution.cpuSwing(x, this.pitchInFlight.x, eye);
         this.swingResult.y = Distribution.cpuSwing(y, this.pitchInFlight.y, eye * 0.75);
 
-        const swingProbability = Distribution.swingLikelihood(eye, x, y, this.umpire);
+        this.batter.lastPitchCertainty = certainty;
+
+        const swingProbability = Distribution.swingLikelihood(eye, x, y, this.umpire, certainty);
         if (swingProbability < 100*Math.random()) {
             x = -20;
         }
@@ -6278,7 +6420,7 @@ Game.prototype = {
                 this.swingResult = result = {};
 
                 result.timing = this.humanBatting() ? this.expectedSwingTiming - Date.now() : this.batter.getAISwingTiming();
-                const inTime = Math.abs(result.timing) < 140;
+                const inTime = Math.abs(result.timing) < 900;
 
                 const bonus = this.batter.eye.bonus || 0, eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
 
@@ -6298,6 +6440,7 @@ Game.prototype = {
                     //log(recalculation.y, precision);
 
                     result.looking = false;
+
                     if (Math.abs(result.x) < 60 && Math.abs(result.y) < 35 && inTime) {
                         result.contact = true;
                         this.field.determineSwingContactResult(result);
@@ -6307,8 +6450,7 @@ Game.prototype = {
                         result.contact = false;
                     }
                 } else {
-                    result.strike = pitch.x > 50 && pitch.x < 150
-                        && pitch.y > 35 && pitch.y < 165;
+                    result.strike = Distribution.inStrikezone(pitch.x, pitch.y);
                     this.batter.eye.bonus = Math.max(0, eye -
                         Math.sqrt(Math.pow(this.batter.eye.x - pitch.x, 2) + Math.pow(this.batter.eye.y - pitch.y, 2)) * 1.5);
                     result.contact = false;
@@ -6761,6 +6903,7 @@ Game.prototype = {
     }
 
 };
+
 
 
 // CONCATENATED MODULE: ./Teams/Trainer.js

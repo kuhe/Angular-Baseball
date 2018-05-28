@@ -29,10 +29,14 @@ Game.prototype.console = true;
 Game.prototype.humanControl = 'none';
 
 const game = new Game();
+
+game.console = true;
+game.humanControl = 'none';
+
 game.gamesIntoSeason = 144;
 let player, p;
 player = new Player(game.teams.home, false);
-//player = samurai.lineup[Math.random() * 9 | 0];
+// player = samurai.lineup[0 && Math.random() * 9 | 0];
 const asPitcher = Math.random() > 0.96;
 p = player;
 
@@ -41,19 +45,11 @@ log('と呼ばれて、10年間も次々の挑戦を向かってきた。');
 
 const TERRIBAD = 5, AWFUL = 25, MEDIOCRE = 45, GOOD = 65, ELITE = 88;
 
-//var offense = {
-//    eye: MEDIOCRE,
-//    power: ELITE,
-//    speed: AWFUL
-//};
-//var defense = {
-//    fielding: ELITE,
-//    throwing: GOOD,
-//    catching: ELITE,
-//    speed: GOOD
-//};
-const offense = player.skill.offense;
+const offense = { eye: ELITE, power: AWFUL, speed: ELITE };
+// const offense = player.skill.offense;
+// const defense = { fielding: ELITE, throwing: GOOD, catching: ELITE, speed: GOOD };
 const defense = player.skill.defense;
+
 offense.eye += 10;
 offense.power += 10;
 offense.speed += 10;
@@ -98,6 +94,10 @@ const getStats = player => {
         cs : format(player.stats.batting.cs),
 
         fp : format(player.stats.fielding.PO / (player.stats.fielding.PO + player.stats.fielding.E)),
+
+        'z%': format(player.stats.batting.getZSwing()),
+        'o%': format(player.stats.batting.getOSwing()),
+        ppa: format(player.stats.batting.getPPA()),
 
         W: format(player.stats.pitching.W),
         L: format(player.stats.pitching.L),
@@ -249,7 +249,10 @@ times.push(Date.now());
                 ' | BABIP',
                 ' | SB  ',
                 ' | CS  ',
-                ' | F%  '
+                ' | F%   ',
+                ' | Z%   ',
+                ' | O%   ',
+                ' | PPA  ',
             );
         }
     };
@@ -293,7 +296,10 @@ times.push(Date.now());
                 ` | ${filter('babip')}`,
                 ` | ${filter('sb')}`,
                 ` | ${filter('cs')}`,
-                ` | ${filter('fp')}`
+                ` | ${filter('fp')}`,
+                ` | ${filter('z%')}`,
+                ` | ${filter('o%')}`,
+                ` | ${filter('ppa')}`,
             );
         }
     };
@@ -321,6 +327,9 @@ times.push(Date.now());
     totals.K9 = format(totals.K9/seasons);
     totals.babip = format(totals.babip/seasons);
     totals.fp = format(totals.fp/seasons);
+    totals['z%'] = format(totals['z%']/seasons);
+    totals['o%'] = format(totals['o%']/seasons);
+    totals.ppa = format(totals.ppa/seasons);
     log('------');
     logYear(totals);
 })();
@@ -328,14 +337,12 @@ times.push(Date.now());
 log(asPitcher ? player.skill.pitching : player.skill.offense, player.skill.defense);
 
 //game.debugOut();
-log('running times');
 
 times = times.map((x, k) => times[k] - (times[k-1] || 0));
 times.shift();
-log(`${times.join('ms, ')}ms`);
 const avg = times.reduce((a, b) => a + b)/(seasons - 1) | 0;
-log('average: ', avg, 'ms/year');
-log('');
+
+log(`${times.join('ms, ')}ms`, 'average: ', avg, 'ms/year');
 
 log('だがある日に「人は産まれる瞬間から死と言う事に近づいてくわけですから、ひょっとしたらも、このシーズンで、終わってしまうかもしれない」');
 log(`    - ${player.getName()}　（${player.name}） (#${player.number} ${player.position} ${player.bats}/${player.throws})`);

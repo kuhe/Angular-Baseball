@@ -1,5 +1,6 @@
 import { Log } from '../Utility/_utils';
 import { Player } from '../Model/Player';
+import {Distribution} from "../Services/Distribution";
 
 const Umpire = function(game) {
     this.init(game);
@@ -101,6 +102,11 @@ Umpire.prototype = {
         }
 
         pitcher.stats.pitching.pitches++;
+
+        const inStrikezone = Distribution.inStrikezone(game.pitchInFlight.x, game.pitchInFlight.y);
+
+        batter.stats.batting.ps++;
+
         if (result.looking) {
             if (result.strike) {
                 this.count.strikes++;
@@ -109,6 +115,12 @@ Umpire.prototype = {
                 this.count.balls++;
             }
         } else {
+            batter.stats.batting.swings++;
+            if (inStrikezone) {
+                batter.stats.batting.zSwings++;
+            } else {
+                batter.stats.batting.oSwings++;
+            }
             pitcher.stats.pitching.strikes++;
             if (result.contact) {
                 game.passMinutes(1);

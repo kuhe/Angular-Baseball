@@ -48,6 +48,7 @@ Player.prototype = {
         this.definingBattingCharacteristic = {};
         this.definingPitchingCharacteristic = {};
         this.definingCharacteristic = {};
+        this.lastPitchCertainty = 0;
     },
     /**
      * inserts the Japanese middle dot at the correct position, allowing a 4-width
@@ -188,6 +189,11 @@ Player.prototype = {
         const E = randBetween(chances/10, 0, 'fielding');
         const PO = chances - E;
 
+        const oSwings = randBetween(gamesIntoSeason * 9, gamesIntoSeason, 'eye');
+        const zSwings = randBetween(gamesIntoSeason, gamesIntoSeason * 6, 'eye');
+        const ps = randBetween(2 * pa, 4.2 * pa, 'eye'); // pitches seen.
+        const swings = oSwings + zSwings;
+
         this.stats = {
             pitching : {
                 pitches : 0, // in game
@@ -251,7 +257,23 @@ Player.prototype = {
                 hbp,
                 sac,
                 sb,
-                cs
+                cs,
+                getPPA() {
+                    return this.ps / this.pa;
+                },
+                ps,
+                oSwings,
+                getOSwing() {
+                    return this.oSwings / this.swings;
+                },
+                zSwings,
+                getZSwing() {
+                    return this.zSwings / this.swings;
+                },
+                swings,
+                getSwing() {
+                    return this.swings / this.ps;
+                }
             },
             fielding : {
                 E,
@@ -445,10 +467,12 @@ Player.prototype = {
     },
     /**
      * Where positive is an early swing and negative is a late swing.
-     * @returns {Number} in milliseconds between -200ms and 200ms
+     * @returns {number} in milliseconds between -200ms and 200ms
      */
     getAISwingTiming() {
-        return (Math.random() - 0.5) * 280 * (60 / (60 + this.skill.offense.eye));
+        return (Math.random() - 0.5) * 280
+            * (60 / (60 + this.skill.offense.eye))
+            * (((200 - this.lastPitchCertainty) / (200 + this.lastPitchCertainty)) || 1);
     },
     /**
      * a localized description of this player's defining batting characteristic e.g. "contact hitter"
@@ -472,8 +496,8 @@ Player.prototype = {
     },
     /**
      * a localized phrase describing a strong trait of this player e.g. "ace" or "power hitter".
-     * @param battingOnly to return only their defining batting characteristic.
-     * @param {boolean} pitchingOnly to return only a pitching characteristic.
+     * @param {boolean} [battingOnly] to return only their defining batting characteristic.
+     * @param {boolean} [pitchingOnly] to return only a pitching characteristic.
      * @returns {string}
      */
     getDefiningCharacteristic(battingOnly, pitchingOnly) {

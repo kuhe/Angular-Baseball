@@ -338,18 +338,28 @@ Game.prototype = {
         let convergence;
         let convergenceSum;
 
+        // if swinging blindly, aim at the center.
         let x = Distribution.centralizedNumber(), y = Distribution.centralizedNumber();
+        /**
+         * @type {number} -100 to 100 negative: fooled on pitch, positive: certain of pitch location.
+         */
+        let certainty = Math.random() * -100 / ((100 + eye) / 100);
 
-        if (100*Math.random() < eye) { // identified the break
+        if (100 * Math.random() < eye) { // identified the break, now swinging at the real location.
             deceptiveX = this.pitchInFlight.x;
             deceptiveY = this.pitchInFlight.y;
+            certainty = (certainty + 200) / 3;
+        } else {
+            certainty = (certainty - 50) / 2;
         }
 
-        if (100*Math.random() < eye) { // identified the location
+        if (100 * Math.random() < eye) { // identified the location more precisely, making a larger adjustment.
             convergence = eye/25;
             convergenceSum = 1 + convergence;
+            certainty = (certainty + 300) / 4;
         } else {
             convergence = eye/100;
+            certainty = (certainty - 50) / 2;
             convergenceSum = 1 + convergence;
         }
 
@@ -359,7 +369,9 @@ Game.prototype = {
         this.swingResult.x = Distribution.cpuSwing(x, this.pitchInFlight.x, eye);
         this.swingResult.y = Distribution.cpuSwing(y, this.pitchInFlight.y, eye * 0.75);
 
-        const swingProbability = Distribution.swingLikelihood(eye, x, y, this.umpire);
+        this.batter.lastPitchCertainty = certainty;
+
+        const swingProbability = Distribution.swingLikelihood(eye, x, y, this.umpire, certainty);
         if (swingProbability < 100*Math.random()) {
             x = -20;
         }
@@ -500,7 +512,7 @@ Game.prototype = {
                 this.swingResult = result = {};
 
                 result.timing = this.humanBatting() ? this.expectedSwingTiming - Date.now() : this.batter.getAISwingTiming();
-                const inTime = Math.abs(result.timing) < 140;
+                const inTime = Math.abs(result.timing) < 900;
 
                 const bonus = this.batter.eye.bonus || 0, eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
 
@@ -520,6 +532,7 @@ Game.prototype = {
                     //log(recalculation.y, precision);
 
                     result.looking = false;
+
                     if (Math.abs(result.x) < 60 && Math.abs(result.y) < 35 && inTime) {
                         result.contact = true;
                         this.field.determineSwingContactResult(result);
@@ -529,8 +542,7 @@ Game.prototype = {
                         result.contact = false;
                     }
                 } else {
-                    result.strike = pitch.x > 50 && pitch.x < 150
-                        && pitch.y > 35 && pitch.y < 165;
+                    result.strike = Distribution.inStrikezone(pitch.x, pitch.y);
                     this.batter.eye.bonus = Math.max(0, eye -
                         Math.sqrt(Math.pow(this.batter.eye.x - pitch.x, 2) + Math.pow(this.batter.eye.y - pitch.y, 2)) * 1.5);
                     result.contact = false;
