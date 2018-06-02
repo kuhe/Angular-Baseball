@@ -52,13 +52,11 @@
 <hr/>
 <div class='block stabilized col-lg-12 hidden-lg hidden-md'>
     <ul class="list-group pitch-record col-xs-6">
-        <li class='list-group-item' *ngFor="let event of y.log.stabilized.pitchRecord[mode()]">
-            {{event}}
+        <li class='list-group-item' *ngFor="let event of y.log.stabilized.pitchRecord[mode()]" [innerHTML]="event">
         </li>
     </ul>
     <ul class="list-group pitch-record col-xs-6">
-        <li class='list-group-item' *ngFor="let event of y.log.stabilized.shortRecord[mode()]">
-            {{event}}
+        <li class='list-group-item' *ngFor="let event of y.log.stabilized.shortRecord[mode()]" [innerHTML]="event">
         </li>
     </ul>
     <hr/>
@@ -180,8 +178,7 @@
 </div>
 <div class='block col-lg-12' *ngIf='y.stage == "end"'>
     <ul class="list-group pitch-record col-xs-12">
-        <li class='list-group-item' *ngFor="let event of y.log.record[mode()]">
-            {{event}}
+        <li class='list-group-item' *ngFor="let event of y.log.record[mode()]" [innerHTML]="event">
         </li>
     </ul>
 </div>

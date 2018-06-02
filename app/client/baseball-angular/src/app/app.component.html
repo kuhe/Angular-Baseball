@@ -13,11 +13,9 @@
                     <!--</div>-->
                     <ul class="list-group pitch-record">
                         <li class='list-group-item' *ngFor="let event of y.log.pitchRecord[mode()]; let i = index;">
-                            <strong [hidden]='i > 0'>
-                                {{event}}
+                            <strong [hidden]='i > 0' [innerHtml]="event">
                             </strong>
-                            <span [hidden]='i === 0'>
-                                {{event}}
+                            <span [hidden]='i === 0' [innerHtml]="event">
                             </span>
                         </li>
                     </ul>
@@ -110,11 +108,9 @@
                 <div class='col-md-4 background-color visible-lg visible-md'>
                     <ul class="list-group play-record">
                         <li class='list-group-item' *ngFor="let event of y.log.shortRecord[mode()]; let i = index;">
-                            <strong [hidden]='i > 0'>
-                                {{event}}
+                            <strong [hidden]='i > 0' [innerHTML]=event>
                             </strong>
-                            <span [hidden]='i === 0'>
-                                {{event}}
+                            <span [hidden]='i === 0' [innerHTML]=event>
                             </span>
                         </li>
                     </ul>

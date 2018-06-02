@@ -136,7 +136,7 @@ Log.prototype = {
             say += text('way inside');
             ball = true;
         }
-        if (say != '') say += text.comma();
+        if (say) say += text.comma();
         if (y < 35) {
             say += text('way low');
             ball = true;
@@ -222,9 +222,9 @@ Log.prototype = {
         let result = '';
         if (swingResult.looking) {
             if (swingResult.strike) {
-                result += text('Strike.')
+                result += `<span class="txt-orange">${text('Strike.')}</span>`;
             } else {
-                result += text('Ball.')
+                result += `<span class="txt-green">${text('Ball.')}</span>`;
             }
         } else {
             const timing = [
@@ -242,20 +242,20 @@ Log.prototype = {
 
             if (swingResult.contact) {
                 if (swingResult.foul) {
-                    result += text('Fouled off.')
+                    result += `<span class="txt-orange">${text('Fouled off.')}</span>`;
                 } else {
                     if (swingResult.caught) {
-                        result += text('In play.')
+                        result += `<span class="txt-blue">${text('In play.')}</span>`;
                     } else {
                         if (swingResult.thrownOut) {
-                            result += text('In play.')
+                            result += `<span class="txt-blue">${text('In play.')}</span>`;
                         } else {
-                            result += text('In play.')
+                            result += `<span class="txt-blue">${text('In play.')}</span>`;
                         }
                     }
                 }
             } else {
-                result += text('Swinging strike.')
+                result += `<span class="txt-orange">${text('Swinging strike.')}</span>`;
             }
         }
         let steal = '';
@@ -330,9 +330,9 @@ Log.prototype = {
         let out = [];
         if (r.looking) {
             if (r.strike) {
-                record = (batter + text(' struck out looking.'));
+                record = (batter + `<span class="txt-red">${text(' struck out looking.')}</span>`);
             } else {
-                record = (batter + text(' walked.'));
+                record = (batter + `<span class="txt-blue">${text(' walked.')}</span>`);
             }
             let steal = '';
             const lineup = this.game.batter.team.lineup;
@@ -408,7 +408,7 @@ Log.prototype = {
                 }
                 record = text.contactResult(batter, fielder, bases, outBy, r.outs === 3 ? [] : r.sacrificeAdvances, out);
             } else {
-                record = (batter + text(' struck out swinging.'));
+                record = (batter + `<span class="txt-red">${text(' struck out swinging.')}</span>`);
             }
         }
         return record;

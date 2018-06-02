@@ -62,3 +62,5 @@ being used to render it.
 
 However, as much as I like TypeScript and Angular, it's been kind of a pain to integrate the ESM portion of the
 baseball engine to an `angular-cli` project.
+
+This project was developed unironically on Microsoft Windows.

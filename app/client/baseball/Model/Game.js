@@ -120,8 +120,8 @@ Game.prototype = {
             h: Math.random() * 6 + 11 | 0,
             m: Math.random() * 60 | 0
         };
-        const timeOfDay = this.timeOfDay = {
-            h: 0,
+        this.timeOfDay = {
+            h: 8,
             m: 0
         }; // @see {Loop} for time initialization
         if (m) text.mode = m;

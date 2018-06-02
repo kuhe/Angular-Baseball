@@ -8,11 +8,11 @@ class Sun extends AbstractMesh {
             this.join(loop);
         }
         this.targetTime = {
-            h: 0,
+            h: 6,
             m: 0
         };
         this.time = {
-            h: 0,
+            h: 6,
             m: 0
         };
     }

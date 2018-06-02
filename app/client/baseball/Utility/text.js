@@ -308,61 +308,61 @@ text.contactResult = (batter, fielder, bases, outBy, sacrificeAdvances, out) => 
             switch (outBy) {
                 case 'fieldersChoice':
                     play = out.length === 2 ? 'double play ' : '';
-                    statement += ` reached on a fielder's choice ${play}by ${text.fielderShortName(fielder)}`;
+                    statement += ` reached on a <span class="txt-red">fielder's choice</span> ${play}by ${text.fielderShortName(fielder)}`;
                     break;
                 case 'line':
-                    statement += ` lined out to ${text.fielderShortName(fielder)}`;
+                    statement += ` <span class="txt-red">lined out</span> to ${text.fielderShortName(fielder)}`;
                     break;
                 case 'fly':
-                    statement += ` flew out to ${text.fielderShortName(fielder)}`;
+                    statement += ` <span class="txt-red">flew out</span> to ${text.fielderShortName(fielder)}`;
                     break;
                 case 'error':
-                    statement += ` reached on error by ${text.fielderShortName(fielder)}`;
+                    statement += ` <span class="txt-blue">reached on error</span> by ${text.fielderShortName(fielder)}`;
                     break;
                 case 'pop':
-                    statement += ` popped out to ${text.fielderShortName(fielder)}`;
+                    statement += ` <span class="txt-red">popped out</span> to ${text.fielderShortName(fielder)}`;
                     break;
                 case 'ground':
                     var play = doublePlay ? 'into a double play by' : 'out to';
-                    statement += ` grounded ${play} ${text.fielderShortName(fielder)}`;
+                    statement += `<span class="txt-red">grounded ${play}</span> ${text.fielderShortName(fielder)}`;
                     break;
                 case 'thrown':
                     play = doublePlay ? ' on a double play' : '';
-                    statement += ` was thrown out by ${text.fielderShortName(fielder)}${play}`;
+                    statement += ` was <span class="txt-red">thrown out</span> by ${text.fielderShortName(fielder)}${play}`;
                     break;
             }
             if (out.length) {
                 const plural = out.length > 1;
                 const runner = plural ? 'Runners' : 'Runner';
                 const is = plural ? 'are' : 'is';
-                statement += `. ${runner} from ${text(out.join(text.comma()))} ${is} out`;
+                statement += `. ${runner} from ${text(out.join(text.comma()))} ${is} <span class="txt-red">out</span>`;
             }
         } else {
             switch (bases) {
                 case 1:
                     if (infield) {
-                        statement += ` reached on an infield hit to ${text.fielderShortName(fielder)}`;
+                        statement += ` reached on an <span class="txt-blue">infield hit</span> to ${text.fielderShortName(fielder)}`;
                     } else {
-                        statement += ` reached on a single to ${text.fielderShortName(fielder)}`;
+                        statement += ` reached on a <span class="txt-blue">single</span> to ${text.fielderShortName(fielder)}`;
                     }
                     break;
                 case 2:
-                    statement += ` doubled past ${text.fielderShortName(fielder)}`;
+                    statement += ` <span class="txt-blue">doubled</span> past ${text.fielderShortName(fielder)}`;
                     break;
                 case 3:
-                    statement += ` tripled past ${text.fielderShortName(fielder)}`;
+                    statement += ` <span class="txt-blue">tripled</span> past ${text.fielderShortName(fielder)}`;
                     break;
                 case 4:
-                    statement += ` homered to ${text.fielderShortName(fielder)}`;
+                    statement += ` <span class="txt-blue">homered</span> to ${text.fielderShortName(fielder)}`;
                     break;
             }
         }
         if (sacrificeAdvances) {
             sacrificeAdvances.map(base => {
                 if (base == 'third') {
-                    statement += `${text.stop()}Runner on third scores`;
+                    statement += `${text.stop()}Runner on third <span class="txt-blue">scores</span>`;
                 } else {
-                    statement += `${text.stop()}Runner on ${base} advances`;
+                    statement += `${text.stop()}Runner on ${base} <span class="txt-green">advances</span>`;
                 }
             });
         }
@@ -376,60 +376,60 @@ text.contactResult = (batter, fielder, bases, outBy, sacrificeAdvances, out) => 
             fielder = text.fielderShortName(fielder);
             switch (outBy) {
                 case 'fieldersChoice':
-                    statement += `野選(${fielder})で出塁`;
+                    statement += `野選(${fielder})で<span class="txt-red">出塁</span>`;
                     break;
                 case 'line':
-                    statement += `${fielder}直`;
+                    statement += `<span class="txt-red">${fielder}直</span>`;
                     break;
                 case 'fly':
-                    statement += `${fielder}飛`;
+                    statement += `<span class="txt-red">${fielder}飛</span>`;
                     break;
                 case 'error':
-                    statement += `エラー(${fielder})で出塁`;
+                    statement += `<span class="txt-blue">エラー(${fielder})で出塁</span>`;
                     break;
                 case 'pop':
-                    statement += `ポップフライで${fielder}飛`;
+                    statement += `<span class="txt-red">ポップフライで${fielder}飛</span>`;
                     break;
                 case 'ground':
-                    statement += `${fielderLong}ゴロに封殺`;
+                    statement += `<span class="txt-red">${fielderLong}ゴロに封殺</span>`;
                     break;
                 case 'thrown':
-                    statement += `${fielder}ゴロ`;
+                    statement += `<span class="txt-red">${fielder}ゴロ</span>`;
                     break;
             }
             if (out.length) {
-                statement += `。${out.map(runner => text(runner)).join(text.comma())}ランナーはアウト`;
+                statement += `。${out.map(runner => text(runner)).join(text.comma())}ランナーは<span class="txt-red">アウト</span>`;
             }
             if (doublePlay) {
-                statement += '。ゲッツー';
+                statement += '。<span class="txt-red">ゲッツー</span>';
             }
         } else {
             fielder = text.fielderShortName(fielder);
             switch (bases) {
                 case 1:
                     if (infield) {
-                        statement += `内野安打(${fielder})で出塁`;
+                        statement += `<span class="txt-blue">内野安打</span>(${fielder})で出塁`;
                     } else {
-                        statement += `安打(${fielder})で出塁`;
+                        statement += `<span class="txt-blue">安打</span>(${fielder})で出塁`;
                     }
                     break;
                 case 2:
-                    statement += `二塁打（${fielder}）で出塁`;
+                    statement += `<span class="txt-blue">二塁打</span>（${fielder}）で出塁`;
                     break;
                 case 3:
-                    statement += `三塁打（${fielder}）で出塁`;
+                    statement += `<span class="txt-blue">三塁打</span>（${fielder}）で出塁`;
                     break;
                 case 4:
-                    statement += `本塁打（${fielder}）`;
+                    statement += `<span class="txt-blue">本塁打</span>（${fielder}）`;
                     break;
             }
         }
         if (sacrificeAdvances) {
             sacrificeAdvances.map(base => {
                 if (base === 'third') {
-                    statement += `${stop}サードランナーホームイン`;
+                    statement += `${stop}サードランナー<span class="txt-blue">ホームイン</span>`;
                 } else {
-                    statement += `${stop + text(base)}ランナー進塁`;
+                    statement += `${stop + text(base)}ランナー<span class="txt-green">進塁</span>`;
                 }
             });
         }
