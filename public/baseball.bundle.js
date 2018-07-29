@@ -3863,6 +3863,10 @@ const lighting = {
 
 const loadSkyShader = () => {
 
+    if (typeof THREE === 'undefined') {
+        return;
+    }
+
     THREE.ShaderLib[ 'sky' ] = {
 
         uniforms: {

@@ -1,4 +1,4 @@
-import { createElement, component_t } from 'nominal-create-element.esm';
+import { createElement, component_t } from 'nominal-create-element/createElement.esm';
 import { classAdapter } from './adapter/class';
 import { styleAdapter } from './adapter/style';
 
@@ -24,7 +24,7 @@ export class App implements component_t {
                     <div class="row">
                         <div class="col-md-4 background-color visible-lg visible-md">
                             <ul class="list-group pitch-record">
-                                {y.log.pitchRecord[y.mode()].map((event, i) => {
+                                {y.log.pitchRecord[this.mode()].map((event, i) => {
                                     return (
                                         <li class="list-group-item">
                                             {i > 0 ? <span>{event}</span> : <strong>{event}</strong>}
@@ -41,7 +41,7 @@ export class App implements component_t {
                                 class={
                                     'windup ' + y.humanControl === 'none' ||
                                     y.humanBatting() ||
-                                    y.opponentConneccted
+                                    y.opponentConnected
                                         ? 'winding'
                                         : ''
                                 }
@@ -184,7 +184,7 @@ export class App implements component_t {
                         </div>
                         <div class="col-md-4 background-color visible-lg visible-md">
                             <ul class="list-group pitch-record">
-                                {y.log.shortRecord[y.mode()].map((event, i) => {
+                                {y.log.shortRecord[this.mode()].map((event, i) => {
                                     return (
                                         <li class="list-group-item">
                                             {i > 0 ? <span>{event}</span> : <strong>{event}</strong>}
@@ -202,5 +202,9 @@ export class App implements component_t {
 
     private indicate(event: Event): void {
         // todo
+    }
+
+    private mode(): string {
+        return this.translator.mode;
     }
 }
