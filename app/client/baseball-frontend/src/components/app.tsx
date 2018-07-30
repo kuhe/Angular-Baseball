@@ -1,13 +1,91 @@
 import { createElement, component_t } from 'nominal-create-element/createElement.esm';
 import { classAdapter } from './adapter/class';
 import { styleAdapter } from './adapter/style';
+import { Baseball } from '../core/baseball';
+
+// todo remove jquery
+const $ = (window as any).$;
 
 export class App implements component_t {
     public element: HTMLElement;
 
-    public constructor(public game: any, public translator: any) {}
-    private showMessage: boolean;
-    private begin: boolean;
+    public showMessage: boolean = true;
+    public holdUpTimeouts: any[];
+    public begin: boolean = false;
+    public expandScoreboard: boolean = false;
+    public allowInput: boolean = true;
+    public lastTimeout: number = -1;
+    public showDifficultySelection: boolean = false;
+
+    public constructor(public game: any, public translator: any) {
+        if (localStorage) {
+            const storedMode = localStorage.__$yakyuuaikoukai_text_mode;
+            if (storedMode === 'e' || storedMode === 'n') {
+                this.mode(storedMode);
+            }
+        }
+        game.updateFlightPath = this.updateFlightPath = Baseball.service.Animator.updateFlightPath.bind(this);
+
+        const bat = $('.target .swing.stance-indicator');
+        const showBat = function (event) {
+            if (game.humanBatting()) {
+                const offset = $('.target').offset();
+                const relativeOffset = {
+                    x: event.pageX - offset.left,
+                    y: 200 - (event.pageY - offset.top)
+                };
+                const angle = game.setBatAngle(relativeOffset.x, relativeOffset.y);
+                bat.css({
+                    top: 200 - relativeOffset.y + "px",
+                    left: relativeOffset.x + "px",
+                    transform: "rotate(" + angle + "deg) rotateY(" + (game.batter.bats == "left" ? 0 : -0) + "deg)"
+                });
+                if (relativeOffset.x > 200 || relativeOffset.x < 0 || relativeOffset.y > 200 || relativeOffset.y < 0) {
+                    bat.hide();
+                } else {
+                    bat.show();
+                }
+            }
+        };
+        const glove = $('.target .glove.stance-indicator');
+        const showGlove = function (event) {
+            if (game.humanPitching()) {
+                const offset = $('.target').offset();
+                const relativeOffset = {
+                    x: event.pageX - offset.left,
+                    y: 200 - (event.pageY - offset.top)
+                };
+                glove.css({
+                    top: 200 - relativeOffset.y + "px",
+                    left: relativeOffset.x + "px"
+                });
+                if (relativeOffset.x > 200 || relativeOffset.x < 0 || relativeOffset.y > 200 || relativeOffset.y < 0) {
+                    glove.hide();
+                } else {
+                    glove.show();
+                }
+            }
+        };
+
+        game.startOpponentPitching = function (callback) {
+            game.updateFlightPath(callback);
+        };
+        game.umpire.onSideChange = function () {
+            if (game.humanBatting()) {
+                $('.input-area').mousemove(showBat);
+            } else {
+                $('.input-area').unbind('mousemove', showBat);
+                bat.hide();
+            }
+            if (game.humanPitching()) {
+                $('.input-area').mousemove(showGlove);
+            } else {
+                $('.input-area').unbind('mousemove', showGlove);
+                glove.hide();
+            }
+        };
+        game.umpire.onSideChange();
+    }
 
     public template(): HTMLElement {
         const y = this.game;
@@ -200,11 +278,45 @@ export class App implements component_t {
         ));
     }
 
-    private indicate(event: Event): void {
-        // todo
+    public holdUp(): void {
+        (document.querySelector('.input-area') as HTMLDivElement).click();
     }
 
-    private mode(): string {
-        return this.translator.mode;
+    public updateFlightPath(): void {
+        throw new Error('delayed binding');
+    }
+
+    public indicate(event: Event & any): void {
+        const { game } = this;
+        if (!this.allowInput) {
+            return;
+        }
+        if (game.humanPitching()) {
+            this.allowInput = false;
+            game.pitcher.windingUp = false;
+        }
+        if (game.pitcher.windingUp) {
+            return;
+        }
+        const offset = $('.target').offset();
+        const relativeOffset = {
+            x: event.pageX - offset.left,
+            y: 200 - (event.pageY - offset.top)
+        };
+        clearTimeout(this.lastTimeout);
+        while (this.holdUpTimeouts.length) {
+            clearTimeout(this.holdUpTimeouts.shift());
+        }
+        this.showMessage = false;
+        game.receiveInput(relativeOffset.x, relativeOffset.y, function (callback) {
+            game.updateFlightPath(callback);
+        });
+    }
+
+    private mode(mode?: string): string {
+        if (mode) {
+            this.translator.mode = mode;
+        }
+        return this.translator.mode || 'e';
     }
 }

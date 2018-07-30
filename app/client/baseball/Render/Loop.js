@@ -11,6 +11,7 @@ import { Wall } from './mesh/Wall';
 import { Sky } from './mesh/Sky';
 import { Sun } from './mesh/Sun';
 import { lighting } from './scene/lighting';
+import { AbstractMesh } from './Mesh/AbstractMesh';
 import { loadSkyShader } from './Shaders/SkyShader';
 
 import { VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE } from './LoopConstants';
@@ -22,7 +23,7 @@ const AHEAD = () => {
         return ahead;
     }
     if (typeof THREE !== 'undefined') {
-        return ahead = new THREE.Vector3(0, VERTICAL_CORRECTION, -60.5)
+        return (ahead = new THREE.Vector3(0, VERTICAL_CORRECTION, -60.5));
     }
 };
 const INITIAL_POSITION = () => {
@@ -30,7 +31,7 @@ const INITIAL_POSITION = () => {
         return initialPosition;
     }
     if (typeof THREE !== 'undefined') {
-        return initialPosition = new THREE.Vector3(0, VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE);
+        return (initialPosition = new THREE.Vector3(0, VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE));
     }
 };
 
@@ -38,7 +39,6 @@ const INITIAL_POSITION = () => {
  * manager for the rendering loop
  */
 class Loop {
-
     /**
      * @param {string} elementClass
      * @param {boolean} background
@@ -55,8 +55,6 @@ class Loop {
 
         /** @type {HTMLElement} */
         this.element = null;
-
-        loadSkyShader();
 
         /** @type {Loop} */
         this.foreground = null;
@@ -84,11 +82,13 @@ class Loop {
 
         this.panToward(this.target);
         const omt = this.overwatchMoveTarget;
-        this.moveToward(this.moveTarget || {
-            x: omt.x,
-            y: omt.y + 12,
-            z: omt.z
-        });
+        this.moveToward(
+            this.moveTarget || {
+                x: omt.x,
+                y: omt.y + 12,
+                z: omt.z
+            }
+        );
 
         this.moveSpeed = 0.05;
         this.panSpeed = 0.3;
@@ -102,18 +102,21 @@ class Loop {
      * initialize lights, camera, action
      */
     main(background) {
-
         this.objects = [];
 
         if (this.getThree()) {
-
             const THREE = this.THREE;
 
-            const scene = this.scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2( 0x838888, 0.002 );
+            const scene = (this.scene = new THREE.Scene());
+            scene.fog = new THREE.FogExp2(0x838888, 0.002);
             if (this.attach()) {
                 lighting.addTo(scene);
-                const camera = this.camera = new THREE.PerspectiveCamera(60, this.getAspect(), 0.1, 1000000);
+                const camera = (this.camera = new THREE.PerspectiveCamera(
+                    60,
+                    this.getAspect(),
+                    0.1,
+                    1000000
+                ));
 
                 this.target = new THREE.Vector3(0, 0, -60.5);
                 this._target = new THREE.Vector3(0, 0, -60.5);
@@ -131,7 +134,6 @@ class Loop {
                     this.main(background);
                 }, 2000);
             }
-
         }
     }
 
@@ -139,7 +141,8 @@ class Loop {
      * @param addition
      */
     addMinutes(addition) {
-        let hours = this.timeOfDay.h, minutes = this.timeOfDay.m;
+        let hours = this.timeOfDay.h,
+            minutes = this.timeOfDay.m;
         minutes += addition;
         while (minutes >= 60) {
             minutes -= 60;
@@ -189,20 +192,20 @@ class Loop {
         if (hours < 7.5) {
             hours += 24;
         }
-        const azimuth = ((hours - 7.5)/24 + (minutes/60)/24);
+        const azimuth = (hours - 7.5) / 24 + minutes / 60 / 24;
         sky.uniforms.azimuth = azimuth;
 
         //if (azimuth > 0.5) {
         //    sky.uniforms.inclination = 0.48;
         //} else {
-            sky.uniforms.inclination = 0.31;
+        sky.uniforms.inclination = 0.31;
         //}
         sun.time.h = hours;
         sun.time.m = minutes;
         sun.derivePosition(sky);
         const luminosity = (-0.5 + Math.max(Math.abs(1.25 - azimuth), Math.abs(0.25 - azimuth))) * 2;
         if (this.Animator) {
-            this.Animator.setLuminosity(0.1 + luminosity/1.4);
+            this.Animator.setLuminosity(0.1 + luminosity / 1.4);
         }
     }
 
@@ -215,7 +218,8 @@ class Loop {
         new Grass().join(this);
         new Grass(this, true);
         new BattersEye().join(this);
-        const sun = new Sun(), sky = new Sky();
+        const sun = new Sun(),
+            sky = new Sky();
         sun.derivePosition(sky);
         sky.join(this);
         sun.join(this);
@@ -243,7 +247,6 @@ class Loop {
 
         new FoulPole(this, 'left');
         new FoulPole(this, 'right');
-
     }
 
     /**
@@ -251,7 +254,9 @@ class Loop {
      */
     breathe() {
         const pos = this.camera.position;
-        const x = pos.x, y = pos.y, z = pos.z;
+        const x = pos.x,
+            y = pos.y,
+            z = pos.z;
         const rate = 0.0005 * this.bob || 1;
         if (y > 0.6) {
             this.bob = -1;
@@ -264,7 +269,7 @@ class Loop {
     }
     getThree() {
         if (this.THREE === Loop.prototype.THREE && typeof window === 'object' && window.THREE) {
-            return this.THREE = window.THREE;
+            return (this.THREE = window.THREE);
         }
         return true;
     }
@@ -324,9 +329,12 @@ class Loop {
         this.forAllLoops(loop => {
             const target = loop._target;
             if (target) {
-                target.x = target.x + Math.max(Math.min((vector.x - target.x)/100, maxIncrement), -maxIncrement);
-                target.y = target.y + Math.max(Math.min((vector.y - target.y)/100, maxIncrement), -maxIncrement);
-                target.z = target.z + Math.max(Math.min((vector.z - target.z)/100, maxIncrement), -maxIncrement);
+                target.x =
+                    target.x + Math.max(Math.min((vector.x - target.x) / 100, maxIncrement), -maxIncrement);
+                target.y =
+                    target.y + Math.max(Math.min((vector.y - target.y) / 100, maxIncrement), -maxIncrement);
+                target.z =
+                    target.z + Math.max(Math.min((vector.z - target.z) / 100, maxIncrement), -maxIncrement);
                 loop.camera.lookAt(target);
             }
         });
@@ -341,9 +349,9 @@ class Loop {
         this.forAllLoops(loop => {
             const position = loop.camera && loop.camera.position;
             if (position) {
-                position.x += Math.max(Math.min((vector.x - position.x), maxIncrement), -maxIncrement);
-                position.y += Math.max(Math.min((vector.y - position.y), maxIncrement), -maxIncrement);
-                position.z += Math.max(Math.min((vector.z - position.z), maxIncrement), -maxIncrement);
+                position.x += Math.max(Math.min(vector.x - position.x, maxIncrement), -maxIncrement);
+                position.y += Math.max(Math.min(vector.y - position.y, maxIncrement), -maxIncrement);
+                position.z += Math.max(Math.min(vector.z - position.z, maxIncrement), -maxIncrement);
             }
         });
     }
@@ -386,7 +394,7 @@ class Loop {
             moveSpeed = 2.5;
         }
         this.setLookTarget(AHEAD(), moveSpeed);
-        this.setMoveTarget(INITIAL_POSITION(), moveSpeed/10);
+        this.setMoveTarget(INITIAL_POSITION(), moveSpeed / 10);
     }
     moveCamera(x, y, z) {
         if (typeof x === 'object') {
@@ -430,15 +438,19 @@ class Loop {
         const ball = new Ball();
         window.Ball = Ball;
         window.ball = ball;
-        ball.deriveTrajectory(data || {
-            splay: -35,
-            travelDistance: 135,
-            flyAngle: -15,
-            x: 100,
-            y: 100
-        }, {
-            x: 0, y: 0
-        });
+        ball.deriveTrajectory(
+            data || {
+                splay: -35,
+                travelDistance: 135,
+                flyAngle: -15,
+                x: 100,
+                y: 100
+            },
+            {
+                x: 0,
+                y: 0
+            }
+        );
         ball.join(this);
     }
 }
