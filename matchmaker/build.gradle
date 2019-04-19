@@ -17,7 +17,7 @@ targetCompatibility = 1.8
 
 jar {
     baseName = 'main-aikoukai-matchmaker'
-    version = '0.2.0'
+    version = '0.3.0'
 }
 
 repositories {
