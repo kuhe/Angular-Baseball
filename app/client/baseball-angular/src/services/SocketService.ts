@@ -11,18 +11,18 @@ import Baseball from './../app/baseball-lib';
  * Socket service for opponent connection.
  *
  */
-var SocketService = (function () {
+const SocketService = (function () {
 
     /**
      * @param {string} field
      * @returns {string}
      */
-    var teamToken = function (field) {
+    const teamToken = function (field) {
 
-        var tn = 'Team' + (Math.random() * 100 | 0);
-        var str = tn + Math.random() * Date.now();
+        const tn = 'Team' + (Math.random() * 100 | 0);
+        const str = tn + Math.random() * Date.now();
 
-        var hash = 0, i, chr;
+        let hash = 0, i, chr;
         if (str.length === 0) return hash;
         for (i = 0; i < str.length; i++) {
             chr = str.charCodeAt(i);
@@ -40,11 +40,11 @@ var SocketService = (function () {
      * @param {String} teamToken
      * @returns {Stomp}
      */
-    var IoAdapter = function (stomp, teamToken) {
+    const IoAdapter = function (stomp, teamToken) {
 
         stomp.subscribe('/matchmaker/' + teamToken, function (frame) {
 
-            var data = JSON.parse(frame.body);
+            const data = JSON.parse(frame.body);
 
             if (data.type in reactions) {
                 reactions[data.type](data);
@@ -53,7 +53,7 @@ var SocketService = (function () {
 
         });
 
-        var reactions = {};
+        const reactions = {};
         stomp.on = function (key, fn) {
             key.split(' ').forEach(function (k) {
                 reactions[k] = fn;
@@ -70,11 +70,13 @@ var SocketService = (function () {
 
     };
 
-    var SocketService = function (game) {
+    const SocketService = function (game) {
 
-        // var connect = 'http://localhost:8080/match-socks';
-        var connect = 'http://default-environment.pgumpc8npq.us-east-1.elasticbeanstalk.com/match-socks';
-        var socket = new (<any>window).SockJS(connect);
+        const connect = !!~location.hostname.indexOf('localhost')
+            ? 'http://localhost:8080/match-socks'
+            : 'http://default-environment.pgumpc8npq.us-east-1.elasticbeanstalk.com/match-socks';
+
+        const socket = new (<any>window).SockJS(connect);
 
         this.game = game;
 
@@ -86,9 +88,8 @@ var SocketService = (function () {
 
     };
 
-    var LOG_TRAFFIC = false;
-    var game, socket, NO_OPERATION = function () {
-        },
+    const LOG_TRAFFIC = false;
+    let game, socket, NO_OPERATION = function () {},
         animator = Baseball.service.Animator;
 
     SocketService.prototype = {
@@ -109,8 +110,8 @@ var SocketService = (function () {
             game.opponentService = this;
             this.field = field;
 
-            var giraffe = this;
-            var token = this.teamToken = teamToken(field);
+            const giraffe = this;
+            const token = this.teamToken = teamToken(field);
 
             socket.connect({}, function (frame) {
 
@@ -139,7 +140,7 @@ var SocketService = (function () {
                 game.windupThen(function () {
 
                     game.thePitch(0, 0, NO_OPERATION, pitch);
-                    var scope = (<any>window).s;
+                    const scope = (<any>window).s;
                     animator.updateFlightPath.bind(scope)();
 
                 });
@@ -156,7 +157,7 @@ var SocketService = (function () {
                 }
                 if (LOG_TRAFFIC) console.log('receive', 'swing', swing);
                 game.theSwing(0, 0, NO_OPERATION, swing);
-                var scope = (<any>window).s;
+                const scope = (<any>window).s;
                 animator.updateFlightPath.bind(scope)(function () {
                     if (swing.contact) {
                         animator.animateFieldingTrajectory(game);
@@ -165,7 +166,7 @@ var SocketService = (function () {
             });
             socket.on('partner_disconnect', function () {
                 console.log('The opponent has disconnected');
-                var scope = (<any>window).s;
+                const scope = (<any>window).s;
                 game.opponentConnected = false;
                 game.batter.ready = false;
                 if (game.stage === 'pitch' && game.humanBatting()) {
@@ -228,7 +229,7 @@ var SocketService = (function () {
 //    app.SocketService = ng.core
 //        .Class({
 //            constructor: function() {
-//                for (var i in SocketService.prototype) { if (SocketService.prototype.hasOwnProperty(i)) {
+//                for (const i in SocketService.prototype) { if (SocketService.prototype.hasOwnProperty(i)) {
 //                    this[i] = SocketService.prototype[i];
 //                }}
 //                SocketService.bind(this)();

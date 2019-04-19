@@ -99,9 +99,15 @@ public class Organizer {
     /**
      * @return a readable list of fields and their occupants.
      */
-    @Todo
     public final String toString() {
-        return "";
+        String output = "";
+
+        for (@FieldId String key : fields.keySet()) {
+            Field field = fields.get(key);
+            output += field.toString() + "\n";
+        }
+
+        return output;
     }
 
     /**

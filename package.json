@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "test": "cd app/client && npm test",
-    "career": "cd app/client && npm test",
-    "serve": "simplehttpserver ."
+    "test": "make test",
+    "career": "make career",
+    "serve": "make serve"
   }
 }

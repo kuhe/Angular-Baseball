@@ -1,4 +1,4 @@
-[Yakyuu-Aikoukai（Baseball Club）](http://kuhe.github.io)
+[野球愛好会（Baseball Club）](http://kuhe.github.io)
 ===============
 
 A game of one of the top five bat-based sports, namely baseball! Now in JavaScript form.
