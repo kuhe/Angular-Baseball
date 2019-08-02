@@ -48,10 +48,43 @@
                 {{ t('Spectate the CPU') }}
             </button>
         </div>
-        <p style='text-align: center; max-width: 340px; margin: auto;'>
-            Supposing the matchmaking server hasn't crashed, you can
-            share your URL (including hash) after clicking 'Play Ball!'
-            to play with a live opponent.
+        <p class='explanation jp' *ngIf="t.mode === 'n'">
+            野球ですけど、今はブラウザの中でプレーすることができる。
+            バッテリーとバッター両方で、ストライクゾーンにクリックすれば、
+            投球や打球がでる。
+        </p>
+        <p class='explanation jp' *ngIf="t.mode === 'n'">
+            簡単に見えるが、野球のファンには作戦が好みだから、このゲームに
+            出来るだけのそのシミュレーションが含まれている。
+        </p>
+        <p class='explanation jp' *ngIf="t.mode === 'n'">
+            守備に入ってから、投球選択で敵バッタを挑戦する。外れすぎだとしたら、バットを振らなくてボール球になる。
+            逆に真ん中のストレートでホームランになってしまうかもしれない。
+        </p>
+        <p class='explanation jp' *ngIf="t.mode === 'n'">
+            攻撃で重要なのはタイミングと目の鋭さ。変化球を見分けるものが勝利をつかむ。
+        </p>
+
+        <p class='explanation' *ngIf="t.mode === 'e'">
+            Well, what is this? It's a browser game, the game of <em>baseball</em>.
+            You can play as the battery (pitcher & catcher) when on defense and play as the batter
+            when on offense. Both involve clicking on the <strong>strike zone</strong> to pitch or bat.
+        </p>
+        <p class='explanation' *ngIf="t.mode === 'e'">
+            Although simple in this presentation, fans of baseball enjoy a lot of strategic depth in the game and I've tried
+            to model many aspects of it into your web browser.
+        </p>
+        <p class='explanation' *ngIf="t.mode === 'e'">
+            Starting as the home team on <strong>defense</strong>, you'll want to mix up your pitches and locate them
+            effectively to keep the batter guessing. Too far off the plate and they won't swing for it, resulting in a <strong>ball</strong>,
+            but too many pitches down the middle may result in a <strong>home run</strong>.
+        </p>
+        <p class='explanation' *ngIf="t.mode === 'e'">
+            Next, on <strong>offense</strong>, keep a good eye on the ball's
+            breaking trajectory and spin, then swing (<em>click, that is</em>) at the location it crosses the plate. Whether
+            it's a swinging strike, foul, fly, or grounder is up to your <strong>timing and coordination</strong>.
+            Lay off pitches outside the <strong>strike zone</strong> or foul them to work the count (pitcher fatigue). Later in the <strong>lineup</strong>,
+            your team's power hitters can watch a pitch or two go by to better drive the ball.
         </p>
     </section>
     <section class='baseball-beginner text-left'>

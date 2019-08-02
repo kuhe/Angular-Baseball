@@ -51,6 +51,7 @@ button.btn {
     padding: 0 12px 3px;
     border-radius: 0;
     &.play-ball {
+        background: @red;
     }
     &.small {
         font-size: 11px;
@@ -65,6 +66,20 @@ button.btn {
     &.disabled {
         pointer-events: auto;
         cursor: auto;
+    }
+}
+
+.explanation {
+    font-weight: normal;
+    margin: 0 auto 2rem;
+    max-width: 500px;
+
+    &.jp {
+        font-weight: bold;
+    }
+
+    strong {
+        font-weight: bold;
     }
 }
 
