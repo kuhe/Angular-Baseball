@@ -13,7 +13,10 @@ import SocketService from '../../services/SocketService';
 export class BlockingComponent extends ModeComponent implements OnInit {
 
     y: object;
-    t: Function;
+    t: {
+        (phrase: string, override?: string): string;
+        mode: 'e' | 'n'
+    };
 
     constructor() {
         super();

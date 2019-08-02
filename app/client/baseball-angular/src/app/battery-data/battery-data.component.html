@@ -8,14 +8,14 @@
                 {{y.teams.away.positions.pitcher.stats.pitching.H}}<span class='stat-abbrev'>{{ t('H') }}</span>
                 {{y.teams.away.positions.pitcher.stats.pitching.BB}}<span class='stat-abbrev'>{{ t('BB') }}</span>
             </span>
-            {{y.teams.away.positions.pitcher.stats.pitching.strikes}} -
-            {{y.teams.away.positions.pitcher.stats.pitching.pitches}}
+            {{y.teams.away.positions.pitcher.stats.pitching.strikes}}<span class='stat-abbrev'>S</span> -
+            {{y.teams.away.positions.pitcher.stats.pitching.pitches}}<span class='stat-abbrev'>P</span>
         </div>
     </div>
     <div class='col-xs-6 text-left'>
         <div class='pitch-count' [ngClass]="{'focus': y.half === 'top'}">
-            {{y.teams.home.positions.pitcher.stats.pitching.strikes}} -
-            {{y.teams.home.positions.pitcher.stats.pitching.pitches}}
+            {{y.teams.home.positions.pitcher.stats.pitching.strikes}}<span class='stat-abbrev'>S</span> -
+            {{y.teams.home.positions.pitcher.stats.pitching.pitches}}<span class='stat-abbrev'>P</span>
 
             <span class='secondary-battery-stats __right'>
                 {{y.teams.home.positions.pitcher.stats.pitching.K}}<span class='stat-abbrev'>{{ t('K') }}</span>

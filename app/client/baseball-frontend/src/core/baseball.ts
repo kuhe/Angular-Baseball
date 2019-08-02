@@ -1,0 +1,1 @@
+export const Baseball = (<any>window).Baseball;
