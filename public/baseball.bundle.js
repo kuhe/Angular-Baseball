@@ -2251,7 +2251,7 @@ text.contactResult = (batter, fielder, bases, outBy, sacrificeAdvances, out) => 
                     break;
                 case 'ground':
                     var play = doublePlay ? 'into a double play by' : 'out to';
-                    statement += `<span class="txt-red">grounded ${play}</span> ${text.fielderShortName(fielder)}`;
+                    statement += ` <span class="txt-red">grounded ${play}</span> ${text.fielderShortName(fielder)}`;
                     break;
                 case 'thrown':
                     play = doublePlay ? ' on a double play' : '';
