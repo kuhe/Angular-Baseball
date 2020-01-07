@@ -5,12 +5,12 @@
     "build": "npx rollup -c"
   },
   "license": "UNLICENSED",
-  "dependencies": {
-    "nominal-create-element": "^2.2.1",
-    "prettier": "^1.14.0",
-    "rollup": "^0.63.4",
-    "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-typescript2": "^0.16.1",
-    "typescript": "^2.9.2"
+  "dependencies": {},
+  "devDependencies": {
+    "prettier": "1.19.1",
+    "rollup": "1.28.0",
+    "rollup-plugin-node-resolve": "5.2.0",
+    "rollup-plugin-typescript2": "0.25.3",
+    "typescript": "3.7.4"
   }
 }

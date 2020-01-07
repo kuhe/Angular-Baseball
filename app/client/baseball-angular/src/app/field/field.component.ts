@@ -3,7 +3,7 @@ import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 @Component({
     selector: 'field',
     templateUrl: './field.component.html',
-    styleUrls: ['./field.component.css'],
+    styleUrls: [],
     encapsulation: ViewEncapsulation.None,
     inputs: ['y']
 })

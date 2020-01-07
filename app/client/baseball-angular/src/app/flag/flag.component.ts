@@ -3,7 +3,7 @@ import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 @Component({
     selector: 'flag',
     templateUrl: './flag.component.html',
-    styleUrls: ['./flag.component.css'],
+    styleUrls: [],
     encapsulation: ViewEncapsulation.None,
     inputs: ['team']
 })

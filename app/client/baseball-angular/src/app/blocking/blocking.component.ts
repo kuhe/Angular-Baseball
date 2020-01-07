@@ -6,7 +6,7 @@ import SocketService from '../../services/SocketService';
 @Component({
     selector: 'blocking',
     templateUrl: './blocking.component.html',
-    styleUrls: ['./blocking.component.css'],
+    styleUrls: [],
     encapsulation: ViewEncapsulation.None,
     inputs: ['y', 't']
 })

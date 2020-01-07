@@ -4,7 +4,7 @@ import Baseball from './../baseball-lib';
 @Component({
     selector: 'batters-data',
     templateUrl: './batters-data.component.html',
-    styleUrls: ['./batters-data.component.css'],
+    styleUrls: [],
     encapsulation: ViewEncapsulation.None,
     inputs: ['y', 't']
 })

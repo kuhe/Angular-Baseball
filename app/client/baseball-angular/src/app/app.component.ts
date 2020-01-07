@@ -1,12 +1,7 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import Baseball from './baseball-lib';
 import SocketService from './../services/SocketService';
-import * as THREE from 'three';
-import TweenMax from 'gsap/TweenMax';
 import {ModeComponent} from "./mode/mode.component";
-
-(<any>window).THREE = THREE;
-(<any>window).TweenMax = TweenMax;
 
 const $: any = (<any>window).$;
 
@@ -40,7 +35,6 @@ const IndexController = function ($scope) {
     selector: 'application-hook',
     templateUrl: './app.component.html',
     styleUrls: [
-        './app.component.css'
     ],
     changeDetection: ChangeDetectionStrategy.Default
 })

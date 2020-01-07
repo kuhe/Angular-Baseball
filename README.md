@@ -25,11 +25,10 @@ todo :
             / baseball : game engine (ES6/ESM)
                 / test : unit (ES6)
             / baseball-angular : TypeScript/Angular5 rendering front end
+            / baseball-frontend : Possible WIP for a thinner Preact front end
             / styles : less
-        / server
-            the websocket server for live head-2-head play (NodeJS service is deprecated)
     matchmaker
-        a Java implementation of the websocket service (active)
+        a Java implementation of the websocket service
     public (end user runtime)
         index.html : the home page
 

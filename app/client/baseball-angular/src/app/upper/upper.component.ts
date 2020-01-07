@@ -4,7 +4,7 @@ import {ModeComponent} from '../mode/mode.component';
 @Component({
     selector: 'upper',
     templateUrl: './upper.component.html',
-    styleUrls: ['./upper.component.css'],
+    styleUrls: [],
     encapsulation: ViewEncapsulation.None,
     inputs: ['y', 't']
 })

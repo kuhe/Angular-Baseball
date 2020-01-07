@@ -5,7 +5,7 @@ import {referenceContainer} from '../app.component';
 @Component({
     selector: 'lower',
     templateUrl: './lower.component.html',
-    styleUrls: ['./lower.component.css'],
+    styleUrls: [],
     encapsulation: ViewEncapsulation.None,
     inputs: ['y', 't']
 })

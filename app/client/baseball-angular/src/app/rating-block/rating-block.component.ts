@@ -3,7 +3,7 @@ import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 @Component({
     selector: 'rating-block',
     templateUrl: './rating-block.component.html',
-    styleUrls: ['./rating-block.component.css'],
+    styleUrls: [],
     encapsulation: ViewEncapsulation.None,
     inputs: ['rating']
 })

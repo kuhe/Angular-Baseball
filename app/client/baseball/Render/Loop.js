@@ -11,7 +11,7 @@ import { Wall } from './mesh/Wall';
 import { Sky } from './mesh/Sky';
 import { Sun } from './mesh/Sun';
 import { lighting } from './scene/lighting';
-import { AbstractMesh } from './Mesh/AbstractMesh';
+import { AbstractMesh } from './mesh/AbstractMesh';
 import { loadSkyShader } from './Shaders/SkyShader';
 
 import { VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE } from './LoopConstants';

@@ -7,10 +7,7 @@ deploy:
 	(cd baseball-angular && npm run build) && make copy
 
 copy:
-	rm -rf ../../public/*
-	cp -R ./baseball-angular/dist/* ../../public
-	mv ../../public/index.html ../../index.html
-	mv ../../public/public/* ../../public/
+	node copy.js
 
 css:
 	npx lessc styles/application.less > ./baseball-angular/src/public/application.css

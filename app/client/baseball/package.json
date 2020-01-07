@@ -11,7 +11,7 @@
     "watch": "npx webpack --watch"
   },
   "author": "George Fu (george.jing.fu@gmail.com)",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "devDependencies": {
     "webpack": "^3.8.1"
   },
