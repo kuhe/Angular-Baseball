@@ -242,24 +242,55 @@ class Ball extends AbstractMesh {
             airTime: 0.96
         };
 
+        // a.k.a. launch angle in Baseball terminology.
         let flyAngle = result.flyAngle;
+
+        // distance the ball travels before hitting the ground the first time.
         let distance = Math.abs(result.travelDistance);
+
         const scalar = result.travelDistance < 0 ? -1 : 1;
+
+        // Using a different scalar for ground balls.
         const flightScalar = flyAngle < 7 ? -1 : 1;
         const splay = result.splay;
 
         if (flightScalar < 0 && result.travelDistance > 0) {
-            distance = Math.max(90, distance);
+            switch (true) {
+                case result.fielder in {
+                    first: 1, second: 1, short: 1, third: 1
+                }:
+                    // If we're using the ground ball animation trajectory,
+                    // have the rendered travel distance be at least 90 if the fielder
+                    // is a non-battery infielder.
+                    distance = Math.max(90, distance);
+                    break;
+                case result.fielder in { pitcher: 1, catcher: 1 }:
+                    distance = Math.min(45, distance);
+                    break;
+                default:
+                    distance = Math.max(110, distance);
+            }
         }
 
         flyAngle = 1 + Math.abs(flyAngle); // todo why plus 1?
         if (flyAngle > 90) flyAngle = 180 - flyAngle;
 
-        // velocity in m/s, I think
-        const velocity = dragScalarApproximation.distance * Math.sqrt(9.81 * distance / Math.sin(2*Math.PI*flyAngle/180));
+        // exit velocity in mph.
+        const velocity = dragScalarApproximation.distance *
+            Math.sqrt(9.81 * distance / Math.sin(2*Math.PI*Math.max(flyAngle, 8)/180));
         const velocityVerticalComponent = Math.sin(Mathinator.RADIAN * flyAngle) * velocity;
+
+        let groundTime = 0;
+
+        // if the ball was caught, stop animation at the landing point.
+        // otherwise, add fielder travel to the tail of the animation as the ball rolls.
+        if (result.fieldingDelay) {
+            groundTime = result.fieldingDelay;
+        }
+
         // in feet
         const apexHeight = velocityVerticalComponent*velocityVerticalComponent/(2*9.81) * dragScalarApproximation.apexHeight;
+
         // in seconds
         const airTime = 1.5 * Math.sqrt(2*apexHeight/9.81) * dragScalarApproximation.airTime; // 2x freefall equation
 
@@ -284,34 +315,82 @@ class Ball extends AbstractMesh {
         };
 
         const frames = [];
-        const frameCount = airTime * 60 | 0;
+        const frameCount = airTime * 60 + groundTime * 20 | 0;
         let counter = frameCount;
         let frame = 0;
 
         let lastHeight = 0;
+        let lastWaveDirection = 0;
 
-        while (counter--) {
-            const progress = (++frame)/frameCount, percent = progress * 100;
+        // travel rate reduction from hitting the ground.
+        // decreases each bounce.
+        let slow = 1;
+
+        let bounces = 0;
+
+        while (counter-- > 0) {
+            let y;
+            /** @type {number} 0 to 1. */
+            let progress;
+            /** @type {number} 0 to 100. */
+            let percent;
+
+            progress = Math.pow(
+                (++frame)/frameCount, 0.9 // ease out / trend toward 1.0 to simulate higher initial speed.
+            );
+            percent = progress * 100;
 
             // this equation is approximate
             if (flightScalar < 0) {
                 const currentDistance = progress * distance;
-                y = (origin.y * scale
-                    + apexHeight*Math.abs(Math.sin(3 * Math.pow(currentDistance, 1.1) / distance * Math.PI/2)))
-                    * ((100 - percent)/100)
-                    + AbstractMesh.WORLD_BASE_Y * (progress);
+
+                const tapering = (100 - percent) / 100;
+                const startingHeight = origin.y * scale;
+                const finalHeight = AbstractMesh.WORLD_BASE_Y;
+
+                // lets say 3 bounces per 90 feet.
+                // in practice, this effect will be invisible after a certain distance due to
+                // tapering.
+                const averageBounceRate = 3;
+
+                // a map of distance to sine wave position.
+                // the multiplication of bounce rate means that as distance approaches the
+                // final distance, the sine wave will have been traversed that many times, giving that
+                // many bounces.
+                const waveProgress = averageBounceRate * Math.pow(currentDistance, 1.1) / distance;
+                const waveComponent = Math.sin(waveProgress * Math.PI/2);
+                const waveHeight = Math.abs(waveComponent);
+
+                if (waveComponent * lastWaveDirection < 0) {
+                    bounces += 1;
+                    slow *= 0.75;
+                    console.log('bounced');
+                }
+                lastWaveDirection = waveComponent;
+
+                /**
+                 * SIN wave with tapering gives a ground ball the bouncing trajectory.
+                 * @type {number}
+                 */
+                y = (startingHeight + apexHeight * waveHeight) * tapering
+                    + finalHeight * progress;
             } else {
-                var y = apexHeight - Math.pow(Math.abs(50 - percent)/50, 2) * apexHeight;
+                /**
+                 * Note the pow(n, 2) gives the flyball a parabolic trajectory.
+                 * @type {number}
+                 */
+                y = apexHeight - Math.pow(Math.abs(50 - percent)/50, 2) * apexHeight;
             }
 
             frames.push({
-                x: extrema.x/frameCount,
+                x: extrema.x/frameCount * slow,
                 y: (y - lastHeight),
-                z: extrema.z/frameCount
+                z: extrema.z/frameCount * slow
             });
 
             lastHeight = y;
         }
+
         this.trajectory = frames;
         return frames;
     }

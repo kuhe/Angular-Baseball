@@ -131,14 +131,20 @@ button.btn {
 .main-area {
     padding: 10px 30px !important;
     .list-group-item {
-        line-height: 14px;
         padding: 5px 10px;
         border: none;
         color: white;
         background-color: rgba(255, 255, 255, 0.15);
         .text-shadow;
-        strong, span {
-            font-size: 19.6px;
+
+        &:first-child {
+            strong, span, * {
+                font-size: 19.6px;
+            }
+        }
+
+        strong, span, * {
+            font-size: 14.0px;
             line-height: 1.1em;
         }
     }

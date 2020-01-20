@@ -285,16 +285,21 @@ button.btn.disabled {
   padding: 10px 30px !important;
 }
 .main-area .list-group-item {
-  line-height: 14px;
   padding: 5px 10px;
   border: none;
   color: white;
   background-color: rgba(255, 255, 255, 0.15);
   text-shadow: -1px -1px 3px #000, 1px -1px 3px #000, -1px 1px 3px #000, 1px 1px 3px #000;
 }
-.main-area .list-group-item strong,
-.main-area .list-group-item span {
+.main-area .list-group-item:first-child strong,
+.main-area .list-group-item:first-child span,
+.main-area .list-group-item:first-child * {
   font-size: 19.6px;
+}
+.main-area .list-group-item strong,
+.main-area .list-group-item span,
+.main-area .list-group-item * {
+  font-size: 14px;
   line-height: 1.1em;
 }
 .main-area .pitch-record {
