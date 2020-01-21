@@ -68,8 +68,8 @@ This project was developed unironically on Microsoft Windows, and sometimes on M
 
 ##### Project milestones:
 
-    - 2014, started the project while working at my first job.
-    - 2016 or thereabouts, modified the rendering engine to use WebGL instead of just CSS.
-    - Wrote nodejs and Java versions of a live-play matchmaking back end.
-    - 2018 or so, upgraded to Angular 2+ (8)
-    - 2020, planned migration to TypeScript (baseball engine) and/or off Angular (front end).
+- 2014, started the project while working at my first job.
+- 2016 or thereabouts, modified the rendering engine to use WebGL instead of just CSS.
+- Wrote nodejs and Java versions of a live-play matchmaking back end.
+- 2018 or so, upgraded to Angular 2+ (8)
+- 2020, planned migration to TypeScript (baseball engine) and/or off Angular (front end).
