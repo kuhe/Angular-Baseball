@@ -5,16 +5,16 @@ const Log = function() {
 };
 
 Log.prototype = {
-    game : 'instance of Game',
+    game: 'instance of Game',
     init() {
         this.lastSwing = '';
         this.lastSwingJ = '';
         this.stabilized = {
-            pitchRecord : {
+            pitchRecord: {
                 e: ['', '', '', '', '', ''],
                 n: ['', '', '', '', '', '']
             },
-            shortRecord : {
+            shortRecord: {
                 e: ['', '', '', '', '', ''],
                 n: ['', '', '', '', '', '']
             }
@@ -32,23 +32,23 @@ Log.prototype = {
             n: []
         };
     },
-    SINGLE : 'H',
-    DOUBLE : '2B',
-    TRIPLE : '3B',
-    HOMERUN : 'HR',
-    WALK : 'BB',
-    GROUNDOUT : 'GO',
-    FLYOUT : 'FO',
-    LINEOUT : 'LO',
-    RUN : 'R',
-    STRIKEOUT : 'SO',
-    SACRIFICE : 'SAC',
-    REACHED_ON_ERROR : 'ROE',
-    FIELDERS_CHOICE : 'FC',
-    GIDP : '(IDP)',
-    GITP : '(ITP)',
-    STOLEN_BASE : 'SB',
-    CAUGHT_STEALING : 'CS',
+    SINGLE: 'H',
+    DOUBLE: '2B',
+    TRIPLE: '3B',
+    HOMERUN: 'HR',
+    WALK: 'BB',
+    GROUNDOUT: 'GO',
+    FLYOUT: 'FO',
+    LINEOUT: 'LO',
+    RUN: 'R',
+    STRIKEOUT: 'SO',
+    SACRIFICE: 'SAC',
+    REACHED_ON_ERROR: 'ROE',
+    FIELDERS_CHOICE: 'FC',
+    GIDP: '(IDP)',
+    GITP: '(ITP)',
+    STOLEN_BASE: 'SB',
+    CAUGHT_STEALING: 'CS',
     stabilizeShortRecord() {
         const rec = this.record.e.slice(0, 6);
         this.shortRecord.e = rec;
@@ -86,20 +86,27 @@ Log.prototype = {
     getBatter(batter) {
         let order = batter.team.nowBatting;
         order = {
-            0 : text(' 1st'),
-            1 : text(' 2nd'),
-            2 : text(' 3rd'),
-            3 : text(' 4th'),
-            4 : text(' 5th'),
-            5 : text(' 6th'),
-            6 : text(' 7th'),
-            7 : text(' 8th'),
-            8 : text(' 9th')
+            0: text(' 1st'),
+            1: text(' 2nd'),
+            2: text(' 3rd'),
+            3: text(' 4th'),
+            4: text(' 5th'),
+            5: text(' 6th'),
+            6: text(' 7th'),
+            7: text(' 8th'),
+            8: text(' 9th')
         }[order];
         const positions = this.longFormFielder();
-        return text('Now batting')+order+text.comma()+positions[batter.position]+text.comma()+
-            batter.getUniformNumber()+text.comma()+
-            batter.getName();
+        return (
+            text('Now batting') +
+            order +
+            text.comma() +
+            positions[batter.position] +
+            text.comma() +
+            batter.getUniformNumber() +
+            text.comma() +
+            batter.getName()
+        );
     },
     noteBatter(batter) {
         const m = text.mode;
@@ -116,7 +123,8 @@ Log.prototype = {
         let x = pitchInFlight.x;
         const y = pitchInFlight.y;
         let say = '';
-        let noComma = false, noComma2 = false;
+        let noComma = false,
+            noComma2 = false;
         let ball = false;
         if (!batterIsLefty) x = 200 - x;
         if (x < 50) {
@@ -192,18 +200,20 @@ Log.prototype = {
         return `${this.game.getInning()}: ${count.strikes}-${count.balls}, ${outs}${text.stop()}`;
     },
     broadcastScore() {
-        return `${this.game.teams.away.getName()} ${this.game.tally.away.R}, ${this.game.teams.home.getName()} ${this.game.tally.home.R}${text.stop()}`;
+        return `${this.game.teams.away.getName()} ${
+            this.game.tally.away.R
+        }, ${this.game.teams.home.getName()} ${this.game.tally.home.R}${text.stop()}`;
     },
     broadcastRunners() {
         const field = this.game.field;
         const runners = [
-            field.first && text('first') || '',
-            field.second && text('second') || '',
-            field.third && text('third') || ''
-        ].filter(x => x);
+            (field.first && text('first')) || '',
+            (field.second && text('second')) || '',
+            (field.third && text('third')) || ''
+        ].filter((x) => x);
 
         let runnerCount = 0;
-        runners.map(runner => {
+        runners.map((runner) => {
             if (runner) {
                 runnerCount++;
             }
@@ -227,17 +237,11 @@ Log.prototype = {
                 result += `<span class="txt-green">${text('Ball.')}</span>`;
             }
         } else {
-            const timing = [
-                'Very late',
-                'Late',
-                '',
-                'Early',
-                'Very Early'
-            ][Math.max(0, Math.min(4,
-                ((swingResult.timing|0) + 175)/70 | 0
-            ))];
+            const timing = ['Very late', 'Late', '', 'Early', 'Very Early'][
+                Math.max(0, Math.min(4, (((swingResult.timing | 0) + 175) / 70) | 0))
+            ];
             if (timing) {
-                result += '('+text(timing)+')' + text.space();
+                result += '(' + text(timing) + ')' + text.space();
             }
 
             if (swingResult.contact) {
@@ -295,21 +299,22 @@ Log.prototype = {
         this.lastSwing = record;
         this.lastSwingJ = recordJ;
 
-        record.indexOf('Previous') !== 0 && this.async(() => {
-            if (record.indexOf('In play') > -1 && record.indexOf('struck out') > -1) {
-                if (text.mode === 'n') {
-                    console.log(recordJ);
+        record.indexOf('Previous') !== 0 &&
+            this.async(() => {
+                if (record.indexOf('In play') > -1 && record.indexOf('struck out') > -1) {
+                    if (text.mode === 'n') {
+                        console.log(recordJ);
+                    } else {
+                        console.log(record);
+                    }
                 } else {
-                    console.log(record);
+                    if (text.mode === 'n') {
+                        console.log(giraffe.broadcastCount(), recordJ);
+                    } else {
+                        console.log(giraffe.broadcastCount(), record);
+                    }
                 }
-            } else {
-                if (text.mode === 'n') {
-                    console.log(giraffe.broadcastCount(), recordJ);
-                } else {
-                    console.log(giraffe.broadcastCount(), record);
-                }
-            }
-        });
+            });
     },
     async(fn) {
         if (!this.game.console) {
@@ -317,8 +322,11 @@ Log.prototype = {
         }
     },
     noteStealAttempt(thief, success, base) {
-        return `${text.space() + thief.getName() + text.comma()
-    + (success ? text('stolen base') : text('caught stealing')) + text.space()}(${text.baseShortName(base)})${text.stop()}`;
+        return `${text.space() +
+            thief.getName() +
+            text.comma() +
+            (success ? text('stolen base') : text('caught stealing')) +
+            text.space()}(${text.baseShortName(base)})${text.stop()}`;
     },
     noteSubstitution(sub, player) {
         return this.note(text.substitution(sub, player, 'e'), text.substitution(sub, player, 'n'));
@@ -330,9 +338,9 @@ Log.prototype = {
         let out = [];
         if (r.looking) {
             if (r.strike) {
-                record = (batter + `<span class="txt-red">${text(' struck out looking.')}</span>`);
+                record = batter + `<span class="txt-red">${text(' struck out looking.')}</span>`;
             } else {
-                record = (batter + `<span class="txt-blue">${text(' walked.')}</span>`);
+                record = batter + `<span class="txt-blue">${text(' walked.')}</span>`;
             }
             let steal = '';
             const lineup = this.game.batter.team.lineup;
@@ -347,7 +355,9 @@ Log.prototype = {
             record += steal;
         } else {
             if (r.contact) {
-                let fielder = r.fielder, bases = r.bases, outBy;
+                let fielder = r.fielder,
+                    bases = r.bases,
+                    outBy;
                 if (r.caught) {
                     if (r.flyAngle < 15) {
                         outBy = 'line';
@@ -392,7 +402,9 @@ Log.prototype = {
                                 }
                             }
                             if (r.firstOut) {
-                                out = out.concat(r.additionalOuts.filter(runner => runner !== 'batter'));
+                                out = out.concat(
+                                    r.additionalOuts.filter((runner) => runner !== 'batter')
+                                );
                                 out.doublePlay = r.doublePlay;
                             }
                             if (r.fieldersChoice) {
@@ -406,15 +418,24 @@ Log.prototype = {
                         }
                     }
                 }
-                record = text.contactResult(batter, fielder, bases, outBy, r.outs === 3 ? [] : r.sacrificeAdvances, out);
+                record = text.contactResult(
+                    batter,
+                    fielder,
+                    bases,
+                    outBy,
+                    r.outs === 3 ? [] : r.sacrificeAdvances,
+                    out
+                );
             } else {
-                record = (batter + `<span class="txt-red">${text(' struck out swinging.')}</span>`);
+                record = batter + `<span class="txt-red">${text(' struck out swinging.')}</span>`;
             }
         }
         return record;
     },
     notePlateAppearanceResult(game) {
-        const m = text.mode, prevJ = text('Previous: ', 'n'), prev = text('Previous: ', 'e');
+        const m = text.mode,
+            prevJ = text('Previous: ', 'n'),
+            prev = text('Previous: ', 'e');
 
         let statement;
         const record = this.record;
@@ -439,50 +460,64 @@ Log.prototype = {
         const giraffe = this;
         this.async(() => {
             if (text.mode === 'n') {
-                console.log([`%c${resultJ}`, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners()].join(' '),
-                    'color: darkgreen;');
+                console.log(
+                    [
+                        `%c${resultJ}`,
+                        giraffe.broadcastCount(true),
+                        giraffe.broadcastScore(),
+                        giraffe.broadcastRunners()
+                    ].join(' '),
+                    'color: darkgreen;'
+                );
             } else {
-                console.log([`%c${result}`, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners()].join(' '),
-                    'color: darkgreen;');
+                console.log(
+                    [
+                        `%c${result}`,
+                        giraffe.broadcastCount(true),
+                        giraffe.broadcastScore(),
+                        giraffe.broadcastRunners()
+                    ].join(' '),
+                    'color: darkgreen;'
+                );
             }
         });
     },
-    pointer : 0,
+    pointer: 0,
     stabilized: {
-        pitchRecord : {
+        pitchRecord: {
             e: ['', '', '', '', '', ''],
             n: ['', '', '', '', '', '']
         },
-        shortRecord : {
+        shortRecord: {
             e: ['', '', '', '', '', ''],
             n: ['', '', '', '', '', '']
         }
     },
-    pitchRecord : {
+    pitchRecord: {
         e: [],
         n: []
     },
-    shortRecord : {
+    shortRecord: {
         e: [],
         n: []
     },
-    record : {
+    record: {
         e: [],
         n: []
     },
     longFormFielder() {
         return {
-            first : text('first baseman'),
-            second : text('second baseman'),
-            third : text('third baseman'),
-            short : text('shortstop'),
-            pitcher : text('pitcher'),
-            catcher : text('catcher'),
-            left : text('left fielder'),
-            center : text('center fielder'),
-            right : text('right fielder')
-        }
+            first: text('first baseman'),
+            second: text('second baseman'),
+            third: text('third baseman'),
+            short: text('shortstop'),
+            pitcher: text('pitcher'),
+            catcher: text('catcher'),
+            left: text('left fielder'),
+            center: text('center fielder'),
+            right: text('right fielder')
+        };
     }
 };
 
-export { Log }
+export { Log };

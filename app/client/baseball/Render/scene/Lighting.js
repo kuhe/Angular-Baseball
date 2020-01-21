@@ -10,8 +10,8 @@ const lighting = {
     },
     setLuminosity(level) {
         this.light.intensity = level;
-        this.sun.intensity = level/2;
+        this.sun.intensity = level / 2;
     }
 };
 
-export { lighting }
+export { lighting };

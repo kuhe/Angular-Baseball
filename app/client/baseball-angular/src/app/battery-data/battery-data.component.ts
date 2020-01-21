@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import Baseball from './../baseball-lib';
 
 @Component({
@@ -9,7 +9,6 @@ import Baseball from './../baseball-lib';
     inputs: ['y', 't']
 })
 export class BatteryDataComponent implements OnInit {
-
     y: any;
     t: Function;
     abbreviatePosition: Function;
@@ -18,7 +17,5 @@ export class BatteryDataComponent implements OnInit {
         this.abbreviatePosition = Baseball.util.text.abbreviatePosition;
     }
 
-    ngOnInit() {
-    }
-
+    ngOnInit() {}
 }

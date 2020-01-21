@@ -31,7 +31,11 @@ const INITIAL_POSITION = () => {
         return initialPosition;
     }
     if (typeof THREE !== 'undefined') {
-        return (initialPosition = new THREE.Vector3(0, VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE));
+        return (initialPosition = new THREE.Vector3(
+            0,
+            VERTICAL_CORRECTION,
+            INITIAL_CAMERA_DISTANCE
+        ));
     }
 };
 
@@ -93,7 +97,7 @@ class Loop {
         this.moveSpeed = 0.05;
         this.panSpeed = 0.3;
 
-        this.objects.forEach(object => object.animate());
+        this.objects.forEach((object) => object.animate());
         //this.breathe();
         this.renderer.render(this.scene, this.camera);
     }
@@ -203,7 +207,8 @@ class Loop {
         sun.time.h = hours;
         sun.time.m = minutes;
         sun.derivePosition(sky);
-        const luminosity = (-0.5 + Math.max(Math.abs(1.25 - azimuth), Math.abs(0.25 - azimuth))) * 2;
+        const luminosity =
+            (-0.5 + Math.max(Math.abs(1.25 - azimuth), Math.abs(0.25 - azimuth))) * 2;
         if (this.Animator) {
             this.Animator.setLuminosity(0.1 + luminosity / 1.4);
         }
@@ -326,15 +331,18 @@ class Loop {
      */
     panToward(vector) {
         const maxIncrement = this.panSpeed;
-        this.forAllLoops(loop => {
+        this.forAllLoops((loop) => {
             const target = loop._target;
             if (target) {
                 target.x =
-                    target.x + Math.max(Math.min((vector.x - target.x) / 100, maxIncrement), -maxIncrement);
+                    target.x +
+                    Math.max(Math.min((vector.x - target.x) / 100, maxIncrement), -maxIncrement);
                 target.y =
-                    target.y + Math.max(Math.min((vector.y - target.y) / 100, maxIncrement), -maxIncrement);
+                    target.y +
+                    Math.max(Math.min((vector.y - target.y) / 100, maxIncrement), -maxIncrement);
                 target.z =
-                    target.z + Math.max(Math.min((vector.z - target.z) / 100, maxIncrement), -maxIncrement);
+                    target.z +
+                    Math.max(Math.min((vector.z - target.z) / 100, maxIncrement), -maxIncrement);
                 loop.camera.lookAt(target);
             }
         });
@@ -346,12 +354,21 @@ class Loop {
      */
     moveToward(vector) {
         const maxIncrement = this.moveSpeed;
-        this.forAllLoops(loop => {
+        this.forAllLoops((loop) => {
             const position = loop.camera && loop.camera.position;
             if (position) {
-                position.x += Math.max(Math.min(vector.x - position.x, maxIncrement), -maxIncrement);
-                position.y += Math.max(Math.min(vector.y - position.y, maxIncrement), -maxIncrement);
-                position.z += Math.max(Math.min(vector.z - position.z, maxIncrement), -maxIncrement);
+                position.x += Math.max(
+                    Math.min(vector.x - position.x, maxIncrement),
+                    -maxIncrement
+                );
+                position.y += Math.max(
+                    Math.min(vector.y - position.y, maxIncrement),
+                    -maxIncrement
+                );
+                position.z += Math.max(
+                    Math.min(vector.z - position.z, maxIncrement),
+                    -maxIncrement
+                );
             }
         });
     }
@@ -362,7 +379,7 @@ class Loop {
      * @param panSpeed
      */
     setLookTarget(vector, panSpeed) {
-        this.forAllLoops(loop => {
+        this.forAllLoops((loop) => {
             loop.panSpeed = panSpeed;
             loop.panning = vector !== AHEAD();
             loop.target = vector;
@@ -375,14 +392,14 @@ class Loop {
      * @param moveSpeed
      */
     setMoveTarget(vector, moveSpeed) {
-        this.forAllLoops(loop => {
+        this.forAllLoops((loop) => {
             loop.moveSpeed = moveSpeed;
             loop.moveTarget = vector;
             loop.overwatchMoveTarget = null;
         });
     }
     setOverwatchMoveTarget(vector, moveSpeed) {
-        this.forAllLoops(loop => {
+        this.forAllLoops((loop) => {
             loop.moveSpeed = moveSpeed;
             loop.overwatchMoveTarget = vector;
             loop.moveTarget = null;
@@ -400,7 +417,7 @@ class Loop {
         if (typeof x === 'object') {
             return this.moveCamera(x.x, x.y, x.z);
         }
-        this.forAllLoops(loop => {
+        this.forAllLoops((loop) => {
             loop.camera.position.x = x;
             loop.camera.position.y = y;
             loop.camera.position.z = z;

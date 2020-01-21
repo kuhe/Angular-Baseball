@@ -39,9 +39,9 @@ Baseball.teams.Provider = Provider;
 Baseball.teams.Japan = samurai;
 
 export default Baseball;
-export { Baseball }
+export { Baseball };
 
-export { Game, Player, Team, AtBat, Field, Manager, Umpire }
-export { Animator, Distribution, Iterator, Mathinator }
-export { text, abbreviatePosition, Log }
-export { Provider }
+export { Game, Player, Team, AtBat, Field, Manager, Umpire };
+export { Animator, Distribution, Iterator, Mathinator };
+export { text, abbreviatePosition, Log };
+export { Provider };

@@ -14,25 +14,25 @@ k.RUNNER_GO = 'go';
 k.RUNNER_HOLD = 'hold';
 
 Team.prototype = {
-    constructor : Team,
+    constructor: Team,
     init(game, heroRate) {
         this.sub = this.noSubstituteSelected;
-        heroRate = heroRate || 0.10;
+        heroRate = heroRate || 0.1;
         this.substituted = [];
         this.pickName();
         this.lineup = [];
         this.bench = [];
         this.bullpen = [];
         this.positions = {
-            pitcher : null,
-            catcher : null,
-            first : null,
-            second : null,
-            short : null,
-            third : null,
-            left : null,
-            center : null,
-            right : null
+            pitcher: null,
+            catcher: null,
+            first: null,
+            second: null,
+            short: null,
+            third: null,
+            left: null,
+            center: null,
+            right: null
         };
         this.manager = new Manager(this);
         if (game !== 'no init') {
@@ -46,25 +46,29 @@ Team.prototype = {
         }
     },
     pickName() {
-        const teamNameIndex = Math.floor(Math.random()*data.teamNames.length);
+        const teamNameIndex = Math.floor(Math.random() * data.teamNames.length);
         this.name = data.teamNames[teamNameIndex];
         this.nameJ = data.teamNamesJ[teamNameIndex];
     },
     getName() {
         return text.mode === 'n' ? this.nameJ : this.name;
     },
-    stealAttempt : k.RUNNERS_DISCRETION,
-    lineup : [],
-    positions : {},
-    manager : null,
-    bench : [],
-    bullpen : [],
-    nowBatting : 0,
-    expanded : 'Player&',
-    noSubstituteSelected : {
-        toString() { return ''; },
-        toValue() { return false; }
+    stealAttempt: k.RUNNERS_DISCRETION,
+    lineup: [],
+    positions: {},
+    manager: null,
+    bench: [],
+    bullpen: [],
+    nowBatting: 0,
+    expanded: 'Player&',
+    noSubstituteSelected: {
+        toString() {
+            return '';
+        },
+        toValue() {
+            return false;
+        }
     }
 };
 
-export { Team }
+export { Team };

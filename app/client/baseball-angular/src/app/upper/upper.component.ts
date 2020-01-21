@@ -1,5 +1,5 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {ModeComponent} from '../mode/mode.component';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ModeComponent } from '../mode/mode.component';
 
 @Component({
     selector: 'upper',
@@ -9,7 +9,6 @@ import {ModeComponent} from '../mode/mode.component';
     inputs: ['y', 't']
 })
 export class UpperComponent extends ModeComponent implements OnInit {
-
     y: any;
     t: any;
 
@@ -17,8 +16,5 @@ export class UpperComponent extends ModeComponent implements OnInit {
         super();
     }
 
-    ngOnInit() {
-
-    }
-
+    ngOnInit() {}
 }

@@ -12,4 +12,4 @@ Provider.prototype.teams = {
     TeamJapan: samurai
 };
 
-export { Provider }
+export { Provider };

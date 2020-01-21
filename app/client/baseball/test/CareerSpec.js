@@ -19,7 +19,7 @@ const log = function() {
 };
 
 const format = (n, digits) => {
-    n = `${Math.floor(n*1000)/1000}`;
+    n = `${Math.floor(n * 1000) / 1000}`;
     while (n.indexOf('.') > -1 && n.length < 5) n += '0';
     while (n.indexOf('.') === -1 && n.length < 4) n = ` ${n}`;
     return n;
@@ -40,10 +40,17 @@ player = new Player(game.teams.home, false);
 const asPitcher = Math.random() > 0.96;
 p = player;
 
-log(`昔話をしてあげましょう。${player.getName()}選手がその伝説の「${player.getDefiningCharacteristic() || '... なんだっけ'}」`);
+log(
+    `昔話をしてあげましょう。${player.getName()}選手がその伝説の「${player.getDefiningCharacteristic() ||
+        '... なんだっけ'}」`
+);
 log('と呼ばれて、10年間も次々の挑戦を向かってきた。');
 
-const TERRIBAD = 5, AWFUL = 25, MEDIOCRE = 45, GOOD = 65, ELITE = 88;
+const TERRIBAD = 5,
+    AWFUL = 25,
+    MEDIOCRE = 45,
+    GOOD = 65,
+    ELITE = 88;
 
 const offense = { eye: ELITE, power: AWFUL, speed: ELITE };
 // const offense = player.skill.offense;
@@ -61,8 +68,8 @@ player.skill.defense = defense;
 player.skill.offense = offense;
 player.resetStats(144);
 
-const vary = player => {
-    const stat = ['eye', 'power', 'speed'][Math.random() * 3 | 0];
+const vary = (player) => {
+    const stat = ['eye', 'power', 'speed'][(Math.random() * 3) | 0];
     const o = player.skill.offense;
     o[stat] -= 6;
     o.eye += 2;
@@ -70,7 +77,7 @@ const vary = player => {
     o.speed += 2;
 };
 
-const getStats = player => {
+const getStats = (player) => {
     return {
         pa: format(player.stats.batting.pa),
         ba: format(player.stats.batting.getBA()),
@@ -87,13 +94,19 @@ const getStats = player => {
         slg: format(player.stats.batting.getSLG()),
         ops: format(player.stats.batting.getOBP() + player.stats.batting.getSLG()),
 
-        opsp : format(100 * (player.stats.batting.getOBP()/0.310 - 1 + player.stats.batting.getSLG()/0.405) | 0),
-        babip : format(player.stats.batting.getBABIP()),
+        opsp: format(
+            (100 *
+                (player.stats.batting.getOBP() / 0.31 -
+                    1 +
+                    player.stats.batting.getSLG() / 0.405)) |
+                0
+        ),
+        babip: format(player.stats.batting.getBABIP()),
 
-        sb : format(player.stats.batting.sb),
-        cs : format(player.stats.batting.cs),
+        sb: format(player.stats.batting.sb),
+        cs: format(player.stats.batting.cs),
 
-        fp : format(player.stats.fielding.PO / (player.stats.fielding.PO + player.stats.fielding.E)),
+        fp: format(player.stats.fielding.PO / (player.stats.fielding.PO + player.stats.fielding.E)),
 
         'z%': format(player.stats.batting.getZSwing()),
         'o%': format(player.stats.batting.getOSwing()),
@@ -102,17 +115,17 @@ const getStats = player => {
         W: format(player.stats.pitching.W),
         L: format(player.stats.pitching.L),
         ERA: format(player.stats.pitching.getERA()),
-        IP: (player.stats.pitching.IP.join('.')),
+        IP: player.stats.pitching.IP.join('.'),
         K: format(player.stats.pitching.K),
         H: format(player.stats.pitching.H),
         BB: format(player.stats.pitching.BB),
         HR: format(player.stats.pitching.HR),
         K9: format(player.stats.pitching.getK9()),
         WHIP: format(player.stats.pitching.getWHIP())
-    }
+    };
 };
 const career = {};
-const logPlayer = yr => {
+const logPlayer = (yr) => {
     career[yr] = getStats(player);
 };
 
@@ -122,7 +135,6 @@ logPlayer((++year, 'Rkie'));
 log(asPitcher ? player.skill.pitching : player.skill.offense, player.skill.defense);
 
 const prepTeams = () => {
-
     game.teams.home = new Team(game, 0);
     game.teams.away = new Team(game, 0);
 
@@ -130,12 +142,11 @@ const prepTeams = () => {
 
     bench[(Math.random() * bench.length) | 0] = p;
     game.teams.home.manager.makeLineup();
-
 };
 
 prepTeams();
 
-const runSeason = n => {
+const runSeason = (n) => {
     let x = 15000;
     game.gamesIntoSeason = 0;
     p = player;
@@ -143,15 +154,15 @@ const runSeason = n => {
         game.teams.home.positions.pitcher = p;
         game.teams.away.positions.pitcher = p;
     } else {
-        game.teams.home.lineup = [p,p,p,p,p,p,p,p,p];
-        game.teams.away.lineup = [p,p,p,p,p,p,p,p,p];
+        game.teams.home.lineup = [p, p, p, p, p, p, p, p, p];
+        game.teams.away.lineup = [p, p, p, p, p, p, p, p, p];
         vary(player);
     }
     player.resetStats();
 
     let games = 0;
     do {
-        game.simulateInput(callback => {
+        game.simulateInput((callback) => {
             typeof callback === 'function' && callback();
         });
         if (game.stage === 'end') {
@@ -175,7 +186,7 @@ const runSeason = n => {
             game.teams.away.positions.pitcher = new Player(game.teams.away, true);
             game.teams.home.positions.pitcher = new Player(game.teams.home, true);
         }
-    } while (games < 144/18 && x--);
+    } while (games < 144 / 18 && x--);
     logPlayer(++year);
 };
 
@@ -252,15 +263,17 @@ times.push(Date.now());
                 ' | F%   ',
                 ' | Z%   ',
                 ' | O%   ',
-                ' | PPA  ',
+                ' | PPA  '
             );
         }
     };
     const logYear = function(stats) {
-        let highest = stat => {
-            return stats[stat] == Math.max.apply(this, statLines[stat]) ? stats[stat].toString().green : stats[stat]
+        let highest = (stat) => {
+            return stats[stat] == Math.max.apply(this, statLines[stat])
+                ? stats[stat].toString().green
+                : stats[stat];
         };
-        let filter = stat => {
+        let filter = (stat) => {
             const s = highest(stat);
             return s == Math.min.apply(this, statLines[stat]) ? s.toString().yellow : s;
         };
@@ -299,7 +312,7 @@ times.push(Date.now());
                 ` | ${filter('fp')}`,
                 ` | ${filter('z%')}`,
                 ` | ${filter('o%')}`,
-                ` | ${filter('ppa')}`,
+                ` | ${filter('ppa')}`
             );
         }
     };
@@ -317,19 +330,19 @@ times.push(Date.now());
         totals[k] = v.reduce(sum);
     });
     year = 'All ';
-    totals.ba = format(totals.ba/seasons);
-    totals.obp = format(totals.obp/seasons);
-    totals.slg = format(totals.slg/seasons);
-    totals.ops = format(totals.ops/seasons);
-    totals.opsp = format(totals.opsp/seasons | 0);
-    totals.ERA = format(totals.ERA/seasons);
-    totals.WHIP = format(totals.WHIP/seasons);
-    totals.K9 = format(totals.K9/seasons);
-    totals.babip = format(totals.babip/seasons);
-    totals.fp = format(totals.fp/seasons);
-    totals['z%'] = format(totals['z%']/seasons);
-    totals['o%'] = format(totals['o%']/seasons);
-    totals.ppa = format(totals.ppa/seasons);
+    totals.ba = format(totals.ba / seasons);
+    totals.obp = format(totals.obp / seasons);
+    totals.slg = format(totals.slg / seasons);
+    totals.ops = format(totals.ops / seasons);
+    totals.opsp = format((totals.opsp / seasons) | 0);
+    totals.ERA = format(totals.ERA / seasons);
+    totals.WHIP = format(totals.WHIP / seasons);
+    totals.K9 = format(totals.K9 / seasons);
+    totals.babip = format(totals.babip / seasons);
+    totals.fp = format(totals.fp / seasons);
+    totals['z%'] = format(totals['z%'] / seasons);
+    totals['o%'] = format(totals['o%'] / seasons);
+    totals.ppa = format(totals.ppa / seasons);
     log('------');
     logYear(totals);
 })();
@@ -338,12 +351,18 @@ log(asPitcher ? player.skill.pitching : player.skill.offense, player.skill.defen
 
 //game.debugOut();
 
-times = times.map((x, k) => times[k] - (times[k-1] || 0));
+times = times.map((x, k) => times[k] - (times[k - 1] || 0));
 times.shift();
-const avg = times.reduce((a, b) => a + b)/(seasons - 1) | 0;
+const avg = (times.reduce((a, b) => a + b) / (seasons - 1)) | 0;
 
 log(`${times.join('ms, ')}ms`, 'average: ', avg, 'ms/year');
 
-log('だがある日に「人は産まれる瞬間から死と言う事に近づいてくわけですから、ひょっとしたらも、このシーズンで、終わってしまうかもしれない」');
-log(`    - ${player.getName()}　（${player.name}） (#${player.number} ${player.position} ${player.bats}/${player.throws})`);
+log(
+    'だがある日に「人は産まれる瞬間から死と言う事に近づいてくわけですから、ひょっとしたらも、このシーズンで、終わってしまうかもしれない」'
+);
+log(
+    `    - ${player.getName()}　（${player.name}） (#${player.number} ${player.position} ${
+        player.bats
+    }/${player.throws})`
+);
 log('と語り、すぐあとに引退をした。');

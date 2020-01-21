@@ -22,8 +22,8 @@ class Sun extends AbstractMesh {
     }
     getMesh() {
         const sun = new THREE.Mesh(
-            new THREE.SphereGeometry( 20000, 16, 8 ),
-            new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true })
+            new THREE.SphereGeometry(20000, 16, 8),
+            new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
         );
         sun.position.z = -950000; // initialize away from scene
         sun.position.y = -100000;
@@ -67,4 +67,4 @@ class Sun extends AbstractMesh {
     }
 }
 
-export { Sun }
+export { Sun };

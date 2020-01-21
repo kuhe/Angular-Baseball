@@ -7,4 +7,4 @@ const Baseball = (<any>window).Baseball;
 
 export default Baseball;
 
-export {Baseball};
+export { Baseball };

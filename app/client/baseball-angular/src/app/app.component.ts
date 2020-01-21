@@ -1,7 +1,14 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import Baseball from './baseball-lib';
 import SocketService from './../services/SocketService';
-import {ModeComponent} from "./mode/mode.component";
+import { ModeComponent } from './mode/mode.component';
+
+declare function require(file: string): any;
+const THREE = require('three');
+const TweenMax = require('gsap/TweenMax');
+
+(<any>window).THREE = THREE;
+(<any>window).TweenMax = TweenMax;
 
 const $: any = (<any>window).$;
 
@@ -11,8 +18,7 @@ const $: any = (<any>window).$;
  * @param $scope
  *
  */
-const IndexController = function ($scope) {
-
+const IndexController = function($scope) {
     const text = Baseball.util.text;
     const Game = Baseball.Game;
 
@@ -28,27 +34,22 @@ const IndexController = function ($scope) {
     }
 
     $scope.abbreviatePosition = Baseball.util.text.abbreviatePosition;
-
 };
 
 @Component({
     selector: 'application-hook',
     templateUrl: './app.component.html',
-    styleUrls: [
-    ],
+    styleUrls: [],
     changeDetection: ChangeDetectionStrategy.Default
 })
 export class AppComponent extends ModeComponent {
-
     y: any; // {Baseball.model.Game}
     t: Function;
 
     constructor() {
-
         super();
         IndexController(this);
         referenceContainer.instance = this;
-
     }
 
     holdUpTimeouts: any[];
@@ -73,7 +74,7 @@ export class AppComponent extends ModeComponent {
 
         // avoid scope cycles, any other easy way?
         const bat = $('.target .swing.stance-indicator');
-        const showBat = function (event) {
+        const showBat = function(event) {
             if (game.humanBatting()) {
                 const offset = $('.target').offset();
                 const relativeOffset = {
@@ -82,11 +83,21 @@ export class AppComponent extends ModeComponent {
                 };
                 const angle = game.setBatAngle(relativeOffset.x, relativeOffset.y);
                 bat.css({
-                    top: 200 - relativeOffset.y + "px",
-                    left: relativeOffset.x + "px",
-                    transform: "rotate(" + angle + "deg) rotateY(" + (game.batter.bats == "left" ? 0 : -0) + "deg)"
+                    top: 200 - relativeOffset.y + 'px',
+                    left: relativeOffset.x + 'px',
+                    transform:
+                        'rotate(' +
+                        angle +
+                        'deg) rotateY(' +
+                        (game.batter.bats == 'left' ? 0 : -0) +
+                        'deg)'
                 });
-                if (relativeOffset.x > 200 || relativeOffset.x < 0 || relativeOffset.y > 200 || relativeOffset.y < 0) {
+                if (
+                    relativeOffset.x > 200 ||
+                    relativeOffset.x < 0 ||
+                    relativeOffset.y > 200 ||
+                    relativeOffset.y < 0
+                ) {
                     bat.hide();
                 } else {
                     bat.show();
@@ -94,7 +105,7 @@ export class AppComponent extends ModeComponent {
             }
         };
         const glove = $('.target .glove.stance-indicator');
-        const showGlove = function (event) {
+        const showGlove = function(event) {
             if (game.humanPitching()) {
                 const offset = $('.target').offset();
                 const relativeOffset = {
@@ -102,10 +113,15 @@ export class AppComponent extends ModeComponent {
                     y: 200 - (event.pageY - offset.top)
                 };
                 glove.css({
-                    top: 200 - relativeOffset.y + "px",
-                    left: relativeOffset.x + "px"
+                    top: 200 - relativeOffset.y + 'px',
+                    left: relativeOffset.x + 'px'
                 });
-                if (relativeOffset.x > 200 || relativeOffset.x < 0 || relativeOffset.y > 200 || relativeOffset.y < 0) {
+                if (
+                    relativeOffset.x > 200 ||
+                    relativeOffset.x < 0 ||
+                    relativeOffset.y > 200 ||
+                    relativeOffset.y < 0
+                ) {
                     glove.hide();
                 } else {
                     glove.show();
@@ -114,13 +130,13 @@ export class AppComponent extends ModeComponent {
         };
 
         $scope.allowInput = true;
-        $scope.holdUp = function () {
+        $scope.holdUp = function() {
             $('.input-area').click();
         };
-        game.startOpponentPitching = function (callback) {
+        game.startOpponentPitching = function(callback) {
             $scope.updateFlightPath(callback);
         };
-        $scope.indicate = function ($event) {
+        $scope.indicate = function($event) {
             if (!$scope.allowInput) {
                 return;
             }
@@ -141,11 +157,11 @@ export class AppComponent extends ModeComponent {
                 clearTimeout($scope.holdUpTimeouts.shift());
             }
             $scope.showMessage = false;
-            game.receiveInput(relativeOffset.x, relativeOffset.y, function (callback) {
+            game.receiveInput(relativeOffset.x, relativeOffset.y, function(callback) {
                 $scope.updateFlightPath(callback);
             });
         };
-        game.umpire.onSideChange = function () {
+        game.umpire.onSideChange = function() {
             if (game.humanBatting()) {
                 $('.input-area').mousemove(showBat);
             } else {
@@ -165,7 +181,6 @@ export class AppComponent extends ModeComponent {
     showMessage: boolean;
     lastTimeout: number;
     showDifficultySelection: boolean;
-
 }
 
 export const referenceContainer: { instance: AppComponent } = {

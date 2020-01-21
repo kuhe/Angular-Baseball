@@ -1,5 +1,5 @@
 const data = {
-    surnames : [
+    surnames: [
         'Sato',
         'Suzuki',
         'Takahashi',
@@ -54,7 +54,7 @@ const data = {
         'Harada',
         'Nakano'
     ],
-    surnamesJ : [
+    surnamesJ: [
         '佐藤',
         '鈴木',
         '高橋',
@@ -221,7 +221,7 @@ const data = {
         '博之',
         '巌'
     ],
-    names : [
+    names: [
         'Takumi',
         'Hikaru',
         'Yuuki',
@@ -332,7 +332,7 @@ const data = {
         'Hiroyuki',
         'Iwao'
     ],
-    teamNamesJ : [
+    teamNamesJ: [
         '横浜',
         '大阪',
         '名古屋',
@@ -433,7 +433,7 @@ const data = {
         '松江',
         '日立'
     ],
-    teamNames : [
+    teamNames: [
         'Yokohama',
         'Osaka',
         'Nagoya',
@@ -536,4 +536,4 @@ const data = {
     ]
 };
 
-export { data }
+export { data };

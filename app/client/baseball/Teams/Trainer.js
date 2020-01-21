@@ -1,12 +1,24 @@
 import { Iterator } from '../Services/Iterator';
 
 class Trainer {
-    makePlayer(player, name, surname, surnameJ, nameJ, pitching, offense, defense, bats, throws, number) {
+    makePlayer(
+        player,
+        name,
+        surname,
+        surnameJ,
+        nameJ,
+        pitching,
+        offense,
+        defense,
+        bats,
+        throws,
+        number
+    ) {
         player.hero = true;
 
         if ('rights' && 0) {
             surnameJ = '代表';
-            nameJ =  '選手';
+            nameJ = '選手';
             name = 'TEAM';
             surname = 'JPN';
         }
@@ -25,12 +37,12 @@ class Trainer {
         player.throws = throws;
         player.number = number;
         Iterator.each(player.pitching, (key, value) => {
-            player.pitching[key].velocity += pitching/5 | 0;
-            player.pitching[key].break += pitching/5 | 0;
-            player.pitching[key].control += pitching/5 | 0;
+            player.pitching[key].velocity += (pitching / 5) | 0;
+            player.pitching[key].break += (pitching / 5) | 0;
+            player.pitching[key].control += (pitching / 5) | 0;
         });
         player.resetStats(0);
     }
 }
 
-export { Trainer }
+export { Trainer };

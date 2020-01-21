@@ -11,18 +11,10 @@ class FoulPole extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: 0xE3EF6E
+            color: 0xe3ef6e
         });
 
-        const mesh = new THREE.Mesh(
-            new THREE.CylinderGeometry(
-                0.35, 0.35,
-                180,
-                8,
-                8
-            ),
-            material
-        );
+        const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 180, 8, 8), material);
 
         const left = this.side === 'left';
 
@@ -38,8 +30,7 @@ class FoulPole extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-    }
+    animate() {}
 }
 
-export { FoulPole }
+export { FoulPole };

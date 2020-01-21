@@ -5,7 +5,7 @@ const Manager = function(team) {
 };
 
 Manager.prototype = {
-    constructor : Manager,
+    constructor: Manager,
     init(team) {
         this.team = team;
     },
@@ -16,22 +16,38 @@ Manager.prototype = {
         if (!this.team.positions.pitcher.number) {
             this.team.positions.pitcher.number = jerseyNumber++;
         }
-        this.team.positions.catcher = this.selectForSkill(this.team.bench, ['defense', 'catching'], 'right');
+        this.team.positions.catcher = this.selectForSkill(
+            this.team.bench,
+            ['defense', 'catching'],
+            'right'
+        );
         this.team.positions.catcher.position = 'catcher';
         if (!this.team.positions.catcher.number) {
             this.team.positions.catcher.number = jerseyNumber++;
         }
         Iterator.each(this.team.bench, (key, player) => {
             if (!player.number) {
-                jerseyNumber += 1 + (Math.random() * 5 | 0);
+                jerseyNumber += 1 + ((Math.random() * 5) | 0);
                 player.number = jerseyNumber;
             }
         });
-        this.team.positions.short = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
+        this.team.positions.short = this.selectForSkill(
+            this.team.bench,
+            ['defense', 'fielding'],
+            'right'
+        );
         this.team.positions.short.position = 'short';
-        this.team.positions.second = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
+        this.team.positions.second = this.selectForSkill(
+            this.team.bench,
+            ['defense', 'fielding'],
+            'right'
+        );
         this.team.positions.second.position = 'second';
-        this.team.positions.third = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
+        this.team.positions.third = this.selectForSkill(
+            this.team.bench,
+            ['defense', 'fielding'],
+            'right'
+        );
         this.team.positions.third.position = 'third';
         this.team.positions.center = this.selectForSkill(this.team.bench, ['defense', 'speed']);
         this.team.positions.center.position = 'center';
@@ -39,7 +55,11 @@ Manager.prototype = {
         this.team.positions.left.position = 'left';
         this.team.positions.right = this.selectForSkill(this.team.bench, ['defense', 'speed']);
         this.team.positions.right.position = 'right';
-        this.team.positions.first = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'left');
+        this.team.positions.first = this.selectForSkill(
+            this.team.bench,
+            ['defense', 'fielding'],
+            'left'
+        );
         this.team.positions.first.position = 'first';
 
         this.team.lineup[3] = this.selectForSkill(this.team.positions, ['offense', 'power']);
@@ -74,7 +94,11 @@ Manager.prototype = {
                     cursor = cursor[property];
                     property = skills.shift();
                 }
-                if (!(player.order+1) && cursor >= rating && (!requiredThrowingHandedness || player.throws === requiredThrowingHandedness)) {
+                if (
+                    !(player.order + 1) &&
+                    cursor >= rating &&
+                    (!requiredThrowingHandedness || player.throws === requiredThrowingHandedness)
+                ) {
                     rating = cursor;
                     selection = player;
                     index = key;
@@ -82,7 +106,9 @@ Manager.prototype = {
             });
             if (pool === this.team.bench) {
                 delete this.team.bench[index];
-                this.team.bench = this.team.bench.filter(player => player instanceof selection.constructor);
+                this.team.bench = this.team.bench.filter(
+                    (player) => player instanceof selection.constructor
+                );
             }
             return selection;
         }
@@ -113,4 +139,4 @@ Manager.prototype = {
     }
 };
 
-export { Manager }
+export { Manager };

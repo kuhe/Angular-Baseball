@@ -1,6 +1,6 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {ModeComponent} from '../mode/mode.component';
-import {referenceContainer} from '../app.component';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ModeComponent } from '../mode/mode.component';
+import { referenceContainer } from '../app.component';
 import SocketService from '../../services/SocketService';
 
 @Component({
@@ -11,19 +11,17 @@ import SocketService from '../../services/SocketService';
     inputs: ['y', 't']
 })
 export class BlockingComponent extends ModeComponent implements OnInit {
-
     y: object;
     t: {
         (phrase: string, override?: string): string;
-        mode: 'e' | 'n'
+        mode: 'e' | 'n';
     };
 
     constructor() {
         super();
     }
 
-    ngOnInit() {
-    }
+    ngOnInit() {}
 
     sim() {
         referenceContainer.instance.y.proceedToGame(SocketService, 1, 1);
@@ -41,5 +39,4 @@ export class BlockingComponent extends ModeComponent implements OnInit {
         referenceContainer.instance.y.proceedToGame(SocketService, 0, 1);
         referenceContainer.instance.bindMethods();
     }
-
 }

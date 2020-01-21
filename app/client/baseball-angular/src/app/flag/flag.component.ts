@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 
 @Component({
     selector: 'flag',
@@ -8,15 +8,9 @@ import {Component, OnInit, ViewEncapsulation} from '@angular/core';
     inputs: ['team']
 })
 export class FlagComponent implements OnInit {
-
     team: any;
 
-    constructor() {
+    constructor() {}
 
-    }
-
-    ngOnInit() {
-
-    }
-
+    ngOnInit() {}
 }

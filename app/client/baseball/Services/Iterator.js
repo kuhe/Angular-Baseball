@@ -1,9 +1,8 @@
-const Iterator = () => {
-};
+const Iterator = () => {};
 
 Iterator.prototype = {
-    identifier : 'Iterator',
-    constructor : Iterator,
+    identifier: 'Iterator',
+    constructor: Iterator,
     each(collection, map) {
         let keys, i;
         if (collection instanceof Array) {
@@ -25,4 +24,4 @@ for (const fn in Iterator.prototype) {
     }
 }
 
-export { Iterator }
+export { Iterator };

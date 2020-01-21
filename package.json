@@ -3,5 +3,8 @@
     "test": "make test",
     "career": "make career",
     "serve": "make serve"
+  },
+  "devDependencies": {
+    "prettier": "1.19.1"
   }
 }

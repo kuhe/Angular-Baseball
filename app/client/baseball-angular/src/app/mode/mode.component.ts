@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import Baseball from './../baseball-lib';
 
 @Component({
@@ -8,14 +8,9 @@ import Baseball from './../baseball-lib';
     encapsulation: ViewEncapsulation.None
 })
 export class ModeComponent implements OnInit {
+    constructor() {}
 
-    constructor() {
-
-    }
-
-    ngOnInit() {
-
-    }
+    ngOnInit() {}
 
     abbreviatePosition(pos: string) {
         return Baseball.util.text.abbreviatePosition(pos);
@@ -34,5 +29,4 @@ export class ModeComponent implements OnInit {
         }
         return Baseball.util.text.mode;
     }
-
 }

@@ -6,9 +6,7 @@ const rootPublic = path.resolve(path.join(__dirname, '..', '..', '..', 'public')
 
 module.exports = {
     entry: path.join(__dirname, 'baseball.js'),
-    plugins: [
-        new webpack.optimize.ModuleConcatenationPlugin()
-    ],
+    plugins: [new webpack.optimize.ModuleConcatenationPlugin()],
     output: {
         path: appPublic,
         filename: 'baseball.bundle.js',

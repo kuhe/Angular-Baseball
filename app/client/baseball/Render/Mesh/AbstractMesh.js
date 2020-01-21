@@ -36,9 +36,7 @@ class AbstractMesh {
             this.attach();
         }
     }
-    animate() {
-
-    }
+    animate() {}
 }
 
 /**
@@ -48,4 +46,4 @@ class AbstractMesh {
  */
 AbstractMesh.WORLD_BASE_Y = -4;
 
-export { AbstractMesh }
+export { AbstractMesh };

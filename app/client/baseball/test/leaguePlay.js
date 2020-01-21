@@ -1,6 +1,6 @@
 // code snippet excised from CareerSpec
 
-const teams = [1,2,3,4,5,6,7].map(() => {
+const teams = [1, 2, 3, 4, 5, 6, 7].map(() => {
     const team = new Team(game);
     team.wins = 0;
     team.losses = 0;
@@ -11,19 +11,16 @@ let schedule = [];
 const createSchedule = () => {
     for (let i = 0; i < 7; i++) {
         for (let j = i + 1; j < 7; j++) {
-            schedule = schedule.concat([
-                {home: i, away: j}
-            ]);
+            schedule = schedule.concat([{ home: i, away: j }]);
         }
     }
 };
-[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].map( _ => createSchedule());
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((_) => createSchedule());
 let scheduleIndex = 0;
 const getTeams = () => ({
     home: teams[schedule[scheduleIndex].home],
     away: teams[schedule[scheduleIndex].away]
 });
-
 
 /////
 

@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 
 @Component({
     selector: 'rating-block',
@@ -8,15 +8,9 @@ import {Component, OnInit, ViewEncapsulation} from '@angular/core';
     inputs: ['rating']
 })
 export class RatingBlockComponent implements OnInit {
-
     rating: any;
 
-    constructor() {
+    constructor() {}
 
-    }
-
-    ngOnInit() {
-
-    }
-
+    ngOnInit() {}
 }

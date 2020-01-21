@@ -15,9 +15,9 @@ class Indicator extends AbstractMesh {
     }
     getMesh() {
         const THREE = window.THREE;
-        const geometry	= new THREE.CircleGeometry(0.30, 32);
-        const material	= new THREE.MeshPhongMaterial({
-            color: 0xFFFFFF
+        const geometry = new THREE.CircleGeometry(0.3, 32);
+        const material = new THREE.MeshPhongMaterial({
+            color: 0xffffff
         });
         this.mesh = new THREE.Mesh(geometry, material);
         return this.mesh;
@@ -31,4 +31,4 @@ class Indicator extends AbstractMesh {
     }
 }
 
-export { Indicator }
+export { Indicator };

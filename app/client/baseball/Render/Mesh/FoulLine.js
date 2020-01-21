@@ -11,30 +11,22 @@ class FoulLine extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: 0xFFFFFF
+            color: 0xffffff
         });
 
-        const mesh = new THREE.Mesh(
-            new THREE.PlaneGeometry(
-                0.35,
-                300,
-                1,
-                1
-            ),
-            material
-        );
+        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 300, 1, 1), material);
 
         const left = this.side === 'left';
 
-        mesh.rotation.x = -90/180 * Math.PI;
-        mesh.rotation.y = 0/180 * Math.PI;
+        mesh.rotation.x = (-90 / 180) * Math.PI;
+        mesh.rotation.y = (0 / 180) * Math.PI;
 
         if (left) {
-            mesh.rotation.z = 45/180 * Math.PI;
+            mesh.rotation.z = (45 / 180) * Math.PI;
             mesh.position.x = -108;
             mesh.position.z = -102;
         } else {
-            mesh.rotation.z = -45/180 * Math.PI;
+            mesh.rotation.z = (-45 / 180) * Math.PI;
             mesh.position.x = 108;
             mesh.position.z = -102;
         }
@@ -43,8 +35,7 @@ class FoulLine extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-    }
+    animate() {}
 }
 
-export { FoulLine }
+export { FoulLine };

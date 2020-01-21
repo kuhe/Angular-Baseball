@@ -11,7 +11,7 @@ const fs = require('fs-extra');
 const root = path.join(__dirname, '..', '..');
 
 const _public = path.join(root, 'public');
-const dist = path.join(root, 'app', 'client', 'baseball-angular', 'dist');
+const dist = path.join(root, 'app', 'client', 'baseball-angular', 'dist', 'angular-baseball');
 const index = path.join(root, 'public', 'index.html');
 const index2 = path.join(root, 'index.html');
 
@@ -25,3 +25,9 @@ fs.copySync(_publicPublic, _public, { overwrite: true });
 fs.removeSync(_publicPublic);
 fs.moveSync(index, index2, { overwrite: true });
 
+fs.writeFileSync(
+    index2,
+    fs.readFileSync(index2, 'utf-8')
+        .replace(/\/public/g, '/public/')
+        .replace(/\/public\/\//g, '/public/')
+);

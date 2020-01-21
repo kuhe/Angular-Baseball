@@ -3,7 +3,7 @@
 test:
 	node baseball/test/CareerSpec.js
 
-deploy:
+deploy: css
 	(cd baseball-angular && npm run build) && make copy
 
 copy:

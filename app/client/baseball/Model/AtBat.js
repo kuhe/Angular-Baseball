@@ -7,16 +7,25 @@ import { Log } from '../Utility/Log';
  */
 class AtBat {
     constructor(text) {
-        this.infield = text.includes(AtBat.prototype.INFIELD_HIT_INDICATOR) ? AtBat.prototype.INFIELD_HIT_INDICATOR : '';
+        this.infield = text.includes(AtBat.prototype.INFIELD_HIT_INDICATOR)
+            ? AtBat.prototype.INFIELD_HIT_INDICATOR
+            : '';
         text = text.replace(AtBat.prototype.INFIELD_HIT_INDICATOR, '');
         this.text = text.split(AtBat.prototype.RBI_INDICATOR)[0];
-        this.rbi = (`${text.split(this.text)[1]}`);
+        this.rbi = `${text.split(this.text)[1]}`;
 
         const log = new Log();
 
         const beneficial = [
-            log.WALK, log.SINGLE, log.HOMERUN, log.DOUBLE, log.TRIPLE, log.SACRIFICE, log.REACHED_ON_ERROR,
-            log.STOLEN_BASE, log.RUN
+            log.WALK,
+            log.SINGLE,
+            log.HOMERUN,
+            log.DOUBLE,
+            log.TRIPLE,
+            log.SACRIFICE,
+            log.REACHED_ON_ERROR,
+            log.STOLEN_BASE,
+            log.RUN
         ];
         if (beneficial.includes(this.text)) {
             this.beneficial = true;
@@ -32,4 +41,4 @@ AtBat.prototype.identifier = 'AtBat';
 AtBat.prototype.INFIELD_HIT_INDICATOR = '';
 AtBat.prototype.RBI_INDICATOR = '+';
 
-export { AtBat }
+export { AtBat };

@@ -1,0 +1,4 @@
+node_modules
+app/client/node_modules
+app/client/baseball/node_modules
+app/client/baseball-angular/node_modules

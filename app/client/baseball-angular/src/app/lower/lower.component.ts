@@ -1,6 +1,6 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {ModeComponent} from '../mode/mode.component';
-import {referenceContainer} from '../app.component';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ModeComponent } from '../mode/mode.component';
+import { referenceContainer } from '../app.component';
 
 @Component({
     selector: 'lower',
@@ -10,7 +10,6 @@ import {referenceContainer} from '../app.component';
     inputs: ['y', 't']
 })
 export class LowerComponent extends ModeComponent implements OnInit {
-
     y: any;
     t: any;
 
@@ -20,8 +19,7 @@ export class LowerComponent extends ModeComponent implements OnInit {
         super();
     }
 
-    ngOnInit() {
-    }
+    ngOnInit() {}
 
     /* Forwarded methods section */
 
@@ -46,5 +44,4 @@ export class LowerComponent extends ModeComponent implements OnInit {
     teamJapan(...args: any[]): void {
         referenceContainer.instance.y.teamJapan(...args);
     }
-
 }

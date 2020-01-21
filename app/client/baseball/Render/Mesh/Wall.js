@@ -11,20 +11,12 @@ class Wall extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: 0x3F4045
+            color: 0x3f4045
         });
 
-        const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(
-                120,
-                15,
-                4,
-                16, 16, 16
-            ),
-            material
-        );
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(120, 15, 4, 16, 16, 16), material);
 
-        const radians = this.angle / 180 * Math.PI;
+        const radians = (this.angle / 180) * Math.PI;
         mesh.rotation.y = -radians;
 
         const hypotenuse = 300;
@@ -38,9 +30,7 @@ class Wall extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-
-    }
+    animate() {}
 }
 
-export { Wall }
+export { Wall };

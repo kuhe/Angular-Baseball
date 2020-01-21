@@ -10,7 +10,7 @@ import { VERTICAL_CORRECTION } from './../LoopConstants';
  * for display purposes. It is only approximately related to actual pitch zone dimensions.
  * @type {number}
  */
-const SCALE = 2.1/100;
+const SCALE = 2.1 / 100;
 
 const INDICATOR_DEPTH = -5;
 
@@ -38,15 +38,15 @@ class Ball extends AbstractMesh {
     }
     getMesh() {
         /** @see threex.sportballs */
-        const baseURL	= 'public/';
+        const baseURL = 'public/';
         const THREE = window.THREE;
         const loader = new THREE.TextureLoader();
-        const textureColor= loader.load(`${baseURL}images/BaseballColor.jpg`);
-        const textureBump	= loader.load(`${baseURL}images/BaseballBump.jpg`);
-        const geometry	= new THREE.SphereGeometry(0.36, 32, 16); // real scale is 0.12
-        const material	= new THREE.MeshPhongMaterial({
-            map	: textureColor,
-            bumpMap	: textureBump,
+        const textureColor = loader.load(`${baseURL}images/BaseballColor.jpg`);
+        const textureBump = loader.load(`${baseURL}images/BaseballBump.jpg`);
+        const geometry = new THREE.SphereGeometry(0.36, 32, 16); // real scale is 0.12
+        const material = new THREE.MeshPhongMaterial({
+            map: textureColor,
+            bumpMap: textureBump,
             bumpScale: 0.01
         });
         this.mesh = new THREE.Mesh(geometry, material);
@@ -58,7 +58,8 @@ class Ball extends AbstractMesh {
      * and rotate while moving (default 1000 RPM)
      */
     animate() {
-        const frame = this.trajectory.shift(), pos = this.mesh.position;
+        const frame = this.trajectory.shift(),
+            pos = this.mesh.position;
 
         if (frame) {
             pos.x += frame.x;
@@ -93,7 +94,7 @@ class Ball extends AbstractMesh {
     setRotation(rpm, rotationAngle) {
         this.RPM = rpm;
         this.RPS = this.RPM / 60;
-        const rotationalIncrement = this.RP60thOfASecond = this.RPS / 60;
+        const rotationalIncrement = (this.RP60thOfASecond = this.RPS / 60);
 
         // calculate rotational components
         // +x is CCW along x axis increasing
@@ -105,12 +106,12 @@ class Ball extends AbstractMesh {
         // 90  --> x:0 y:1
         // 180 --> x:-1 y:0
 
-        const xComponent = rotationalIncrement * Math.cos(rotationAngle / 180 * Math.PI);
-        const yComponent = rotationalIncrement * Math.sin(rotationAngle / 180 * Math.PI);
+        const xComponent = rotationalIncrement * Math.cos((rotationAngle / 180) * Math.PI);
+        const yComponent = rotationalIncrement * Math.sin((rotationAngle / 180) * Math.PI);
 
         this.rotation = {
-            x: xComponent * 360 * Math.PI / 180,
-            y: yComponent * 360 * Math.PI / 180
+            x: (xComponent * 360 * Math.PI) / 180,
+            y: (yComponent * 360 * Math.PI) / 180
         };
     }
     exportPositionTo(mesh) {
@@ -132,15 +133,17 @@ class Ball extends AbstractMesh {
     derivePitchingTrajectory(game) {
         this.setType(game.pitchInFlight.name, game.pitcher.throws === 'right' ? 1 : -1);
         const top = 200 - game.pitchTarget.y,
-              left = game.pitchTarget.x,
-              breakTop = 200 - game.pitchInFlight.y,
-              breakLeft = game.pitchInFlight.x,
-              flightTime = Mathinator.getFlightTime(game.pitchInFlight.velocity,
-                  helper.pitchDefinitions[game.pitchInFlight.name][2]);
+            left = game.pitchTarget.x,
+            breakTop = 200 - game.pitchInFlight.y,
+            breakLeft = game.pitchInFlight.x,
+            flightTime = Mathinator.getFlightTime(
+                game.pitchInFlight.velocity,
+                helper.pitchDefinitions[game.pitchInFlight.name][2]
+            );
 
         const scale = SCALE;
         const origin = {
-            x: (game.pitcher.throws == 'left' ? 1.5 : -1.5),
+            x: game.pitcher.throws == 'left' ? 1.5 : -1.5,
             y: AbstractMesh.WORLD_BASE_Y + 6,
             z: -60.5 // mound distance
         };
@@ -161,27 +164,33 @@ class Ball extends AbstractMesh {
         };
 
         let lastPosition = {
-                x: origin.x, y: origin.y, z: origin.z
+                x: origin.x,
+                y: origin.y,
+                z: origin.z
             },
             lastBreakingPosition = {
-                x: origin.x, y: origin.y, z: origin.z
+                x: origin.x,
+                y: origin.y,
+                z: origin.z
             };
 
         const frames = [];
         const breakingFrames = [];
-        const frameCount = flightTime * 60 | 0;
-        let counter = frameCount * 1.08 | 0;
+        const frameCount = (flightTime * 60) | 0;
+        let counter = (frameCount * 1.08) | 0;
         let frame = 0;
 
-        const xBreak = breakingTerminus.x - terminus.x, yBreak = breakingTerminus.y - terminus.y;
+        const xBreak = breakingTerminus.x - terminus.x,
+            yBreak = breakingTerminus.y - terminus.y;
         const breakingDistance = Math.sqrt(Math.pow(xBreak, 2) + Math.pow(yBreak, 2));
         /**
          * @type {number} 1.0+, an expression of how late the pitch breaks
          */
-        const breakingLateness = breakingDistance/(2 * ARC_APPROXIMATION_Y_ADDITIVE)/scale, breakingLatenessMomentumExponent = 0.2 + Math.pow(0.45, breakingLateness);
+        const breakingLateness = breakingDistance / (2 * ARC_APPROXIMATION_Y_ADDITIVE) / scale,
+            breakingLatenessMomentumExponent = 0.2 + Math.pow(0.45, breakingLateness);
 
         while (counter--) {
-            const progress = (++frame)/frameCount;
+            const progress = ++frame / frameCount;
 
             // linear position
             const position = {
@@ -200,12 +209,19 @@ class Ball extends AbstractMesh {
             } else {
                 var momentumScalar = Math.pow(1 - progress, breakingLatenessMomentumExponent);
             }
-            const breakingScalar = 1 - momentumScalar, scalarSum = momentumScalar + breakingScalar;
+            const breakingScalar = 1 - momentumScalar,
+                scalarSum = momentumScalar + breakingScalar;
             // adjustment toward breaking ball position
             const breakingPosition = {
-                x: (position.x * momentumScalar + breakingInfluencePosition.x * breakingScalar)/scalarSum,
-                y: (position.y * momentumScalar + breakingInfluencePosition.y * breakingScalar)/scalarSum,
-                z: (position.z * momentumScalar + breakingInfluencePosition.z * breakingScalar)/scalarSum
+                x:
+                    (position.x * momentumScalar + breakingInfluencePosition.x * breakingScalar) /
+                    scalarSum,
+                y:
+                    (position.y * momentumScalar + breakingInfluencePosition.y * breakingScalar) /
+                    scalarSum,
+                z:
+                    (position.z * momentumScalar + breakingInfluencePosition.z * breakingScalar) /
+                    scalarSum
             };
             const increment = {
                 x: position.x - lastPosition.x,
@@ -227,8 +243,8 @@ class Ball extends AbstractMesh {
 
         let pause = 60;
         while (pause--) {
-            breakingFrames.push({x:0, y:0, z:0});
-            frames.push({x:0, y:0, z:0});
+            breakingFrames.push({ x: 0, y: 0, z: 0 });
+            frames.push({ x: 0, y: 0, z: 0 });
         }
 
         this.breakingTrajectory = breakingFrames;
@@ -256,9 +272,13 @@ class Ball extends AbstractMesh {
 
         if (flightScalar < 0 && result.travelDistance > 0) {
             switch (true) {
-                case result.fielder in {
-                    first: 1, second: 1, short: 1, third: 1
-                }:
+                case result.fielder in
+                    {
+                        first: 1,
+                        second: 1,
+                        short: 1,
+                        third: 1
+                    }:
                     // If we're using the ground ball animation trajectory,
                     // have the rendered travel distance be at least to the
                     // infield arc if the fielder
@@ -272,8 +292,9 @@ class Ball extends AbstractMesh {
         if (flyAngle > 90) flyAngle = 180 - flyAngle;
 
         // exit velocity in mph.
-        const velocity = dragScalarApproximation.distance *
-            Math.sqrt(9.81 * distance / Math.sin(2*Math.PI*Math.max(flyAngle, 8)/180));
+        const velocity =
+            dragScalarApproximation.distance *
+            Math.sqrt((9.81 * distance) / Math.sin((2 * Math.PI * Math.max(flyAngle, 8)) / 180));
         const velocityVerticalComponent = Math.sin(Mathinator.RADIAN * flyAngle) * velocity;
 
         let groundTime = 0;
@@ -285,10 +306,12 @@ class Ball extends AbstractMesh {
         }
 
         // in feet
-        const apexHeight = velocityVerticalComponent*velocityVerticalComponent/(2*9.81) * dragScalarApproximation.apexHeight;
+        const apexHeight =
+            ((velocityVerticalComponent * velocityVerticalComponent) / (2 * 9.81)) *
+            dragScalarApproximation.apexHeight;
 
         // in seconds
-        const airTime = 1.5 * Math.sqrt(2*apexHeight/9.81) * dragScalarApproximation.airTime; // 2x freefall equation
+        const airTime = 1.5 * Math.sqrt((2 * apexHeight) / 9.81) * dragScalarApproximation.airTime; // 2x freefall equation
 
         this.airTime = airTime;
 
@@ -305,13 +328,13 @@ class Ball extends AbstractMesh {
         this.mesh.position.z = origin.z;
 
         const extrema = {
-            x: Math.sin(splay / 180 * Math.PI) * distance,
+            x: Math.sin((splay / 180) * Math.PI) * distance,
             y: apexHeight,
-            z: -Math.cos(splay / 180 * Math.PI) * distance
+            z: -Math.cos((splay / 180) * Math.PI) * distance
         };
 
         const frames = [];
-        let frameCount = airTime * 60 + groundTime * 20 | 0;
+        let frameCount = (airTime * 60 + groundTime * 20) | 0;
         let counter = frameCount;
         let frame = 0;
 
@@ -331,7 +354,8 @@ class Ball extends AbstractMesh {
             let percent;
 
             progress = Math.pow(
-                (++frame)/frameCount, 0.87 // ease out / trend toward 1.0 to simulate higher initial speed.
+                ++frame / frameCount,
+                0.87 // ease out / trend toward 1.0 to simulate higher initial speed.
             );
             percent = progress * 100;
 
@@ -339,10 +363,7 @@ class Ball extends AbstractMesh {
             if (flightScalar < 0) {
                 const currentDistance = progress * distance;
 
-                const tapering = Math.max(
-                    0,
-                    (100 - bounces * 20) / 100
-                );
+                const tapering = Math.max(0, (100 - bounces * 20) / 100);
                 const startingHeight = origin.y * scale;
                 const finalHeight = AbstractMesh.WORLD_BASE_Y;
 
@@ -355,8 +376,9 @@ class Ball extends AbstractMesh {
                 // the multiplication of bounce rate means that as distance approaches the
                 // final distance, the sine wave will have been traversed that many times, giving that
                 // many bounces.
-                const waveProgress = averageBounceRate * Math.pow(currentDistance, 1.1) / distance;
-                const waveComponent = Math.sin(waveProgress * Math.PI/2);
+                const waveProgress =
+                    (averageBounceRate * Math.pow(currentDistance, 1.1)) / distance;
+                const waveComponent = Math.sin((waveProgress * Math.PI) / 2);
                 const waveHeight = Math.abs(waveComponent);
 
                 if (waveComponent * lastWaveDirection < 0) {
@@ -373,20 +395,19 @@ class Ball extends AbstractMesh {
                  * SIN wave with tapering gives a ground ball the bouncing trajectory.
                  * @type {number}
                  */
-                y = (startingHeight + apexHeight * waveHeight) * tapering
-                    + finalHeight * progress;
+                y = (startingHeight + apexHeight * waveHeight) * tapering + finalHeight * progress;
             } else {
                 /**
                  * Note the pow(n, 2) gives the flyball a parabolic trajectory.
                  * @type {number}
                  */
-                y = apexHeight - Math.pow(Math.abs(50 - percent)/50, 2) * apexHeight;
+                y = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 2) * apexHeight;
             }
 
             frames.push({
-                x: extrema.x/frameCount * slow,
-                y: (y - lastHeight),
-                z: extrema.z/frameCount * slow
+                x: (extrema.x / frameCount) * slow,
+                y: y - lastHeight,
+                z: (extrema.z / frameCount) * slow
             });
 
             lastHeight = y;
@@ -402,8 +423,8 @@ Ball.prototype.RPM = 1000;
 Ball.prototype.RPS = 1000 / 60;
 Ball.prototype.RP60thOfASecond = 1000 / 60 / 60;
 Ball.prototype.rotation = {
-    x: Ball.prototype.RP60thOfASecond * 360 * Math.PI / 180, // in radians per 60th of a second
-    y: Ball.prototype.RP60thOfASecond * 360 * Math.PI / 180
+    x: (Ball.prototype.RP60thOfASecond * 360 * Math.PI) / 180, // in radians per 60th of a second
+    y: (Ball.prototype.RP60thOfASecond * 360 * Math.PI) / 180
 };
 
-export { Ball }
+export { Ball };

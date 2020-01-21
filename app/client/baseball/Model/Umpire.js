@@ -1,20 +1,20 @@
 import { Log } from '../Utility/_utils';
 import { Player } from '../Model/Player';
-import {Distribution} from "../Services/Distribution";
+import { Distribution } from '../Services/Distribution';
 
 const Umpire = function(game) {
     this.init(game);
 };
 
 Umpire.prototype = {
-    constructor : Umpire,
+    constructor: Umpire,
     init(game) {
         this.game = game;
         this.playBall();
         this.count = {
-            strikes : 0,
-            balls : 0,
-            outs : 0
+            strikes: 0,
+            balls: 0,
+            outs: 0
         };
     },
     /**
@@ -29,12 +29,11 @@ Umpire.prototype = {
         game.deck = game.teams.away.lineup[1];
         game.hole = game.teams.away.lineup[2];
         game.pitcher = game.teams.home.positions.pitcher;
-        const n = `一回のオモテ、${game.teams.away.nameJ}の攻撃対${game.teams.home.nameJ}、ピッチャーは${game.teams.home.positions.pitcher.nameJ}。`, e = `Top 1, ${game.teams.away.name} offense vs. ${game.teams.home.positions.pitcher.name} starting for ${game.teams.home.name}`;
+        const n = `一回のオモテ、${game.teams.away.nameJ}の攻撃対${game.teams.home.nameJ}、ピッチャーは${game.teams.home.positions.pitcher.nameJ}。`,
+            e = `Top 1, ${game.teams.away.name} offense vs. ${game.teams.home.positions.pitcher.name} starting for ${game.teams.home.name}`;
         game.log.note(e, n);
         game.batter.ready = true;
-        game.log.noteBatter(
-            game.batter
-        );
+        game.log.noteBatter(game.batter);
     },
     /**
      * makes the call based on the last pitch and swing (or no swing)
@@ -49,7 +48,8 @@ Umpire.prototype = {
         const field = game.field;
 
         if (game.swingResult.fielder) {
-            var fielder = game.teams[game.half === 'top' ? 'home' : 'away'].positions[result.fielder]
+            var fielder =
+                game.teams[game.half === 'top' ? 'home' : 'away'].positions[result.fielder];
         } else {
             fielder = null;
         }
@@ -77,7 +77,8 @@ Umpire.prototype = {
             thief.stats.batting.sb++;
         }
         if (!isNaN(result.caughtStealing)) {
-            game.teams[game.half === 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding.PO++;
+            game.teams[game.half === 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding
+                .PO++;
             this.count.outs++;
             thief = game.batter.team.lineup[result.caughtStealing];
             thief.stats.batting.cs++;
@@ -151,7 +152,7 @@ Umpire.prototype = {
                         batter.stats.batting.ab++;
                         if (result.firstOut) {
                             game.field[result.firstOut] = null;
-                            result.additionalOuts.map(runner => {
+                            result.additionalOuts.map((runner) => {
                                 if (runner !== 'batter') {
                                     game.field[runner] = null;
                                 }
@@ -190,7 +191,9 @@ Umpire.prototype = {
                         }
                         if (result.bases) {
                             if (!result.error) {
-                                game.tally[game.half === 'top' ? 'away' : 'home'][Log.prototype.SINGLE]++;
+                                game.tally[game.half === 'top' ? 'away' : 'home'][
+                                    Log.prototype.SINGLE
+                                ]++;
                                 pitcher.stats.pitching.H++;
                             } else {
                                 if (result.bases > 0) {
@@ -200,10 +203,10 @@ Umpire.prototype = {
                             }
                             let bases = result.bases;
                             switch (bases) {
-                                case 0 :
+                                case 0:
                                     game.batter.atBats.push(Log.prototype.GROUNDOUT);
                                     break;
-                                case 1 :
+                                case 1:
                                     if (result.error) {
                                         game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
                                         break;
@@ -211,7 +214,7 @@ Umpire.prototype = {
                                     game.batter.atBats.push(Log.prototype.SINGLE);
                                     batter.stats.batting.h++;
                                     break;
-                                case 2 :
+                                case 2:
                                     if (result.error) {
                                         game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
                                         break;
@@ -220,7 +223,7 @@ Umpire.prototype = {
                                     batter.stats.batting.h++;
                                     batter.stats.batting['2b']++;
                                     break;
-                                case 3 :
+                                case 3:
                                     if (result.error) {
                                         game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
                                         break;
@@ -229,7 +232,7 @@ Umpire.prototype = {
                                     batter.stats.batting.h++;
                                     batter.stats.batting['3b']++;
                                     break;
-                                case 4 :
+                                case 4:
                                     if (result.error) {
                                         game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
                                         break;
@@ -263,7 +266,7 @@ Umpire.prototype = {
             }
         }
 
-        this.says = (`${this.count.balls} and ${this.count.strikes}`);
+        this.says = `${this.count.balls} and ${this.count.strikes}`;
 
         result.outs = this.count.outs;
 
@@ -286,7 +289,9 @@ Umpire.prototype = {
             this.says = 'Ball four.';
             this.count.balls = this.count.strikes = 0;
             batter.atBats.push(Log.prototype.WALK);
-            this.advanceRunners(true).reachBase().newBatter();
+            this.advanceRunners(true)
+                .reachBase()
+                .newBatter();
         }
         if (this.count.outs > 2) {
             this.says = 'Three outs, change.';
@@ -363,12 +368,12 @@ Umpire.prototype = {
             }
             let canAdvance = (position) => true;
             if (sacrificeAdvances) {
-                canAdvance = position => {
+                canAdvance = (position) => {
                     switch (position) {
                         case 'first':
-                            return sacrificeAdvances.includes('first') && (!game.field.second);
+                            return sacrificeAdvances.includes('first') && !game.field.second;
                         case 'second':
-                            return sacrificeAdvances.includes('second') && (!game.field.third);
+                            return sacrificeAdvances.includes('second') && !game.field.third;
                         case 'third':
                             return sacrificeAdvances.includes('third');
                     }
@@ -398,27 +403,30 @@ Umpire.prototype = {
             if (second && canAdvance('second')) {
                 game.field.third = second;
                 game.field.second = null;
-                if (second != game.batter && !sacrificeAdvances
-                    && Math.random() * (second.skill.offense.speed + 120) > arm + 50) {
-
+                if (
+                    second != game.batter &&
+                    !sacrificeAdvances &&
+                    Math.random() * (second.skill.offense.speed + 120) > arm + 50
+                ) {
                     this.runScores();
                     if (game.batter != second) {
                         game.batter.recordRBI();
                         second.atBats.push(Log.prototype.RUN);
                     }
                     game.field.third = null;
-
                 }
             }
             if (first && canAdvance('first')) {
                 game.field.second = first;
                 game.field.first = null;
-                if (first != game.batter && !game.field.third && !sacrificeAdvances
-                    && Math.random() * (first.skill.offense.speed + 120) > arm + 60) {
-
+                if (
+                    first != game.batter &&
+                    !game.field.third &&
+                    !sacrificeAdvances &&
+                    Math.random() * (first.skill.offense.speed + 120) > arm + 60
+                ) {
                     game.field.third = first;
                     game.field.second = null;
-
                 }
             }
         }
@@ -446,11 +454,11 @@ Umpire.prototype = {
         game.log.notePlateAppearanceResult(game);
         const team = game.half === 'bottom' ? game.teams.home : game.teams.away;
         game.lastBatter = game.batter;
-        game.batter = team.lineup[(team.nowBatting + 1)%9];
+        game.batter = team.lineup[(team.nowBatting + 1) % 9];
         game.batter.ready = !game.humanBatting();
-        game.deck = team.lineup[(team.nowBatting + 2)%9];
-        game.hole = team.lineup[(team.nowBatting + 3)%9];
-        team.nowBatting = (team.nowBatting + 1)%9;
+        game.deck = team.lineup[(team.nowBatting + 2) % 9];
+        game.hole = team.lineup[(team.nowBatting + 3) % 9];
+        team.nowBatting = (team.nowBatting + 1) % 9;
         if (this.count.outs < 3) {
             game.log.noteBatter(game.batter);
         }
@@ -491,13 +499,16 @@ Umpire.prototype = {
         }
         offense = game.half === 'top' ? 'away' : 'home';
         defense = game.half === 'top' ? 'home' : 'away';
-        const n = `${game.inning}回の${game.half === 'top' ? 'オモテ' : 'ウラ'}、${game.teams[(game.half === 'top' ? 'away' : 'home')].getName()}の攻撃。`, e = `${game.half === 'top' ? 'Top' : 'Bottom'} ${game.inning}`;
+        const n = `${game.inning}回の${game.half === 'top' ? 'オモテ' : 'ウラ'}、${game.teams[
+                game.half === 'top' ? 'away' : 'home'
+            ].getName()}の攻撃。`,
+            e = `${game.half === 'top' ? 'Top' : 'Bottom'} ${game.inning}`;
         game.log.note(e, n);
         const team = game.teams[offense];
         game.batter = team.lineup[team.nowBatting];
         game.batterRunner = game.batter;
-        game.deck = team.lineup[(team.nowBatting + 1)%9];
-        game.hole = team.lineup[(team.nowBatting + 2)%9];
+        game.deck = team.lineup[(team.nowBatting + 1) % 9];
+        game.hole = team.lineup[(team.nowBatting + 2) % 9];
 
         game.pitcher = game.teams[defense].positions.pitcher;
         game.log.noteBatter(game.batter);
@@ -506,8 +517,8 @@ Umpire.prototype = {
         this.onSideChange();
     },
     onSideChange() {}, // will be be bound externally
-    says : 'Play ball!',
-    game : null
+    says: 'Play ball!',
+    game: null
 };
 
-export { Umpire }
+export { Umpire };

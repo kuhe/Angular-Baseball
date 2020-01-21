@@ -1030,16 +1030,25 @@ Log.prototype = {
  */
 class AtBat_AtBat {
     constructor(text) {
-        this.infield = text.includes(AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR) ? AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR : '';
+        this.infield = text.includes(AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR)
+            ? AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR
+            : '';
         text = text.replace(AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR, '');
         this.text = text.split(AtBat_AtBat.prototype.RBI_INDICATOR)[0];
-        this.rbi = (`${text.split(this.text)[1]}`);
+        this.rbi = `${text.split(this.text)[1]}`;
 
         const log = new Log();
 
         const beneficial = [
-            log.WALK, log.SINGLE, log.HOMERUN, log.DOUBLE, log.TRIPLE, log.SACRIFICE, log.REACHED_ON_ERROR,
-            log.STOLEN_BASE, log.RUN
+            log.WALK,
+            log.SINGLE,
+            log.HOMERUN,
+            log.DOUBLE,
+            log.TRIPLE,
+            log.SACRIFICE,
+            log.REACHED_ON_ERROR,
+            log.STOLEN_BASE,
+            log.RUN
         ];
         if (beneficial.includes(this.text)) {
             this.beneficial = true;
@@ -1054,6 +1063,7 @@ AtBat_AtBat.prototype.constructor = AtBat_AtBat;
 AtBat_AtBat.prototype.identifier = 'AtBat';
 AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR = '';
 AtBat_AtBat.prototype.RBI_INDICATOR = '+';
+
 
 
 // CONCATENATED MODULE: ./Utility/data.js
@@ -1646,11 +1656,11 @@ const { random, min, max, floor, ceil, abs, pow, sqrt } = Math;
  * For Probability!
  * @constructor
  */
-const DistributionCtor = function () {};
+const DistributionCtor = function() {};
 
 const Distribution = Object.assign(DistributionCtor, {
-    identifier : 'Distribution',
-    constructor : DistributionCtor,
+    identifier: 'Distribution',
+    constructor: DistributionCtor,
     /**
      * @param scale {number}
      * @returns {number}
@@ -1664,7 +1674,7 @@ const Distribution = Object.assign(DistributionCtor, {
      * @returns {boolean}
      */
     error(fielder) {
-        return (100-fielder.skill.defense.fielding) * 0.1 + 3.25 > random()*100;
+        return (100 - fielder.skill.defense.fielding) * 0.1 + 3.25 > random() * 100;
     },
     /**
      * @param power
@@ -1674,13 +1684,13 @@ const Distribution = Object.assign(DistributionCtor, {
      * @returns {number}
      */
     landingDistance(power, flyAngle, x, y) {
-        x = min(5, abs(x)|0);
-        y = min(5, abs(y)|0);
-        const goodContactBonus = 8 - sqrt(x*x + y*y);
+        x = min(5, abs(x) | 0);
+        y = min(5, abs(y) | 0);
+        const goodContactBonus = 8 - sqrt(x * x + y * y);
 
         const scalar = pow(random(), 1 - goodContactBonus * 0.125);
-        const staticPowerContribution = power/300;
-        const randomPowerContribution = random() * power/75;
+        const staticPowerContribution = power / 300;
+        const randomPowerContribution = (random() * power) / 75;
 
         /**
          * The launch angle scalar should ideally be around these values based on flyAngle.
@@ -1690,11 +1700,12 @@ const Distribution = Object.assign(DistributionCtor, {
          * over 50 -> risk of pop fly
          * @type {number}
          */
-        const launchAngleScalar = (1 - abs(flyAngle - 30)/60) *
-            (1 - (10 - Math.max(Math.min(10, flyAngle), -10))/20 * 0.83);
+        const launchAngleScalar =
+            (1 - abs(flyAngle - 30) / 60) * (1 - ((10 - Math.max(Math.min(10, flyAngle), -10)) / 20) * 0.83);
 
-        return (10 + scalar * 320 + staticPowerContribution + randomPowerContribution * 150)
-            * launchAngleScalar;
+        return (
+            (10 + scalar * 320 + staticPowerContribution + randomPowerContribution * 150) * launchAngleScalar
+        );
     },
     /**
      * @param count {{strikes: number, balls: number}}
@@ -1703,25 +1714,25 @@ const Distribution = Object.assign(DistributionCtor, {
     pitchLocation(count) {
         let x, y;
         if (random() < 0.5) {
-            x = 50 + floor(random()*90) - floor(random()*30);
+            x = 50 + floor(random() * 90) - floor(random() * 30);
         } else {
-            x = 150 + floor(random()*30) - floor(random()*90);
+            x = 150 + floor(random() * 30) - floor(random() * 90);
         }
-        y = 30 + (170 - floor(sqrt(random()*28900)));
+        y = 30 + (170 - floor(sqrt(random() * 28900)));
 
         const sum = count.strikes + count.balls + 3;
 
-        x = ((3 + count.strikes)*x + count.balls*100)/sum;
-        y = ((3 + count.strikes)*y + count.balls*100)/sum;
+        x = ((3 + count.strikes) * x + count.balls * 100) / sum;
+        y = ((3 + count.strikes) * y + count.balls * 100) / sum;
 
-        return {x, y};
+        return { x, y };
     },
     /**
      * swing centering basis, gives number near 100.
      * @returns {number}
      */
     centralizedNumber() {
-        return 100 + floor(random()*15) - floor(random()*15);
+        return 100 + floor(random() * 15) - floor(random() * 15);
     },
     /**
      * @param eye {Player.skill.offense.eye}
@@ -1732,8 +1743,7 @@ const Distribution = Object.assign(DistributionCtor, {
      *                             negative indicates wrongful certainty (fooled).
      * @returns {number} on scale of 100.
      */
-    swingLikelihood: function (eye, x, y, umpire, certainty = 50) {
-
+    swingLikelihood: function(eye, x, y, umpire, certainty = 50) {
         /**
          * Initially the batter may have planned on whether or not to swing
          * before seeing the pitch, depending on the count, for example.
@@ -1795,35 +1805,36 @@ const Distribution = Object.assign(DistributionCtor, {
 
         const inStrikezone = Distribution.inStrikezone(x, y);
 
-        if (!inStrikezone) { // ball
+        if (!inStrikezone) {
+            // ball
             /** based on avg O-Swing of 30%, decreased by better eye */
-            var eyeEvaluatedSwingLikelihood = 30 - (eye * 0.30);
+            var eyeEvaluatedSwingLikelihood = 30 - eye * 0.3;
         } else {
             /** based on avg Z-Swing of 65%, increased by better eye */
-            eyeEvaluatedSwingLikelihood = 65 + (eye * 0.30);
+            eyeEvaluatedSwingLikelihood = 65 + eye * 0.3;
         }
 
-        const swingLikelihood = (
-            positionalLikelihood * 30 +
-            eyeEvaluatedSwingLikelihood * 40 +
-            planToSwing * 20 +
-            abs(certainty) * 10
-        ) / 100;
+        const swingLikelihood =
+            (positionalLikelihood * 30 +
+                eyeEvaluatedSwingLikelihood * 40 +
+                planToSwing * 20 +
+                abs(certainty) * 10) /
+            100;
 
         const reflex = random() * 100 < eye;
         let finalSwingLikelihood = swingLikelihood;
 
-        if (reflex) { // Roll reflex to be able to override the initial impulse, making a purely reflexive decision to swing.
-            if ((eyeEvaluatedSwingLikelihood > planToSwing && inStrikezone) ||
-                (eyeEvaluatedSwingLikelihood < planToSwing && !inStrikezone)) {
-
+        if (reflex) {
+            // Roll reflex to be able to override the initial impulse, making a purely reflexive decision to swing.
+            if (
+                (eyeEvaluatedSwingLikelihood > planToSwing && inStrikezone) ||
+                (eyeEvaluatedSwingLikelihood < planToSwing && !inStrikezone)
+            ) {
                 // the planning (guess) component is removed from the swing decision.
 
-                finalSwingLikelihood = (
-                    positionalLikelihood * 20 +
-                    eyeEvaluatedSwingLikelihood * 70 +
-                    abs(certainty) * 10
-                ) / 100;
+                finalSwingLikelihood =
+                    (positionalLikelihood * 20 + eyeEvaluatedSwingLikelihood * 70 + abs(certainty) * 10) /
+                    100;
             }
         }
 
@@ -1835,7 +1846,7 @@ const Distribution = Object.assign(DistributionCtor, {
      * @returns {number}
      */
     pitchControl(target, control) {
-        const effect = (50 - random()*100)/(1+control/100);
+        const effect = (50 - random() * 100) / (1 + control / 100);
         return min(199.9, max(0.1, target + effect));
     },
     /**
@@ -1849,10 +1860,14 @@ const Distribution = Object.assign(DistributionCtor, {
      */
     breakEffect(pitch, pitcher, x, y) {
         const effect = {};
-        effect.x = floor(x + (pitch.breakDirection[0]
-            * ((0.50 + 0.5*random() + (pitcher.pitching[pitch.name]).break/200))));
-        effect.y = floor(y + (pitch.breakDirection[1]
-            * ((0.50 + 0.5*random() + (pitcher.pitching[pitch.name]).break/200)/(0.5 + y/200))));
+        effect.x = floor(
+            x + pitch.breakDirection[0] * (0.5 + 0.5 * random() + pitcher.pitching[pitch.name].break / 200)
+        );
+        effect.y = floor(
+            y +
+                pitch.breakDirection[1] *
+                    ((0.5 + 0.5 * random() + pitcher.pitching[pitch.name].break / 200) / (0.5 + y / 200))
+        );
         return effect;
     },
     /**
@@ -1864,7 +1879,7 @@ const Distribution = Object.assign(DistributionCtor, {
      */
     cpuSwing(target, actual, eye) {
         eye = min(eye, 100); // higher eye would overcompensate here
-        return 100 + (target - 100)*(0.5+random()*eye/200) - actual;
+        return 100 + (target - 100) * (0.5 + (random() * eye) / 200) - actual;
     },
     /**
      * @param {number} x - 0-200.
@@ -1872,8 +1887,7 @@ const Distribution = Object.assign(DistributionCtor, {
      * @returns {boolean}
      */
     inStrikezone(x, y) {
-        return x > 50 && x < 150
-            && y > 35 && y < 165;
+        return x > 50 && x < 150 && y > 35 && y < 165;
     },
     /**
      * Determine the swing scalar
@@ -1881,7 +1895,7 @@ const Distribution = Object.assign(DistributionCtor, {
      * @returns {number}
      */
     swing(eye) {
-        return 100/(eye + 25 + random()*50);
+        return 100 / (eye + 25 + random() * 50);
     },
     /**
      * @param pitch {Object} game.pitchInFlight
@@ -1896,17 +1910,21 @@ const Distribution = Object.assign(DistributionCtor, {
         const rand2 = random();
 
         if (base == 4) {
-            rand = rand/100;
+            rand = rand / 100;
         }
 
-        const smoothedRand2 = (1 + rand2)/2;
+        const smoothedRand2 = (1 + rand2) / 2;
 
-        const pitchBaseSpeedMultiplier = (pitchDefinitions[pitch.name] || ['','',0.6])[2];
+        const pitchBaseSpeedMultiplier = (pitchDefinitions[pitch.name] || ['', '', 0.6])[2];
 
-        return ((volitional|0) * 35 + thief.skill.offense.eye + (base * -25 + 45)) * rand
-            + 10 + thief.skill.offense.speed*2 - thief.fatigue
-            > (pitchBaseSpeedMultiplier * pitch.velocity * smoothedRand2
-            + (catcher.skill.defense.catching + catcher.skill.defense.throwing) * rand2);
+        return (
+            ((volitional | 0) * 35 + thief.skill.offense.eye + (base * -25 + 45)) * rand +
+                10 +
+                thief.skill.offense.speed * 2 -
+                thief.fatigue >
+            pitchBaseSpeedMultiplier * pitch.velocity * smoothedRand2 +
+                (catcher.skill.defense.catching + catcher.skill.defense.throwing) * rand2
+        );
     },
     /**
      * @param pitch {Object} game.pitchInFlight
@@ -1917,7 +1935,7 @@ const Distribution = Object.assign(DistributionCtor, {
      */
     willSteal(pitch, catcher, thief, base) {
         if (base == 4) return false;
-        return (random() < 0.15) && this.stealSuccess(pitch, catcher, thief, base, false) && (random() < 0.5);
+        return random() < 0.15 && this.stealSuccess(pitch, catcher, thief, base, false) && random() < 0.5;
     }
 });
 
@@ -1931,15 +1949,24 @@ Distribution.main = () => {
     while (ump.count.balls < 4) {
         while (ump.count.strikes < 3) {
             console.log('S', ump.count.strikes, 'B', ump.count.balls);
-            console.log('middle', [15, 35, 55, 75, 95].map(x => {
-                return Distribution.swingLikelihood(x, 100, 100, ump)|0;
-            }));
-            console.log('corner', [15, 35, 55, 75, 95].map(x => {
-                return Distribution.swingLikelihood(x, 50, 50, ump)|0;
-            }));
-            console.log('ball', [15, 35, 55, 75, 95].map(x => {
-                return Distribution.swingLikelihood(x, 15, 15, ump)|0;
-            }));
+            console.log(
+                'middle',
+                [15, 35, 55, 75, 95].map(x => {
+                    return Distribution.swingLikelihood(x, 100, 100, ump) | 0;
+                })
+            );
+            console.log(
+                'corner',
+                [15, 35, 55, 75, 95].map(x => {
+                    return Distribution.swingLikelihood(x, 50, 50, ump) | 0;
+                })
+            );
+            console.log(
+                'ball',
+                [15, 35, 55, 75, 95].map(x => {
+                    return Distribution.swingLikelihood(x, 15, 15, ump) | 0;
+                })
+            );
             ump.count.strikes++;
         }
         ump.count.balls++;
@@ -1954,7 +1981,7 @@ Distribution.main = () => {
  * For Math!
  * @constructor
  */
-const Mathinator = function () {};
+const Mathinator = function() {};
 
 /**
  * @param n
@@ -1963,22 +1990,25 @@ const Mathinator = function () {};
 Mathinator.square = n => n * n;
 
 Mathinator.prototype = {
-    identifier : 'Mathinator',
-    constructor : Mathinator,
+    identifier: 'Mathinator',
+    constructor: Mathinator,
     /**
      * CONST
      */
-    RADIAN : Math.PI / 180,
-    SPLAY_INDICATOR_LEFT : -4,
+    RADIAN: Math.PI / 180,
+    SPLAY_INDICATOR_LEFT: -4,
     /**
      * @param offset {{x: number, y: number}}
      * @param angle {number}
      * @returns {{x: number, y: number}}
      */
     getAngularOffset(offset, angle) {
-        const xScalar = offset.x < 0 ? -1 : 1, yScalar = offset.y < 0 ? -1 : 1;
-        const originalAngle = Math.atan(offset.x / offset.y)/this.RADIAN;
-        const distance = Math.sqrt(offset.x * offset.x + offset.y * offset.y), angledY = yScalar * Math.cos((angle - originalAngle) * this.RADIAN) * distance, angledX = xScalar * Math.sqrt(distance * distance - angledY * angledY);
+        const xScalar = offset.x < 0 ? -1 : 1,
+            yScalar = offset.y < 0 ? -1 : 1;
+        const originalAngle = Math.atan(offset.x / offset.y) / this.RADIAN;
+        const distance = Math.sqrt(offset.x * offset.x + offset.y * offset.y),
+            angledY = yScalar * Math.cos((angle - originalAngle) * this.RADIAN) * distance,
+            angledX = xScalar * Math.sqrt(distance * distance - angledY * angledY);
         return {
             x: angledX,
             y: angledY
@@ -1991,7 +2021,9 @@ Mathinator.prototype = {
      */
     getPolarDistance(a, b) {
         const radians = this.RADIAN;
-        return Math.sqrt(a[1]*a[1] + b[1]*b[1] - 2*a[1]*b[1]*Math.cos(a[0]*radians - b[0]*radians));
+        return Math.sqrt(
+            a[1] * a[1] + b[1] * b[1] - 2 * a[1] * b[1] * Math.cos(a[0] * radians - b[0] * radians)
+        );
     },
     /**
      * @param origin
@@ -2002,9 +2034,9 @@ Mathinator.prototype = {
      * of various swing heights.
      */
     battingAngle(origin, target) {
-        return Math.atan((origin.y - target.y)/(target.x - origin.x))/Math.PI * 125;
+        return (Math.atan((origin.y - target.y) / (target.x - origin.x)) / Math.PI) * 125;
     },
-    memory : {},
+    memory: {},
     /**
      * @param percent {number} 0-100
      * @param quarter {number} seconds
@@ -2018,29 +2050,36 @@ Mathinator.prototype = {
         if (givenApexHeight) Mathinator.prototype.memory.apexHeight = givenApexHeight;
         if (givenDistance) Mathinator.prototype.memory.distance = givenDistance;
         if (givenSplayAngle) Mathinator.prototype.memory.splay = givenSplayAngle;
-        const apexHeight = Mathinator.prototype.memory.apexHeight, distance = Mathinator.prototype.memory.distance, splay = Mathinator.prototype.memory.splay;
+        const apexHeight = Mathinator.prototype.memory.apexHeight,
+            distance = Mathinator.prototype.memory.distance,
+            splay = Mathinator.prototype.memory.splay;
         let bottom, left, padding, borderWidth;
-        const bounding = Mathinator.prototype.memory.bounding, radian = this.RADIAN;
+        const bounding = Mathinator.prototype.memory.bounding,
+            radian = this.RADIAN;
 
         if (bounding) {
             quarter *= 4;
-            percent = Math.floor(Math.sqrt(percent/100)*100);
+            percent = Math.floor(Math.sqrt(percent / 100) * 100);
         }
 
-        bottom = Math.cos(splay * radian) * percent/100 * distance * 95/300;
-        left = Math.sin(splay * radian) * percent/100 * distance * 95/300 + this.SPLAY_INDICATOR_LEFT;
+        bottom = (((Math.cos(splay * radian) * percent) / 100) * distance * 95) / 300;
+        left =
+            (((Math.sin(splay * radian) * percent) / 100) * distance * 95) / 300 + this.SPLAY_INDICATOR_LEFT;
 
-        const apexRatio = Math.sqrt((50 - Math.abs(percent - 50))/100)*(1/0.7071);
+        const apexRatio = Math.sqrt((50 - Math.abs(percent - 50)) / 100) * (1 / 0.7071);
         if (bounding) {
             padding = 1;
             borderWidth = 1;
         } else {
-            padding = apexRatio * apexHeight/90 * 15;
-            borderWidth = 2 + (apexRatio * 2);
+            padding = ((apexRatio * apexHeight) / 90) * 15;
+            borderWidth = 2 + apexRatio * 2;
         }
         bottom = Math.max(Math.min(bottom, 400), -20);
         left = Math.max(Math.min(left, 100), -100);
         padding = Math.max(Math.min(padding, 12), 0);
+
+        const { Power4, Linear } = TweenMax;
+
         return {
             bottom,
             left,
@@ -2067,28 +2106,34 @@ Mathinator.prototype = {
         givenApexHeight,
         givenDistance,
         givenSplayAngle,
-        givenOrigin) {
+        givenOrigin
+    ) {
         const memory = Mathinator.prototype.memory;
         if (givenApexHeight) memory.apexHeight = givenApexHeight;
         if (givenDistance) memory.distance = givenDistance;
         if (givenSplayAngle) memory.splay = givenSplayAngle;
         if (givenOrigin) memory.origin = givenOrigin;
-        const apexHeight = memory.apexHeight, distance = memory.distance, splay = memory.splay, origin = memory.origin;
+        const apexHeight = memory.apexHeight,
+            distance = memory.distance,
+            splay = memory.splay,
+            origin = memory.origin;
         let top, left, padding, borderWidth;
-        const bounding = Mathinator.prototype.memory.bounding, radian = this.RADIAN;
+        const bounding = Mathinator.prototype.memory.bounding,
+            radian = this.RADIAN;
 
         if (bounding) {
-            percent = Math.floor(Math.sqrt(percent/100)*100);
+            percent = Math.floor(Math.sqrt(percent / 100) * 100);
         }
 
-        const height = apexHeight - Math.pow(Math.abs(50 - percent)/50, 1.2) * apexHeight, currentDistance = distance * percent/100;
+        const height = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 1.2) * apexHeight,
+            currentDistance = (distance * percent) / 100;
 
-        const projection = Math.pow((500 - currentDistance)/500, 2); // reduction of dimensions due to distance
+        const projection = Math.pow((500 - currentDistance) / 500, 2); // reduction of dimensions due to distance
 
-        top = (200 - origin.y) - (height * 20) * projection + (percent/100 * (origin.y - 85)) * projection;
+        top = 200 - origin.y - height * 20 * projection + (percent / 100) * (origin.y - 85) * projection;
         left = origin.x + Math.sin(splay * radian) * (currentDistance * 8) * projection;
         padding = 12 * projection * projection;
-        borderWidth = Math.max(Math.min(padding/3, 4), 0);
+        borderWidth = Math.max(Math.min(padding / 3, 4), 0);
 
         top = Math.max(Math.min(top, 500), -10000);
         left = Math.max(Math.min(left, 10000), -10000);
@@ -2113,8 +2158,10 @@ Mathinator.prototype = {
         // CF HR bottom: 95px, centerline: left: 190px;
         let bottom, left;
 
-        bottom = Math.cos(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300;
-        left = Math.sin(swingResult.splay / 180 * Math.PI) * swingResult.travelDistance * 95/300 + this.SPLAY_INDICATOR_LEFT;
+        bottom = (Math.cos((swingResult.splay / 180) * Math.PI) * swingResult.travelDistance * 95) / 300;
+        left =
+            (Math.sin((swingResult.splay / 180) * Math.PI) * swingResult.travelDistance * 95) / 300 +
+            this.SPLAY_INDICATOR_LEFT;
 
         bottom = Math.max(Math.min(bottom, 400), -20);
         left = Math.max(Math.min(left, 100), -100);
@@ -2145,18 +2192,19 @@ Mathinator.prototype = {
             let _top, _left;
             _top = breakTop || top;
             _left = breakLeft || left;
-            _top = originTop + Mathinator.square(percent/100)*(_top - originTop);
+            _top = originTop + Mathinator.square(percent / 100) * (_top - originTop);
             if (step == 1) {
                 _top -= 2;
             }
             if (step == 2) {
                 _top -= 1;
             }
-            _left = originLeft + Mathinator.square(percent/100)*(_left - originLeft);
-            const padding = Math.max(Mathinator.square(percent/100)*maxPadding, 1), borderWidth = Math.max(Mathinator.square(percent/100)*maxBorderWidth, 1);
+            _left = originLeft + Mathinator.square(percent / 100) * (_left - originLeft);
+            const padding = Math.max(Mathinator.square(percent / 100) * maxPadding, 1),
+                borderWidth = Math.max(Mathinator.square(percent / 100) * maxBorderWidth, 1);
             return {
                 top: _top,
-                left: _left ,
+                left: _left,
                 padding: `${padding}px`,
                 borderWidth: `${borderWidth}px`,
                 transform: 'translateZ(0)',
@@ -2173,26 +2221,32 @@ Mathinator.prototype = {
      * @returns {number} seconds
      */
     fielderReturnDelay(distance, throwing, fielding, intercept) {
-        return distance/90 // bip distance (up to 3s+)
-            + (5*((distance)/310) // worst case time to reach the ball,
-            * (Math.min(intercept - 120, 0))/-240) // a good intercept rating will cut the base down to 0
-            + 1 - (0.2 + fielding * 0.8) // gather time (up to 0.8s)
-            + (distance/90)/(0.5 + throwing/2); // throwing distance (up to 2s)
+        return (
+            distance / 90 + // bip distance (up to 3s+)
+            (5 *
+            (distance / 310) * // worst case time to reach the ball,
+                Math.min(intercept - 120, 0)) /
+                -240 + // a good intercept rating will cut the base down to 0
+            1 -
+            (0.2 + fielding * 0.8) + // gather time (up to 0.8s)
+            distance / 90 / (0.5 + throwing / 2)
+        ); // throwing distance (up to 2s)
     },
     /**
      * @param player {Player}
      * @returns {number} ~2.0
      */
     infieldThrowDelay(player) {
-        const fielding = player.skill.defense.fielding, throwing = player.skill.defense.throwing;
-        return 3.5 - (fielding + throwing)/200;
+        const fielding = player.skill.defense.fielding,
+            throwing = player.skill.defense.throwing;
+        return 3.5 - (fielding + throwing) / 200;
     },
     /**
      * @param speed {number} 0-100
      * @returns {number} seconds
      */
     baseRunningTime(speed) {
-        return 7.0 - (speed/100 * 4.1)
+        return 7.0 - (speed / 100) * 4.1;
     },
     /**
      * @param x {Number} bat offset
@@ -2208,21 +2262,20 @@ Mathinator.prototype = {
      * @returns {{splay: number, fly: number}}
      */
     getSplayAndFlyAngle(x, y, angle, eye, timing, lefty) {
-
         const pullDirection = lefty ? 1 : -1;
         // Let's say that you have a 100ms window in which to hit the ball fair, with an additional 40ms for
         // playing this game interface.
         // With this formula, 140ms early will pull the ball by ~50 degrees
-        let pull = pullDirection * ((50/140 * timing) + (Math.random() * 10 * (100/(50 + eye))));
+        let pull = pullDirection * ((50 / 140) * timing + Math.random() * 10 * (100 / (50 + eye)));
 
         pull /= Math.abs(100 / (100 + angle)); // diluted by angle
 
-        let splay = -1.5*x - (y * angle / 20) + pull;
+        let splay = -1.5 * x - (y * angle) / 20 + pull;
 
         return {
             splay,
-            fly: -3*y / ((Math.abs(angle) + 25) / 35 ) // more difficult to hit a pop fly on a angled bat
-        }
+            fly: (-3 * y) / ((Math.abs(angle) + 25) / 35) // more difficult to hit a pop fly on a angled bat
+        };
     },
     /**
      * @param velocityRating {Number} 0-100
@@ -2230,7 +2283,7 @@ Mathinator.prototype = {
      * @returns {number}
      */
     getFlightTime(velocityRating, velocityScalar) {
-        return (1.3 - 0.6*(velocityRating + 300)/400)/(velocityScalar);
+        return (1.3 - (0.6 * (velocityRating + 300)) / 400) / velocityScalar;
     }
 };
 
@@ -2241,13 +2294,13 @@ for (const fn in Mathinator.prototype) {
 }
 
 
+
 // CONCATENATED MODULE: ./Services/Iterator.js
-const Iterator = () => {
-};
+const Iterator = () => {};
 
 Iterator.prototype = {
-    identifier : 'Iterator',
-    constructor : Iterator,
+    identifier: 'Iterator',
+    constructor: Iterator,
     each(collection, map) {
         let keys, i;
         if (collection instanceof Array) {
@@ -2268,6 +2321,7 @@ for (const fn in Iterator.prototype) {
         Iterator[fn] = Iterator.prototype[fn];
     }
 }
+
 
 
 // CONCATENATED MODULE: ./Model/TeamConstants.js
@@ -2294,11 +2348,11 @@ for (const fn in Iterator.prototype) {
  */
 const Player = function(team, hero) {
     this.init(team, hero);
-    this.resetStats(this.team.game && this.team.game.gamesIntoSeason || 72);
+    this.resetStats((this.team.game && this.team.game.gamesIntoSeason) || 72);
 };
 
 Player.prototype = {
-    constructor : Player,
+    constructor: Player,
     /**
      * @see {Player}
      */
@@ -2314,13 +2368,15 @@ Player.prototype = {
             x: 100,
             y: 100
         };
-        this.pitching = {averaging : []};
+        this.pitching = { averaging: [] };
         this.number = 0;
-        this.randomizeSkills(hero || (Math.random() > 0.9));
-        const surnameKey = Math.floor(Math.random()*data_data.surnames.length), nameKey = Math.floor(Math.random()*data_data.names.length);
+        this.randomizeSkills(hero || Math.random() > 0.9);
+        const surnameKey = Math.floor(Math.random() * data_data.surnames.length),
+            nameKey = Math.floor(Math.random() * data_data.names.length);
 
         this.name = `${data_data.surnames[surnameKey]} ${data_data.names[nameKey]}`;
-        const jSurname = data_data.surnamesJ[surnameKey], jGivenName = data_data.namesJ[nameKey];
+        const jSurname = data_data.surnamesJ[surnameKey],
+            jGivenName = data_data.namesJ[nameKey];
         this.spaceName(jSurname, jGivenName);
         this.surname = data_data.surnames[surnameKey];
         this.surnameJ = data_data.surnamesJ[surnameKey];
@@ -2373,7 +2429,8 @@ Player.prototype = {
      */
     substitute(player) {
         if (player.team !== this.team) return false;
-        const order = player.order, position = player.position;
+        const order = player.order,
+            position = player.position;
         player.team.substituted.push(player);
         player.team.positions[position] = this;
         player.team.lineup[order] = this;
@@ -2392,7 +2449,8 @@ Player.prototype = {
         if (field.second === player) field.second = this;
         if (field.third === player) field.third = this;
 
-        const bench = this.team.bench, bullpen = this.team.bullpen;
+        const bench = this.team.bench,
+            bullpen = this.team.bullpen;
         if (bench.includes(this)) {
             bench.splice(bench.indexOf(this), 1);
         }
@@ -2406,11 +2464,12 @@ Player.prototype = {
      * @param gamesIntoSeason
      * @returns {*}
      */
-    resetStats(gamesIntoSeason=72) {
+    resetStats(gamesIntoSeason = 72) {
         const offense = this.skill.offense;
         const defense = this.skill.defense;
         const randBetween = (a, b, skill) => {
-            let total = 0, count = 0;
+            let total = 0,
+                count = 0;
             skill += '';
             if (!skill) skill = '';
             Iterator.each(skill.split(' '), (key, value) => {
@@ -2422,51 +2481,53 @@ Player.prototype = {
                 count++;
             });
 
-            skill = Math.sqrt(0.05 + Math.random()*0.95)*(total/(count * 0.97));
-            return Math.floor((skill/100) * (b - a) + a);
+            skill = Math.sqrt(0.05 + Math.random() * 0.95) * (total / (count * 0.97));
+            return Math.floor((skill / 100) * (b - a) + a);
         };
         let IP, ER, GS, W, L;
         if (this.skill.pitching > 65) {
-            IP = (this.skill.pitching - 65)*gamesIntoSeason/20;
-            ER = (IP/9)*randBetween(800, 215, this.skill.pitching)/100;
+            IP = ((this.skill.pitching - 65) * gamesIntoSeason) / 20;
+            ER = ((IP / 9) * randBetween(800, 215, this.skill.pitching)) / 100;
             if (IP > gamesIntoSeason) {
                 //starter
-                GS = Math.floor(gamesIntoSeason/5);
-                W = randBetween(GS * 0.1, GS * 0.8, this.skill.pitching/1.20);
-                L = randBetween((GS - W), 0, this.skill.pitching/3);
+                GS = Math.floor(gamesIntoSeason / 5);
+                W = randBetween(GS * 0.1, GS * 0.8, this.skill.pitching / 1.2);
+                L = randBetween(GS - W, 0, this.skill.pitching / 3);
             } else {
                 //reliever
-                GS = Math.floor(gamesIntoSeason/40);
-                W = randBetween(0, GS*0.6, this.skill.pitching);
-                L = randBetween((GS - W), 0, this.skill.pitching);
+                GS = Math.floor(gamesIntoSeason / 40);
+                W = randBetween(0, GS * 0.6, this.skill.pitching);
+                L = randBetween(GS - W, 0, this.skill.pitching);
             }
         } else {
             IP = 0;
             ER = 0;
-            GS = 0; W = 0; L = 0;
+            GS = 0;
+            W = 0;
+            L = 0;
         }
-        const pa = randBetween(gamesIntoSeason*3, gamesIntoSeason*5, 'speed eye');
+        const pa = randBetween(gamesIntoSeason * 3, gamesIntoSeason * 5, 'speed eye');
         let paRemaining = pa;
-        const bb = Math.floor(randBetween(0, 18, 'power eye')*paRemaining/100);
+        const bb = Math.floor((randBetween(0, 18, 'power eye') * paRemaining) / 100);
         paRemaining -= bb;
         const ab = paRemaining;
-        const so = Math.floor(randBetween(25, 2, 'eye')*paRemaining/100);
+        const so = Math.floor((randBetween(25, 2, 'eye') * paRemaining) / 100);
         paRemaining -= so;
-        const h = Math.floor(randBetween(185, 372, 'eye power speed')*paRemaining/1000);
+        const h = Math.floor((randBetween(185, 372, 'eye power speed') * paRemaining) / 1000);
         paRemaining -= h;
-        const sb = randBetween(0, (h + bb)/6, 'speed') | 0;
+        const sb = randBetween(0, (h + bb) / 6, 'speed') | 0;
         const cs = randBetween(sb, 0, 'speed eye') | 0;
 
-        const doubles = randBetween(0, h/4, 'power speed');
-        const triples = randBetween(0, h/12, 'speed');
-        const hr = Math.max(0, randBetween(-h/20, h/5, 'power eye'));
-        const r = randBetween(h/8, (h + bb)/3, 'speed') + hr;
-        const rbi = randBetween(h/8, (h)/2, 'power eye') + hr;
-        const hbp = randBetween(0, gamesIntoSeason/25);
-        const sac = randBetween(0, gamesIntoSeason/5, 'eye');
+        const doubles = randBetween(0, h / 4, 'power speed');
+        const triples = randBetween(0, h / 12, 'speed');
+        const hr = Math.max(0, randBetween(-h / 20, h / 5, 'power eye'));
+        const r = randBetween(h / 8, (h + bb) / 3, 'speed') + hr;
+        const rbi = randBetween(h / 8, h / 2, 'power eye') + hr;
+        const hbp = randBetween(0, gamesIntoSeason / 25);
+        const sac = randBetween(0, gamesIntoSeason / 5, 'eye');
 
         const chances = randBetween(gamesIntoSeason * 5, pa - bb - so - hr, 'fielding');
-        const E = randBetween(chances/10, 0, 'fielding');
+        const E = randBetween(chances / 10, 0, 'fielding');
         const PO = chances - E;
 
         const oSwings = randBetween(gamesIntoSeason * 9, gamesIntoSeason, 'eye');
@@ -2475,62 +2536,75 @@ Player.prototype = {
         const swings = oSwings + zSwings;
 
         this.stats = {
-            pitching : {
-                pitches : 0, // in game
+            pitching: {
+                pitches: 0, // in game
                 GS,
                 W,
                 L,
-                strikes : 0, // in game
-                K : 0, // in game
+                strikes: 0, // in game
+                K: 0, // in game
                 getK9() {
-                    return this.K / (this.IP[0]/9);
+                    return this.K / (this.IP[0] / 9);
                 },
                 getERA() {
-                    const val = 9 * this.ER / Math.max(1/3, this.IP[0] + this.IP[1]/3);
+                    const val = (9 * this.ER) / Math.max(1 / 3, this.IP[0] + this.IP[1] / 3);
                     return (val + '00').slice(0, 4);
                 },
-                ERA : null,
+                ERA: null,
                 ER,
-                H : 0, // in game
-                HR : 0, // in game
-                BB : 0, // in game
-                IP : [IP,0],
-                WHIP : 0,
+                H: 0, // in game
+                HR: 0, // in game
+                BB: 0, // in game
+                IP: [IP, 0],
+                WHIP: 0,
                 getWHIP() {
-                    return (this.H + this.BB)/(this.IP[0] ? this.IP[0] : 1);
+                    return (this.H + this.BB) / (this.IP[0] ? this.IP[0] : 1);
                 }
             },
-            batting : {
+            batting: {
                 getBA() {
-                    return this.h / (Math.max(1, this.ab));
+                    return this.h / Math.max(1, this.ab);
                 },
                 getBABIP() {
                     return (this.h - this.hr) / (this.ab - this.so - this.hr + this.sac);
                 },
-                ba : null,
+                ba: null,
                 getOBP() {
-                    return (this.h + this.bb + this.hbp)/(this.ab + this.bb + this.hbp + this.sac);
+                    return (this.h + this.bb + this.hbp) / (this.ab + this.bb + this.hbp + this.sac);
                 },
-                obp : null,
+                obp: null,
                 getSLG() {
-                    return ((this.h - this['2b'] - this['3b'] - this.hr) + 2*this['2b'] + 3*this['3b'] + 4*this.hr)/this.ab;
+                    return (
+                        (this.h -
+                            this['2b'] -
+                            this['3b'] -
+                            this.hr +
+                            2 * this['2b'] +
+                            3 * this['3b'] +
+                            4 * this.hr) /
+                        this.ab
+                    );
                 },
                 getSlash() {
-                    this.slash = this.slash || [this.getBA() || '.---', this.getOBP(), this.getSLG()].map(x => {
-                            if (isNaN(x)) return '.---';
-                            if (x < 1) return (`${x}0000`).slice(1, 5);
-                            return (`${x}0000`).slice(0, 5);
-                        }).join('/');
+                    this.slash =
+                        this.slash ||
+                        [this.getBA() || '.---', this.getOBP(), this.getSLG()]
+                            .map(x => {
+                                if (isNaN(x)) return '.---';
+                                if (x < 1) return `${x}0000`.slice(1, 5);
+                                return `${x}0000`.slice(0, 5);
+                            })
+                            .join('/');
                     return this.slash;
                 },
-                slg : null,
+                slg: null,
                 pa,
                 ab,
                 so,
                 bb,
                 h,
-                '2b' : doubles,
-                '3b' : triples,
+                '2b': doubles,
+                '3b': triples,
                 hr,
                 r,
                 rbi,
@@ -2555,10 +2629,10 @@ Player.prototype = {
                     return this.swings / this.ps;
                 }
             },
-            fielding : {
+            fielding: {
                 E,
                 PO, // should depend on position
-                A : Math.floor(Math.random()*5) + 1 // ehh should depend on position
+                A: Math.floor(Math.random() * 5) + 1 // ehh should depend on position
             }
         };
         this.stats.pitching.ERA = this.stats.pitching.getERA();
@@ -2569,7 +2643,7 @@ Player.prototype = {
     /**
      * a list of at bat results {AtBat[]}
      */
-    atBatObjects : [],
+    atBatObjects: [],
     getAtBats() {
         if (this.atBats.length > this.atBatObjects.length) {
             this.atBatObjects = this.atBats.map(item => new AtBat_AtBat(item));
@@ -2596,8 +2670,13 @@ Player.prototype = {
      */
     attemptSteal(game, base) {
         const pitch = game.pitchInFlight;
-        const success = Distribution.stealSuccess(pitch, game.pitcher.team.positions.catcher,
-            this, base, this.team.stealAttempt === TeamConstants.RUNNERS_DISCRETION);
+        const success = Distribution.stealSuccess(
+            pitch,
+            game.pitcher.team.positions.catcher,
+            this,
+            base,
+            this.team.stealAttempt === TeamConstants.RUNNERS_DISCRETION
+        );
         if (success) {
             game.swingResult.stoleABase = this.order;
             game.swingResult.caughtStealing = undefined;
@@ -2627,7 +2706,7 @@ Player.prototype = {
      */
     defensiveAverage() {
         const _this = this.skill.defense;
-        return (_this.speed + _this.fielding + _this.throwing) / 3
+        return (_this.speed + _this.fielding + _this.throwing) / 3;
     },
     /**
      * randomizes the player's skills, usually called at init
@@ -2638,79 +2717,79 @@ Player.prototype = {
         this.hero = hero;
         const giraffe = this;
         const randValue = isPitching => {
-            let value = Math.floor(Math.pow(Math.random(), 0.75)*80 + Math.random()*20);
+            let value = Math.floor(Math.pow(Math.random(), 0.75) * 80 + Math.random() * 20);
             if (hero) {
-                value += Math.floor((100 - value)*Math.max(Math.random(), isPitching ? 0 : 0.65));
+                value += Math.floor((100 - value) * Math.max(Math.random(), isPitching ? 0 : 0.65));
             }
             if (isPitching) giraffe.pitching.averaging.push(value);
             return value;
         };
         this.skill.offense = {
-            eye : randValue(),
-            power : randValue(),
-            speed : randValue()
+            eye: randValue(),
+            power: randValue(),
+            speed: randValue()
         };
         this.skill.defense = {
-            catching : randValue(),
-            fielding : randValue(),
-            speed : randValue(),
-            throwing : randValue()
+            catching: randValue(),
+            fielding: randValue(),
+            speed: randValue(),
+            throwing: randValue()
         };
         this.pitching.averaging = [];
         this.pitching['4-seam'] = {
-            velocity : randValue(true),
-            'break' : randValue(true),
-            control : randValue(true)
+            velocity: randValue(true),
+            break: randValue(true),
+            control: randValue(true)
         };
         this.pitching.slider = {
-            velocity : randValue(true),
-            'break' : randValue(true),
-            control : randValue(true)
+            velocity: randValue(true),
+            break: randValue(true),
+            control: randValue(true)
         };
         if (Math.random() < 0.85 || allPitches) {
             // can pitch!
             if (Math.random() > 0.6 || allPitches) {
                 this.pitching['2-seam'] = {
-                    velocity : randValue(true),
-                    'break' : randValue(true),
-                    control : randValue(true)
+                    velocity: randValue(true),
+                    break: randValue(true),
+                    control: randValue(true)
                 };
             }
             if (Math.random() < 0.18 || allPitches) {
                 this.pitching.fork = {
-                    velocity : randValue(true),
-                    'break' : randValue(true),
-                    control : randValue(true)
+                    velocity: randValue(true),
+                    break: randValue(true),
+                    control: randValue(true)
                 };
             }
             if (Math.random() > 0.77 || allPitches) {
                 this.pitching.cutter = {
-                    velocity : randValue(true),
-                    'break' : randValue(true),
-                    control : randValue(true)
+                    velocity: randValue(true),
+                    break: randValue(true),
+                    control: randValue(true)
                 };
             }
             if (Math.random() < 0.21 || allPitches) {
                 this.pitching.sinker = {
-                    velocity : randValue(true),
-                    'break' : randValue(true),
-                    control : randValue(true)
+                    velocity: randValue(true),
+                    break: randValue(true),
+                    control: randValue(true)
                 };
             }
 
             if (Math.random() < 0.4 || allPitches) {
                 this.pitching.curve = {
-                    velocity : randValue(true),
-                    'break' : randValue(true),
-                    control : randValue(true)
+                    velocity: randValue(true),
+                    break: randValue(true),
+                    control: randValue(true)
                 };
             }
 
             if (Math.random() < 0.9 || allPitches) {
                 this.pitching.change = {
-                    velocity : randValue(true),
-                    'break' : randValue(true),
-                    control : randValue(true)
+                    velocity: randValue(true),
+                    break: randValue(true),
+                    control: randValue(true)
                 };
             }
         }
@@ -2750,9 +2829,12 @@ Player.prototype = {
      * @returns {number} in milliseconds between -200ms and 200ms
      */
     getAISwingTiming() {
-        return (Math.random() - 0.5) * 280
-            * (60 / (60 + this.skill.offense.eye))
-            * (((200 - this.lastPitchCertainty) / (200 + this.lastPitchCertainty)) || 1);
+        return (
+            (Math.random() - 0.5) *
+            280 *
+            (60 / (60 + this.skill.offense.eye)) *
+            ((200 - this.lastPitchCertainty) / (200 + this.lastPitchCertainty) || 1)
+        );
     },
     /**
      * a localized description of this player's defining batting characteristic e.g. "contact hitter"
@@ -2785,7 +2867,9 @@ Player.prototype = {
             return this.definingCharacteristic[text_text.mode];
         }
         let out = '';
-        const o = this.skill.offense, d = this.skill.defense, pitcherRating = this.skill.pitching;
+        const o = this.skill.offense,
+            d = this.skill.defense,
+            pitcherRating = this.skill.pitching;
         const p = this.pitching;
         const ELITE = 90;
         const EXCELLENT = 80;
@@ -2799,9 +2883,9 @@ Player.prototype = {
         const offense = [o.eye, o.power, o.speed];
         const defense = [d.fielding, d.speed, d.throwing];
 
-        const sum = x => x.reduce((a,b) => a + b);
+        const sum = x => x.reduce((a, b) => a + b);
 
-        let pitching =  [0, 0, 0]; // control, speed, break
+        let pitching = [0, 0, 0]; // control, speed, break
         const pitchingKeys = Object.keys(p);
         pitchingKeys.map(x => {
             pitching[0] += p[x].control;
@@ -2809,7 +2893,7 @@ Player.prototype = {
             pitching[2] += p[x].break;
         });
         const pitches = pitchingKeys.length;
-        pitching = pitching.map(x => x/pitches | 0);
+        pitching = pitching.map(x => (x / pitches) | 0);
 
         if (pitchingOnly || (pitcherRating > 90 && !battingOnly)) {
             if (pitcherRating > 94) {
@@ -2822,8 +2906,8 @@ Player.prototype = {
                 out = text_text('Breaking ball');
             }
         } else {
-            if (battingOnly || sum([offense[0] * 2, offense[1] * 0.50, offense[2]]) > sum(defense)) {
-                if (offense[0] > 98 || (sum(offense) > ELITE * 3)) {
+            if (battingOnly || sum([offense[0] * 2, offense[1] * 0.5, offense[2]]) > sum(defense)) {
+                if (offense[0] > 98 || sum(offense) > ELITE * 3) {
                     out = text_text('Genius batter');
                 } else if (offense[1] > EXCELLENT && offense[1] > offense[0]) {
                     out = text_text('Power hitter');
@@ -2831,7 +2915,7 @@ Player.prototype = {
                     out = text_text('Contact');
                 } else if (offense[2] > EXCELLENT) {
                     out = text_text('Speedster');
-                } else if (offense[0] < INEPT || (sum(offense) < POOR * 3)) {
+                } else if (offense[0] < INEPT || sum(offense) < POOR * 3) {
                     out = text_text('Inept');
                 } else if (offense[1] < INEPT && offense[1] < offense[0]) {
                     out = text_text('Weak swing');
@@ -2853,7 +2937,7 @@ Player.prototype = {
             }
         }
         if (battingOnly || pitchingOnly) return out;
-        return this.definingCharacteristic[text_text.mode] = out;
+        return (this.definingCharacteristic[text_text.mode] = out);
     },
     /**
      * to ease comparison in Angular (?)
@@ -2904,9 +2988,7 @@ class AbstractMesh {
             this.attach();
         }
     }
-    animate() {
-
-    }
+    animate() {}
 }
 
 /**
@@ -2915,6 +2997,7 @@ class AbstractMesh {
  * @type {number}
  */
 AbstractMesh.WORLD_BASE_Y = -4;
+
 
 
 // CONCATENATED MODULE: ./Render/mesh/Indicator.js
@@ -2935,9 +3018,9 @@ class Indicator extends AbstractMesh {
     }
     getMesh() {
         const THREE = window.THREE;
-        const geometry	= new THREE.CircleGeometry(0.30, 32);
-        const material	= new THREE.MeshPhongMaterial({
-            color: 0xFFFFFF
+        const geometry = new THREE.CircleGeometry(0.3, 32);
+        const material = new THREE.MeshPhongMaterial({
+            color: 0xffffff
         });
         this.mesh = new THREE.Mesh(geometry, material);
         return this.mesh;
@@ -2950,6 +3033,7 @@ class Indicator extends AbstractMesh {
         }
     }
 }
+
 
 
 // CONCATENATED MODULE: ./Render/LoopConstants.js
@@ -2973,7 +3057,7 @@ const INITIAL_CAMERA_DISTANCE = 8;
  * for display purposes. It is only approximately related to actual pitch zone dimensions.
  * @type {number}
  */
-const SCALE = 2.1/100;
+const SCALE = 2.1 / 100;
 
 const INDICATOR_DEPTH = -5;
 
@@ -3001,15 +3085,15 @@ class Ball_Ball extends AbstractMesh {
     }
     getMesh() {
         /** @see threex.sportballs */
-        const baseURL	= 'public/';
+        const baseURL = 'public/';
         const THREE = window.THREE;
         const loader = new THREE.TextureLoader();
-        const textureColor= loader.load(`${baseURL}images/BaseballColor.jpg`);
-        const textureBump	= loader.load(`${baseURL}images/BaseballBump.jpg`);
-        const geometry	= new THREE.SphereGeometry(0.36, 32, 16); // real scale is 0.12
-        const material	= new THREE.MeshPhongMaterial({
-            map	: textureColor,
-            bumpMap	: textureBump,
+        const textureColor = loader.load(`${baseURL}images/BaseballColor.jpg`);
+        const textureBump = loader.load(`${baseURL}images/BaseballBump.jpg`);
+        const geometry = new THREE.SphereGeometry(0.36, 32, 16); // real scale is 0.12
+        const material = new THREE.MeshPhongMaterial({
+            map: textureColor,
+            bumpMap: textureBump,
             bumpScale: 0.01
         });
         this.mesh = new THREE.Mesh(geometry, material);
@@ -3021,7 +3105,8 @@ class Ball_Ball extends AbstractMesh {
      * and rotate while moving (default 1000 RPM)
      */
     animate() {
-        const frame = this.trajectory.shift(), pos = this.mesh.position;
+        const frame = this.trajectory.shift(),
+            pos = this.mesh.position;
 
         if (frame) {
             pos.x += frame.x;
@@ -3056,7 +3141,7 @@ class Ball_Ball extends AbstractMesh {
     setRotation(rpm, rotationAngle) {
         this.RPM = rpm;
         this.RPS = this.RPM / 60;
-        const rotationalIncrement = this.RP60thOfASecond = this.RPS / 60;
+        const rotationalIncrement = (this.RP60thOfASecond = this.RPS / 60);
 
         // calculate rotational components
         // +x is CCW along x axis increasing
@@ -3068,12 +3153,12 @@ class Ball_Ball extends AbstractMesh {
         // 90  --> x:0 y:1
         // 180 --> x:-1 y:0
 
-        const xComponent = rotationalIncrement * Math.cos(rotationAngle / 180 * Math.PI);
-        const yComponent = rotationalIncrement * Math.sin(rotationAngle / 180 * Math.PI);
+        const xComponent = rotationalIncrement * Math.cos((rotationAngle / 180) * Math.PI);
+        const yComponent = rotationalIncrement * Math.sin((rotationAngle / 180) * Math.PI);
 
         this.rotation = {
-            x: xComponent * 360 * Math.PI / 180,
-            y: yComponent * 360 * Math.PI / 180
+            x: (xComponent * 360 * Math.PI) / 180,
+            y: (yComponent * 360 * Math.PI) / 180
         };
     }
     exportPositionTo(mesh) {
@@ -3095,15 +3180,17 @@ class Ball_Ball extends AbstractMesh {
     derivePitchingTrajectory(game) {
         this.setType(game.pitchInFlight.name, game.pitcher.throws === 'right' ? 1 : -1);
         const top = 200 - game.pitchTarget.y,
-              left = game.pitchTarget.x,
-              breakTop = 200 - game.pitchInFlight.y,
-              breakLeft = game.pitchInFlight.x,
-              flightTime = Mathinator.getFlightTime(game.pitchInFlight.velocity,
-                  helper.pitchDefinitions[game.pitchInFlight.name][2]);
+            left = game.pitchTarget.x,
+            breakTop = 200 - game.pitchInFlight.y,
+            breakLeft = game.pitchInFlight.x,
+            flightTime = Mathinator.getFlightTime(
+                game.pitchInFlight.velocity,
+                helper.pitchDefinitions[game.pitchInFlight.name][2]
+            );
 
         const scale = SCALE;
         const origin = {
-            x: (game.pitcher.throws == 'left' ? 1.5 : -1.5),
+            x: game.pitcher.throws == 'left' ? 1.5 : -1.5,
             y: AbstractMesh.WORLD_BASE_Y + 6,
             z: -60.5 // mound distance
         };
@@ -3124,27 +3211,33 @@ class Ball_Ball extends AbstractMesh {
         };
 
         let lastPosition = {
-                x: origin.x, y: origin.y, z: origin.z
+                x: origin.x,
+                y: origin.y,
+                z: origin.z
             },
             lastBreakingPosition = {
-                x: origin.x, y: origin.y, z: origin.z
+                x: origin.x,
+                y: origin.y,
+                z: origin.z
             };
 
         const frames = [];
         const breakingFrames = [];
-        const frameCount = flightTime * 60 | 0;
-        let counter = frameCount * 1.08 | 0;
+        const frameCount = (flightTime * 60) | 0;
+        let counter = (frameCount * 1.08) | 0;
         let frame = 0;
 
-        const xBreak = breakingTerminus.x - terminus.x, yBreak = breakingTerminus.y - terminus.y;
+        const xBreak = breakingTerminus.x - terminus.x,
+            yBreak = breakingTerminus.y - terminus.y;
         const breakingDistance = Math.sqrt(Math.pow(xBreak, 2) + Math.pow(yBreak, 2));
         /**
          * @type {number} 1.0+, an expression of how late the pitch breaks
          */
-        const breakingLateness = breakingDistance/(2 * ARC_APPROXIMATION_Y_ADDITIVE)/scale, breakingLatenessMomentumExponent = 0.2 + Math.pow(0.45, breakingLateness);
+        const breakingLateness = breakingDistance / (2 * ARC_APPROXIMATION_Y_ADDITIVE) / scale,
+            breakingLatenessMomentumExponent = 0.2 + Math.pow(0.45, breakingLateness);
 
         while (counter--) {
-            const progress = (++frame)/frameCount;
+            const progress = ++frame / frameCount;
 
             // linear position
             const position = {
@@ -3163,12 +3256,13 @@ class Ball_Ball extends AbstractMesh {
             } else {
                 var momentumScalar = Math.pow(1 - progress, breakingLatenessMomentumExponent);
             }
-            const breakingScalar = 1 - momentumScalar, scalarSum = momentumScalar + breakingScalar;
+            const breakingScalar = 1 - momentumScalar,
+                scalarSum = momentumScalar + breakingScalar;
             // adjustment toward breaking ball position
             const breakingPosition = {
-                x: (position.x * momentumScalar + breakingInfluencePosition.x * breakingScalar)/scalarSum,
-                y: (position.y * momentumScalar + breakingInfluencePosition.y * breakingScalar)/scalarSum,
-                z: (position.z * momentumScalar + breakingInfluencePosition.z * breakingScalar)/scalarSum
+                x: (position.x * momentumScalar + breakingInfluencePosition.x * breakingScalar) / scalarSum,
+                y: (position.y * momentumScalar + breakingInfluencePosition.y * breakingScalar) / scalarSum,
+                z: (position.z * momentumScalar + breakingInfluencePosition.z * breakingScalar) / scalarSum
             };
             const increment = {
                 x: position.x - lastPosition.x,
@@ -3190,8 +3284,8 @@ class Ball_Ball extends AbstractMesh {
 
         let pause = 60;
         while (pause--) {
-            breakingFrames.push({x:0, y:0, z:0});
-            frames.push({x:0, y:0, z:0});
+            breakingFrames.push({ x: 0, y: 0, z: 0 });
+            frames.push({ x: 0, y: 0, z: 0 });
         }
 
         this.breakingTrajectory = breakingFrames;
@@ -3219,9 +3313,13 @@ class Ball_Ball extends AbstractMesh {
 
         if (flightScalar < 0 && result.travelDistance > 0) {
             switch (true) {
-                case result.fielder in {
-                    first: 1, second: 1, short: 1, third: 1
-                }:
+                case result.fielder in
+                    {
+                        first: 1,
+                        second: 1,
+                        short: 1,
+                        third: 1
+                    }:
                     // If we're using the ground ball animation trajectory,
                     // have the rendered travel distance be at least to the
                     // infield arc if the fielder
@@ -3235,8 +3333,9 @@ class Ball_Ball extends AbstractMesh {
         if (flyAngle > 90) flyAngle = 180 - flyAngle;
 
         // exit velocity in mph.
-        const velocity = dragScalarApproximation.distance *
-            Math.sqrt(9.81 * distance / Math.sin(2*Math.PI*Math.max(flyAngle, 8)/180));
+        const velocity =
+            dragScalarApproximation.distance *
+            Math.sqrt((9.81 * distance) / Math.sin((2 * Math.PI * Math.max(flyAngle, 8)) / 180));
         const velocityVerticalComponent = Math.sin(Mathinator.RADIAN * flyAngle) * velocity;
 
         let groundTime = 0;
@@ -3248,10 +3347,12 @@ class Ball_Ball extends AbstractMesh {
         }
 
         // in feet
-        const apexHeight = velocityVerticalComponent*velocityVerticalComponent/(2*9.81) * dragScalarApproximation.apexHeight;
+        const apexHeight =
+            ((velocityVerticalComponent * velocityVerticalComponent) / (2 * 9.81)) *
+            dragScalarApproximation.apexHeight;
 
         // in seconds
-        const airTime = 1.5 * Math.sqrt(2*apexHeight/9.81) * dragScalarApproximation.airTime; // 2x freefall equation
+        const airTime = 1.5 * Math.sqrt((2 * apexHeight) / 9.81) * dragScalarApproximation.airTime; // 2x freefall equation
 
         this.airTime = airTime;
 
@@ -3268,13 +3369,13 @@ class Ball_Ball extends AbstractMesh {
         this.mesh.position.z = origin.z;
 
         const extrema = {
-            x: Math.sin(splay / 180 * Math.PI) * distance,
+            x: Math.sin((splay / 180) * Math.PI) * distance,
             y: apexHeight,
-            z: -Math.cos(splay / 180 * Math.PI) * distance
+            z: -Math.cos((splay / 180) * Math.PI) * distance
         };
 
         const frames = [];
-        let frameCount = airTime * 60 + groundTime * 20 | 0;
+        let frameCount = (airTime * 60 + groundTime * 20) | 0;
         let counter = frameCount;
         let frame = 0;
 
@@ -3294,7 +3395,8 @@ class Ball_Ball extends AbstractMesh {
             let percent;
 
             progress = Math.pow(
-                (++frame)/frameCount, 0.87 // ease out / trend toward 1.0 to simulate higher initial speed.
+                ++frame / frameCount,
+                0.87 // ease out / trend toward 1.0 to simulate higher initial speed.
             );
             percent = progress * 100;
 
@@ -3302,10 +3404,7 @@ class Ball_Ball extends AbstractMesh {
             if (flightScalar < 0) {
                 const currentDistance = progress * distance;
 
-                const tapering = Math.max(
-                    0,
-                    (100 - bounces * 20) / 100
-                );
+                const tapering = Math.max(0, (100 - bounces * 20) / 100);
                 const startingHeight = origin.y * scale;
                 const finalHeight = AbstractMesh.WORLD_BASE_Y;
 
@@ -3318,8 +3417,8 @@ class Ball_Ball extends AbstractMesh {
                 // the multiplication of bounce rate means that as distance approaches the
                 // final distance, the sine wave will have been traversed that many times, giving that
                 // many bounces.
-                const waveProgress = averageBounceRate * Math.pow(currentDistance, 1.1) / distance;
-                const waveComponent = Math.sin(waveProgress * Math.PI/2);
+                const waveProgress = (averageBounceRate * Math.pow(currentDistance, 1.1)) / distance;
+                const waveComponent = Math.sin((waveProgress * Math.PI) / 2);
                 const waveHeight = Math.abs(waveComponent);
 
                 if (waveComponent * lastWaveDirection < 0) {
@@ -3336,20 +3435,19 @@ class Ball_Ball extends AbstractMesh {
                  * SIN wave with tapering gives a ground ball the bouncing trajectory.
                  * @type {number}
                  */
-                y = (startingHeight + apexHeight * waveHeight) * tapering
-                    + finalHeight * progress;
+                y = (startingHeight + apexHeight * waveHeight) * tapering + finalHeight * progress;
             } else {
                 /**
                  * Note the pow(n, 2) gives the flyball a parabolic trajectory.
                  * @type {number}
                  */
-                y = apexHeight - Math.pow(Math.abs(50 - percent)/50, 2) * apexHeight;
+                y = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 2) * apexHeight;
             }
 
             frames.push({
-                x: extrema.x/frameCount * slow,
-                y: (y - lastHeight),
-                z: extrema.z/frameCount * slow
+                x: (extrema.x / frameCount) * slow,
+                y: y - lastHeight,
+                z: (extrema.z / frameCount) * slow
             });
 
             lastHeight = y;
@@ -3365,8 +3463,8 @@ Ball_Ball.prototype.RPM = 1000;
 Ball_Ball.prototype.RPS = 1000 / 60;
 Ball_Ball.prototype.RP60thOfASecond = 1000 / 60 / 60;
 Ball_Ball.prototype.rotation = {
-    x: Ball_Ball.prototype.RP60thOfASecond * 360 * Math.PI / 180, // in radians per 60th of a second
-    y: Ball_Ball.prototype.RP60thOfASecond * 360 * Math.PI / 180
+    x: (Ball_Ball.prototype.RP60thOfASecond * 360 * Math.PI) / 180, // in radians per 60th of a second
+    y: (Ball_Ball.prototype.RP60thOfASecond * 360 * Math.PI) / 180
 };
 
 
@@ -3384,19 +3482,14 @@ class Mound_Mound extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: 0xDCB096
+            color: 0xdcb096
         });
 
-        const mesh = new THREE.Mesh(
-            new THREE.CircleGeometry(
-                9
-            ),
-            material
-        );
+        const mesh = new THREE.Mesh(new THREE.CircleGeometry(9), material);
 
-        mesh.rotation.x = -90/180 * Math.PI;
+        mesh.rotation.x = (-90 / 180) * Math.PI;
         mesh.rotation.y = 0;
-        mesh.rotation.z = 45/180 * Math.PI;
+        mesh.rotation.z = (45 / 180) * Math.PI;
 
         mesh.position.x = 0;
         mesh.position.y = AbstractMesh.WORLD_BASE_Y + 0.9;
@@ -3405,10 +3498,9 @@ class Mound_Mound extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-
-    }
+    animate() {}
 }
+
 
 
 // CONCATENATED MODULE: ./Render/mesh/Base.js
@@ -3425,22 +3517,14 @@ class Base_Base extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: 0xFFFFFF
+            color: 0xffffff
         });
 
-        const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(
-                1.5,
-                0.3,
-                1.5,
-                8, 8, 8
-            ),
-            material
-        );
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.3, 1.5, 8, 8, 8), material);
 
-        mesh.rotation.x = -0/180 * Math.PI;
-        mesh.rotation.y = 45/180 * Math.PI;
-        mesh.rotation.z = 0/180 * Math.PI;
+        mesh.rotation.x = (-0 / 180) * Math.PI;
+        mesh.rotation.y = (45 / 180) * Math.PI;
+        mesh.rotation.z = (0 / 180) * Math.PI;
 
         switch (this.base) {
             case 'first':
@@ -3467,10 +3551,9 @@ class Base_Base extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-
-    }
+    animate() {}
 }
+
 
 
 // CONCATENATED MODULE: ./Render/mesh/FoulLine.js
@@ -3487,30 +3570,22 @@ class FoulLine_FoulLine extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: 0xFFFFFF
+            color: 0xffffff
         });
 
-        const mesh = new THREE.Mesh(
-            new THREE.PlaneGeometry(
-                0.35,
-                300,
-                1,
-                1
-            ),
-            material
-        );
+        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 300, 1, 1), material);
 
         const left = this.side === 'left';
 
-        mesh.rotation.x = -90/180 * Math.PI;
-        mesh.rotation.y = 0/180 * Math.PI;
+        mesh.rotation.x = (-90 / 180) * Math.PI;
+        mesh.rotation.y = (0 / 180) * Math.PI;
 
         if (left) {
-            mesh.rotation.z = 45/180 * Math.PI;
+            mesh.rotation.z = (45 / 180) * Math.PI;
             mesh.position.x = -108;
             mesh.position.z = -102;
         } else {
-            mesh.rotation.z = -45/180 * Math.PI;
+            mesh.rotation.z = (-45 / 180) * Math.PI;
             mesh.position.x = 108;
             mesh.position.z = -102;
         }
@@ -3519,9 +3594,9 @@ class FoulLine_FoulLine extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-    }
+    animate() {}
 }
+
 
 
 // CONCATENATED MODULE: ./Render/mesh/FoulPole.js
@@ -3538,18 +3613,10 @@ class FoulPole_FoulPole extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: 0xE3EF6E
+            color: 0xe3ef6e
         });
 
-        const mesh = new THREE.Mesh(
-            new THREE.CylinderGeometry(
-                0.35, 0.35,
-                180,
-                8,
-                8
-            ),
-            material
-        );
+        const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 180, 8, 8), material);
 
         const left = this.side === 'left';
 
@@ -3565,9 +3632,9 @@ class FoulPole_FoulPole extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-    }
+    animate() {}
 }
+
 
 
 // CONCATENATED MODULE: ./Render/mesh/Field.js
@@ -3583,22 +3650,14 @@ class Field_Field extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: 0xDCB096
+            color: 0xdcb096
         });
 
-        const mesh = new THREE.Mesh(
-            new THREE.PlaneGeometry(
-                160,
-                160,
-                32,
-                32
-            ),
-            material
-        );
+        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(160, 160, 32, 32), material);
 
-        mesh.rotation.x = -90/180 * Math.PI;
+        mesh.rotation.x = (-90 / 180) * Math.PI;
         mesh.rotation.y = 0;
-        mesh.rotation.z = 45/180 * Math.PI;
+        mesh.rotation.z = (45 / 180) * Math.PI;
 
         mesh.position.x = 0;
         mesh.position.y = AbstractMesh.WORLD_BASE_Y;
@@ -3607,10 +3666,9 @@ class Field_Field extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-
-    }
+    animate() {}
 }
+
 
 
 // CONCATENATED MODULE: ./Render/mesh/Grass.js
@@ -3627,31 +3685,26 @@ class Grass_Grass extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: this.infield ? 0x284C19: 0x284C19 //0x486D1F
+            color: this.infield ? 0x284c19 : 0x284c19 //0x486D1F
         });
 
         const mesh = new THREE.Mesh(
-            new THREE.PlaneGeometry(
-                this.infield ? 94 : 8000,
-                this.infield ? 94 : 8000,
-                16,
-                16
-            ),
+            new THREE.PlaneGeometry(this.infield ? 94 : 8000, this.infield ? 94 : 8000, 16, 16),
             material
         );
 
         if (this.infield) {
-            mesh.rotation.x = -90/180 * Math.PI;
+            mesh.rotation.x = (-90 / 180) * Math.PI;
             mesh.rotation.y = 0;
-            mesh.rotation.z = 45/180 * Math.PI;
+            mesh.rotation.z = (45 / 180) * Math.PI;
 
             mesh.position.x = 0;
             mesh.position.y = AbstractMesh.WORLD_BASE_Y + 0.2;
             mesh.position.z = -62;
         } else {
-            mesh.rotation.x = -90/180 * Math.PI;
+            mesh.rotation.x = (-90 / 180) * Math.PI;
             mesh.rotation.y = 0;
-            mesh.rotation.z = 45/180 * Math.PI;
+            mesh.rotation.z = (45 / 180) * Math.PI;
 
             mesh.position.x = 0;
             mesh.position.y = AbstractMesh.WORLD_BASE_Y - 0.2;
@@ -3661,10 +3714,9 @@ class Grass_Grass extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-
-    }
+    animate() {}
 }
+
 
 
 // CONCATENATED MODULE: ./Render/mesh/BaseDirt.js
@@ -3681,20 +3733,15 @@ class BaseDirt_BaseDirt extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: 0xDCB096
+            color: 0xdcb096
         });
         const home = this.base.base === 'home';
 
-        const mesh = new THREE.Mesh(
-            new THREE.CircleGeometry(
-                home ? 18 : 12, 32
-            ),
-            material
-        );
+        const mesh = new THREE.Mesh(new THREE.CircleGeometry(home ? 18 : 12, 32), material);
 
-        mesh.rotation.x = -90/180 * Math.PI;
+        mesh.rotation.x = (-90 / 180) * Math.PI;
         mesh.rotation.y = 0;
-        mesh.rotation.z = 45/180 * Math.PI;
+        mesh.rotation.z = (45 / 180) * Math.PI;
 
         const base = this.base.getMesh().position;
 
@@ -3705,10 +3752,9 @@ class BaseDirt_BaseDirt extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-
-    }
+    animate() {}
 }
+
 
 
 // CONCATENATED MODULE: ./Render/mesh/BattersEye.js
@@ -3724,18 +3770,10 @@ class BattersEye_BattersEye extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: 0x3F4045
+            color: 0x3f4045
         });
 
-        const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(
-                200,
-                45,
-                4,
-                16, 16, 16
-            ),
-            material
-        );
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(200, 45, 4, 16, 16, 16), material);
 
         mesh.position.y = AbstractMesh.WORLD_BASE_Y + 0;
         mesh.position.z -= 310;
@@ -3743,10 +3781,9 @@ class BattersEye_BattersEye extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-
-    }
+    animate() {}
 }
+
 
 
 // CONCATENATED MODULE: ./Render/mesh/Wall.js
@@ -3763,20 +3800,12 @@ class Wall_Wall extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: 0x3F4045
+            color: 0x3f4045
         });
 
-        const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(
-                120,
-                15,
-                4,
-                16, 16, 16
-            ),
-            material
-        );
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(120, 15, 4, 16, 16, 16), material);
 
-        const radians = this.angle / 180 * Math.PI;
+        const radians = (this.angle / 180) * Math.PI;
         mesh.rotation.y = -radians;
 
         const hypotenuse = 300;
@@ -3790,10 +3819,9 @@ class Wall_Wall extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-
-    }
+    animate() {}
 }
+
 
 
 // CONCATENATED MODULE: ./Render/Shaders/SkyShader.js
@@ -4124,8 +4152,8 @@ class Sun extends AbstractMesh {
     }
     getMesh() {
         const sun = new THREE.Mesh(
-            new THREE.SphereGeometry( 20000, 16, 8 ),
-            new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true })
+            new THREE.SphereGeometry(20000, 16, 8),
+            new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
         );
         sun.position.z = -950000; // initialize away from scene
         sun.position.y = -100000;
@@ -4170,6 +4198,7 @@ class Sun extends AbstractMesh {
 }
 
 
+
 // CONCATENATED MODULE: ./Render/scene/lighting.js
 const lighting = {
     addTo(scene) {
@@ -4183,9 +4212,10 @@ const lighting = {
     },
     setLuminosity(level) {
         this.light.intensity = level;
-        this.sun.intensity = level/2;
+        this.sun.intensity = level / 2;
     }
 };
+
 
 
 // CONCATENATED MODULE: ./Render/Loop.js
@@ -4669,8 +4699,8 @@ const Animator_Animator = function() {
 };
 Animator_Animator.TweenMax = {};
 Animator_Animator.prototype = {
-    identifier : 'Animator',
-    constructor : Animator_Animator,
+    identifier: 'Animator',
+    constructor: Animator_Animator,
     /**
      * console mode disables most animator functions
      */
@@ -4680,12 +4710,12 @@ Animator_Animator.prototype = {
     set console(value) {
         Animator_Animator.console = value;
     },
-    TweenMax : {},
-    THREE : {},
+    TweenMax: {},
+    THREE: {},
     /**
      * anything other than webgl will use TweenMax for JS animations
      */
-    renderingMode : 'webgl',
+    renderingMode: 'webgl',
     init() {
         if (Animator_Animator.console) return;
         if (!this.loop && this.renderingMode === 'webgl') {
@@ -4719,17 +4749,17 @@ Animator_Animator.prototype = {
                 to() {},
                 from() {},
                 killAll() {}
-            }
+            };
         } else {
             Animator_Animator.TweenMax = window.TweenMax;
         }
         return Animator_Animator.TweenMax;
     },
-    TIME_FROM_SET : 2300, //ms
-    TIME_FROM_WINDUP : 3600, //ms
-    HOLD_UP_ALLOWANCE : 0.25, // seconds
-    pitchTarget : null,
-    pitchBreak : null,
+    TIME_FROM_SET: 2300, //ms
+    TIME_FROM_WINDUP: 3600, //ms
+    HOLD_UP_ALLOWANCE: 0.25, // seconds
+    pitchTarget: null,
+    pitchBreak: null,
     /**
      * this is called with $scope context binding
      * @param callback
@@ -4750,10 +4780,21 @@ Animator_Animator.prototype = {
     tweenFlightPath(callback, $scope) {
         const TweenMax = Animator_Animator.loadTweenMax();
         TweenMax.killAll();
-        const game = $scope.y, top = 200-game.pitchTarget.y, left = game.pitchTarget.x, breakTop = 200-game.pitchInFlight.y, breakLeft = game.pitchInFlight.x, $baseballs = $('.baseball'), flightSpeed = 1.3 - 0.6*(game.pitchInFlight.velocity + 300)/400, originTop = 50, originLeft = 110 + (game.pitcher.throws == 'left' ? 20 : -20);
-        const pitch = this.pitchTarget = $('.main-area .target .baseball.pitch'), henka = this.pitchBreak = $('.main-area .target .baseball.break'), quarter = flightSpeed/4;
+        const game = $scope.y,
+            top = 200 - game.pitchTarget.y,
+            left = game.pitchTarget.x,
+            breakTop = 200 - game.pitchInFlight.y,
+            breakLeft = game.pitchInFlight.x,
+            $baseballs = $('.baseball'),
+            flightSpeed = 1.3 - (0.6 * (game.pitchInFlight.velocity + 300)) / 400,
+            originTop = 50,
+            originLeft = 110 + (game.pitcher.throws == 'left' ? 20 : -20);
+        const pitch = (this.pitchTarget = $('.main-area .target .baseball.pitch')),
+            henka = (this.pitchBreak = $('.main-area .target .baseball.break')),
+            quarter = flightSpeed / 4;
 
-        const pitchTransition = Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 12, 4), targetTransition = Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 10, 3);
+        const pitchTransition = Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 12, 4),
+            targetTransition = Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 10, 3);
 
         const transitions = [
             pitchTransition(0, 0),
@@ -4777,12 +4818,12 @@ Animator_Animator.prototype = {
             if (typeof callback == 'function') {
                 callback();
             }
-        }, flightSpeed*1000);
+        }, flightSpeed * 1000);
 
         if (!game.pitchInFlight.x) {
             $baseballs.addClass('hide');
         } else {
-            if (game.humanBatting() && Math.random()*180 > game.batter.skill.offense.eye) {
+            if (game.humanBatting() && Math.random() * 180 > game.batter.skill.offense.eye) {
                 $('.baseball.break').addClass('hide');
             } else {
                 $('.baseball.break').removeClass('hide');
@@ -4791,9 +4832,11 @@ Animator_Animator.prototype = {
         }
 
         if (game.humanBatting() && !game.humanPitching()) {
-            $scope.holdUpTimeouts.push(setTimeout(() => {
-                $scope.holdUp();
-            }, (flightSpeed + Animator_Animator.HOLD_UP_ALLOWANCE) * 1000));
+            $scope.holdUpTimeouts.push(
+                setTimeout(() => {
+                    $scope.holdUp();
+                }, (flightSpeed + Animator_Animator.HOLD_UP_ALLOWANCE) * 1000)
+            );
         }
     },
     /**
@@ -4805,8 +4848,10 @@ Animator_Animator.prototype = {
         const TweenMax = Animator_Animator.loadTweenMax();
         TweenMax.killAll();
         const game = $scope.y,
-              flightSpeed = Mathinator.getFlightTime(game.pitchInFlight.velocity,
-                  helper.pitchDefinitions[game.pitchInFlight.name][2]);
+            flightSpeed = Mathinator.getFlightTime(
+                game.pitchInFlight.velocity,
+                helper.pitchDefinitions[game.pitchInFlight.name][2]
+            );
 
         game.expectedSwingTiming = Date.now() + flightSpeed * 1000;
 
@@ -4830,9 +4875,11 @@ Animator_Animator.prototype = {
         $baseballs.addClass('hide');
 
         if (game.humanBatting()) {
-            $scope.holdUpTimeouts.push(setTimeout(() => {
-                $scope.holdUp();
-            }, (flightSpeed + Animator_Animator.HOLD_UP_ALLOWANCE) * 1000));
+            $scope.holdUpTimeouts.push(
+                setTimeout(() => {
+                    $scope.holdUp();
+                }, (flightSpeed + Animator_Animator.HOLD_UP_ALLOWANCE) * 1000)
+            );
         }
     },
     /**
@@ -4877,13 +4924,17 @@ Animator_Animator.prototype = {
         angle = 1 + Math.abs(angle);
         if (angle > 90) angle = 180 - angle;
 
-        const velocity = linearApproximateDragScalar.distance * Math.sqrt(9.81 * distance / Math.sin(2*Math.PI*angle/180));
+        const velocity =
+            linearApproximateDragScalar.distance *
+            Math.sqrt((9.81 * distance) / Math.sin((2 * Math.PI * angle) / 180));
         const velocityVerticalComponent = Math.sin(Mathinator.RADIAN * angle) * velocity;
-        const apexHeight = velocityVerticalComponent*velocityVerticalComponent/(2*9.81) * linearApproximateDragScalar.apexHeight;
-        const airTime = 1.5 * Math.sqrt(2*apexHeight/9.81) * linearApproximateDragScalar.airTime; // 2x freefall equation
+        const apexHeight =
+            ((velocityVerticalComponent * velocityVerticalComponent) / (2 * 9.81)) *
+            linearApproximateDragScalar.apexHeight;
+        const airTime = 1.5 * Math.sqrt((2 * apexHeight) / 9.81) * linearApproximateDragScalar.airTime; // 2x freefall equation
 
         //log('angle', angle, 'vel', velocity, 'apex', apexHeight, 'air', airTime, 'dist', result.travelDistance);
-        const quarter = airTime/4;
+        const quarter = airTime / 4;
         const mathinator = new Mathinator();
         let transitions = [
             mathinator.transitionalTrajectory(0, quarter, 0, apexHeight, scalar * distance, result.splay),
@@ -4899,19 +4950,28 @@ Animator_Animator.prototype = {
         TweenMax.to(ball, quarter, transitions[4]);
 
         if (!splayOnly) {
-            ball = $('.indicator.baseball.break').removeClass('hide').show();
-            const time = quarter/2;
+            ball = $('.indicator.baseball.break')
+                .removeClass('hide')
+                .show();
+            const time = quarter / 2;
             transitions = [
-                mathinator.transitionalCatcherPerspectiveTrajectory(0, time, 0, apexHeight, scalar * distance,
-                    result.splay, game.pitchInFlight),
-                mathinator.transitionalCatcherPerspectiveTrajectory(12.5,   time * 0.75, 0),
-                mathinator.transitionalCatcherPerspectiveTrajectory(25,     time * 0.80, 1),
-                mathinator.transitionalCatcherPerspectiveTrajectory(37.5,   time * 0.85, 2),
-                mathinator.transitionalCatcherPerspectiveTrajectory(50,     time * 0.90, 3),
-                mathinator.transitionalCatcherPerspectiveTrajectory(62.5,   time * 0.95, 4),
-                mathinator.transitionalCatcherPerspectiveTrajectory(75,     time, 5),
-                mathinator.transitionalCatcherPerspectiveTrajectory(87.5,   time, 6),
-                mathinator.transitionalCatcherPerspectiveTrajectory(100,    time, 7)
+                mathinator.transitionalCatcherPerspectiveTrajectory(
+                    0,
+                    time,
+                    0,
+                    apexHeight,
+                    scalar * distance,
+                    result.splay,
+                    game.pitchInFlight
+                ),
+                mathinator.transitionalCatcherPerspectiveTrajectory(12.5, time * 0.75, 0),
+                mathinator.transitionalCatcherPerspectiveTrajectory(25, time * 0.8, 1),
+                mathinator.transitionalCatcherPerspectiveTrajectory(37.5, time * 0.85, 2),
+                mathinator.transitionalCatcherPerspectiveTrajectory(50, time * 0.9, 3),
+                mathinator.transitionalCatcherPerspectiveTrajectory(62.5, time * 0.95, 4),
+                mathinator.transitionalCatcherPerspectiveTrajectory(75, time, 5),
+                mathinator.transitionalCatcherPerspectiveTrajectory(87.5, time, 6),
+                mathinator.transitionalCatcherPerspectiveTrajectory(100, time, 7)
             ];
             TweenMax.set(ball, transitions[0]);
             TweenMax.to(ball, time, transitions[1]);
@@ -4925,7 +4985,9 @@ Animator_Animator.prototype = {
 
             setTimeout(() => {
                 // hack
-                $('.indicator.baseball.break').removeClass('hide').show();
+                $('.indicator.baseball.break')
+                    .removeClass('hide')
+                    .show();
             }, 50);
         }
 
@@ -4947,22 +5009,20 @@ Animator_Animator.prototype = {
         ball.join(this.loop);
 
         if (result.thrownOut || result.caught || result.bases) {
-            if ((Math.random() < 0.15 && ball.airTime > 1.5)
-                ||
-                (Math.random() < 0.50 && ball.airTime > 2.5)) {
+            if ((Math.random() < 0.15 && ball.airTime > 1.5) || (Math.random() < 0.5 && ball.airTime > 2.5)) {
                 var scale = 1;
                 if (result.splay > 0) {
-                   scale = -1;
+                    scale = -1;
                 }
                 this.loop.setLookTarget(ball.mesh.position, 0.3);
                 this.loop.setOverwatchMoveTarget(ball.mesh.position, 0.32);
             } else {
                 this.loop.setLookTarget(ball.mesh.position, 0.5);
-                this.loop.setMoveTarget({x: 0, y: 6, z: INITIAL_CAMERA_DISTANCE}, 0.05);
+                this.loop.setMoveTarget({ x: 0, y: 6, z: INITIAL_CAMERA_DISTANCE }, 0.05);
             }
         } else if (Math.abs(result.splay) < 60) {
             this.loop.setLookTarget(ball.mesh.position, 0.5);
-            this.loop.setMoveTarget({x: 0, y: 6, z: INITIAL_CAMERA_DISTANCE}, 0.05);
+            this.loop.setMoveTarget({ x: 0, y: 6, z: INITIAL_CAMERA_DISTANCE }, 0.05);
         }
 
         return game.swingResult;
@@ -4974,6 +5034,7 @@ for (const fn in Animator_Animator.prototype) {
         Animator_Animator[fn] = Animator_Animator.prototype[fn];
     }
 }
+
 
 
 // CONCATENATED MODULE: ./Model/Field.js
@@ -4992,7 +5053,7 @@ const Model_Field_Field = function(game) {
 };
 
 Model_Field_Field.prototype = {
-    constructor : Model_Field_Field,
+    constructor: Model_Field_Field,
     init(game) {
         this.game = game;
         this.first = null;
@@ -5010,12 +5071,12 @@ Model_Field_Field.prototype = {
      * @returns {object}
      */
     determineSwingContactResult(swing) {
-
         if (this.first) this.first.fatigue += 4;
         if (this.second) this.second.fatigue += 4;
         if (this.third) this.third.fatigue += 4;
 
-        const x = swing.x, y = swing.y;
+        const x = swing.x,
+            y = swing.y;
         const game = this.game;
         const eye = game.batter.skill.offense.eye;
         /**
@@ -5025,17 +5086,20 @@ Model_Field_Field.prototype = {
          * increase the left/right effect.
          */
         const angles = Mathinator.getSplayAndFlyAngle(
-            x, y, swing.angle, eye,
+            x,
+            y,
+            swing.angle,
+            eye,
             swing.timing,
             game.batter.bats === 'left'
         );
         const splayAngle = angles.splay;
 
         const flyAngle = angles.fly;
-        const power = this.game.batter.skill.offense.power + (this.game.batter.eye.bonus || 0)/5;
+        const power = this.game.batter.skill.offense.power + (this.game.batter.eye.bonus || 0) / 5;
         let landingDistance = Distribution.landingDistance(power, flyAngle, x, y);
         if (flyAngle < 0 && landingDistance > 95) {
-            landingDistance = (landingDistance - 95)/4 + 95;
+            landingDistance = (landingDistance - 95) / 4 + 95;
         }
 
         if (Math.abs(splayAngle) > 50) swing.foul = true;
@@ -5054,19 +5118,26 @@ Model_Field_Field.prototype = {
         swing.sacrificeAdvances = [];
 
         if (swing.fielder) {
-            const fielder = (game.half === 'top' ? game.teams.home.positions[swing.fielder] : game.teams.away.positions[swing.fielder]);
+            const fielder =
+                game.half === 'top'
+                    ? game.teams.home.positions[swing.fielder]
+                    : game.teams.away.positions[swing.fielder];
             const isOutfielder = fielder.position in { left: true, center: true, right: true };
             fielder.fatigue += 4;
             swing.error = false;
-            let fieldingEase = fielder.skill.defense.fielding/100;
-            const throwingEase = (fielder.skill.defense.throwing/100);
+            let fieldingEase = fielder.skill.defense.fielding / 100;
+            const throwingEase = fielder.skill.defense.throwing / 100;
             //reach the batted ball?
-            swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle + 90, landingDistance]);
-            const speedComponent = (1 + Math.sqrt(fielder.skill.defense.speed/100))/2 * 100;
-            const interceptRating = speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel*1.55 - 15;
+            swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [
+                splayAngle + 90,
+                landingDistance
+            ]);
+            const speedComponent = ((1 + Math.sqrt(fielder.skill.defense.speed / 100)) / 2) * 100;
+            const interceptRating = speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.55 - 15;
             if (interceptRating > 0 && flyAngle > 4) {
                 //caught cleanly?
-                if (Distribution.error(fielder)) { //error
+                if (Distribution.error(fielder)) {
+                    //error
                     fieldingEase *= 0.5;
                     swing.error = true;
                     fielder.stats.fielding.E++;
@@ -5076,7 +5147,10 @@ Model_Field_Field.prototype = {
                     swing.caught = true;
                     if (game.umpire.count.outs < 2 && isOutfielder) {
                         const sacrificeThrowInTime = Mathinator.fielderReturnDelay(
-                            swing.travelDistance, throwingEase, fieldingEase, 100
+                            swing.travelDistance,
+                            throwingEase,
+                            fieldingEase,
+                            100
                         );
                         // todo ran into outfield assist
                         if (this.first && sacrificeThrowInTime > this.first.getBaseRunningTime() + 4.5) {
@@ -5097,9 +5171,14 @@ Model_Field_Field.prototype = {
             if (!swing.caught) {
                 swing.bases = 0;
                 swing.thrownOut = false; // default value
-                let fieldingReturnDelay = Mathinator.fielderReturnDelay(swing.travelDistance, throwingEase, fieldingEase, interceptRating);
+                let fieldingReturnDelay = Mathinator.fielderReturnDelay(
+                    swing.travelDistance,
+                    throwingEase,
+                    fieldingEase,
+                    interceptRating
+                );
                 swing.fieldingDelay = fieldingReturnDelay;
-                swing.outfielder = {'left' : 1, 'center' : 1, 'right' : 1}[swing.fielder] === 1;
+                swing.outfielder = { left: 1, center: 1, right: 1 }[swing.fielder] === 1;
                 const speed = game.batter.skill.offense.speed;
                 let baseRunningTime = Mathinator.baseRunningTime(speed);
 
@@ -5108,19 +5187,27 @@ Model_Field_Field.prototype = {
                     baseRunningTime *= 1.05;
                     fieldingReturnDelay -= baseRunningTime;
 
-                    while (((fieldingReturnDelay > baseRunningTime && Math.random() < 0.25 + speed/200)
-                    || Math.random() < 0.04 + speed/650) && swing.bases < 3) {
+                    while (
+                        ((fieldingReturnDelay > baseRunningTime && Math.random() < 0.25 + speed / 200) ||
+                            Math.random() < 0.04 + speed / 650) &&
+                        swing.bases < 3
+                    ) {
                         baseRunningTime *= 0.95;
                         swing.bases++;
                         fieldingReturnDelay -= baseRunningTime;
                     }
                 } else {
-                    const first = this.first, second = this.second, third = this.third;
+                    const first = this.first,
+                        second = this.second,
+                        third = this.third;
                     swing.fieldersChoice = null;
                     swing.bases = fieldingReturnDelay >= baseRunningTime + 1 ? 1 : 0;
-                    if (first && fieldingReturnDelay < first.getBaseRunningTime()) swing.fieldersChoice = 'first';
-                    if (first && second && fieldingReturnDelay < second.getBaseRunningTime() + 0.6) swing.fieldersChoice = 'second';
-                    if (third && fieldingReturnDelay < third.getBaseRunningTime()) swing.fieldersChoice = 'third';
+                    if (first && fieldingReturnDelay < first.getBaseRunningTime())
+                        swing.fieldersChoice = 'first';
+                    if (first && second && fieldingReturnDelay < second.getBaseRunningTime() + 0.6)
+                        swing.fieldersChoice = 'second';
+                    if (third && fieldingReturnDelay < third.getBaseRunningTime())
+                        swing.fieldersChoice = 'third';
                     // double play
                     let outs = game.umpire.count.outs;
                     if (swing.fieldersChoice) {
@@ -5131,24 +5218,39 @@ Model_Field_Field.prototype = {
                         if (force) {
                             const additionalOuts = [];
                             let throwingDelay = fieldingReturnDelay;
-                            if (third && force === 'third' &&
-                                Mathinator.infieldThrowDelay(fielders.catcher) + throwingDelay < second.getBaseRunningTime() && outs < 3) {
+                            if (
+                                third &&
+                                force === 'third' &&
+                                Mathinator.infieldThrowDelay(fielders.catcher) + throwingDelay <
+                                    second.getBaseRunningTime() &&
+                                outs < 3
+                            ) {
                                 throwingDelay += Mathinator.infieldThrowDelay(fielders.catcher);
                                 fielders.catcher.fatigue += 4;
                                 additionalOuts.push('second');
                                 outs++;
                                 force = 'second';
                             }
-                            if (second && force === 'second' &&
-                                Mathinator.infieldThrowDelay(fielders.third) + throwingDelay < first.getBaseRunningTime() && outs < 3) {
+                            if (
+                                second &&
+                                force === 'second' &&
+                                Mathinator.infieldThrowDelay(fielders.third) + throwingDelay <
+                                    first.getBaseRunningTime() &&
+                                outs < 3
+                            ) {
                                 throwingDelay += Mathinator.infieldThrowDelay(fielders.third);
                                 fielders.third.fatigue += 4;
                                 additionalOuts.push('first');
                                 outs++;
                                 force = 'first';
                             }
-                            if (first && force === 'first' &&
-                                Mathinator.infieldThrowDelay(fielders.second) + throwingDelay < game.batter.getBaseRunningTime() && outs < 3) {
+                            if (
+                                first &&
+                                force === 'first' &&
+                                Mathinator.infieldThrowDelay(fielders.second) + throwingDelay <
+                                    game.batter.getBaseRunningTime() &&
+                                outs < 3
+                            ) {
                                 throwingDelay += Mathinator.infieldThrowDelay(fielders.second);
                                 fielders.second.fatigue += 4;
                                 additionalOuts.push('batter');
@@ -5201,15 +5303,19 @@ Model_Field_Field.prototype = {
         }
     },
     forcePlaySituation() {
-        const first = this.first, second = this.second, third = this.third;
-        return (first && second && third) && 'third' || (first && second) && 'second' || first && 'first';
+        const first = this.first,
+            second = this.second,
+            third = this.third;
+        return (first && second && third && 'third') || (first && second && 'second') || (first && 'first');
     },
     /**
      * @returns {Player}
      * the best steal candidate.
      */
     getLeadRunner() {
-        const first = this.first, second = this.second, third = this.third;
+        const first = this.first,
+            second = this.second,
+            third = this.third;
         if (third && first && !second) return first;
         return third || second || first;
     },
@@ -5235,23 +5341,25 @@ Model_Field_Field.prototype = {
             return 'pitcher';
         }
 
-        let infield = landingDistance < 145 - (Math.abs(angle))/90*50;
-        if (flyAngle < 7) { // 7 degrees straight would fly over the infielder, but add some for arc
-            let horizontalVelocity = Math.cos(flyAngle/180*Math.PI) * (85 + (power/100) * 10); // mph toward infielder
+        let infield = landingDistance < 145 - (Math.abs(angle) / 90) * 50;
+        if (flyAngle < 7) {
+            // 7 degrees straight would fly over the infielder, but add some for arc
+            let horizontalVelocity = Math.cos((flyAngle / 180) * Math.PI) * (85 + (power / 100) * 10); // mph toward infielder
             if (flyAngle < 0) horizontalVelocity *= 0.5; // velocity loss on bounce
-            const fielderLateralReachDegrees = 1 + 22.5 * (100 - horizontalVelocity)/100; // up to 90/4 = 22.5
+            const fielderLateralReachDegrees = 1 + (22.5 * (100 - horizontalVelocity)) / 100; // up to 90/4 = 22.5
             if (angle < -20) {
                 fielder = 'third';
             } else if (angle < 5) {
                 fielder = 'short';
             } else if (angle < 30) {
                 fielder = 'second';
-            } else { // first has reduced arc to receive the throw
+            } else {
+                // first has reduced arc to receive the throw
                 fielder = 'first';
             }
             const fielderArcPosition = this.positions[fielder][0] - 90;
             // a good infielder can field a hard hit grounder even with a high terminal distance
-            infield = infield || (Math.abs(angle - (fielderArcPosition)) < fielderLateralReachDegrees);
+            infield = infield || Math.abs(angle - fielderArcPosition) < fielderLateralReachDegrees;
         }
 
         if (infield) {
@@ -5261,10 +5369,12 @@ Model_Field_Field.prototype = {
                 fielder = 'short';
             } else if (angle < 30) {
                 fielder = 'second';
-            } else { // first has reduced arc to receive the throw
+            } else {
+                // first has reduced arc to receive the throw
                 fielder = 'first';
             }
-        } else if (landingDistance < 310) { // past the infield or fly ball to outfielder
+        } else if (landingDistance < 310) {
+            // past the infield or fly ball to outfielder
             if (angle < -15) {
                 fielder = 'left';
             } else if (angle < 16) {
@@ -5280,21 +5390,22 @@ Model_Field_Field.prototype = {
     /**
      * approximate fielder positions (polar degrees where 90 is up the middle, distance from origin (home plate))
      */
-    positions : {
-        pitcher : [90, 66],
-        catcher : [0, 0],
-        first : [90 + 45 - 7, 98],
-        second : [90 + 12.5, 130],
-        short : [90 - 12.5, 130],
-        third : [90 - 45 + 7, 98],
-        left : [45 + 14, 280],
-        center : [90, 280],
-        right : [135 - 14, 280]
+    positions: {
+        pitcher: [90, 66],
+        catcher: [0, 0],
+        first: [90 + 45 - 7, 98],
+        second: [90 + 12.5, 130],
+        short: [90 - 12.5, 130],
+        third: [90 - 45 + 7, 98],
+        left: [45 + 14, 280],
+        center: [90, 280],
+        right: [135 - 14, 280]
     },
     getPolarDistance(a, b) {
         return Mathinator.getPolarDistance(a, b);
     }
 };
+
 
 
 // CONCATENATED MODULE: ./Model/Manager.js
@@ -5305,7 +5416,7 @@ const Manager = function(team) {
 };
 
 Manager.prototype = {
-    constructor : Manager,
+    constructor: Manager,
     init(team) {
         this.team = team;
     },
@@ -5323,7 +5434,7 @@ Manager.prototype = {
         }
         Iterator.each(this.team.bench, (key, player) => {
             if (!player.number) {
-                jerseyNumber += 1 + (Math.random() * 5 | 0);
+                jerseyNumber += 1 + ((Math.random() * 5) | 0);
                 player.number = jerseyNumber;
             }
         });
@@ -5374,7 +5485,11 @@ Manager.prototype = {
                     cursor = cursor[property];
                     property = skills.shift();
                 }
-                if (!(player.order+1) && cursor >= rating && (!requiredThrowingHandedness || player.throws === requiredThrowingHandedness)) {
+                if (
+                    !(player.order + 1) &&
+                    cursor >= rating &&
+                    (!requiredThrowingHandedness || player.throws === requiredThrowingHandedness)
+                ) {
                     rating = cursor;
                     selection = player;
                     index = key;
@@ -5414,6 +5529,7 @@ Manager.prototype = {
 };
 
 
+
 // CONCATENATED MODULE: ./Model/Team.js
 
 
@@ -5431,25 +5547,25 @@ TeamConstants.RUNNER_GO = 'go';
 TeamConstants.RUNNER_HOLD = 'hold';
 
 Team.prototype = {
-    constructor : Team,
+    constructor: Team,
     init(game, heroRate) {
         this.sub = this.noSubstituteSelected;
-        heroRate = heroRate || 0.10;
+        heroRate = heroRate || 0.1;
         this.substituted = [];
         this.pickName();
         this.lineup = [];
         this.bench = [];
         this.bullpen = [];
         this.positions = {
-            pitcher : null,
-            catcher : null,
-            first : null,
-            second : null,
-            short : null,
-            third : null,
-            left : null,
-            center : null,
-            right : null
+            pitcher: null,
+            catcher: null,
+            first: null,
+            second: null,
+            short: null,
+            third: null,
+            left: null,
+            center: null,
+            right: null
         };
         this.manager = new Manager(this);
         if (game !== 'no init') {
@@ -5463,26 +5579,31 @@ Team.prototype = {
         }
     },
     pickName() {
-        const teamNameIndex = Math.floor(Math.random()*data_data.teamNames.length);
+        const teamNameIndex = Math.floor(Math.random() * data_data.teamNames.length);
         this.name = data_data.teamNames[teamNameIndex];
         this.nameJ = data_data.teamNamesJ[teamNameIndex];
     },
     getName() {
         return text_text.mode === 'n' ? this.nameJ : this.name;
     },
-    stealAttempt : TeamConstants.RUNNERS_DISCRETION,
-    lineup : [],
-    positions : {},
-    manager : null,
-    bench : [],
-    bullpen : [],
-    nowBatting : 0,
-    expanded : 'Player&',
-    noSubstituteSelected : {
-        toString() { return ''; },
-        toValue() { return false; }
+    stealAttempt: TeamConstants.RUNNERS_DISCRETION,
+    lineup: [],
+    positions: {},
+    manager: null,
+    bench: [],
+    bullpen: [],
+    nowBatting: 0,
+    expanded: 'Player&',
+    noSubstituteSelected: {
+        toString() {
+            return '';
+        },
+        toValue() {
+            return false;
+        }
     }
 };
+
 
 
 // CONCATENATED MODULE: ./Model/Umpire.js
@@ -5495,14 +5616,14 @@ const Umpire = function(game) {
 };
 
 Umpire.prototype = {
-    constructor : Umpire,
+    constructor: Umpire,
     init(game) {
         this.game = game;
         this.playBall();
         this.count = {
-            strikes : 0,
-            balls : 0,
-            outs : 0
+            strikes: 0,
+            balls: 0,
+            outs: 0
         };
     },
     /**
@@ -5517,12 +5638,11 @@ Umpire.prototype = {
         game.deck = game.teams.away.lineup[1];
         game.hole = game.teams.away.lineup[2];
         game.pitcher = game.teams.home.positions.pitcher;
-        const n = `一回のオモテ、${game.teams.away.nameJ}の攻撃対${game.teams.home.nameJ}、ピッチャーは${game.teams.home.positions.pitcher.nameJ}。`, e = `Top 1, ${game.teams.away.name} offense vs. ${game.teams.home.positions.pitcher.name} starting for ${game.teams.home.name}`;
+        const n = `一回のオモテ、${game.teams.away.nameJ}の攻撃対${game.teams.home.nameJ}、ピッチャーは${game.teams.home.positions.pitcher.nameJ}。`,
+            e = `Top 1, ${game.teams.away.name} offense vs. ${game.teams.home.positions.pitcher.name} starting for ${game.teams.home.name}`;
         game.log.note(e, n);
         game.batter.ready = true;
-        game.log.noteBatter(
-            game.batter
-        );
+        game.log.noteBatter(game.batter);
     },
     /**
      * makes the call based on the last pitch and swing (or no swing)
@@ -5537,7 +5657,7 @@ Umpire.prototype = {
         const field = game.field;
 
         if (game.swingResult.fielder) {
-            var fielder = game.teams[game.half === 'top' ? 'home' : 'away'].positions[result.fielder]
+            var fielder = game.teams[game.half === 'top' ? 'home' : 'away'].positions[result.fielder];
         } else {
             fielder = null;
         }
@@ -5688,10 +5808,10 @@ Umpire.prototype = {
                             }
                             let bases = result.bases;
                             switch (bases) {
-                                case 0 :
+                                case 0:
                                     game.batter.atBats.push(Log.prototype.GROUNDOUT);
                                     break;
-                                case 1 :
+                                case 1:
                                     if (result.error) {
                                         game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
                                         break;
@@ -5699,7 +5819,7 @@ Umpire.prototype = {
                                     game.batter.atBats.push(Log.prototype.SINGLE);
                                     batter.stats.batting.h++;
                                     break;
-                                case 2 :
+                                case 2:
                                     if (result.error) {
                                         game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
                                         break;
@@ -5708,7 +5828,7 @@ Umpire.prototype = {
                                     batter.stats.batting.h++;
                                     batter.stats.batting['2b']++;
                                     break;
-                                case 3 :
+                                case 3:
                                     if (result.error) {
                                         game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
                                         break;
@@ -5717,7 +5837,7 @@ Umpire.prototype = {
                                     batter.stats.batting.h++;
                                     batter.stats.batting['3b']++;
                                     break;
-                                case 4 :
+                                case 4:
                                     if (result.error) {
                                         game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
                                         break;
@@ -5751,7 +5871,7 @@ Umpire.prototype = {
             }
         }
 
-        this.says = (`${this.count.balls} and ${this.count.strikes}`);
+        this.says = `${this.count.balls} and ${this.count.strikes}`;
 
         result.outs = this.count.outs;
 
@@ -5774,7 +5894,9 @@ Umpire.prototype = {
             this.says = 'Ball four.';
             this.count.balls = this.count.strikes = 0;
             batter.atBats.push(Log.prototype.WALK);
-            this.advanceRunners(true).reachBase().newBatter();
+            this.advanceRunners(true)
+                .reachBase()
+                .newBatter();
         }
         if (this.count.outs > 2) {
             this.says = 'Three outs, change.';
@@ -5849,14 +5971,14 @@ Umpire.prototype = {
                 second = game.field.second;
                 third = game.field.third;
             }
-            let canAdvance = (position) => true;
+            let canAdvance = position => true;
             if (sacrificeAdvances) {
                 canAdvance = position => {
                     switch (position) {
                         case 'first':
-                            return sacrificeAdvances.includes('first') && (!game.field.second);
+                            return sacrificeAdvances.includes('first') && !game.field.second;
                         case 'second':
-                            return sacrificeAdvances.includes('second') && (!game.field.third);
+                            return sacrificeAdvances.includes('second') && !game.field.third;
                         case 'third':
                             return sacrificeAdvances.includes('third');
                     }
@@ -5886,27 +6008,30 @@ Umpire.prototype = {
             if (second && canAdvance('second')) {
                 game.field.third = second;
                 game.field.second = null;
-                if (second != game.batter && !sacrificeAdvances
-                    && Math.random() * (second.skill.offense.speed + 120) > arm + 50) {
-
+                if (
+                    second != game.batter &&
+                    !sacrificeAdvances &&
+                    Math.random() * (second.skill.offense.speed + 120) > arm + 50
+                ) {
                     this.runScores();
                     if (game.batter != second) {
                         game.batter.recordRBI();
                         second.atBats.push(Log.prototype.RUN);
                     }
                     game.field.third = null;
-
                 }
             }
             if (first && canAdvance('first')) {
                 game.field.second = first;
                 game.field.first = null;
-                if (first != game.batter && !game.field.third && !sacrificeAdvances
-                    && Math.random() * (first.skill.offense.speed + 120) > arm + 60) {
-
+                if (
+                    first != game.batter &&
+                    !game.field.third &&
+                    !sacrificeAdvances &&
+                    Math.random() * (first.skill.offense.speed + 120) > arm + 60
+                ) {
                     game.field.third = first;
                     game.field.second = null;
-
                 }
             }
         }
@@ -5934,11 +6059,11 @@ Umpire.prototype = {
         game.log.notePlateAppearanceResult(game);
         const team = game.half === 'bottom' ? game.teams.home : game.teams.away;
         game.lastBatter = game.batter;
-        game.batter = team.lineup[(team.nowBatting + 1)%9];
+        game.batter = team.lineup[(team.nowBatting + 1) % 9];
         game.batter.ready = !game.humanBatting();
-        game.deck = team.lineup[(team.nowBatting + 2)%9];
-        game.hole = team.lineup[(team.nowBatting + 3)%9];
-        team.nowBatting = (team.nowBatting + 1)%9;
+        game.deck = team.lineup[(team.nowBatting + 2) % 9];
+        game.hole = team.lineup[(team.nowBatting + 3) % 9];
+        team.nowBatting = (team.nowBatting + 1) % 9;
         if (this.count.outs < 3) {
             game.log.noteBatter(game.batter);
         }
@@ -5979,13 +6104,16 @@ Umpire.prototype = {
         }
         offense = game.half === 'top' ? 'away' : 'home';
         defense = game.half === 'top' ? 'home' : 'away';
-        const n = `${game.inning}回の${game.half === 'top' ? 'オモテ' : 'ウラ'}、${game.teams[(game.half === 'top' ? 'away' : 'home')].getName()}の攻撃。`, e = `${game.half === 'top' ? 'Top' : 'Bottom'} ${game.inning}`;
+        const n = `${game.inning}回の${game.half === 'top' ? 'オモテ' : 'ウラ'}、${game.teams[
+                game.half === 'top' ? 'away' : 'home'
+            ].getName()}の攻撃。`,
+            e = `${game.half === 'top' ? 'Top' : 'Bottom'} ${game.inning}`;
         game.log.note(e, n);
         const team = game.teams[offense];
         game.batter = team.lineup[team.nowBatting];
         game.batterRunner = game.batter;
-        game.deck = team.lineup[(team.nowBatting + 1)%9];
-        game.hole = team.lineup[(team.nowBatting + 2)%9];
+        game.deck = team.lineup[(team.nowBatting + 1) % 9];
+        game.hole = team.lineup[(team.nowBatting + 2) % 9];
 
         game.pitcher = game.teams[defense].positions.pitcher;
         game.log.noteBatter(game.batter);
@@ -5994,8 +6122,8 @@ Umpire.prototype = {
         this.onSideChange();
     },
     onSideChange() {}, // will be be bound externally
-    says : 'Play ball!',
-    game : null
+    says: 'Play ball!',
+    game: null
 };
 
 
@@ -6041,27 +6169,27 @@ const Game = function(m) {
         n: ''
     };
     this.startOpponentPitching = null; // late function
-    this.pitchTarget = {x : 100, y : 100};
+    this.pitchTarget = { x: 100, y: 100 };
     this.pitchInFlight = {
-        x : 100,
-        y : 100,
-        breakDirection : [0, 0],
-        name : 'slider',
-        velocity : 50,
-        'break' : 50,
-        control : 50
+        x: 100,
+        y: 100,
+        breakDirection: [0, 0],
+        name: 'slider',
+        velocity: 50,
+        break: 50,
+        control: 50
     };
     this.swingResult = {
-        x : 100, //difference to pitch location
-        y : 100, //difference to pitch location
-        strike : false,
-        foul : false,
-        caught : false,
-        contact : false,
-        looking : true,
-        bases : 0,
-        fielder : 'short',
-        outs : 0
+        x: 100, //difference to pitch location
+        y: 100, //difference to pitch location
+        strike: false,
+        foul: false,
+        caught: false,
+        contact: false,
+        looking: true,
+        bases: 0,
+        fielder: 'short',
+        outs: 0
     };
     this.playResult = {
         batter: '',
@@ -6069,59 +6197,59 @@ const Game = function(m) {
     };
     this.field = null;
     this.teams = {
-        away : null,
-        home : null
+        away: null,
+        home: null
     };
     this.log = null;
     this.half = 'top';
     this.inning = 1;
     this.scoreboard = {
-        away : {
-            1 : 0,
-            2 : 0,
-            3 : 0,
-            4 : 0,
-            5 : 0,
-            6 : 0,
-            7 : 0,
-            8 : 0,
-            9 : 0
+        away: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+            6: 0,
+            7: 0,
+            8: 0,
+            9: 0
         },
-        home : {
-            1 : 0,
-            2 : 0,
-            3 : 0,
-            4 : 0,
-            5 : 0,
-            6 : 0,
-            7 : 0,
-            8 : 0,
-            9 : 0
+        home: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+            6: 0,
+            7: 0,
+            8: 0,
+            9: 0
         }
     };
     this.tally = {
-        away : {
-            H : 0,
-            R : 0,
-            E : 0
+        away: {
+            H: 0,
+            R: 0,
+            E: 0
         },
-        home : {
-            H : 0,
-            R : 0,
-            E : 0
+        home: {
+            H: 0,
+            R: 0,
+            E: 0
         }
     };
     this.init(m);
 };
 
 Game.prototype = {
-    constructor : Game,
+    constructor: Game,
     init(m) {
         this.expectedSwingTiming = 0;
         this.reset();
         this.startTime = {
-            h: Math.random() * 6 + 11 | 0,
-            m: Math.random() * 60 | 0
+            h: (Math.random() * 6 + 11) | 0,
+            m: (Math.random() * 60) | 0
         };
         this.timeOfDay = {
             h: 8,
@@ -6164,7 +6292,9 @@ Game.prototype = {
         if (!Animator_Animator.console) Animator_Animator.loop.setTargetTimeOfDay(time.h, time.m);
     },
     getInning() {
-        return text_text.mode === 'n' ? (this.inning + (this.half === 'top' ? 'オモテ' : 'ウラ')) : `${this.half.toUpperCase()} ${this.inning}`;
+        return text_text.mode === 'n'
+            ? this.inning + (this.half === 'top' ? 'オモテ' : 'ウラ')
+            : `${this.half.toUpperCase()} ${this.inning}`;
     },
     /**
      * @returns {boolean} is a human player is batting
@@ -6198,10 +6328,18 @@ Game.prototype = {
     end() {
         this.stage = 'end';
         let e, n;
-        e = this.tally.home.R > this.tally.away.R ? 'Home team wins!' :
-            (this.tally.home.R === this.tally.away.R ? 'You tied. Yes, you can do that.' : 'Visitors win!');
-        n = this.tally.home.R > this.tally.away.R ? `${this.teams.home.getName()}の勝利` :
-            (this.tally.home.R === this.tally.away.R ? '引き分け' : `${this.teams.away.getName()}の勝利`);
+        e =
+            this.tally.home.R > this.tally.away.R
+                ? 'Home team wins!'
+                : this.tally.home.R === this.tally.away.R
+                ? 'You tied. Yes, you can do that.'
+                : 'Visitors win!';
+        n =
+            this.tally.home.R > this.tally.away.R
+                ? `${this.teams.home.getName()}の勝利`
+                : this.tally.home.R === this.tally.away.R
+                ? '引き分け'
+                : `${this.teams.away.getName()}の勝利`;
         if (this.tally.home.R > this.tally.away.R) {
             this.teams.home.positions.pitcher.stats.pitching.W++;
             this.teams.away.positions.pitcher.stats.pitching.L++;
@@ -6217,7 +6355,8 @@ Game.prototype = {
      * @param callback
      */
     simulateInput(callback) {
-        const stage = this.stage, pitchTarget = this.pitchTarget;
+        const stage = this.stage,
+            pitchTarget = this.pitchTarget;
         if (stage === 'end') {
             return;
         }
@@ -6225,7 +6364,7 @@ Game.prototype = {
             this.autoPitch(callback);
         } else if (stage === 'swing') {
             if (typeof pitchTarget != 'object') {
-                this.pitchTarget = {x: 100, y: 100};
+                this.pitchTarget = { x: 100, y: 100 };
             }
             this.autoSwing(this.pitchTarget.x, this.pitchTarget.y, callback);
         }
@@ -6240,12 +6379,17 @@ Game.prototype = {
         }
         this.autoPitch(callback);
         const giraffe = this;
-        setTimeout(() => {
-            if (typeof giraffe.pitchTarget != 'object') {
-                giraffe.pitchTarget = {x: 100, y: 100};
-            }
-            giraffe.autoSwing(giraffe.pitchTarget.x, giraffe.pitchTarget.y, callback => {callback();});
-        }, giraffe.field.hasRunnersOn() ? Animator_Animator.TIME_FROM_SET + 2500 : Animator_Animator.TIME_FROM_WINDUP + 2500);
+        setTimeout(
+            () => {
+                if (typeof giraffe.pitchTarget != 'object') {
+                    giraffe.pitchTarget = { x: 100, y: 100 };
+                }
+                giraffe.autoSwing(giraffe.pitchTarget.x, giraffe.pitchTarget.y, callback => {
+                    callback();
+                });
+            },
+            giraffe.field.hasRunnersOn() ? Animator_Animator.TIME_FROM_SET + 2500 : Animator_Animator.TIME_FROM_WINDUP + 2500
+        );
     },
     /**
      * generically receive click input and decide what to do
@@ -6262,7 +6406,7 @@ Game.prototype = {
         }
         if (this.stage === 'pitch' && this.humanPitching()) {
             this.thePitch(x, y, callback);
-        } else if (this.stage === 'swing'  && this.humanBatting()) {
+        } else if (this.stage === 'swing' && this.humanBatting()) {
             this.theSwing(x, y, callback);
         }
     },
@@ -6273,7 +6417,7 @@ Game.prototype = {
      */
     autoPitchSelect() {
         const pitchNames = Object.keys(this.pitcher.pitching);
-        const pitchName = pitchNames[Math.random() * pitchNames.length | 0];
+        const pitchName = pitchNames[(Math.random() * pitchNames.length) | 0];
         const pitch = this.pitcher.pitching[pitchName];
         pitch.name = pitchName;
         this.pitchInFlight = pitch;
@@ -6298,10 +6442,14 @@ Game.prototype = {
             if (!Animator_Animator.console) {
                 Animator_Animator.loop.resetCamera();
             }
-            windup.animate({width: 0}, this.field.hasRunnersOn() ? Animator_Animator.TIME_FROM_SET : Animator_Animator.TIME_FROM_WINDUP, () => {
-                pitcher.windingUp = false;
-                callback();
-            });
+            windup.animate(
+                { width: 0 },
+                this.field.hasRunnersOn() ? Animator_Animator.TIME_FROM_SET : Animator_Animator.TIME_FROM_WINDUP,
+                () => {
+                    pitcher.windingUp = false;
+                    callback();
+                }
+            );
         }
     },
     /**
@@ -6337,18 +6485,21 @@ Game.prototype = {
     autoSwing(deceptiveX, deceptiveY, callback) {
         const giraffe = this;
         const bonus = this.batter.eye.bonus || 0;
-        const eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
+        const eye =
+            this.batter.skill.offense.eye + 6 * (this.umpire.count.balls + this.umpire.count.strikes) + bonus;
         let convergence;
         let convergenceSum;
 
         // if swinging blindly, aim at the center.
-        let x = Distribution.centralizedNumber(), y = Distribution.centralizedNumber();
+        let x = Distribution.centralizedNumber(),
+            y = Distribution.centralizedNumber();
         /**
          * @type {number} -100 to 100 negative: fooled on pitch, positive: certain of pitch location.
          */
-        let certainty = Math.random() * -100 / ((100 + eye) / 100);
+        let certainty = (Math.random() * -100) / ((100 + eye) / 100);
 
-        if (100 * Math.random() < eye) { // identified the break, now swinging at the real location.
+        if (100 * Math.random() < eye) {
+            // identified the break, now swinging at the real location.
             deceptiveX = this.pitchInFlight.x;
             deceptiveY = this.pitchInFlight.y;
             certainty = (certainty + 200) / 3;
@@ -6356,18 +6507,19 @@ Game.prototype = {
             certainty = (certainty - 50) / 2;
         }
 
-        if (100 * Math.random() < eye) { // identified the location more precisely, making a larger adjustment.
-            convergence = eye/25;
+        if (100 * Math.random() < eye) {
+            // identified the location more precisely, making a larger adjustment.
+            convergence = eye / 25;
             convergenceSum = 1 + convergence;
             certainty = (certainty + 300) / 4;
         } else {
-            convergence = eye/100;
+            convergence = eye / 100;
             certainty = (certainty - 50) / 2;
             convergenceSum = 1 + convergence;
         }
 
-        x = (deceptiveX*(convergence) + x)/convergenceSum;
-        y = (deceptiveY*(convergence) + y)/convergenceSum;
+        x = (deceptiveX * convergence + x) / convergenceSum;
+        y = (deceptiveY * convergence + y) / convergenceSum;
 
         this.swingResult.x = Distribution.cpuSwing(x, this.pitchInFlight.x, eye);
         this.swingResult.y = Distribution.cpuSwing(y, this.pitchInFlight.y, eye * 0.75);
@@ -6375,7 +6527,7 @@ Game.prototype = {
         this.batter.lastPitchCertainty = certainty;
 
         const swingProbability = Distribution.swingLikelihood(eye, x, y, this.umpire, certainty);
-        if (swingProbability < 100*Math.random()) {
+        if (swingProbability < 100 * Math.random()) {
             x = -20;
         }
 
@@ -6473,13 +6625,18 @@ Game.prototype = {
                 pitch.breakDirection = this.helper.pitchDefinitions[pitch.name].slice(0, 2);
                 this.battersEye = text_text.getBattersEye(this);
 
-                const control = Math.floor(pitch.control - this.pitcher.fatigue/2);
+                const control = Math.floor(pitch.control - this.pitcher.fatigue / 2);
                 this.pitchTarget.x = Distribution.pitchControl(this.pitchTarget.x, control);
                 this.pitchTarget.y = Distribution.pitchControl(this.pitchTarget.y, control);
 
                 if (this.pitcher.throws === 'right') pitch.breakDirection[0] *= -1;
 
-                const breakEffect = Distribution.breakEffect(pitch, this.pitcher, this.pitchTarget.x, this.pitchTarget.y);
+                const breakEffect = Distribution.breakEffect(
+                    pitch,
+                    this.pitcher,
+                    this.pitchTarget.x,
+                    this.pitchTarget.y
+                );
 
                 pitch.x = breakEffect.x;
                 pitch.y = breakEffect.y;
@@ -6509,15 +6666,21 @@ Game.prototype = {
         const pitch = this.pitchInFlight;
         if (this.stage === 'swing') {
             if (override) {
-                var result = this.swingResult = override;
+                var result = (this.swingResult = override);
                 callback = this.waitingCallback;
             } else {
                 this.swingResult = result = {};
 
-                result.timing = this.humanBatting() ? this.expectedSwingTiming - Date.now() : this.batter.getAISwingTiming();
+                result.timing = this.humanBatting()
+                    ? this.expectedSwingTiming - Date.now()
+                    : this.batter.getAISwingTiming();
                 const inTime = Math.abs(result.timing) < 900;
 
-                const bonus = this.batter.eye.bonus || 0, eye = this.batter.skill.offense.eye + 6*(this.umpire.count.balls + this.umpire.count.strikes) + bonus;
+                const bonus = this.batter.eye.bonus || 0,
+                    eye =
+                        this.batter.skill.offense.eye +
+                        6 * (this.umpire.count.balls + this.umpire.count.strikes) +
+                        bonus;
 
                 if (x >= 0 && x <= 200) {
                     this.batter.fatigue++;
@@ -6546,8 +6709,15 @@ Game.prototype = {
                     }
                 } else {
                     result.strike = Distribution.inStrikezone(pitch.x, pitch.y);
-                    this.batter.eye.bonus = Math.max(0, eye -
-                        Math.sqrt(Math.pow(this.batter.eye.x - pitch.x, 2) + Math.pow(this.batter.eye.y - pitch.y, 2)) * 1.5);
+                    this.batter.eye.bonus = Math.max(
+                        0,
+                        eye -
+                            Math.sqrt(
+                                Math.pow(this.batter.eye.x - pitch.x, 2) +
+                                    Math.pow(this.batter.eye.y - pitch.y, 2)
+                            ) *
+                                1.5
+                    );
                     result.contact = false;
                     result.looking = true;
                     this.batter.eye.x = pitch.x;
@@ -6558,7 +6728,10 @@ Game.prototype = {
             // stealing bases
             const field = this.field;
             const team = this.batter.team;
-            if ((team.stealAttempt === Team.RUNNER_GO || team.stealAttempt === Team.RUNNERS_DISCRETION) && !this.opponentConnected) {
+            if (
+                (team.stealAttempt === Team.RUNNER_GO || team.stealAttempt === Team.RUNNERS_DISCRETION) &&
+                !this.opponentConnected
+            ) {
                 const thief = field.getLeadRunner();
                 if (thief instanceof Player) {
                     let base;
@@ -6581,7 +6754,9 @@ Game.prototype = {
                     if (result.foul || result.caught) {
                         validToSteal = false;
                     }
-                    const discretion = team.stealAttempt === 'go' || Distribution.willSteal(pitch, this.pitcher.team.positions.catcher, thief, base);
+                    const discretion =
+                        team.stealAttempt === 'go' ||
+                        Distribution.willSteal(pitch, this.pitcher.team.positions.catcher, thief, base);
                     if (discretion && validToSteal) {
                         thief.attemptSteal(this, base);
                     }
@@ -6621,7 +6796,9 @@ Game.prototype = {
      * @returns {*|number}
      */
     setBatAngle(x, y) {
-        const giraffe = this, pitchInFlight = this.pitchInFlight, swingResult = this.swingResult;
+        const giraffe = this,
+            pitchInFlight = this.pitchInFlight,
+            swingResult = this.swingResult;
         const origin = {
             x: giraffe.batter.bats === 'right' ? -10 : 210,
             y: 199
@@ -6633,15 +6810,25 @@ Game.prototype = {
         return Mathinator.battingAngle(origin, swing);
     },
     debugOut() {
-        log('slugging', this.debug.filter(a => a.bases == 1).length,
+        log(
+            'slugging',
+            this.debug.filter(a => a.bases == 1).length,
             this.debug.filter(a => a.bases == 2).length,
             this.debug.filter(a => a.bases == 3).length,
             this.debug.filter(a => a.bases == 4).length
         );
-        log('grounders', this.debug.filter(a => !a.caught && !a.foul && a.flyAngle < 0).length,
-            'thrown out', this.debug.filter(a => !a.caught && !a.foul && a.flyAngle < 0 && a.thrownOut).length);
-        log('flies/liners', this.debug.filter(a => !a.foul && a.flyAngle > 0).length,
-            'caught', this.debug.filter(a => a.caught && a.flyAngle > 0).length);
+        log(
+            'grounders',
+            this.debug.filter(a => !a.caught && !a.foul && a.flyAngle < 0).length,
+            'thrown out',
+            this.debug.filter(a => !a.caught && !a.foul && a.flyAngle < 0 && a.thrownOut).length
+        );
+        log(
+            'flies/liners',
+            this.debug.filter(a => !a.foul && a.flyAngle > 0).length,
+            'caught',
+            this.debug.filter(a => a.caught && a.flyAngle > 0).length
+        );
 
         const PO = {};
         this.debug.map(a => {
@@ -6672,14 +6859,32 @@ Game.prototype = {
         const CS = atBats.filter(ab => ab === 'CS').length;
         const SB = atBats.filter(ab => ab === 'SB').length;
 
-        log('line outs', LO, 'fly outs', FO, 'groundouts', GO, 'strikeouts', SO, 'sacrifices', SAC,
-            'FC', FC, 'gidp', GIDP, 'CS', CS, 'total', LO+FO+GO+SO+SAC+FC+GIDP+CS);
+        log(
+            'line outs',
+            LO,
+            'fly outs',
+            FO,
+            'groundouts',
+            GO,
+            'strikeouts',
+            SO,
+            'sacrifices',
+            SAC,
+            'FC',
+            FC,
+            'gidp',
+            GIDP,
+            'CS',
+            CS,
+            'total',
+            LO + FO + GO + SO + SAC + FC + GIDP + CS
+        );
 
         log('BB', BB, 'SB', SB);
         log('fouls', this.debug.filter(a => a.foul).length);
         log('fatigue, home vs away');
         const teams = this.teams;
-        const fatigue = {home: {}, away: {}};
+        const fatigue = { home: {}, away: {} };
         Iterator.each(this.teams.home.positions, key => {
             const position = key;
             fatigue.home[position] = teams.home.positions[position].fatigue;
@@ -6719,17 +6924,17 @@ Game.prototype = {
             }
         };
         data.umpire = {
-            says : giraffe.umpire.says,
+            says: giraffe.umpire.says,
             count: {
-                strikes : giraffe.umpire.count.strikes,
+                strikes: giraffe.umpire.count.strikes,
                 balls: giraffe.umpire.count.balls,
                 outs: giraffe.umpire.count.outs
             }
         };
         // data.players = players.map(player => player.toData());
         data.log = {
-            pitchRecord : giraffe.log.pitchRecord,
-            record : giraffe.log.record
+            pitchRecord: giraffe.log.pitchRecord,
+            record: giraffe.log.record
         };
         data.gamesIntoSeason = this.gamesIntoSeason;
         return data;
@@ -6775,47 +6980,45 @@ Game.prototype = {
         }
         return this;
     },
-    pitchSelect() {
-
-    },
+    pitchSelect() {},
     reset() {
-        this.scoreboard =  {
-            away : {
-                1 : 0,
-                2 : 0,
-                3 : 0,
-                4 : 0,
-                5 : 0,
-                6 : 0,
-                7 : 0,
-                8 : 0,
-                9 : 0
+        this.scoreboard = {
+            away: {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0,
+                6: 0,
+                7: 0,
+                8: 0,
+                9: 0
             },
-            home : {
-                1 : 0,
-                2 : 0,
-                3 : 0,
-                4 : 0,
-                5 : 0,
-                6 : 0,
-                7 : 0,
-                8 : 0,
-                9 : 0
+            home: {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0,
+                6: 0,
+                7: 0,
+                8: 0,
+                9: 0
             }
         };
         this.resetTally();
     },
     resetTally() {
         this.tally = {
-            away : {
-                H : 0,
-                R : 0,
-                E : 0
+            away: {
+                H: 0,
+                R: 0,
+                E: 0
             },
-            home : {
-                H : 0,
-                R : 0,
-                E : 0
+            home: {
+                H: 0,
+                R: 0,
+                E: 0
             }
         };
     },
@@ -6826,7 +7029,7 @@ Game.prototype = {
      * Assign specialist opponent.
      */
     teamJapan() {
-        const provider = new Baseball.teams.Provider;
+        const provider = new Baseball.teams.Provider();
         provider.assignTeam(this, 'TeamJapan', 'away');
         const game = this;
         if (game.half === 'top') {
@@ -6845,14 +7048,14 @@ Game.prototype = {
         const game = this;
         if (game.humanControl === 'home' && player.team !== game.teams.home) return;
         if (game.humanControl === 'away' && player.team !== game.teams.away) return;
-        player.team.sub = (player.team.sub === player ? player.team.noSubstituteSelected : player);
+        player.team.sub = player.team.sub === player ? player.team.noSubstituteSelected : player;
     },
 
     /**
      * User selects a pitch.
      * @param {string} pitchName
      */
-    selectPitch (pitchName) {
+    selectPitch(pitchName) {
         const game = this;
         if (game.stage === 'pitch') {
             game.pitchInFlight = Game_$.extend({}, game.pitcher.pitching[pitchName]);
@@ -6866,7 +7069,7 @@ Game.prototype = {
      * @param player
      * @returns {*|boolean}
      */
-    clickLineup (player) {
+    clickLineup(player) {
         if (player.team.sub !== player.team.noSubstituteSelected) {
             const sub = player.team.sub;
             player.team.sub = null;
@@ -6875,7 +7078,7 @@ Game.prototype = {
             }
             return;
         }
-        player.team.expanded = (player.team.expanded === player ? null : player);
+        player.team.expanded = player.team.expanded === player ? null : player;
     },
 
     /**
@@ -6900,7 +7103,9 @@ Game.prototype = {
         const game = this;
         game.humanControl = spectateCpu ? 'none' : 'home';
         game.console = !!quickMode && quickMode !== 7;
-        const field = window.location.hash ? window.location.hash.slice(1) : game.teams.home.name + Math.ceil(Math.random() * 47);
+        const field = window.location.hash
+            ? window.location.hash.slice(1)
+            : game.teams.home.name + Math.ceil(Math.random() * 47);
         if (typeof window.SockJS !== 'undefined') {
             var socketService = new SocketService(game);
             socketService.start(field);
@@ -6916,7 +7121,7 @@ Game.prototype = {
             game.console = true;
             do {
                 n++;
-                game.simulateInput(function (callback) {
+                game.simulateInput(function(callback) {
                     typeof callback === 'function' && callback();
                 });
             } while (game.stage !== 'end' && n < 500);
@@ -6926,7 +7131,7 @@ Game.prototype = {
         } else if (quickMode === 7 && spectateCpu === 1) {
             Animator_Animator.console = game.console = true;
             do {
-                game.simulateInput(function (callback) {
+                game.simulateInput(function(callback) {
                     typeof callback === 'function' && callback();
                 });
             } while (game.inning < 7);
@@ -6939,17 +7144,20 @@ Game.prototype = {
             game.umpire.onSideChange();
         } else if (game.humanControl === 'none') {
             const scalar = game.console ? 0.05 : 1;
-            const auto = setInterval(function () {
+            const auto = setInterval(function() {
                 if (game.stage === 'end') {
                     clearInterval(auto);
                 }
-                game.simulatePitchAndSwing(function (callback) {
+                game.simulatePitchAndSwing(function(callback) {
                     game.updateFlightPath(callback);
                 });
-            }, scalar * (game.field.hasRunnersOn() ? Animator_Animator.TIME_FROM_SET + 2000 : Animator_Animator.TIME_FROM_WINDUP + 2000));
+            }, scalar *
+                (game.field.hasRunnersOn()
+                    ? Animator_Animator.TIME_FROM_SET + 2000
+                    : Animator_Animator.TIME_FROM_WINDUP + 2000));
         }
         if (game.humanControl === 'away') {
-            game.simulateInput(function (callback) {
+            game.simulateInput(function(callback) {
                 game.updateFlightPath(callback);
             });
         }
@@ -6973,7 +7181,7 @@ Game.prototype = {
         const control = game.humanControl;
         game.humanControl = 'none';
         do {
-            game.simulateInput(function (callback) {
+            game.simulateInput(function(callback) {
                 typeof callback === 'function' && callback();
             });
         } while (game.batter === batter && this.stage !== 'end');
@@ -6996,7 +7204,6 @@ Game.prototype = {
         if (this.opponentConnected) return false;
         return true;
     }
-
 };
 
 
@@ -7048,47 +7255,152 @@ const samurai = new Team('no init');
 samurai.name = 'Japan';
 samurai.nameJ = '日本';
 
-const darvish = new Player(samurai), johjima = new Player(samurai), ogasawara = new Player(samurai), nishioka = new Player(samurai), kawasaki = new Player(samurai), murata = new Player(samurai), matsui = new Player(samurai), ichiro = new Player(samurai), inaba = new Player(samurai);
+const darvish = new Player(samurai),
+    johjima = new Player(samurai),
+    ogasawara = new Player(samurai),
+    nishioka = new Player(samurai),
+    kawasaki = new Player(samurai),
+    murata = new Player(samurai),
+    matsui = new Player(samurai),
+    ichiro = new Player(samurai),
+    inaba = new Player(samurai);
 
-const matsuzaka = new Player(samurai), fukudome = new Player(samurai), aoki = new Player(samurai), abe = new Player(samurai), iwamura = new Player(samurai);
+const matsuzaka = new Player(samurai),
+    fukudome = new Player(samurai),
+    aoki = new Player(samurai),
+    abe = new Player(samurai),
+    iwamura = new Player(samurai);
 
 const coach = new Trainer_Trainer();
 
-coach.makePlayer(darvish, 'Yu', 'Darvish', 'ダルビッシュ', '有', 150, {eye: 80, power: 80, speed: 80},
-    {catching: 50, fielding: 70, throwing: 100, speed: 80}, 'right', 'right', 11);
+coach.makePlayer(
+    darvish,
+    'Yu',
+    'Darvish',
+    'ダルビッシュ',
+    '有',
+    150,
+    { eye: 80, power: 80, speed: 80 },
+    { catching: 50, fielding: 70, throwing: 100, speed: 80 },
+    'right',
+    'right',
+    11
+);
 
-coach.makePlayer(johjima, 'Kenji', 'Johjima', '城島', '健司', 60, {eye: 90, power: 108, speed: 70},
-    {catching: 140, fielding: 88, throwing: 75, speed: 75}, 'right', 'right', 2);
+coach.makePlayer(
+    johjima,
+    'Kenji',
+    'Johjima',
+    '城島',
+    '健司',
+    60,
+    { eye: 90, power: 108, speed: 70 },
+    { catching: 140, fielding: 88, throwing: 75, speed: 75 },
+    'right',
+    'right',
+    2
+);
 
+coach.makePlayer(
+    ogasawara,
+    'Michihiro',
+    'Ogasawara',
+    '小笠原',
+    '道大',
+    80,
+    { eye: 96, power: 90, speed: 90 },
+    { catching: 50, fielding: 96, throwing: 85, speed: 70 },
+    'left',
+    'right',
+    36
+);
 
+coach.makePlayer(
+    nishioka,
+    'Tsuyoshi',
+    'Nishioka',
+    '西岡',
+    '剛',
+    80,
+    { eye: 95, power: 75, speed: 92 },
+    { catching: 90, fielding: 88, throwing: 88, speed: 90 },
+    'right',
+    'right',
+    7
+);
 
-coach.makePlayer(ogasawara, 'Michihiro', 'Ogasawara', '小笠原', '道大', 80, {eye: 96, power: 90, speed: 90},
-    {catching: 50, fielding: 96, throwing: 85, speed: 70}, 'left', 'right', 36);
+coach.makePlayer(
+    kawasaki,
+    'Munenori',
+    'Kawasaki',
+    '川崎',
+    '宗則',
+    80,
+    { eye: 95, power: 75, speed: 95 },
+    { catching: 90, fielding: 120, throwing: 99, speed: 100 },
+    'left',
+    'right',
+    52
+);
 
-coach.makePlayer(nishioka, 'Tsuyoshi', 'Nishioka', '西岡', '剛', 80, {eye: 95, power: 75, speed: 92},
-    {catching: 90, fielding: 88, throwing: 88, speed: 90}, 'right', 'right', 7);
+coach.makePlayer(
+    murata,
+    'Shuichi',
+    'Murata',
+    '村田',
+    '修一',
+    80,
+    { eye: 82, power: 110, speed: 70 },
+    { catching: 80, fielding: 80, throwing: 90, speed: 60 },
+    'right',
+    'right',
+    25
+);
 
-coach.makePlayer(kawasaki, 'Munenori', 'Kawasaki', '川崎', '宗則', 80, {eye: 95, power: 75, speed: 95},
-    {catching: 90, fielding: 120, throwing: 99, speed: 100}, 'left', 'right', 52);
+coach.makePlayer(
+    matsui,
+    'Hideki',
+    'Matsui',
+    '松井',
+    '秀樹',
+    75,
+    { eye: 104, power: 120, speed: 50 },
+    { catching: 40, fielding: 85, throwing: 70, speed: 60 },
+    'left',
+    'right',
+    55
+);
 
-coach.makePlayer(murata, 'Shuichi', 'Murata', '村田', '修一', 80, {eye: 82, power: 110, speed: 70},
-    {catching: 80, fielding: 80, throwing: 90, speed: 60}, 'right', 'right', 25);
+coach.makePlayer(
+    ichiro,
+    '',
+    'Ichiro',
+    'イチロー',
+    '',
+    89,
+    { eye: 115, power: 80, speed: 115 },
+    { catching: 80, fielding: 115, throwing: 115, speed: 115 },
+    'left',
+    'right',
+    51
+);
 
+coach.makePlayer(
+    inaba,
+    'Atsunori',
+    'Inaba',
+    '稲葉',
+    '篤紀',
+    80,
+    { eye: 92, power: 95, speed: 75 },
+    { catching: 50, fielding: 95, throwing: 95, speed: 75 },
+    'right',
+    'right',
+    41
+);
 
-
-coach.makePlayer(matsui, 'Hideki', 'Matsui', '松井', '秀樹', 75, {eye: 104, power: 120, speed: 50},
-    {catching: 40, fielding: 85, throwing: 70, speed: 60}, 'left', 'right', 55);
-
-coach.makePlayer(ichiro, '', 'Ichiro', 'イチロー', '', 89, {eye: 115, power: 80, speed: 115},
-    {catching: 80, fielding: 115, throwing: 115, speed: 115}, 'left', 'right', 51);
-
-coach.makePlayer(inaba, 'Atsunori', 'Inaba', '稲葉', '篤紀', 80, {eye: 92, power: 95, speed: 75},
-    {catching: 50, fielding: 95, throwing: 95, speed: 75}, 'right', 'right', 41);
-
-
-samurai.bench = [
-    darvish, johjima, ogasawara, nishioka, kawasaki, murata, matsui, ichiro, inaba];
-    //matsuzaka, fukudome, aoki, abe, iwamura];
+samurai.bench = [darvish, johjima, ogasawara, nishioka, kawasaki, murata, matsui, ichiro, inaba];
+//matsuzaka, fukudome, aoki, abe, iwamura];
 samurai.manager.makeLineup();
 samurai.positions = {
     pitcher: darvish,
@@ -7104,17 +7416,18 @@ samurai.positions = {
     right: inaba
 };
 
-for (const position in samurai.positions) { if (samurai.positions.hasOwnProperty(position)) {
-    samurai.positions[position].position = position;
-}}
+for (const position in samurai.positions) {
+    if (samurai.positions.hasOwnProperty(position)) {
+        samurai.positions[position].position = position;
+    }
+}
 
-samurai.lineup = [
-    ichiro, kawasaki, inaba, matsui, ogasawara, johjima, murata, nishioka, darvish
-];
+samurai.lineup = [ichiro, kawasaki, inaba, matsui, ogasawara, johjima, murata, nishioka, darvish];
 
 samurai.lineup.map((player, order) => {
     player.order = order;
 });
+
 
 
 // CONCATENATED MODULE: ./Teams/Provider.js
@@ -7131,6 +7444,7 @@ class Provider {
 Provider.prototype.teams = {
     TeamJapan: samurai
 };
+
 
 
 // CONCATENATED MODULE: ./namespace.js

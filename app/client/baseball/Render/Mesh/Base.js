@@ -11,22 +11,14 @@ class Base extends AbstractMesh {
     }
     getMesh() {
         const material = new THREE.MeshLambertMaterial({
-            color: 0xFFFFFF
+            color: 0xffffff
         });
 
-        const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(
-                1.5,
-                0.3,
-                1.5,
-                8, 8, 8
-            ),
-            material
-        );
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.3, 1.5, 8, 8, 8), material);
 
-        mesh.rotation.x = -0/180 * Math.PI;
-        mesh.rotation.y = 45/180 * Math.PI;
-        mesh.rotation.z = 0/180 * Math.PI;
+        mesh.rotation.x = (-0 / 180) * Math.PI;
+        mesh.rotation.y = (45 / 180) * Math.PI;
+        mesh.rotation.z = (0 / 180) * Math.PI;
 
         switch (this.base) {
             case 'first':
@@ -53,9 +45,7 @@ class Base extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {
-
-    }
+    animate() {}
 }
 
-export { Base }
+export { Base };

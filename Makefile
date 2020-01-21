@@ -10,6 +10,7 @@ career: test
 # build everything and move to deployment location.
 build:
 	(cd app/client && make css deploy)
+deploy: build
 
 # run the app locally after having run "build".
 serve:
