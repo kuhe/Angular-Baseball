@@ -179,7 +179,7 @@ const translations = {
     }
 };
 
-export type mode_t = 'e' | 'n'; // English or Japanese;
+export type lang_mode_t = 'e' | 'n'; // English or Japanese;
 
 const text: {
     /**
@@ -187,23 +187,23 @@ const text: {
      * @param phrase - key to translate.
      * @param override - language override.
      */
-    (phrase: string, override?: mode_t): string;
+    (phrase: string, override?: lang_mode_t): string;
     /**
      * Denotes which language the app UI is running in.
      */
-    mode: mode_t;
+    mode: lang_mode_t;
     /**
      * Describe a bench substitution that has occurred.
      * @param sub - new player.
      * @param player - outgoing player.
      * @param mode - lang override.
      */
-    substitution: (sub: Player, player: Player, mode?: mode_t) => string;
+    substitution: (sub: Player, player: Player, mode?: lang_mode_t) => string;
     /**
      * Locale description of how a batter sees an incoming pitch.
      * @param game - will use pitchInFlight, probably.
      */
-    getBattersEye: (game: Game) => Record<mode_t, string>;
+    getBattersEye: (game: Game) => Record<lang_mode_t, string>;
     /**
      * @param base
      * @returns locale description of which base a ball was batted to, or outfield area.
@@ -215,7 +215,7 @@ const text: {
      * @param override - language overrride.
      * @returns e.g. 'short' or 'ショート'.
      */
-    fielderShortName: (fielder: fielder_short_name_t | string, override?: mode_t) => string;
+    fielderShortName: (fielder: fielder_short_name_t | string, override?: lang_mode_t) => string;
     /**
      * Locale slash / spacer.
      */
@@ -226,7 +226,7 @@ const text: {
      * @returns long name of fielder.
      * @example 'short' -> shortstop, 'center' -> center fielder.
      */
-    fielderLongName: (fielder: fielder_short_name_t, override?: mode_t) => string;
+    fielderLongName: (fielder: fielder_short_name_t, override?: lang_mode_t) => string;
     /**
      * Locale comma.
      */
@@ -246,7 +246,7 @@ const text: {
     namePitch: (pitch: { name: string }) => string;
     /**
      * Narrative for a contact result (ball in play).
-     * @param batter - batter for the play.
+     * @param batter - batter for the play (name).
      * @param fielder - fielder for the play.
      * @param bases - bases gained.
      * @param outBy - method of out.
@@ -254,12 +254,12 @@ const text: {
      * @param out - any runners that were out.
      */
     contactResult: (
-        batter: Player,
+        batter: string,
         fielder: string | fielder_short_name_t,
         bases: 0 | 1 | 2 | 3 | 4,
         outBy: out_by_t,
         sacrificeAdvances: string[],
-        out: string[] & { doublePlay: boolean }
+        out: string[] & { doublePlay?: boolean }
     ) => string;
 } = (phrase, override) => {
     if (!text.mode) text.mode = 'e';
@@ -300,7 +300,7 @@ text.substitution = (sub, player, mode) => {
 };
 
 text.getBattersEye = (game) => {
-    const eye: Record<mode_t, string> = {
+    const eye: Record<lang_mode_t, string> = {
             e: '',
             n: ''
         },
@@ -362,19 +362,6 @@ text.slash = () => {
 };
 
 text.fielderLongName = (fielder) => {
-    if (text.mode == 'n') {
-        return {
-            first: 'ファースト',
-            second: 'セカンド',
-            third: 'サード',
-            short: 'ショート',
-            pitcher: 'ピッチャー',
-            catcher: 'キャッチャー',
-            left: 'レフト',
-            center: 'センター',
-            right: 'ライト'
-        }[fielder];
-    }
     return {
         first: text('first baseman'),
         second: text('second baseman'),

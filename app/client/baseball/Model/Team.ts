@@ -4,20 +4,22 @@ import { Game } from './Game';
 
 import { data, text } from '../Utility/_utils';
 
-import k from './TeamConstants';
 import { fielder_short_name_t } from '../Api/fielderShortName';
 
 class Team {
-    public stealAttempt: string = k.RUNNERS_DISCRETION;
-    public lineup = [];
-    public game: Game = (null as unknown) as Game;
+    public static readonly RUNNERS_DISCRETION = 'runnersDiscretion';
+    public static readonly RUNNER_GO = 'go';
+    public static readonly RUNNER_HOLD = 'hold';
+    public stealAttempt: string = Team.RUNNERS_DISCRETION;
+    public lineup: Player[] = [];
     public positions: Record<fielder_short_name_t, Player>;
-    public manager: Manager = null;
+    public game: Game = (null as unknown) as Game;
+    public manager: Manager = new Manager(this);
     public bench: Player[] = [];
-    public bullpen = [];
+    public bullpen: Player[] = [];
     public nowBatting = 0;
-    public substituted = [];
-    public sub: { toString(): string; toValue(): boolean };
+    public substituted: Player[] = [];
+    public sub: { toString(): string; toValue?(): boolean };
     public expanded: Player = (null as unknown) as Player;
 
     public name: string = '';
@@ -32,9 +34,8 @@ class Team {
         }
     };
 
-    constructor(game: Game | 'no init', heroRate: number) {
+    constructor(game: Game | 'no init', heroRate: number = 0.1) {
         this.sub = this.noSubstituteSelected;
-        heroRate = heroRate || 0.1;
         this.substituted = [];
         this.pickName();
         this.lineup = [];
@@ -51,7 +52,6 @@ class Team {
             center: (null as unknown) as Player,
             right: (null as unknown) as Player
         };
-        this.manager = new Manager(this);
         if (game !== 'no init') {
             this.game = game;
             for (let j = 0; j < 20; j++) {

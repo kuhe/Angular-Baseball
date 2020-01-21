@@ -1,41 +1,253 @@
 import { data, text } from '../Utility/_utils';
 import { Distribution } from '../Services/Distribution';
 import { Mathinator } from '../Services/Mathinator';
-import { Iterator } from '../Services/Iterator';
-import { AtBat } from '../Model/AtBat';
-import k from '../Model/TeamConstants';
+import { AtBat } from './AtBat';
+import { Team } from './Team';
+import { fielder_short_name_t } from '../Api/fielderShortName';
+import { handedness_t } from '../Api/handedness';
+import { pitch_in_flight_t, strike_zone_coordinate_t } from '../Api/pitchInFlight';
+import { player_skill_t } from '../Api/player';
+import { pitch_skill_t, pitches_t } from '../Api/pitches';
+import { multilingual_description_t } from '../Api/log';
+import { Game } from './Game';
+import { base_name_t } from '../Api/baseName';
 
 /**
- *
- * @param team \the team to assign the player to (bench)
- * @param hero \whether the player should be generated with elite skills
- * @constructor
- *
+ * Models game participants: batter, runners, fielders, bench.
  */
-const Player = function(team, hero) {
-    this.init(team, hero);
-    this.resetStats((this.team.game && this.team.game.gamesIntoSeason) || 72);
-};
+class Player {
+    public position: fielder_short_name_t | 'bench' = 'bench';
+    public ready: boolean = false;
 
-Player.prototype = {
-    constructor: Player,
     /**
-     * @see {Player}
+     * Indicates the player has above-average skills.
      */
-    init(team, hero) {
-        this.position = 'bench';
-        this.ready = false;
-        this.fatigue = 0;
-        this.throws = Math.random() > 0.86 ? 'left' : 'right';
-        this.bats = Math.random() > 0.75 ? 'left' : 'right';
-        this.team = team;
-        this.skill = {};
-        this.eye = {
-            x: 100,
-            y: 100
+    public hero: boolean = false;
+
+    /**
+     * Affects abilities negatively when accumulated.
+     */
+    public fatigue = 0;
+
+    /**
+     * Batting order index (0 - 8).
+     */
+    public order = 0;
+
+    public throws: handedness_t = Math.random() > 0.86 ? 'left' : 'right';
+    public bats: handedness_t = Math.random() > 0.75 ? 'left' : 'right';
+
+    /**
+     * This affects how CPU players perform against the player, or
+     * how user-controlled players perform in automatic tasks, such as
+     * fielding, base-running, or batting-contact-aim-assist.
+     *
+     * The default values here are overwritten on construction by the randomizer.
+     * @see #randomizeSkills()
+     */
+    public skill: {
+        offense: {
+            eye: player_skill_t; // contact accuracy
+            power: player_skill_t;
+            speed: player_skill_t; // baserunning
         };
-        this.pitching = { averaging: [] };
-        this.number = 0;
+        defense: {
+            catching: player_skill_t;
+            fielding: player_skill_t;
+            throwing: player_skill_t; // note this is distinct from pitching velocity.
+            speed: player_skill_t;
+        };
+        pitching: player_skill_t;
+    } = {
+        offense: {
+            eye: 0,
+            power: 0,
+            speed: 0
+        },
+        defense: {
+            catching: 0,
+            fielding: 0,
+            throwing: 0,
+            speed: 0
+        },
+        pitching: 0
+    };
+
+    /**
+     * Tracks the player's prediction of the incoming pitch location,
+     * used when the player is at bat.
+     */
+    public eye: strike_zone_coordinate_t & { bonus?: number } = {
+        x: 100,
+        y: 100
+    };
+    /**
+     * Used during at bats.
+     */
+    public lastPitchCertainty = 0;
+
+    /**
+     * Describes the player's abilities with their pitch arsenal.
+     */
+    public pitching: Partial<Record<pitches_t, pitch_skill_t>> & {
+        averaging: number[];
+    } = {
+        averaging: []
+    };
+
+    /**
+     * Uniform number.
+     */
+    public number = 0;
+
+    /**
+     * Full name, English.
+     */
+    public name: string;
+    /**
+     * Full name, Japanese.
+     */
+    public nameJ: string = '';
+    public surname: string;
+    public surnameJ: string;
+
+    /**
+     * String representation of the objects in atBatObjects.
+     */
+    public atBats: string[] = [];
+    /**
+     * a list of at bat results {AtBat[]}
+     */
+    public atBatObjects: AtBat[] = [];
+
+    /**
+     * Used for color descriptors of the player's abilities: batter.
+     */
+    public definingBattingCharacteristic: multilingual_description_t = { e: '', n: '' };
+
+    /**
+     * Used for color descriptors of the player's abilities: pitcher.
+     */
+    public definingPitchingCharacteristic: multilingual_description_t = { e: '', n: '' };
+
+    /**
+     * Used for color descriptors of the player's abilities: most notable between offense/defense.
+     */
+    public definingCharacteristic: multilingual_description_t = { e: '', n: '' };
+
+    /**
+     * UI indicator when player is pitching.
+     */
+    public windingUp: boolean = false;
+
+    public stats = {
+        pitching: {
+            pitches: 0, // in game
+            GS: 0,
+            W: 0,
+            L: 0,
+            strikes: 0, // in game
+            K: 0, // in game
+            K9: 0,
+            getK9() {
+                return this.K / (this.IP[0] / 9);
+            },
+            getERA() {
+                const val = (9 * this.ER) / Math.max(1 / 3, this.IP[0] + this.IP[1] / 3);
+                return (val + '00').slice(0, 4);
+            },
+            ERA: '0',
+            ER: 0,
+            H: 0, // in game
+            HR: 0, // in game
+            BB: 0, // in game
+            IP: [0, 0],
+            WHIP: 0,
+            getWHIP() {
+                return (this.H + this.BB) / (this.IP[0] ? this.IP[0] : 1);
+            }
+        },
+        batting: {
+            getBA() {
+                return this.h / Math.max(1, this.ab);
+            },
+            getBABIP() {
+                return (this.h - this.hr) / (this.ab - this.so - this.hr + this.sac);
+            },
+            ba: 0,
+            getOBP() {
+                return (this.h + this.bb + this.hbp) / (this.ab + this.bb + this.hbp + this.sac);
+            },
+            obp: 0,
+            getSLG() {
+                return (
+                    (this.h -
+                        this['2b'] -
+                        this['3b'] -
+                        this.hr +
+                        2 * this['2b'] +
+                        3 * this['3b'] +
+                        4 * this.hr) /
+                    this.ab
+                );
+            },
+            slash: '',
+            getSlash() {
+                this.slash =
+                    this.slash ||
+                    [this.getBA() || '.---', this.getOBP(), this.getSLG()]
+                        .map((x) => {
+                            if (isNaN(Number(x))) return '.---';
+                            if (x < 1) return `${x}0000`.slice(1, 5);
+                            return `${x}0000`.slice(0, 5);
+                        })
+                        .join('/');
+                return this.slash;
+            },
+            slg: '',
+            pa: 0,
+            ab: 0,
+            so: 0,
+            bb: 0,
+            h: 0,
+            '2b': 0,
+            '3b': 0,
+            hr: 0,
+            r: 0,
+            rbi: 0,
+            hbp: 0,
+            sac: 0,
+            sb: 0,
+            cs: 0,
+            getPPA() {
+                return this.ps / this.pa;
+            },
+            ps: 0,
+            oSwings: 0,
+            getOSwing() {
+                return this.oSwings / this.swings;
+            },
+            zSwings: 0,
+            getZSwing() {
+                return this.zSwings / this.swings;
+            },
+            swings: 0,
+            getSwing() {
+                return this.swings / this.ps;
+            }
+        },
+        fielding: {
+            E: 0,
+            PO: 0, // should depend on position
+            A: Math.floor(Math.random() * 5) + 1 // ehh should depend on position
+        }
+    };
+
+    /**
+     * @param team \the team to assign the player to (bench).
+     * @param hero \whether the player should be generated with higher-than-average skills.
+     */
+    constructor(public team: Team, hero?: boolean) {
         this.randomizeSkills(hero || Math.random() > 0.9);
         const surnameKey = Math.floor(Math.random() * data.surnames.length),
             nameKey = Math.floor(Math.random() * data.names.length);
@@ -46,66 +258,63 @@ Player.prototype = {
         this.spaceName(jSurname, jGivenName);
         this.surname = data.surnames[surnameKey];
         this.surnameJ = data.surnamesJ[surnameKey];
-        this.atBats = [];
-        this.definingBattingCharacteristic = {};
-        this.definingPitchingCharacteristic = {};
-        this.definingCharacteristic = {};
-        this.lastPitchCertainty = 0;
-    },
+        this.resetStats((this.team.game && this.team.game.gamesIntoSeason) || 72);
+    }
+
     /**
-     * inserts the Japanese middle dot at the correct position, allowing a 4-width
-     * @param jSurname
-     * @param jGivenName
+     * Inserts the Japanese middle dot at the correct position, allowing a 4-width
+     * name string.
+     * @param jSurname - Japanese family name.
+     * @param jGivenName - Japanese first name.
      */
-    spaceName(jSurname, jGivenName) {
+    public spaceName(jSurname: string, jGivenName: string): void {
         if (jSurname.length === 1 && jGivenName.length <= 2) jSurname += '・';
         if (jGivenName.length === 1 && !jSurname.includes('・') && jSurname.length <= 2)
             jSurname += '・';
         this.nameJ = jSurname + jGivenName;
         this.surnameJ = jSurname;
-    },
+    }
+
     /**
-     * for websocket transfer
+     * for websocket transfer.
      */
-    toData() {
+    public toData(): Player {
         const team = this.team;
         delete this.team;
         const data = JSON.parse(JSON.stringify(this));
         this.team = team;
         return data;
-    },
+    }
+
     /**
      * @param data
-     * inverts @see #serialize()
+     * inverts @see #toData()
      */
-    fromData(data) {
-        const giraffe = this;
-        Iterator.each(data, (key, value) => {
-            giraffe[key] = value;
-        });
+    public fromData(data: Player) {
+        Object.assign(this, data);
         delete this.atBatObjects;
         this.getAtBats();
-    },
+    }
 
     /**
      *
-     * take over the other player's position and batting order immediately, sending him/her to the bench
-     * @param {Player} player
-     * @returns {boolean}
+     * take over the other player's position and batting order immediately, sending him/her to the bench.
+     * @param player - to replace this player.
+     * @returns true on success.
      *
      */
-    substitute(player) {
+    public substitute(player: Player): boolean {
         if (player.team !== this.team) return false;
         const order = player.order,
             position = player.position;
         player.team.substituted.push(player);
-        player.team.positions[position] = this;
+        player.team.positions[position as fielder_short_name_t] = this;
         player.team.lineup[order] = this;
 
         this.position = position;
         this.order = order;
 
-        const game = this.team.game;
+        const game = this.team.game as Game;
         if (game.pitcher === player) game.pitcher = this;
         if (game.batter === player) game.batter = this;
         if (game.deck === player) game.deck = this;
@@ -118,38 +327,48 @@ Player.prototype = {
 
         const bench = this.team.bench,
             bullpen = this.team.bullpen;
-        if (bench.includes(this)) {
+        if (~bench.indexOf(this)) {
             bench.splice(bench.indexOf(this), 1);
         }
-        if (bullpen.includes(this)) {
+        if (~bullpen.indexOf(this)) {
             bullpen.splice(bullpen.indexOf(this), 1);
         }
         game.log.noteSubstitution(this, player);
-    },
+        return true;
+    }
+
     /**
-     * resets the player's statistics
-     * @param gamesIntoSeason
-     * @returns {*}
+     * Resets the player's statistics, randomized with regard for their skills.
+     * @param gamesIntoSeason - how many games have been played, used for accumulative stats.
      */
-    resetStats(gamesIntoSeason = 72) {
+    public resetStats(gamesIntoSeason = 72): void {
         const offense = this.skill.offense;
         const defense = this.skill.defense;
-        const randBetween = (a, b, skill) => {
+        const randBetween = (a: number, b: number, skill: string | number = '') => {
             let total = 0,
                 count = 0;
-            skill += '';
-            if (!skill) skill = '';
-            Iterator.each(skill.split(' '), (key, value) => {
-                let skill = value;
-                if (offense[skill]) skill = offense[skill];
-                if (defense[skill]) skill = defense[skill];
-                if (isNaN(skill)) skill = 50;
-                total += skill;
-                count++;
-            });
 
-            skill = Math.sqrt(0.05 + Math.random() * 0.95) * (total / (count * 0.97));
-            return Math.floor((skill / 100) * (b - a) + a);
+            let skillNumber = 0;
+
+            if (typeof skill === 'number') {
+                total += skill;
+            } else {
+                skill += '';
+                if (!skill) skill = '';
+
+                for (const skillKey of skill.split(' ')) {
+                    if (offense[skillKey as keyof typeof offense])
+                        skillNumber = offense[skillKey as keyof typeof offense];
+                    if (defense[skillKey as keyof typeof defense])
+                        skillNumber = defense[skillKey as keyof typeof defense];
+                    if (isNaN(skillNumber)) skillNumber = 50;
+                    total += skillNumber;
+                    count++;
+                }
+            }
+
+            skillNumber = Math.sqrt(0.05 + Math.random() * 0.95) * (total / (count * 0.97));
+            return Math.floor((skillNumber / 100) * (b - a) + a);
         };
         let IP, ER, GS, W, L;
         if (this.skill.pitching > 65) {
@@ -202,149 +421,94 @@ Player.prototype = {
         const ps = randBetween(2 * pa, 4.2 * pa, 'eye'); // pitches seen.
         const swings = oSwings + zSwings;
 
-        this.stats = {
-            pitching: {
-                pitches: 0, // in game
-                GS,
-                W,
-                L,
-                strikes: 0, // in game
-                K: 0, // in game
-                getK9() {
-                    return this.K / (this.IP[0] / 9);
-                },
-                getERA() {
-                    const val = (9 * this.ER) / Math.max(1 / 3, this.IP[0] + this.IP[1] / 3);
-                    return (val + '00').slice(0, 4);
-                },
-                ERA: null,
-                ER,
-                H: 0, // in game
-                HR: 0, // in game
-                BB: 0, // in game
-                IP: [IP, 0],
-                WHIP: 0,
-                getWHIP() {
-                    return (this.H + this.BB) / (this.IP[0] ? this.IP[0] : 1);
-                }
-            },
-            batting: {
-                getBA() {
-                    return this.h / Math.max(1, this.ab);
-                },
-                getBABIP() {
-                    return (this.h - this.hr) / (this.ab - this.so - this.hr + this.sac);
-                },
-                ba: null,
-                getOBP() {
-                    return (
-                        (this.h + this.bb + this.hbp) / (this.ab + this.bb + this.hbp + this.sac)
-                    );
-                },
-                obp: null,
-                getSLG() {
-                    return (
-                        (this.h -
-                            this['2b'] -
-                            this['3b'] -
-                            this.hr +
-                            2 * this['2b'] +
-                            3 * this['3b'] +
-                            4 * this.hr) /
-                        this.ab
-                    );
-                },
-                getSlash() {
-                    this.slash =
-                        this.slash ||
-                        [this.getBA() || '.---', this.getOBP(), this.getSLG()]
-                            .map((x) => {
-                                if (isNaN(x)) return '.---';
-                                if (x < 1) return `${x}0000`.slice(1, 5);
-                                return `${x}0000`.slice(0, 5);
-                            })
-                            .join('/');
-                    return this.slash;
-                },
-                slg: null,
-                pa,
-                ab,
-                so,
-                bb,
-                h,
-                '2b': doubles,
-                '3b': triples,
-                hr,
-                r,
-                rbi,
-                hbp,
-                sac,
-                sb,
-                cs,
-                getPPA() {
-                    return this.ps / this.pa;
-                },
-                ps,
-                oSwings,
-                getOSwing() {
-                    return this.oSwings / this.swings;
-                },
-                zSwings,
-                getZSwing() {
-                    return this.zSwings / this.swings;
-                },
-                swings,
-                getSwing() {
-                    return this.swings / this.ps;
-                }
-            },
-            fielding: {
-                E,
-                PO, // should depend on position
-                A: Math.floor(Math.random() * 5) + 1 // ehh should depend on position
-            }
-        };
+        Object.assign(this.stats.pitching, {
+            pitches: 0, // in game
+            GS,
+            W,
+            L,
+            strikes: 0, // in game
+            K: 0, // in game
+            ERA: '0.00',
+            ER,
+            H: 0, // in game
+            HR: 0, // in game
+            BB: 0, // in game
+            IP: [IP, 0],
+            WHIP: 0
+        });
+
+        Object.assign(this.stats.batting, {
+            ba: 0,
+            obp: 0,
+            slg: 0,
+            pa,
+            ab,
+            so,
+            bb,
+            h,
+            '2b': doubles,
+            '3b': triples,
+            hr,
+            r,
+            rbi,
+            hbp,
+            sac,
+            sb,
+            cs,
+            ps,
+            oSwings,
+            zSwings,
+            swings
+        });
+
+        Object.assign(this.stats.fielding, {
+            E,
+            PO, // should depend on position
+            A: Math.floor(Math.random() * 5) + 1 // ehh should depend on position
+        });
+
         this.stats.pitching.ERA = this.stats.pitching.getERA();
         this.stats.pitching.K9 = this.stats.pitching.getK9();
         this.stats.pitching.WHIP = this.stats.pitching.getWHIP();
         this.stats.batting.ba = this.stats.batting.getBA();
-    },
-    /**
-     * a list of at bat results {AtBat[]}
-     */
-    atBatObjects: [],
-    getAtBats() {
+    }
+
+    public getAtBats(): AtBat[] {
         if (this.atBats.length > this.atBatObjects.length) {
             this.atBatObjects = this.atBats.map((item) => new AtBat(item));
         }
         return this.atBatObjects;
-    },
-    recordRBI() {
+    }
+
+    public recordRBI(): void {
         this.atBats[this.atBats.length - 1] += AtBat.RBI_INDICATOR;
-    },
-    recordInfieldHit() {
+    }
+
+    public recordInfieldHit(): void {
         this.atBats[this.atBats.length - 1] += AtBat.INFIELD_HIT_INDICATOR;
-    },
+    }
+
     /**
-     * @returns {number}
+     * @returns seconds to get from base to base.
      */
-    getBaseRunningTime() {
+    public getBaseRunningTime(): number {
         return Mathinator.baseRunningTime(this.skill.offense.speed);
-    },
+    }
+
     /**
-     * live game steal
+     * live game steal.
      * @param game
      * @param base
-     * @returns {Player.attemptSteal}
+     * @returns self.
      */
-    attemptSteal(game, base) {
+    public attemptSteal(game: Game, base: 1 | 2 | 3 | 4): Player {
         const pitch = game.pitchInFlight;
         const success = Distribution.stealSuccess(
-            pitch,
+            pitch as pitch_in_flight_t,
             game.pitcher.team.positions.catcher,
             this,
             base,
-            this.team.stealAttempt === k.RUNNERS_DISCRETION
+            this.team.stealAttempt === Team.RUNNERS_DISCRETION
         );
         if (success) {
             game.swingResult.stoleABase = this.order;
@@ -353,39 +517,42 @@ Player.prototype = {
             game.swingResult.stoleABase = undefined;
             game.swingResult.caughtStealing = this.order;
         }
+        let _base: base_name_t;
         switch (base) {
             case 1:
-                base = '1st';
+                _base = '1st';
                 break;
             case 2:
-                base = '2nd';
+                _base = '2nd';
                 break;
             case 3:
-                base = '3rd';
+                _base = '3rd';
                 break;
             case 4:
-                base = 'Home';
+                _base = 'Home';
         }
-        game.swingResult.attemptedBase = base;
+        game.swingResult.attemptedBase = _base;
         return this;
-    },
+    }
+
     /**
      * used for other calculations/orderings
-     * @returns {number}
+     * @returns
      */
-    defensiveAverage() {
-        const _this = this.skill.defense;
-        return (_this.speed + _this.fielding + _this.throwing) / 3;
-    },
+    public defensiveAverage(): player_skill_t {
+        const defense = this.skill.defense;
+        return (defense.speed + defense.fielding + defense.throwing) / 3;
+    }
+
     /**
-     * randomizes the player's skills, usually called at init
-     * @param hero
-     * @param allPitches
+     * randomizes the player's skills, usually called at init.
+     * @param hero - assign above-average skills.
+     * @param allPitches - give the player all pitch types.
      */
-    randomizeSkills(hero, allPitches) {
+    public randomizeSkills(hero: boolean, allPitches?: boolean): void {
         this.hero = hero;
         const giraffe = this;
-        const randValue = (isPitching) => {
+        const randValue = (isPitching?: boolean) => {
             let value = Math.floor(Math.pow(Math.random(), 0.75) * 80 + Math.random() * 20);
             if (hero) {
                 value += Math.floor((100 - value) * Math.max(Math.random(), isPitching ? 0 : 0.65));
@@ -468,60 +635,65 @@ Player.prototype = {
 
         this.skill.pitching = Math.floor(pitchingAverage);
         delete this.pitching.averaging;
-    },
+    }
+
     /**
      * language-sensitive
-     * @returns {String}
+     * @returns family name.
      */
-    getSurname() {
+    getSurname(): string {
         return text.mode === 'n' ? this.surnameJ : this.surname;
-    },
+    }
+
     /**
-     * language-sensitive
-     * @returns {String}
+     * @returns language-sensitive full name.
      */
-    getName() {
+    public getName(): string {
         return text.mode === 'n' ? this.nameJ : this.name;
-    },
-    getUniformNumber() {
+    }
+
+    public getUniformNumber(): string {
         return text('#') + this.number;
-    },
+    }
+
     /**
      * language-sensitive, for text representation of batting order
      * @returns {String}
      */
-    getOrder() {
+    public getOrder(): string {
         return text(
             [' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]
         );
-    },
+    }
+
     /**
      * Where positive is an early swing and negative is a late swing.
-     * @returns {number} in milliseconds between -200ms and 200ms
+     * @returns in milliseconds between -200ms and 200ms
      */
-    getAISwingTiming() {
+    public getAISwingTiming(): number {
         return (
             (Math.random() - 0.5) *
             280 *
             (60 / (60 + this.skill.offense.eye)) *
             ((200 - this.lastPitchCertainty) / (200 + this.lastPitchCertainty) || 1)
         );
-    },
+    }
+
     /**
      * a localized description of this player's defining batting characteristic e.g. "contact hitter"
      * @returns {string}
      */
-    getDefiningBattingCharacteristic() {
+    public getDefiningBattingCharacteristic(): string {
         if (!this.definingBattingCharacteristic[text.mode]) {
             this.definingBattingCharacteristic[text.mode] = this.getDefiningCharacteristic(true);
         }
         return this.definingBattingCharacteristic[text.mode];
-    },
+    }
+
     /**
-     * a localized description of this player's defining pitching characteristic e.g. "control pitcher"
-     * @returns {string}
+     * @returns a localized description of this player's defining pitching characteristic e.g. "control pitcher"
      */
-    getDefiningPitchingCharacteristic() {
+    public getDefiningPitchingCharacteristic(): string {
         if (!this.definingPitchingCharacteristic[text.mode]) {
             this.definingPitchingCharacteristic[text.mode] = this.getDefiningCharacteristic(
                 false,
@@ -529,14 +701,14 @@ Player.prototype = {
             );
         }
         return this.definingPitchingCharacteristic[text.mode];
-    },
+    }
+
     /**
-     * a localized phrase describing a strong trait of this player e.g. "ace" or "power hitter".
-     * @param {boolean} [battingOnly] to return only their defining batting characteristic.
-     * @param {boolean} [pitchingOnly] to return only a pitching characteristic.
-     * @returns {string}
+     * @param [battingOnly] to return only their defining batting characteristic.
+     * @param [pitchingOnly] to return only a pitching characteristic.
+     * @returns a localized phrase describing a strong trait of this player e.g. "ace" or "power hitter".
      */
-    getDefiningCharacteristic(battingOnly, pitchingOnly) {
+    public getDefiningCharacteristic(battingOnly?: boolean, pitchingOnly?: boolean): string {
         if (this.definingCharacteristic[text.mode] && !battingOnly) {
             return this.definingCharacteristic[text.mode];
         }
@@ -557,14 +729,15 @@ Player.prototype = {
         const offense = [o.eye, o.power, o.speed];
         const defense = [d.fielding, d.speed, d.throwing];
 
-        const sum = (x) => x.reduce((a, b) => a + b);
+        const sum = (x: number[]) => x.reduce((a, b) => a + b);
 
         let pitching = [0, 0, 0]; // control, speed, break
         const pitchingKeys = Object.keys(p);
         pitchingKeys.map((x) => {
-            pitching[0] += p[x].control;
-            pitching[1] += p[x].velocity;
-            pitching[2] += p[x].break;
+            const _pitch: pitch_skill_t = (p[x as pitches_t] as unknown) as pitch_skill_t;
+            pitching[0] += _pitch.control;
+            pitching[1] += _pitch.velocity;
+            pitching[2] += _pitch.break;
         });
         const pitches = pitchingKeys.length;
         pitching = pitching.map((x) => (x / pitches) | 0);
@@ -612,13 +785,14 @@ Player.prototype = {
         }
         if (battingOnly || pitchingOnly) return out;
         return (this.definingCharacteristic[text.mode] = out);
-    },
+    }
+
     /**
      * to ease comparison in Angular (?)
      */
-    toString() {
+    public toString(): string {
         return `${this.name} #${this.number}`;
     }
-};
+}
 
 export { Player };

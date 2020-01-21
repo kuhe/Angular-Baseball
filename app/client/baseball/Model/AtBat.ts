@@ -23,18 +23,16 @@ class AtBat {
         this.text = text.split(AtBat.RBI_INDICATOR)[0];
         this.rbi = `${text.split(this.text)[1] || ''}`;
 
-        const log = new Log();
-
         const beneficial = [
-            log.WALK,
-            log.SINGLE,
-            log.HOMERUN,
-            log.DOUBLE,
-            log.TRIPLE,
-            log.SACRIFICE,
-            log.REACHED_ON_ERROR,
-            log.STOLEN_BASE,
-            log.RUN
+            Log.WALK,
+            Log.SINGLE,
+            Log.HOMERUN,
+            Log.DOUBLE,
+            Log.TRIPLE,
+            Log.SACRIFICE,
+            Log.REACHED_ON_ERROR,
+            Log.STOLEN_BASE,
+            Log.RUN
         ];
         if (~beneficial.indexOf(this.text)) {
             this.beneficial = true;

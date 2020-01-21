@@ -1,7 +1,7 @@
-import { Field } from '../Model/Field';
-import { Team } from '../Model/Team';
-import { Umpire } from '../Model/Umpire';
-import { Player } from '../Model/Player';
+import { Field } from './Field';
+import { Team } from './Team';
+import { Umpire } from './Umpire';
+import { Player } from './Player';
 import { Log } from '../Utility/Log';
 
 import { helper, text } from '../Utility/_utils';
@@ -10,36 +10,57 @@ import { Animator } from '../Services/Animator';
 import { Distribution } from '../Services/Distribution';
 import { Mathinator } from '../Services/Mathinator';
 import { Iterator } from '../Services/Iterator';
+import { lang_mode_t } from '../Utility/text';
+import { swing_result_t } from '../Api/swingResult';
+import { axis_t, pitch_in_flight_t, strike_zone_coordinate_t } from '../Api/pitchInFlight';
+import { pitches_t } from '../Api/pitches';
+import { degrees_t, ratio_t } from '../Api/math';
+import { fielder_short_name_t } from '../Api/fielderShortName';
+import { Provider } from '../Teams/Provider';
 
-const $ = typeof window === 'object' ? window.$ : () => {};
+const $ = typeof window === 'object' ? ((window as unknown) as { $: any }).$ : () => {};
+const log = console.log;
 
 /**
+ *
  * Apologies for the godclass here.
- * @param m - language mode.
- * @constructor
+ *
  */
-const Game = function(m) {
-    this.gamesIntoSeason = 72;
-    this.humanControl = 'home'; //home, away, both, none
-    this.debug = [];
-    this.pitcher = null; // Player&
-    this.batter = null; // Player&
-    this.stage = 'pitch'; //pitch, swing
+class Game {
+    public field = new Field(this);
+    public teams = {
+        away: new Team(this),
+        home: new Team(this)
+    };
+    public log = new Log();
+    public umpire = new Umpire(this);
+
+    public gamesIntoSeason = 72;
+    public humanControl: 'home' | 'away' | 'both' | 'none' = 'home';
+    public showMessage = false;
+    public debug: any[] = [];
+
+    public pitcher: Player = (null as unknown) as Player;
+    public batter: Player = (null as unknown) as Player;
+    public deck: Player = (null as unknown) as Player;
+    public hole: Player = (null as unknown) as Player;
+
+    public stage: 'pitch' | 'swing' | 'end' = 'pitch';
     /**
      * websocket opponent is connected
      */
-    this.opponentConnected = false;
-    this.batterReadyTimeout = -1;
+    public opponentConnected = false;
+    public batterReadyTimeout = -1;
     /**
      * language sensitive string describing what kind of pitch the batter sees
      */
-    this.battersEye = {
+    public battersEye = {
         e: '',
         n: ''
     };
-    this.startOpponentPitching = null; // late function
-    this.pitchTarget = { x: 100, y: 100 };
-    this.pitchInFlight = {
+    public startOpponentPitching: () => void = () => {}; // late bound function.
+    public pitchTarget: strike_zone_coordinate_t = { x: 100, y: 100 };
+    public pitchInFlight: pitch_in_flight_t = {
         x: 100,
         y: 100,
         breakDirection: [0, 0],
@@ -48,7 +69,7 @@ const Game = function(m) {
         break: 50,
         control: 50
     };
-    this.swingResult = {
+    public swingResult: swing_result_t = {
         x: 100, //difference to pitch location
         y: 100, //difference to pitch location
         strike: false,
@@ -59,20 +80,14 @@ const Game = function(m) {
         bases: 0,
         fielder: 'short',
         outs: 0
-    };
-    this.playResult = {
+    } as swing_result_t;
+    public playResult = {
         batter: '',
         fielder: ''
     };
-    this.field = null;
-    this.teams = {
-        away: null,
-        home: null
-    };
-    this.log = null;
-    this.half = 'top';
-    this.inning = 1;
-    this.scoreboard = {
+    public half = 'top';
+    public inning = 1;
+    public scoreboard = {
         away: {
             1: 0,
             2: 0,
@@ -96,7 +111,7 @@ const Game = function(m) {
             9: 0
         }
     };
-    this.tally = {
+    public tally = {
         away: {
             H: 0,
             R: 0,
@@ -108,67 +123,80 @@ const Game = function(m) {
             E: 0
         }
     };
-    this.init(m);
-};
 
-Game.prototype = {
-    constructor: Game,
-    init(m) {
-        this.expectedSwingTiming = 0;
+    public expectedSwingTiming = 0;
+    public helper = helper;
+
+    public startTime = {
+        h: (Math.random() * 6 + 11) | 0,
+        m: (Math.random() * 60) | 0
+    };
+    public timeOfDay = {
+        h: 8,
+        m: 0
+    }; // @see {Loop} for time initialization.
+
+    /**
+     * Socket service for live head-2-head.
+     */
+    public opponentService: any = null;
+
+    /**
+     * @param m - language mode.
+     */
+    public constructor(m: lang_mode_t) {
         this.reset();
-        this.startTime = {
-            h: (Math.random() * 6 + 11) | 0,
-            m: (Math.random() * 60) | 0
-        };
-        this.timeOfDay = {
-            h: 8,
-            m: 0
-        }; // @see {Loop} for time initialization
         if (m) text.mode = m;
         this.gamesIntoSeason = 72 + Math.floor(Math.random() * 72);
-        this.field = new Field(this);
-        this.teams.away = new Team(this);
-        this.teams.home = new Team(this);
-        this.log = new Log();
         this.log.game = this;
         this.debug = [];
-        this.helper = helper;
         while (this.teams.away.name === this.teams.home.name) {
             this.teams.away.pickName();
         }
-        this.umpire = new Umpire(this);
         if (this.humanPitching()) {
             this.stage = 'pitch';
         }
         this.autoPitchSelect();
         Animator.init();
         this.passMinutes(5);
-    },
-    get console() {
+    }
+
+    public get console(): boolean {
         return Animator.console;
-    },
-    set console(value) {
+    }
+
+    public set console(value) {
         Animator.console = value;
-    },
-    passMinutes(minutes) {
+    }
+
+    /**
+     * Advance time and scenery mesh.
+     * @param minutes
+     */
+    public passMinutes(minutes: number): void {
         const time = this.timeOfDay;
-        time.m = parseInt(time.m);
-        time.m += parseInt(minutes);
+        time.m |= 0;
+        time.m += minutes | 0;
         while (time.m >= 60) {
-            time.m = parseInt(time.m) - 60;
-            time.h = (parseInt(time.h) + 1) % 24;
+            time.m -= -60;
+            time.h = ((time.h | 0) + 1) % 24;
         }
         if (!Animator.console) Animator.loop.setTargetTimeOfDay(time.h, time.m);
-    },
-    getInning() {
+    }
+
+    /**
+     * String description of half and inning.
+     */
+    public getInning(): string {
         return text.mode === 'n'
             ? this.inning + (this.half === 'top' ? 'オモテ' : 'ウラ')
             : `${this.half.toUpperCase()} ${this.inning}`;
-    },
+    }
+
     /**
-     * @returns {boolean} is a human player is batting
+     * @returns is a human player is batting?
      */
-    humanBatting() {
+    public humanBatting(): boolean {
         const humanControl = this.humanControl;
         if (humanControl === 'none') return false;
         switch (this.half) {
@@ -177,11 +205,13 @@ Game.prototype = {
             case 'bottom':
                 return humanControl === 'both' || humanControl === 'home';
         }
-    },
+        return false;
+    }
+
     /**
-     * @returns {boolean}
+     * @returns whether human player is pitching.
      */
-    humanPitching() {
+    public humanPitching(): boolean {
         const humanControl = this.humanControl;
         if (humanControl === 'none') return false;
         switch (this.half) {
@@ -190,11 +220,13 @@ Game.prototype = {
             case 'bottom':
                 return humanControl === 'both' || humanControl === 'away';
         }
-    },
+        return false;
+    }
+
     /**
-     * ends the game
+     * ends the game.
      */
-    end() {
+    public end(): void {
         this.stage = 'end';
         let e, n;
         e =
@@ -218,12 +250,13 @@ Game.prototype = {
         }
         this.log.note(e, n);
         this.log.note('Reload to play again', 'リロるは次の試合へ');
-    },
+    }
+
     /**
      * advances an AI turn (response to the previous action) by pitching or swinging
      * @param callback
      */
-    simulateInput(callback) {
+    public simulateInput(callback: (cb?: () => void) => void): void {
         const stage = this.stage,
             pitchTarget = this.pitchTarget;
         if (stage === 'end') {
@@ -237,12 +270,13 @@ Game.prototype = {
             }
             this.autoSwing(this.pitchTarget.x, this.pitchTarget.y, callback);
         }
-    },
+    }
+
     /**
      * usually for spectator mode in which the AI plays against itself
      * @param callback
      */
-    simulatePitchAndSwing(callback) {
+    public simulatePitchAndSwing(callback: (cb?: () => void) => void): void {
         if (this.stage === 'end') {
             return;
         }
@@ -253,22 +287,27 @@ Game.prototype = {
                 if (typeof giraffe.pitchTarget != 'object') {
                     giraffe.pitchTarget = { x: 100, y: 100 };
                 }
-                giraffe.autoSwing(giraffe.pitchTarget.x, giraffe.pitchTarget.y, (callback) => {
-                    callback();
-                });
+                giraffe.autoSwing(
+                    giraffe.pitchTarget.x,
+                    giraffe.pitchTarget.y,
+                    (callback: () => void) => {
+                        callback();
+                    }
+                );
             },
             giraffe.field.hasRunnersOn()
                 ? Animator.TIME_FROM_SET + 2500
                 : Animator.TIME_FROM_WINDUP + 2500
         );
-    },
+    }
+
     /**
      * generically receive click input and decide what to do
      * @param x
      * @param y
      * @param callback
      */
-    receiveInput(x, y, callback) {
+    public receiveInput(x: axis_t, y: axis_t, callback: () => void): void {
         if (this.humanControl === 'none') {
             return;
         }
@@ -280,24 +319,28 @@ Game.prototype = {
         } else if (this.stage === 'swing' && this.humanBatting()) {
             this.theSwing(x, y, callback);
         }
-    },
+    }
+
     /**
-     * select a pitch for the AI
+     * select a pitch for the AI.
      * @todo use an out pitch at 2 strikes?
      * @todo use more fastballs against weak batters?
      */
-    autoPitchSelect() {
+    public autoPitchSelect(): void {
         const pitchNames = Object.keys(this.pitcher.pitching);
-        const pitchName = pitchNames[(Math.random() * pitchNames.length) | 0];
-        const pitch = this.pitcher.pitching[pitchName];
+        const pitchName = pitchNames[(Math.random() * pitchNames.length) | 0] as pitches_t;
+        const pitch = (this.pitcher.pitching[
+            pitchName as pitches_t
+        ] as unknown) as pitch_in_flight_t;
         pitch.name = pitchName;
         this.pitchInFlight = pitch;
-    },
+    }
+
     /**
      * delayed pitch
-     * @param callback {Function}
+     * @param callback - called after windup finishes animating.
      */
-    windupThen(callback) {
+    public windupThen(callback: () => void): void {
         const pitcher = this.pitcher;
         pitcher.windingUp = true;
 
@@ -322,16 +365,16 @@ Game.prototype = {
                 }
             );
         }
-    },
+    }
     /**
      * AI pitcher winds up and throws
      * @param callback \usually a function to resolve the animations resulting from the pitch
      */
-    autoPitch(callback) {
+    public autoPitch(callback: () => void): void {
         this.autoPitchSelect();
 
         const count = this.umpire.count;
-        let x, y, pitch;
+        let x: axis_t, y: axis_t, pitch: strike_zone_coordinate_t;
         pitch = Distribution.pitchLocation(count);
         x = pitch.x;
         y = pitch.y;
@@ -340,7 +383,8 @@ Game.prototype = {
             !Animator.console && $('.baseball.pitch').removeClass('hide');
             this.thePitch(x, y, callback);
         });
-    },
+    }
+
     /**
      * AI batter decides whether to swing
      *
@@ -353,7 +397,11 @@ Game.prototype = {
      * @param deceptiveY \the apparent Y target of the pitch
      * @param callback
      */
-    autoSwing(deceptiveX, deceptiveY, callback) {
+    public autoSwing(
+        deceptiveX: axis_t,
+        deceptiveY: axis_t,
+        callback?: (cb: () => void) => void
+    ): void {
         const giraffe = this;
         const bonus = this.batter.eye.bonus || 0;
         const eye =
@@ -404,36 +452,43 @@ Game.prototype = {
             x = -20;
         }
 
-        callback(() => {
+        (callback || (() => {}))(() => {
             giraffe.theSwing(x, y);
         });
-    },
+    }
+
     /**
      * variable function for what to do when the batter becomes ready for a pitch (overwritten many times)
      */
-    onBatterReady() {},
+    public onBatterReady(): void {}
+
     /**
-     * @param setValue
-     * @returns {boolean|*}
+     * @param setValue true to set ready.
+     * @returns whether batter has come ready.
      * trigger batter readiness passively, or actively with setValue, i.e. ready to see pitch
      */
-    batterReady(setValue) {
+    public batterReady(setValue?: boolean): boolean {
         clearTimeout(this.batterReadyTimeout);
         if (setValue !== undefined) {
-            this.batter.ready = !!setValue;
+            this.batter.ready = Boolean(setValue);
         }
         if (this.batter.ready) {
             this.onBatterReady();
         }
         return this.batter.ready;
-    },
-    waitingCallback() {},
+    }
+
+    /**
+     * May be overwritten.
+     */
+    public waitingCallback(): void {}
+
     /**
      * signals readiness for the next pitch. This behavior varies depending on whether AI or human is pitching
      * @param callback
      * @param swingResult
      */
-    awaitPitch(callback, swingResult) {
+    public awaitPitch(callback: () => void, swingResult?: swing_result_t): void {
         const giraffe = this;
         if (this.opponentConnected) {
             this.waitingCallback = callback;
@@ -451,7 +506,8 @@ Game.prototype = {
                 }, 5200);
             }
         }
-    },
+    }
+
     /**
      * Signals readiness for the batter's response to a pitch in flight.
      * In case of a human pitching to AI, the AI batter is automatically ready.
@@ -461,9 +517,15 @@ Game.prototype = {
      * @param pitchInFlight
      * @param pitchTarget
      */
-    awaitSwing(x, y, callback, pitchInFlight, pitchTarget) {
+    public awaitSwing(
+        x: axis_t,
+        y: axis_t,
+        callback?: () => void,
+        pitchInFlight?: pitch_in_flight_t,
+        pitchTarget?: strike_zone_coordinate_t
+    ): void {
         if (this.opponentConnected) {
-            this.waitingCallback = callback;
+            this.waitingCallback = callback || (() => {});
             this.opponentService.emitPitch({
                 inFlight: pitchInFlight,
                 target: pitchTarget
@@ -471,7 +533,7 @@ Game.prototype = {
         } else {
             this.autoSwing(x, y, callback);
         }
-    },
+    }
     /**
      * triggers a pitch to aspirational target (x,y) from the current pitcher on the mound.
      * @param x \coordinate X in the strike zone (0, 200)
@@ -479,7 +541,12 @@ Game.prototype = {
      * @param callback \typically to resolve animations and move to the next step (batting this pitch)
      * @param override \a websocket opponent will override the engine's pitch location calculations with their actual
      */
-    thePitch(x, y, callback, override) {
+    public thePitch(
+        x: axis_t,
+        y: axis_t,
+        callback?: () => void,
+        override?: { inFlight: pitch_in_flight_t; target: strike_zone_coordinate_t }
+    ) {
         if (override) {
             this.pitchInFlight = override.inFlight;
             this.pitchTarget = override.target;
@@ -495,7 +562,10 @@ Game.prototype = {
                 this.pitchTarget.x = x;
                 this.pitchTarget.y = y;
 
-                pitch.breakDirection = this.helper.pitchDefinitions[pitch.name].slice(0, 2);
+                pitch.breakDirection = this.helper.pitchDefinitions[pitch.name].slice(0, 2) as [
+                    axis_t,
+                    axis_t
+                ];
                 this.battersEye = text.getBattersEye(this);
 
                 const control = Math.floor(pitch.control - this.pitcher.fatigue / 2);
@@ -519,7 +589,7 @@ Game.prototype = {
 
             this.stage = 'swing';
             if (this.humanBatting()) {
-                callback();
+                (callback || (() => {}))();
             } else {
                 if (this.opponentConnected && this.humanPitching()) {
                     this.windupThen(() => {});
@@ -527,22 +597,22 @@ Game.prototype = {
                 this.awaitSwing(x, y, callback, pitch, this.pitchTarget);
             }
         }
-    },
+    }
     /**
      * makes an aspirational swing to (x,y) by the current player in the batter's box
      * @param x
      * @param y
      * @param callback \resolves animations
-     * @param override
+     * @param override - from socket, remote data overrides local simulation.
      */
-    theSwing(x, y, callback, override) {
+    public theSwing(x: axis_t, y: axis_t, callback?: () => void, override?: swing_result_t): void {
         const pitch = this.pitchInFlight;
         if (this.stage === 'swing') {
             if (override) {
                 var result = (this.swingResult = override);
                 callback = this.waitingCallback;
             } else {
-                this.swingResult = result = {};
+                this.swingResult = result = {} as swing_result_t;
 
                 result.timing = this.humanBatting()
                     ? this.expectedSwingTiming - Date.now()
@@ -608,7 +678,7 @@ Game.prototype = {
             ) {
                 const thief = field.getLeadRunner();
                 if (thief instanceof Player) {
-                    let base;
+                    let base: 2 | 3 | 4 = 2;
                     switch (thief) {
                         case field.first:
                             base = 2;
@@ -668,17 +738,18 @@ Game.prototype = {
                 }
             }
         }
-    },
+    }
+
     /**
      * for CSS
      * @param x
      * @param y
-     * @returns {*|number}
+     * @returns bat angle
      */
-    setBatAngle(x, y) {
-        const giraffe = this,
-            pitchInFlight = this.pitchInFlight,
-            swingResult = this.swingResult;
+    public setBatAngle(x?: axis_t, y?: axis_t): degrees_t {
+        const giraffe = this;
+        const pitchInFlight = this.pitchInFlight;
+        const swingResult = this.swingResult || { x: 0, y: 0 };
         const origin = {
             x: giraffe.batter.bats === 'right' ? -10 : 210,
             y: 199
@@ -688,8 +759,9 @@ Game.prototype = {
             y: y ? y : pitchInFlight.y + swingResult.y
         };
         return Mathinator.battingAngle(origin, swing);
-    },
-    debugOut() {
+    }
+
+    public debugOut(): void {
         log(
             'slugging',
             this.debug.filter((a) => a.bases == 1).length,
@@ -710,7 +782,7 @@ Game.prototype = {
             this.debug.filter((a) => a.caught && a.flyAngle > 0).length
         );
 
-        const PO = {};
+        const PO: Record<string, number> = {};
         this.debug.map((a) => {
             if (!a.fielder) return;
             if (!PO[a.fielder]) {
@@ -723,7 +795,7 @@ Game.prototype = {
         log('fielding outs', JSON.stringify(PO));
 
         const hitters = this.teams.away.lineup.concat(this.teams.home.lineup);
-        let atBats = [];
+        let atBats: string[] = [];
         hitters.map((a) => {
             atBats = atBats.concat(a.getAtBats().map((ab) => ab.text));
         });
@@ -764,7 +836,10 @@ Game.prototype = {
         log('fouls', this.debug.filter((a) => a.foul).length);
         log('fatigue, home vs away');
         const teams = this.teams;
-        const fatigue = { home: {}, away: {} };
+        const fatigue = {
+            home: {} as Record<fielder_short_name_t, number>,
+            away: {} as Record<fielder_short_name_t, number>
+        };
         Iterator.each(this.teams.home.positions, (key) => {
             const position = key;
             fatigue.home[position] = teams.home.positions[position].fatigue;
@@ -773,12 +848,13 @@ Game.prototype = {
         console.table(fatigue);
         console.table(this.scoreboard);
         console.table(this.tally);
-    },
+    }
+
     /**
-     * for websocket serialization
+     * for websocket serialization.
      */
-    toData() {
-        const data = {};
+    public toData(): any {
+        const data: any = {};
         data.half = this.half;
         data.inning = this.inning;
         data.tally = this.tally;
@@ -786,9 +862,9 @@ Game.prototype = {
         const players = this.teams.away.lineup.concat(this.teams.home.lineup);
         // note: bench not included
         data.field = {
-            first: players.indexOf(this.field.first),
-            second: players.indexOf(this.field.second),
-            third: players.indexOf(this.field.third)
+            first: players.indexOf(this.field.first as Player),
+            second: players.indexOf(this.field.second as Player),
+            third: players.indexOf(this.field.third as Player)
         };
         data.batter = players.indexOf(this.batter);
         data.deck = players.indexOf(this.deck);
@@ -818,8 +894,13 @@ Game.prototype = {
         };
         data.gamesIntoSeason = this.gamesIntoSeason;
         return data;
-    },
-    fromData(data) {
+    }
+
+    /**
+     * Ingest socket data over matchmaker.
+     * @param data
+     */
+    public fromData(data: Game & any): void {
         this.half = data.half;
         this.inning = data.inning;
         this.tally = data.tally;
@@ -858,10 +939,17 @@ Game.prototype = {
         if (this.humanPitching()) {
             this.autoPitchSelect();
         }
-        return this;
-    },
-    pitchSelect() {},
-    reset() {
+    }
+
+    /**
+     * Overridden?
+     */
+    public pitchSelect(): void {}
+
+    /**
+     * Reset the game, possibly used in unit tests.
+     */
+    public reset(): void {
         this.scoreboard = {
             away: {
                 1: 0,
@@ -887,8 +975,12 @@ Game.prototype = {
             }
         };
         this.resetTally();
-    },
-    resetTally() {
+    }
+
+    /**
+     * Reset scores.
+     */
+    public resetTally(): void {
         this.tally = {
             away: {
                 H: 0,
@@ -901,15 +993,15 @@ Game.prototype = {
                 E: 0
             }
         };
-    },
+    }
 
     /* user-interaction implementations */
 
     /**
      * Assign specialist opponent.
      */
-    teamJapan() {
-        const provider = new Baseball.teams.Provider();
+    public teamJapan(): void {
+        const provider = new Provider();
         provider.assignTeam(this, 'TeamJapan', 'away');
         const game = this;
         if (game.half === 'top') {
@@ -919,74 +1011,82 @@ Game.prototype = {
         } else {
             game.pitcher = game.teams.away.positions.pitcher;
         }
-    },
+    }
 
     /**
-     * @param {Player} player
+     * @param player - to be selected. Does not activate the sub unless confirmed.
      */
-    selectSubstitute(player) {
+    public selectSubstitute(player: Player) {
         const game = this;
         if (game.humanControl === 'home' && player.team !== game.teams.home) return;
         if (game.humanControl === 'away' && player.team !== game.teams.away) return;
-        player.team.sub = player.team.sub === player ? player.team.noSubstituteSelected : player;
-    },
+        player.team.sub =
+            player.team.sub === player
+                ? ((player.team.noSubstituteSelected as unknown) as Player)
+                : player;
+    }
 
     /**
      * User selects a pitch.
-     * @param {string} pitchName
+     * @param pitchName
      */
-    selectPitch(pitchName) {
+    public selectPitch(pitchName: pitches_t): void {
         const game = this;
         if (game.stage === 'pitch') {
-            game.pitchInFlight = $.extend({}, game.pitcher.pitching[pitchName]);
+            game.pitchInFlight = JSON.parse(JSON.stringify(game.pitcher.pitching[pitchName]));
             game.pitchInFlight.name = pitchName;
             game.swingResult.looking = true;
         }
-    },
+    }
 
     /**
      * Used for substitutions or player info expansion.
      * @param player
-     * @returns {*|boolean}
      */
-    clickLineup(player) {
+    public clickLineup(player: Player): void | boolean {
         if (player.team.sub !== player.team.noSubstituteSelected) {
-            const sub = player.team.sub;
-            player.team.sub = null;
+            const sub = player.team.sub as Player;
+            player.team.sub = (null as unknown) as Player;
             if (sub) {
                 return sub.substitute(player);
             }
             return;
         }
-        player.team.expanded = player.team.expanded === player ? null : player;
-    },
+        player.team.expanded = ((player.team.expanded === player
+            ? null
+            : player) as unknown) as Player;
+    }
 
     /**
      * Generate a new opponent team (mid-game).
      * @param heroRate
      */
-    generateTeam(heroRate) {
-        this.teams.away = new Baseball.model.Team(this, heroRate);
-    },
+    public generateTeam(heroRate: ratio_t): void {
+        this.teams.away = new Team(this, heroRate);
+    }
 
     /**
      * Bound externally using the UI + Animator service.
      */
-    updateFlightPath: () => {},
+    public updateFlightPath(cb?: () => void): void {}
 
     /**
-     * @param {Class} SocketService
-     * @param {boolean|number} quickMode - 7 for playing from the 7th inning.
-     * @param {boolean|number} spectateCpu
+     * @param SocketService
+     * @param quickMode - 7 for playing from the 7th inning.
+     * @param spectateCpu - no human player, auto-play.
      */
-    proceedToGame(SocketService, quickMode, spectateCpu) {
+    public proceedToGame(
+        SocketService?: any,
+        quickMode?: boolean | number,
+        spectateCpu?: boolean | number
+    ): void {
         const game = this;
         game.humanControl = spectateCpu ? 'none' : 'home';
         game.console = !!quickMode && quickMode !== 7;
         const field = window.location.hash
             ? window.location.hash.slice(1)
             : game.teams.home.name + Math.ceil(Math.random() * 47);
-        if (typeof window.SockJS !== 'undefined') {
+        if (typeof ((window as unknown) as { SockJS: any }).SockJS !== 'undefined') {
             var socketService = new SocketService(game);
             socketService.start(field);
         } else {
@@ -1001,7 +1101,7 @@ Game.prototype = {
             game.console = true;
             do {
                 n++;
-                game.simulateInput(function(callback) {
+                game.simulateInput(function(callback?: () => void) {
                     typeof callback === 'function' && callback();
                 });
             } while (game.stage !== 'end' && n < 500);
@@ -1011,7 +1111,7 @@ Game.prototype = {
         } else if (quickMode === 7 && spectateCpu === 1) {
             Animator.console = game.console = true;
             do {
-                game.simulateInput(function(callback) {
+                game.simulateInput(function(callback?: () => void) {
                     typeof callback === 'function' && callback();
                 });
             } while (game.inning < 7);
@@ -1028,7 +1128,7 @@ Game.prototype = {
                 if (game.stage === 'end') {
                     clearInterval(auto);
                 }
-                game.simulatePitchAndSwing(function(callback) {
+                game.simulatePitchAndSwing(function(callback?: () => void) {
                     game.updateFlightPath(callback);
                 });
             }, scalar *
@@ -1036,7 +1136,7 @@ Game.prototype = {
                     ? Animator.TIME_FROM_SET + 2000
                     : Animator.TIME_FROM_WINDUP + 2000));
         }
-        if (game.humanControl === 'away') {
+        if ((game.humanControl as string) === 'away') {
             game.simulateInput(function(callback) {
                 game.updateFlightPath(callback);
             });
@@ -1049,12 +1149,12 @@ Game.prototype = {
             game.timeOfDay.h = game.startTime.h;
             game.timeOfDay.m = game.startTime.m;
         }
-    },
+    }
 
     /**
      * Proceed to the end of the current at bat.
      */
-    simulateAtBat() {
+    public simulateAtBat(): void {
         const game = this;
         Animator.console = game.console = true;
         const batter = game.batter;
@@ -1075,15 +1175,15 @@ Game.prototype = {
         game.stage = 'pitch';
         Animator.console = game.console = false;
         game.umpire.onSideChange(); // rebind hover UI, not actual change sides :\...
-    },
+    }
 
     /**
-     * @returns {boolean}
+     * @returns if simulating the at-bat (instantly) is allowed.
      */
-    allowSimAtBat() {
+    public allowSimAtBat(): boolean {
         if (this.opponentConnected) return false;
         return true;
     }
-};
+}
 
 export { Game };

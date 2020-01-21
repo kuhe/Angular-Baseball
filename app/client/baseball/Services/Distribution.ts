@@ -1,40 +1,39 @@
 import { helper } from '../Utility/helper';
+import { Player } from '../Model/Player';
+import { player_skill_t } from '../Api/player';
+import { fly_angle_t, probability_t, ratio_t } from '../Api/math';
+import { count_t } from '../Api/count';
+import { axis_t, pitch_in_flight_t, strike_zone_coordinate_t } from '../Api/pitchInFlight';
+import { Umpire } from '../Model/Umpire';
 const pitchDefinitions = helper.pitchDefinitions;
 
 const { random, min, max, floor, ceil, abs, pow, sqrt } = Math;
 
 /**
  * For Probability!
- * @constructor
  */
-const DistributionCtor = function() {};
-
-const Distribution = Object.assign(DistributionCtor, {
-    identifier: 'Distribution',
-    constructor: DistributionCtor,
+class Distribution {
     /**
-     * @param scale {number}
-     * @returns {number}
+     * @param fielder
+     * @returns fielder commits error.
      */
-    chance(scale) {
-        if (!scale) scale = 1;
-        return random() * scale;
-    },
-    /**
-     * @param fielder {Player}
-     * @returns {boolean}
-     */
-    error(fielder) {
+    public static error(fielder: Player): boolean {
         return (100 - fielder.skill.defense.fielding) * 0.1 + 3.25 > random() * 100;
-    },
+    }
+
     /**
      * @param power
      * @param flyAngle
-     * @param x {number} batting offset horizontal
-     * @param y {number} batting offset vertical
-     * @returns {number}
+     * @param x - batting offset horizontal
+     * @param y - batting offset vertical
+     * @returns landing distance. 310 is usually considered the outfield fence distance, beyond which is a home run.
      */
-    landingDistance(power, flyAngle, x, y) {
+    public static landingDistance(
+        power: player_skill_t,
+        flyAngle: fly_angle_t,
+        x: number,
+        y: number
+    ): number {
         x = min(5, abs(x) | 0);
         y = min(5, abs(y) | 0);
         const goodContactBonus = 8 - sqrt(x * x + y * y);
@@ -49,7 +48,6 @@ const Distribution = Object.assign(DistributionCtor, {
          * 10 -> max 120 or so
          * 30 to 45 -> any distance
          * over 50 -> risk of pop fly
-         * @type {number}
          */
         const launchAngleScalar =
             (1 - abs(flyAngle - 30) / 60) *
@@ -59,12 +57,13 @@ const Distribution = Object.assign(DistributionCtor, {
             (10 + scalar * 320 + staticPowerContribution + randomPowerContribution * 150) *
             launchAngleScalar
         );
-    },
+    }
+
     /**
      * @param count {{strikes: number, balls: number}}
-     * @returns {{x: number, y: number}}
+     * @returns strike zone coord.
      */
-    pitchLocation(count) {
+    public static pitchLocation(count: count_t): strike_zone_coordinate_t {
         let x, y;
         if (random() < 0.5) {
             x = 50 + floor(random() * 90) - floor(random() * 30);
@@ -79,30 +78,37 @@ const Distribution = Object.assign(DistributionCtor, {
         y = ((3 + count.strikes) * y + count.balls * 100) / sum;
 
         return { x, y };
-    },
+    }
+
     /**
      * swing centering basis, gives number near 100.
-     * @returns {number}
+     * @returns 100 +/- 15.
      */
-    centralizedNumber() {
+    public static centralizedNumber() {
         return 100 + floor(random() * 15) - floor(random() * 15);
-    },
+    }
+
     /**
-     * @param eye {Player.skill.offense.eye}
+     * @param eye - batter skill
      * @param x
      * @param y
-     * @param {Umpire} umpire
-     * @param {number} certainty - -100 to 100 relative certainty of pitch location by the batter.
+     * @param umpire
+     * @param certainty - -100 to 100 relative certainty of pitch location by the batter.
      *                             negative indicates wrongful certainty (fooled).
-     * @returns {number} on scale of 100.
+     * @returns - on scale of 100.
      */
-    swingLikelihood: function(eye, x, y, umpire, certainty = 50) {
+    public static swingLikelihood(
+        eye: player_skill_t,
+        x: axis_t,
+        y: axis_t,
+        umpire: Umpire,
+        certainty: number = 50
+    ) {
         /**
          * Initially the batter may have planned on whether or not to swing
          * before seeing the pitch, depending on the count, for example.
-         * @type {number} scale to 1.
          */
-        let planToSwing = 30;
+        let planToSwing: probability_t;
         const count = String(umpire.count.balls) + String(umpire.count.strikes);
         switch (count) {
             case '01':
@@ -152,7 +158,7 @@ const Distribution = Object.assign(DistributionCtor, {
 
         /**
          * Positional likelihood based on where the pitch location is perceived to be.
-         * @type {number}
+         * 0 - 100.
          */
         const positionalLikelihood = (180 - abs(100 - x) - abs(100 - y)) / 2;
 
@@ -194,76 +200,96 @@ const Distribution = Object.assign(DistributionCtor, {
         }
 
         return finalSwingLikelihood;
-    },
+    }
+
     /**
-     * @param target {number} 0-200
-     * @param control {number} 0-100
-     * @returns {number}
+     * @param target - 0-200
+     * @param control - 0-100
+     * @returns closer to the target for higher control skill.
      */
-    pitchControl(target, control) {
+    public static pitchControl(target: axis_t, control: player_skill_t): axis_t {
         const effect = (50 - random() * 100) / (1 + control / 100);
         return min(199.9, max(0.1, target + effect));
-    },
+    }
+
     /**
-     * @param pitch {Game.pitchInFlight}
-     * @param pitcher {Player}
-     * @param x {number}
-     * @param y {number}
-     * @returns {object|{x: number, y: number}}
+     * @param pitch - contains breaking direction information.
+     * @param pitcher - for skill reference with the given pitch.
+     * @param x - original target.
+     * @param y - original target.
+     *
+     * @returns map of x and y params to the new strike zone coordinate as modified by the breaking direction.
+     *
      * 0.5 to 1.5 of the pitch's nominal breaking effect X
      * 0.5 to 1.5 of the pitch's nominal breaking effect Y, magnified for lower Y
      */
-    breakEffect(pitch, pitcher, x, y) {
-        const effect = {};
+    public static breakEffect(
+        pitch: pitch_in_flight_t,
+        pitcher: Player,
+        x: axis_t,
+        y: axis_t
+    ): strike_zone_coordinate_t {
+        const effect: strike_zone_coordinate_t = {
+            x: 0,
+            y: 0
+        };
+        const pitchStats = pitcher.pitching[pitch.name] || { break: 0 };
         effect.x = floor(
-            x +
-                pitch.breakDirection[0] *
-                    (0.5 + 0.5 * random() + pitcher.pitching[pitch.name].break / 200)
+            x + pitch.breakDirection[0] * (0.5 + 0.5 * random() + pitchStats.break / 200)
         );
         effect.y = floor(
             y +
                 pitch.breakDirection[1] *
-                    ((0.5 + 0.5 * random() + pitcher.pitching[pitch.name].break / 200) /
-                        (0.5 + y / 200))
+                    ((0.5 + 0.5 * random() + pitchStats.break / 200) / (0.5 + y / 200))
         );
         return effect;
-    },
+    }
+
     /**
-     * Determine the swing target along an axis
-     * @param target {number} 0-200
-     * @param actual {number} 0-200
-     * @param eye {number} 0-100
-     * @returns {number} 0-200
+     * Determine the swing target along an axis for CPU based on batting eye skill.
+     * @param target - 0-200
+     * @param actual - 0-200
+     * @param eye - 0-100
+     * @returns - 0-200
      */
-    cpuSwing(target, actual, eye) {
+    public static cpuSwing(target: axis_t, actual: axis_t, eye: player_skill_t): axis_t {
         eye = min(eye, 100); // higher eye would overcompensate here
         return 100 + (target - 100) * (0.5 + (random() * eye) / 200) - actual;
-    },
+    }
+
     /**
-     * @param {number} x - 0-200.
-     * @param {number} y - 0-200.
-     * @returns {boolean}
+     * @param x - 0-200.
+     * @param y - 0-200.
+     * @returns whether location is in strike zone.
      */
-    inStrikezone(x, y) {
+    public static inStrikezone(x: axis_t, y: axis_t): boolean {
         return x > 50 && x < 150 && y > 35 && y < 165;
-    },
+    }
+
     /**
-     * Determine the swing scalar
-     * @param eye {number} 0-100
-     * @returns {number}
+     * Determine the swing (auto-aim) scalar.
+     * @param eye - 0-100 batter skill.
+     * @returns a ratio type that decreases swing location disparity for better eye skill.
      */
-    swing(eye) {
+    public static swing(eye: player_skill_t): ratio_t {
         return 100 / (eye + 25 + random() * 50);
-    },
+    }
+
     /**
-     * @param pitch {Object} game.pitchInFlight
-     * @param catcher {Player}
-     * @param thief {Player}
-     * @param base {Number} 1,2,3,4
-     * @param volitional {boolean} whether the runner decided to steal
-     * @returns {boolean}
+     * @param pitch - from Game pitchInFlight.
+     * @param catcher - on defense.
+     * @param thief - runner.
+     * @param base - 1,2,3,4 where 4 is home.
+     * @param volitional - whether the runner wanted to steal.
+     * @returns true for successful steal.
      */
-    stealSuccess(pitch, catcher, thief, base, volitional) {
+    public static stealSuccess(
+        pitch: pitch_in_flight_t,
+        catcher: Player,
+        thief: Player,
+        base: 1 | 2 | 3 | 4,
+        volitional?: boolean
+    ): boolean {
         let rand = random();
         const rand2 = random();
 
@@ -276,22 +302,28 @@ const Distribution = Object.assign(DistributionCtor, {
         const pitchBaseSpeedMultiplier = (pitchDefinitions[pitch.name] || ['', '', 0.6])[2];
 
         return (
-            ((volitional | 0) * 35 + thief.skill.offense.eye + (base * -25 + 45)) * rand +
+            (Number(volitional) * 35 + thief.skill.offense.eye + (base * -25 + 45)) * rand +
                 10 +
                 thief.skill.offense.speed * 2 -
                 thief.fatigue >
             pitchBaseSpeedMultiplier * pitch.velocity * smoothedRand2 +
                 (catcher.skill.defense.catching + catcher.skill.defense.throwing) * rand2
         );
-    },
+    }
+
     /**
-     * @param pitch {Object} game.pitchInFlight
-     * @param catcher {Player}
-     * @param thief {Player}
-     * @param base {Number} 1,2,3,4
-     * @returns {boolean}
+     * @param pitch - game pitch in flight.
+     * @param catcher
+     * @param thief
+     * @param base - 1,2,3,4 where 4 is home.
+     * @returns player will attempt to steal.
      */
-    willSteal(pitch, catcher, thief, base) {
+    public static willSteal(
+        pitch: pitch_in_flight_t,
+        catcher: Player,
+        thief: Player,
+        base: 1 | 2 | 3 | 4
+    ): boolean {
         if (base == 4) return false;
         return (
             random() < 0.15 &&
@@ -299,41 +331,44 @@ const Distribution = Object.assign(DistributionCtor, {
             random() < 0.5
         );
     }
-});
 
-Distribution.main = () => {
-    const ump = {
-        count: {
-            balls: 0,
-            strikes: 0
+    /**
+     * Test block.
+     */
+    public static main(): void {
+        const ump = {
+            count: {
+                balls: 0,
+                strikes: 0
+            }
+        } as Umpire;
+        while (ump.count.balls < 4) {
+            while (ump.count.strikes < 3) {
+                console.log('S', ump.count.strikes, 'B', ump.count.balls);
+                console.log(
+                    'middle',
+                    [15, 35, 55, 75, 95].map((x) => {
+                        return Distribution.swingLikelihood(x, 100, 100, ump) | 0;
+                    })
+                );
+                console.log(
+                    'corner',
+                    [15, 35, 55, 75, 95].map((x) => {
+                        return Distribution.swingLikelihood(x, 50, 50, ump) | 0;
+                    })
+                );
+                console.log(
+                    'ball',
+                    [15, 35, 55, 75, 95].map((x) => {
+                        return Distribution.swingLikelihood(x, 15, 15, ump) | 0;
+                    })
+                );
+                ump.count.strikes++;
+            }
+            ump.count.balls++;
+            ump.count.strikes = 0;
         }
-    };
-    while (ump.count.balls < 4) {
-        while (ump.count.strikes < 3) {
-            console.log('S', ump.count.strikes, 'B', ump.count.balls);
-            console.log(
-                'middle',
-                [15, 35, 55, 75, 95].map((x) => {
-                    return Distribution.swingLikelihood(x, 100, 100, ump) | 0;
-                })
-            );
-            console.log(
-                'corner',
-                [15, 35, 55, 75, 95].map((x) => {
-                    return Distribution.swingLikelihood(x, 50, 50, ump) | 0;
-                })
-            );
-            console.log(
-                'ball',
-                [15, 35, 55, 75, 95].map((x) => {
-                    return Distribution.swingLikelihood(x, 15, 15, ump) | 0;
-                })
-            );
-            ump.count.strikes++;
-        }
-        ump.count.balls++;
-        ump.count.strikes = 0;
     }
-};
+}
 
 export { Distribution };

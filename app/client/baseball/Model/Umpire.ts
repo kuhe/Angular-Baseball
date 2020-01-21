@@ -1,24 +1,29 @@
-import { Log } from '../Utility/_utils';
-import { Player } from '../Model/Player';
+import { Log } from '../Utility/Log';
 import { Distribution } from '../Services/Distribution';
+import { Game } from './Game';
+import { count_t } from '../Api/count';
 
-const Umpire = function(game) {
-    this.init(game);
-};
-
-Umpire.prototype = {
-    constructor: Umpire,
-    init(game) {
-        this.game = game;
-        this.playBall();
-        this.count = {
-            strikes: 0,
-            balls: 0,
-            outs: 0
-        };
-    },
+class Umpire {
     /**
-     * starts the game by announcing it and signalling the first batter up
+     * Three strikes and you're out!
+     */
+    public count: count_t = {
+        strikes: 0,
+        balls: 0,
+        outs: 0
+    };
+
+    /**
+     * The latest utterance of the umpire.
+     */
+    public says: string = 'Play ball!';
+
+    constructor(public game: Game) {
+        this.playBall();
+    }
+
+    /**
+     * Starts the game by announcing it and signalling the first batter up
      */
     playBall() {
         const game = this.game;
@@ -34,10 +39,11 @@ Umpire.prototype = {
         game.log.note(e, n);
         game.batter.ready = true;
         game.log.noteBatter(game.batter);
-    },
+    }
+
     /**
-     * makes the call based on the last pitch and swing (or no swing)
-     * @todo add margin of error to Umpire to simulate real umpiring, haha
+     * Makes the call based on the last pitch and swing (or no swing)
+     * @todo add margin of error to Umpire to simulate real umpiring, haha.
      */
     makeCall() {
         this.says = '';
@@ -58,7 +64,7 @@ Umpire.prototype = {
 
         if (!isNaN(result.stoleABase)) {
             var thief = game.batter.team.lineup[result.stoleABase];
-            thief.atBats.push(Log.prototype.STOLEN_BASE);
+            thief.atBats.push(Log.STOLEN_BASE);
             switch (thief) {
                 case field.first:
                     field.second = thief;
@@ -71,7 +77,7 @@ Umpire.prototype = {
                 case field.third:
                     field.third = null;
                     thief.stats.batting.r++;
-                    thief.atBats.push(Log.prototype.RUN);
+                    thief.atBats.push(Log.RUN);
                     this.runScores();
             }
             thief.stats.batting.sb++;
@@ -82,7 +88,7 @@ Umpire.prototype = {
             this.count.outs++;
             thief = game.batter.team.lineup[result.caughtStealing];
             thief.stats.batting.cs++;
-            thief.atBats.push(Log.prototype.CAUGHT_STEALING);
+            thief.atBats.push(Log.CAUGHT_STEALING);
             switch (thief) {
                 case field.first:
                     field.first = null;
@@ -130,14 +136,14 @@ Umpire.prototype = {
                     pitcher.stats.pitching.IP[1]++;
                     if (result.sacrificeAdvances.length && this.count.outs < 2) {
                         batter.stats.batting.sac++;
-                        game.batter.atBats.push(Log.prototype.SACRIFICE);
+                        game.batter.atBats.push(Log.SACRIFICE);
                         this.advanceRunners(false, null, result.sacrificeAdvances);
                     } else {
                         batter.stats.batting.ab++;
                         if (result.flyAngle < 15) {
-                            game.batter.atBats.push(Log.prototype.LINEOUT);
+                            game.batter.atBats.push(Log.LINEOUT);
                         } else {
-                            game.batter.atBats.push(Log.prototype.FLYOUT);
+                            game.batter.atBats.push(Log.FLYOUT);
                         }
                     }
                     this.count.outs++;
@@ -164,9 +170,9 @@ Umpire.prototype = {
                             this.count.outs++;
                             fielder.stats.fielding.PO++;
                             pitcher.stats.pitching.IP[1]++;
-                            game.batter.atBats.push(Log.prototype.FIELDERS_CHOICE);
+                            game.batter.atBats.push(Log.FIELDERS_CHOICE);
                             this.advanceRunners(false, result.fieldersChoice);
-                            result.doublePlay && game.batter.atBats.push(Log.prototype.GIDP);
+                            result.doublePlay && game.batter.atBats.push(Log.GIDP);
                             this.reachBase();
                             result.outs = this.count.outs;
                             this.newBatter();
@@ -178,8 +184,8 @@ Umpire.prototype = {
                             this.count.outs++;
                             fielder.stats.fielding.PO++;
                             pitcher.stats.pitching.IP[1]++;
-                            game.batter.atBats.push(Log.prototype.GROUNDOUT);
-                            result.doublePlay && game.batter.atBats.push(Log.prototype.GIDP);
+                            game.batter.atBats.push(Log.GROUNDOUT);
+                            result.doublePlay && game.batter.atBats.push(Log.GIDP);
                             if (this.count.outs < 3) {
                                 this.advanceRunners(false);
                             }
@@ -191,9 +197,7 @@ Umpire.prototype = {
                         }
                         if (result.bases) {
                             if (!result.error) {
-                                game.tally[game.half === 'top' ? 'away' : 'home'][
-                                    Log.prototype.SINGLE
-                                ]++;
+                                game.tally[game.half === 'top' ? 'away' : 'home'][Log.SINGLE]++;
                                 pitcher.stats.pitching.H++;
                             } else {
                                 if (result.bases > 0) {
@@ -204,40 +208,40 @@ Umpire.prototype = {
                             let bases = result.bases;
                             switch (bases) {
                                 case 0:
-                                    game.batter.atBats.push(Log.prototype.GROUNDOUT);
+                                    game.batter.atBats.push(Log.GROUNDOUT);
                                     break;
                                 case 1:
                                     if (result.error) {
-                                        game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
+                                        game.batter.atBats.push(Log.REACHED_ON_ERROR);
                                         break;
                                     }
-                                    game.batter.atBats.push(Log.prototype.SINGLE);
+                                    game.batter.atBats.push(Log.SINGLE);
                                     batter.stats.batting.h++;
                                     break;
                                 case 2:
                                     if (result.error) {
-                                        game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
+                                        game.batter.atBats.push(Log.REACHED_ON_ERROR);
                                         break;
                                     }
-                                    game.batter.atBats.push(Log.prototype.DOUBLE);
+                                    game.batter.atBats.push(Log.DOUBLE);
                                     batter.stats.batting.h++;
                                     batter.stats.batting['2b']++;
                                     break;
                                 case 3:
                                     if (result.error) {
-                                        game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
+                                        game.batter.atBats.push(Log.REACHED_ON_ERROR);
                                         break;
                                     }
-                                    game.batter.atBats.push(Log.prototype.TRIPLE);
+                                    game.batter.atBats.push(Log.TRIPLE);
                                     batter.stats.batting.h++;
                                     batter.stats.batting['3b']++;
                                     break;
                                 case 4:
                                     if (result.error) {
-                                        game.batter.atBats.push(Log.prototype.REACHED_ON_ERROR);
+                                        game.batter.atBats.push(Log.REACHED_ON_ERROR);
                                         break;
                                     }
-                                    game.batter.atBats.push(Log.prototype.HOMERUN);
+                                    game.batter.atBats.push(Log.HOMERUN);
                                     pitcher.stats.pitching.HR++;
                                     batter.stats.batting.h++;
                                     batter.stats.batting.hr++;
@@ -279,7 +283,7 @@ Umpire.prototype = {
             pitcher.stats.pitching.IP[1]++;
             this.count.balls = this.count.strikes = 0;
             this.says = 'Strike three. Batter out.';
-            batter.atBats.push(Log.prototype.STRIKEOUT);
+            batter.atBats.push(Log.STRIKEOUT);
             this.newBatter();
         }
         if (this.count.balls > 3) {
@@ -288,7 +292,7 @@ Umpire.prototype = {
             pitcher.stats.pitching.BB++;
             this.says = 'Ball four.';
             this.count.balls = this.count.strikes = 0;
-            batter.atBats.push(Log.prototype.WALK);
+            batter.atBats.push(Log.WALK);
             this.advanceRunners(true)
                 .reachBase()
                 .newBatter();
@@ -300,7 +304,8 @@ Umpire.prototype = {
             pitcher.stats.pitching.IP[1] = 0;
             this.changeSides();
         }
-    },
+    }
+
     /**
      * awards first base to the batter
      */
@@ -309,7 +314,8 @@ Umpire.prototype = {
         game.field.first = game.batter;
         game.field.first.fatigue += 2;
         return this;
-    },
+    }
+
     /**
      * advance the runners (ball in play or walk)
      *
@@ -332,7 +338,7 @@ Umpire.prototype = {
                         //bases loaded
                         game.batter.recordRBI();
                         game.batter.stats.batting.rbi++;
-                        third.atBats.push(Log.prototype.RUN);
+                        third.atBats.push(Log.RUN);
                         third.stats.batting.r++;
                         game.pitcher.stats.pitching.ER++;
                         this.runScores();
@@ -393,7 +399,7 @@ Umpire.prototype = {
                 this.runScores();
                 if (game.batter != third) {
                     game.batter.recordRBI();
-                    third.atBats.push(Log.prototype.RUN);
+                    third.atBats.push(Log.RUN);
                 }
                 game.batter.stats.batting.rbi++;
                 third.stats.batting.r++;
@@ -411,7 +417,7 @@ Umpire.prototype = {
                     this.runScores();
                     if (game.batter != second) {
                         game.batter.recordRBI();
-                        second.atBats.push(Log.prototype.RUN);
+                        second.atBats.push(Log.RUN);
                     }
                     game.field.third = null;
                 }
@@ -431,7 +437,8 @@ Umpire.prototype = {
             }
         }
         return this;
-    },
+    }
+
     /**
      * "run scores!"
      */
@@ -439,9 +446,10 @@ Umpire.prototype = {
         const game = this.game;
         game.scoreboard[game.half === 'top' ? 'away' : 'home'][game.inning]++;
         game.tally[game.half === 'top' ? 'away' : 'home'].R++;
-    },
+    }
+
     /**
-     * lets the on deck batter into the batter's box
+     * lets the on deck batter into the batter's box.
      */
     newBatter() {
         const game = this.game;
@@ -466,7 +474,8 @@ Umpire.prototype = {
         if (!game.humanPitching()) {
             game.pitcher.team.manager.checkPitcherFatigue();
         }
-    },
+    }
+
     /**
      * 3 outs
      */
@@ -515,10 +524,9 @@ Umpire.prototype = {
         game.autoPitchSelect();
         game.field.defense = team.positions;
         this.onSideChange();
-    },
-    onSideChange() {}, // will be be bound externally
-    says: 'Play ball!',
-    game: null
-};
+    }
+
+    onSideChange(): void {} // will be be bound externally
+}
 
 export { Umpire };

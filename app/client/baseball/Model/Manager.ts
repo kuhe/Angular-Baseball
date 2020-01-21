@@ -1,15 +1,20 @@
 import { Iterator } from '../Services/Iterator';
+import { Team } from './Team';
+import { Player } from './Player';
+import { handedness_t } from '../Api/handedness';
+import { fielder_short_name_t } from '../Api/fielderShortName';
 
-const Manager = function(team) {
-    this.init(team);
-};
+/**
+ * Doesn't do all that much in our context, but this models
+ * the coach of a baseball team.
+ */
+class Manager {
+    constructor(public team: Team) {}
 
-Manager.prototype = {
-    constructor: Manager,
-    init(team) {
-        this.team = team;
-    },
-    makeLineup() {
+    /**
+     * Build an offensive lineup out of the players on the bench of the team.
+     */
+    public makeLineup(): void {
         let jerseyNumber = 1;
         this.team.positions.pitcher = this.selectForSkill(this.team.bench, ['pitching']);
         this.team.positions.pitcher.position = 'pitcher';
@@ -80,15 +85,26 @@ Manager.prototype = {
         this.team.lineup[7].order = 7;
         this.team.lineup[8] = this.selectForSkill(this.team.positions, ['offense', 'speed']);
         this.team.lineup[8].order = 8;
-    },
-    selectForSkill(pool, skillset, requiredThrowingHandedness) {
+    }
+
+    /**
+     * Select a player from a pool (bench or positions) based on a skillset.
+     * @param pool
+     * @param skillset
+     * @param requiredThrowingHandedness - e.g. lefty for 1B.
+     */
+    public selectForSkill(
+        pool: Player[] | Record<fielder_short_name_t, Player>,
+        skillset: string[],
+        requiredThrowingHandedness?: handedness_t
+    ): Player {
         if (this.team.bench.length || pool === this.team.positions) {
             let selection = this.team.bench[0];
             let rating = 0;
             let index = 0;
-            Iterator.each(pool, (key, player) => {
+            Iterator.each(pool as Player[], (key: number, player: Player) => {
                 const skills = skillset.slice();
-                let cursor = player.skill;
+                let cursor: any = player.skill;
                 let property = skills.shift();
                 while (property) {
                     cursor = cursor[property];
@@ -112,14 +128,15 @@ Manager.prototype = {
             }
             return selection;
         }
-        return 'no players available';
-    },
+        throw new Error('no players available');
+    }
+
     /**
      * used by the AI to substitute a fatigued pitcher
      * @param {Number} fatigueAllowed
      * only execute if the pitcher's fatigue is greater than this number
      */
-    checkPitcherFatigue(fatigueAllowed = 120) {
+    public checkPitcherFatigue(fatigueAllowed = 120): void {
         const team = this.team;
         const pitcher = team.positions.pitcher;
 
@@ -137,6 +154,6 @@ Manager.prototype = {
             team.bench.push(sub);
         }
     }
-};
+}
 
 export { Manager };

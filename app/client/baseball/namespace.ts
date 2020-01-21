@@ -1,5 +1,3 @@
-const Baseball = {};
-
 import { AtBat } from './Model/AtBat';
 import { Field } from './Model/Field';
 import { Game } from './Model/Game';
@@ -18,25 +16,36 @@ import { Iterator } from './Services/Iterator';
 import { Provider } from './Teams/Provider';
 import { samurai } from './Teams/TeamJapan';
 
-Baseball.model = {};
-Baseball.model.Game = Baseball.Game = Game;
-Baseball.model.Player = Baseball.Player = Player;
-Baseball.model.Team = Baseball.Team = Team;
-
-Baseball.service = {};
-Baseball.service.Animator = Animator;
-Baseball.service.Distribution = Distribution;
-Baseball.service.Iterator = Iterator;
-Baseball.service.Mathinator = Mathinator;
-
-Baseball.util = {};
-Baseball.util.text = text;
-Baseball.util.Log = Log;
-Baseball.util.text.abbreviatePosition = abbreviatePosition;
-
-Baseball.teams = {};
-Baseball.teams.Provider = Provider;
-Baseball.teams.Japan = samurai;
+const Baseball = {
+    Game,
+    Player,
+    Team,
+    Field,
+    Manager,
+    Umpire,
+    model: {
+        Game,
+        Player,
+        Team,
+        Field,
+        Manager,
+        Umpire
+    },
+    service: {
+        Animator,
+        Distribution,
+        Iterator,
+        Mathinator
+    },
+    util: {
+        text: Object.assign(text, { abbreviatePosition }),
+        Log
+    },
+    teams: {
+        Provider,
+        Japan: samurai
+    }
+};
 
 export default Baseball;
 export { Baseball };

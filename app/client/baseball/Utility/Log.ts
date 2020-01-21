@@ -1,55 +1,69 @@
-import { text } from '../Utility/text';
+import { lang_mode_t, text } from './text';
+import { Game } from '../Model/Game';
+import { Player } from '../Model/Player';
+import { fielder_short_name_t } from '../Api/fielderShortName';
+import { pitch_in_flight_t } from '../Api/pitchInFlight';
+import { swing_result_t } from '../Api/swingResult';
+import { base_name_t } from '../Api/baseName';
+import { runner_name_t } from '../Api/runnerName';
+import { out_by_t } from '../Api/outBy';
+import { multilingual_log_t } from '../Api/log';
 
-const Log = function() {
-    this.init();
-};
+class Log {
+    public game: Game = (null as unknown) as Game;
+    public static readonly SINGLE = 'H';
+    public static readonly DOUBLE = '2B';
+    public static readonly TRIPLE = '3B';
+    public static readonly HOMERUN = 'HR';
+    public static readonly WALK = 'BB';
+    public static readonly GROUNDOUT = 'GO';
+    public static readonly FLYOUT = 'FO';
+    public static readonly LINEOUT = 'LO';
+    public static readonly RUN = 'R';
+    public static readonly STRIKEOUT = 'SO';
+    public static readonly SACRIFICE = 'SAC';
+    public static readonly REACHED_ON_ERROR = 'ROE';
+    public static readonly FIELDERS_CHOICE = 'FC';
+    public static readonly GIDP = '(IDP)';
+    public static readonly GITP = '(ITP)';
+    public static readonly STOLEN_BASE = 'SB';
+    public static readonly CAUGHT_STEALING = 'CS';
 
-Log.prototype = {
-    game: 'instance of Game',
-    init() {
-        this.lastSwing = '';
-        this.lastSwingJ = '';
-        this.stabilized = {
-            pitchRecord: {
-                e: ['', '', '', '', '', ''],
-                n: ['', '', '', '', '', '']
-            },
-            shortRecord: {
-                e: ['', '', '', '', '', ''],
-                n: ['', '', '', '', '', '']
-            }
-        };
-        this.pitchRecord = {
-            e: [],
-            n: []
-        };
-        this.shortRecord = {
-            e: [],
-            n: []
-        };
-        this.record = {
-            e: [],
-            n: []
-        };
-    },
-    SINGLE: 'H',
-    DOUBLE: '2B',
-    TRIPLE: '3B',
-    HOMERUN: 'HR',
-    WALK: 'BB',
-    GROUNDOUT: 'GO',
-    FLYOUT: 'FO',
-    LINEOUT: 'LO',
-    RUN: 'R',
-    STRIKEOUT: 'SO',
-    SACRIFICE: 'SAC',
-    REACHED_ON_ERROR: 'ROE',
-    FIELDERS_CHOICE: 'FC',
-    GIDP: '(IDP)',
-    GITP: '(ITP)',
-    STOLEN_BASE: 'SB',
-    CAUGHT_STEALING: 'CS',
-    stabilizeShortRecord() {
+    private lastOuts: number = 0;
+    public pointer = 0;
+    public stabilized: {
+        pitchRecord: multilingual_log_t;
+        shortRecord: multilingual_log_t;
+    } = {
+        pitchRecord: {
+            e: ['', '', '', '', '', ''],
+            n: ['', '', '', '', '', '']
+        },
+        shortRecord: {
+            e: ['', '', '', '', '', ''],
+            n: ['', '', '', '', '', '']
+        }
+    };
+    public pitchRecord: multilingual_log_t = {
+        e: [],
+        n: []
+    };
+    public shortRecord: multilingual_log_t = {
+        e: [],
+        n: []
+    };
+    public record: multilingual_log_t = {
+        e: [],
+        n: []
+    };
+
+    public lastSwing: string = '';
+    public lastSwingJ: string = '';
+
+    /**
+     * Stabilize shortRecord to exactly 6 items, for UI balancing purposes.
+     */
+    stabilizeShortRecord(): void {
         const rec = this.record.e.slice(0, 6);
         this.shortRecord.e = rec;
         this.stabilized.shortRecord.e = rec.concat(['', '', '', '', '', '']).slice(0, 6);
@@ -57,8 +71,15 @@ Log.prototype = {
         const rec2 = this.record.n.slice(0, 6);
         this.shortRecord.n = rec2;
         this.stabilized.shortRecord.n = rec2.concat(['', '', '', '', '', '']).slice(0, 6);
-    },
-    note(note, noteJ, only) {
+    }
+
+    /**
+     * Add bilingual notes to the record.
+     * @param note - English log phrase or note.
+     * @param noteJ - Japanese.
+     * @param only - only log one language.
+     */
+    note(note: string, noteJ: string, only?: lang_mode_t): void {
         //todo fix don't double language when specifying param [only]
         if (only === 'e') {
             this.record.e.unshift(note);
@@ -82,10 +103,16 @@ Log.prototype = {
             });
         }
         this.stabilizeShortRecord();
-    },
-    getBatter(batter) {
-        let order = batter.team.nowBatting;
-        order = {
+    }
+
+    /**
+     * "Now batting..."
+     * @param batter - up to bat.
+     * @returns e.g. "now batting 1st, right fielder, #51, Ichiro"
+     */
+    getBatter(batter: Player): string {
+        const orderIndex = batter.team.nowBatting;
+        const order = {
             0: text(' 1st'),
             1: text(' 2nd'),
             2: text(' 3rd'),
@@ -95,20 +122,24 @@ Log.prototype = {
             6: text(' 7th'),
             7: text(' 8th'),
             8: text(' 9th')
-        }[order];
-        const positions = this.longFormFielder();
+        }[orderIndex as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8];
         return (
             text('Now batting') +
             order +
             text.comma() +
-            positions[batter.position] +
+            text.fielderLongName(batter.position as fielder_short_name_t) +
             text.comma() +
             batter.getUniformNumber() +
             text.comma() +
             batter.getName()
         );
-    },
-    noteBatter(batter) {
+    }
+
+    /**
+     * Announce a new batter at the plate.
+     * @param batter - up to bat.
+     */
+    noteBatter(batter: Player): void {
         const m = text.mode;
         let record;
         let recordJ;
@@ -118,8 +149,18 @@ Log.prototype = {
         recordJ = this.getBatter(batter);
         text.mode = m;
         this.note(record, recordJ);
-    },
-    getPitchLocationDescription(pitchInFlight, batterIsLefty) {
+    }
+
+    /**
+     * Describe an incoming pitch, before it is put in play or caught.
+     * Upon being put in play, this log statement is typically amended to say
+     * what happened.
+     *
+     * @param pitchInFlight - from Game.
+     * @param batterIsLefty - from Player.
+     * @returns e.g. "Curveball, way outside".
+     */
+    getPitchLocationDescription(pitchInFlight: pitch_in_flight_t, batterIsLefty?: boolean): string {
         let x = pitchInFlight.x;
         const y = pitchInFlight.y;
         let say = '';
@@ -168,8 +209,16 @@ Log.prototype = {
         // say = (ball ? 'Ball, ' : 'Strike, ') + say;
         say = text.namePitch(pitchInFlight) + text.comma() + say + text.stop();
         return say;
-    },
-    notePitch(pitchInFlight, batter) {
+    }
+
+    /**
+     * @example
+     *  "Curveball, way outside, way low"
+     *
+     * @param pitchInFlight - from Game.
+     * @param batter - a Player.
+     */
+    notePitch(pitchInFlight: pitch_in_flight_t, batter: Player): void {
         const m = text.mode;
         let record;
         let recordJ;
@@ -184,27 +233,42 @@ Log.prototype = {
         this.stabilized.pitchRecord.n.unshift(recordJ);
         this.stabilized.pitchRecord.n.pop();
         text.mode = m;
-    },
-    broadcastCount(justOuts) {
+    }
+
+    /**
+     * Broadcast inning (optional), strike/ball count.
+     * @param justOuts - only announce number of outs, vs an inning change.
+     */
+    broadcastCount(justOuts?: boolean): string {
+        let outs;
         if (!this.game.umpire) return '';
         const count = this.game.umpire.count;
-        if (this.lastOuts == 2 && count.outs == 0) {
+        if (this.lastOuts === 2 && count.outs === 0) {
             outs = 3 + text(' outs');
         } else {
-            var outs = count.outs + (count.outs == 1 ? text(' out') : text(' outs'));
+            outs = count.outs + (count.outs == 1 ? text(' out') : text(' outs'));
         }
         this.lastOuts = count.outs;
         if (justOuts) {
             return outs + text.stop();
         }
         return `${this.game.getInning()}: ${count.strikes}-${count.balls}, ${outs}${text.stop()}`;
-    },
-    broadcastScore() {
+    }
+
+    /**
+     * @example
+     * "Yankees 2, Red Sox 1"
+     */
+    broadcastScore(): string {
         return `${this.game.teams.away.getName()} ${
             this.game.tally.away.R
         }, ${this.game.teams.home.getName()} ${this.game.tally.home.R}${text.stop()}`;
-    },
-    broadcastRunners() {
+    }
+
+    /**
+     * @returns e.g. "Runners on first, second".
+     */
+    broadcastRunners(): string {
         const field = this.game.field;
         const runners = [
             (field.first && text('first')) || '',
@@ -227,8 +291,15 @@ Log.prototype = {
             default:
                 return `${text('Runners on')}: ${runners.join(text.comma())}${text.stop()}`;
         }
-    },
-    getSwing(swingResult) {
+    }
+
+    /**
+     * Note the result of a swingResult (misnomer, also includes not swinging):
+     * strike, ball, foul, or in play. Does not know what the fielding result is yet.
+     *
+     * @param swingResult - from Game.
+     */
+    getSwing(swingResult: swing_result_t) {
         let result = '';
         if (swingResult.looking) {
             if (swingResult.strike) {
@@ -276,11 +347,16 @@ Log.prototype = {
             this.note(steal, steal, text.mode);
         }
         return result + steal;
-    },
-    noteSwing(swingResult) {
+    }
+
+    /**
+     * @see Log#getSwing()
+     * @param swingResult - from Game.
+     */
+    noteSwing(swingResult: swing_result_t) {
         const m = text.mode;
-        let record;
-        let recordJ;
+        let record: string;
+        let recordJ: string;
         const pitchRecord = this.pitchRecord;
         const stabilized = this.stabilized.pitchRecord;
         text.mode = 'e';
@@ -315,27 +391,50 @@ Log.prototype = {
                     }
                 }
             });
-    },
-    async(fn) {
+    }
+
+    /**
+     * Async logging.
+     * @param fn
+     */
+    async(fn: () => void) {
         if (!this.game.console) {
             setTimeout(fn, 100);
         }
-    },
-    noteStealAttempt(thief, success, base) {
+    }
+
+    /**
+     * Log a base steal attempt and its result.
+     * @param thief - a Player.
+     * @param success - whether base was stolen.
+     * @param base - which base?
+     */
+    noteStealAttempt(thief: Player, success: boolean, base: base_name_t) {
         return `${text.space() +
             thief.getName() +
             text.comma() +
             (success ? text('stolen base') : text('caught stealing')) +
             text.space()}(${text.baseShortName(base)})${text.stop()}`;
-    },
-    noteSubstitution(sub, player) {
+    }
+
+    /**
+     * Note a bench substitution.
+     * @param sub - new Player.
+     * @param player - Player leaving the field.
+     */
+    noteSubstitution(sub: Player, player: Player): void {
         return this.note(text.substitution(sub, player, 'e'), text.substitution(sub, player, 'n'));
-    },
-    getPlateAppearanceResult(game) {
+    }
+
+    /**
+     * E.g. "Ichiro reached on a single to right".
+     * @param game
+     */
+    getPlateAppearanceResult(game: Game): string {
         const r = game.swingResult;
         let record = '';
         const batter = game.batter.getName();
-        let out = [];
+        let out: string[] & { doublePlay?: boolean } = [];
         if (r.looking) {
             if (r.strike) {
                 record = batter + `<span class="txt-red">${text(' struck out looking.')}</span>`;
@@ -357,12 +456,12 @@ Log.prototype = {
             if (r.contact) {
                 let fielder = r.fielder,
                     bases = r.bases,
-                    outBy;
+                    outBy: out_by_t = false;
                 if (r.caught) {
                     if (r.flyAngle < 15) {
                         outBy = 'line';
                     } else {
-                        if (['left', 'center', 'right'].indexOf(r.fielder) < 0) {
+                        if (['left', 'center', 'right'].indexOf(r.fielder as string) < 0) {
                             outBy = 'pop';
                         } else {
                             outBy = 'fly';
@@ -403,7 +502,9 @@ Log.prototype = {
                             }
                             if (r.firstOut) {
                                 out = out.concat(
-                                    r.additionalOuts.filter((runner) => runner !== 'batter')
+                                    r.additionalOuts.filter(
+                                        (runner: runner_name_t) => runner !== 'batter'
+                                    )
                                 );
                                 out.doublePlay = r.doublePlay;
                             }
@@ -420,7 +521,7 @@ Log.prototype = {
                 }
                 record = text.contactResult(
                     batter,
-                    fielder,
+                    fielder as string,
                     bases,
                     outBy,
                     r.outs === 3 ? [] : r.sacrificeAdvances,
@@ -431,8 +532,13 @@ Log.prototype = {
             }
         }
         return record;
-    },
-    notePlateAppearanceResult(game) {
+    }
+
+    /**
+     * @see #getPlateAppearanceResult()
+     * @param game
+     */
+    notePlateAppearanceResult(game: Game): void {
         const m = text.mode,
             prevJ = text('Previous: ', 'n'),
             prev = text('Previous: ', 'e');
@@ -481,43 +587,7 @@ Log.prototype = {
                 );
             }
         });
-    },
-    pointer: 0,
-    stabilized: {
-        pitchRecord: {
-            e: ['', '', '', '', '', ''],
-            n: ['', '', '', '', '', '']
-        },
-        shortRecord: {
-            e: ['', '', '', '', '', ''],
-            n: ['', '', '', '', '', '']
-        }
-    },
-    pitchRecord: {
-        e: [],
-        n: []
-    },
-    shortRecord: {
-        e: [],
-        n: []
-    },
-    record: {
-        e: [],
-        n: []
-    },
-    longFormFielder() {
-        return {
-            first: text('first baseman'),
-            second: text('second baseman'),
-            third: text('third baseman'),
-            short: text('shortstop'),
-            pitcher: text('pitcher'),
-            catcher: text('catcher'),
-            left: text('left fielder'),
-            center: text('center fielder'),
-            right: text('right fielder')
-        };
     }
-};
+}
 
 export { Log };

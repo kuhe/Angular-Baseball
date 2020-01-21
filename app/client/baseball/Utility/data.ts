@@ -1,3 +1,9 @@
+/**
+ *
+ * Contains name lists for randomization of
+ * teams and players.
+ *
+ */
 const data = {
     surnames: [
         'Sato',

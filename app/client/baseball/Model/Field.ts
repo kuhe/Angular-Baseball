@@ -1,25 +1,42 @@
-import { Player } from '../Model/Player';
+import { Player } from './Player';
 import { Distribution } from '../Services/Distribution';
 import { Mathinator } from '../Services/Mathinator';
 import { Animator } from '../Services/Animator';
+import { Game } from './Game';
+import { swing_result_t } from '../Api/swingResult';
+import { polar_coordinate_reversed_t } from '../Api/pitchInFlight';
+import { fielder_short_name_t } from '../Api/fielderShortName';
+import { degrees_t, fly_angle_t } from '../Api/math';
+import { player_skill_t } from '../Api/player';
+import { runner_name_t } from '../Api/runnerName';
 
 /**
- * The baseball field tracks the ball's movement, fielders, and what runners are on
- * @param game
- * @constructor
+ * The baseball field tracks the ball's movement, fielders, and what runners are on.
  */
-const Field = function(game) {
-    this.init(game);
-};
+class Field {
+    public first: Player | null = null;
+    public second: Player | null = null;
+    public third: Player | null = null;
 
-Field.prototype = {
-    constructor: Field,
-    init(game) {
+    /**
+     * approximate fielder positions (polar degrees where 90 is up the middle, distance from origin (home plate))
+     */
+    public readonly positions = {
+        pitcher: [90, 66],
+        catcher: [0, 0],
+        first: [90 + 45 - 7, 98],
+        second: [90 + 12.5, 130],
+        short: [90 - 12.5, 130],
+        third: [90 - 45 + 7, 98],
+        left: [45 + 14, 280],
+        center: [90, 280],
+        right: [135 - 14, 280]
+    };
+
+    constructor(public game: Game) {
         this.game = game;
-        this.first = null;
-        this.second = null;
-        this.third = null;
-    },
+    }
+
     /**
      * @returns {boolean}
      */
@@ -29,12 +46,13 @@ Field.prototype = {
             this.second instanceof Player ||
             this.third instanceof Player
         );
-    },
+    }
+
     /**
      * @param swing
      * @returns {object}
      */
-    determineSwingContactResult(swing) {
+    determineSwingContactResult(swing: swing_result_t) {
         if (this.first) this.first.fatigue += 4;
         if (this.second) this.second.fatigue += 4;
         if (this.third) this.third.fatigue += 4;
@@ -52,9 +70,9 @@ Field.prototype = {
         const angles = Mathinator.getSplayAndFlyAngle(
             x,
             y,
-            swing.angle,
+            swing.angle as number,
             eye,
-            swing.timing,
+            swing.timing as number,
             game.batter.bats === 'left'
         );
         const splayAngle = angles.splay;
@@ -92,10 +110,10 @@ Field.prototype = {
             let fieldingEase = fielder.skill.defense.fielding / 100;
             const throwingEase = fielder.skill.defense.throwing / 100;
             //reach the batted ball?
-            swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [
-                splayAngle + 90,
-                landingDistance
-            ]);
+            swing.fielderTravel = this.getPolarDistance(
+                this.positions[swing.fielder] as [number, number],
+                [splayAngle + 90, landingDistance]
+            );
             const speedComponent = ((1 + Math.sqrt(fielder.skill.defense.speed / 100)) / 2) * 100;
 
             /**
@@ -162,7 +180,8 @@ Field.prototype = {
                     interceptRating
                 );
                 swing.fieldingDelay = fieldingReturnDelay;
-                swing.outfielder = { left: 1, center: 1, right: 1 }[swing.fielder] === 1;
+                swing.outfielder =
+                    (swing.fielder as fielder_short_name_t) in { left: 1, center: 1, right: 1 };
                 const speed = game.batter.skill.offense.speed;
                 let baseRunningTime = Mathinator.baseRunningTime(speed);
 
@@ -201,10 +220,11 @@ Field.prototype = {
                         const fielders = fielder.team.positions;
                         let force = this.forcePlaySituation();
                         if (force) {
-                            const additionalOuts = [];
+                            const additionalOuts: runner_name_t[] = [];
                             let throwingDelay = fieldingReturnDelay;
                             if (
                                 third &&
+                                second &&
                                 force === 'third' &&
                                 Mathinator.infieldThrowDelay(fielders.catcher) + throwingDelay <
                                     second.getBaseRunningTime() &&
@@ -218,6 +238,7 @@ Field.prototype = {
                             }
                             if (
                                 second &&
+                                first &&
                                 force === 'second' &&
                                 Mathinator.infieldThrowDelay(fielders.third) + throwingDelay <
                                     first.getBaseRunningTime() &&
@@ -249,7 +270,7 @@ Field.prototype = {
                             if (additionalOuts.length) {
                                 swing.additionalOuts = additionalOuts;
                                 swing.firstOut = swing.fieldersChoice;
-                                if (additionalOuts.includes('batter')) {
+                                if (~additionalOuts.indexOf('batter')) {
                                     delete swing.fieldersChoice;
                                 }
                             }
@@ -286,7 +307,8 @@ Field.prototype = {
             Animator._ball.hasIndicator = true;
             Animator.animateFieldingTrajectory(this.game);
         }
-    },
+    }
+
     forcePlaySituation() {
         const first = this.first,
             second = this.second,
@@ -296,7 +318,8 @@ Field.prototype = {
             (first && second && 'second') ||
             (first && 'first')
         );
-    },
+    }
+
     /**
      * @returns {Player}
      * the best steal candidate.
@@ -307,21 +330,28 @@ Field.prototype = {
             third = this.third;
         if (third && first && !second) return first;
         return third || second || first;
-    },
+    }
+
     //printRunnerNames : function() {
     //    return [this.first ? this.first.getName() : '', this.second ? this.second.getName() : '', this.third ? this.third.getname() : ''];
-    //},
+    //}
+
     /**
-     * @param splayAngle {Number} -45 to 45.
-     * @param landingDistance {Number} in feet, up to 310 or so
-     * @param power {Number} 0-100
-     * @param flyAngle {Number} roughly -15 to 90
-     * @returns {string|boolean}
+     * @param splayAngle - -45 to 45.
+     * @param landingDistance - in feet, up to 310 or so
+     * @param power - 0-100
+     * @param flyAngle - roughly -15 to 90
+     * @returns fielder covering the play.
      */
-    findFielder(splayAngle, landingDistance, power, flyAngle) {
+    findFielder(
+        splayAngle: degrees_t,
+        landingDistance: number,
+        power: player_skill_t,
+        flyAngle: fly_angle_t
+    ): fielder_short_name_t | false {
         const angle = splayAngle; // 0 is up the middle, clockwise increasing
 
-        let fielder;
+        let fielder: fielder_short_name_t | false;
 
         if (Math.abs(angle) > 50) return false; // foul
         if (landingDistance < 10 && landingDistance > -20) {
@@ -376,24 +406,11 @@ Field.prototype = {
             fielder = false;
         }
         return fielder;
-    },
-    /**
-     * approximate fielder positions (polar degrees where 90 is up the middle, distance from origin (home plate))
-     */
-    positions: {
-        pitcher: [90, 66],
-        catcher: [0, 0],
-        first: [90 + 45 - 7, 98],
-        second: [90 + 12.5, 130],
-        short: [90 - 12.5, 130],
-        third: [90 - 45 + 7, 98],
-        left: [45 + 14, 280],
-        center: [90, 280],
-        right: [135 - 14, 280]
-    },
-    getPolarDistance(a, b) {
+    }
+
+    getPolarDistance(a: polar_coordinate_reversed_t, b: polar_coordinate_reversed_t) {
         return Mathinator.getPolarDistance(a, b);
     }
-};
+}
 
 export { Field };
