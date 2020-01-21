@@ -3,15 +3,24 @@ import { Log } from '../Utility/Log';
 /**
  *
  * e.g. "HR++" (HR and 2 extra runs), "SO" strikeout, "FO" flyout
+ * string formatting encapsulation for an at-bat.
  *
  */
 class AtBat {
-    constructor(text) {
-        this.infield = text.includes(AtBat.prototype.INFIELD_HIT_INDICATOR)
-            ? AtBat.prototype.INFIELD_HIT_INDICATOR
+    public static readonly INFIELD_HIT_INDICATOR: string = '';
+    public static readonly RBI_INDICATOR: string = '+';
+
+    public infield: string;
+    public text: string;
+    public rbi: string;
+    public beneficial: boolean = false;
+
+    constructor(text: string) {
+        this.infield = text.includes(AtBat.INFIELD_HIT_INDICATOR)
+            ? AtBat.INFIELD_HIT_INDICATOR
             : '';
-        text = text.replace(AtBat.prototype.INFIELD_HIT_INDICATOR, '');
-        this.text = text.split(AtBat.prototype.RBI_INDICATOR)[0];
+        text = text.replace(AtBat.INFIELD_HIT_INDICATOR, '');
+        this.text = text.split(AtBat.RBI_INDICATOR)[0];
         this.rbi = `${text.split(this.text)[1]}`;
 
         const log = new Log();
@@ -27,7 +36,7 @@ class AtBat {
             log.STOLEN_BASE,
             log.RUN
         ];
-        if (beneficial.includes(this.text)) {
+        if (~beneficial.indexOf(this.text)) {
             this.beneficial = true;
         }
     }
@@ -35,10 +44,5 @@ class AtBat {
         return `${this.infield}${this.text}${this.rbi}`;
     }
 }
-
-AtBat.prototype.constructor = AtBat;
-AtBat.prototype.identifier = 'AtBat';
-AtBat.prototype.INFIELD_HIT_INDICATOR = '';
-AtBat.prototype.RBI_INDICATOR = '+';
 
 export { AtBat };

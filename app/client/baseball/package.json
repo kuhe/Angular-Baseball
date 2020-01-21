@@ -8,12 +8,15 @@
   "scripts": {
     "test": "node test/CareerSpec.js",
     "build": "npx webpack",
-    "watch": "npx webpack --watch"
+    "watch": "npx webpack --watch --mode development"
   },
   "author": "George Fu (george.jing.fu@gmail.com)",
   "license": "UNLICENSED",
   "devDependencies": {
-    "webpack": "^3.8.1"
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   },
   "directories": {
     "test": "test"

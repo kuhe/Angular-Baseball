@@ -97,9 +97,19 @@ Field.prototype = {
                 landingDistance
             ]);
             const speedComponent = ((1 + Math.sqrt(fielder.skill.defense.speed / 100)) / 2) * 100;
+
+            /**
+             * This is an important calculation, since it decides
+             * whether a ball was caught in the air, or
+             * how quickly a fielder reaches a landed ball.
+             *
+             * Higher is better for the defense.
+             * @type {number}
+             */
             const interceptRating =
-                speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.55 - 15;
-            if (interceptRating > 0 && flyAngle > 4) {
+                speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.35 - 25;
+
+            if (interceptRating > 0 && flyAngle > 10) {
                 //caught cleanly?
                 if (Distribution.error(fielder)) {
                     //error
@@ -176,7 +186,7 @@ Field.prototype = {
                         second = this.second,
                         third = this.third;
                     swing.fieldersChoice = null;
-                    swing.bases = fieldingReturnDelay >= baseRunningTime + 1 ? 1 : 0;
+                    swing.bases = fieldingReturnDelay >= baseRunningTime ? 1 : 0;
                     if (first && fieldingReturnDelay < first.getBaseRunningTime())
                         swing.fieldersChoice = 'first';
                     if (first && second && fieldingReturnDelay < second.getBaseRunningTime() + 0.6)
@@ -256,7 +266,7 @@ Field.prototype = {
                         delete swing.fieldersChoice;
                     }
                 }
-                swing.thrownOut = swing.bases == 0;
+                swing.thrownOut = swing.bases === 0;
                 if (swing.thrownOut) {
                     fielder.stats.fielding.PO++; // todo A to PO
                     swing.thrownOut = true;

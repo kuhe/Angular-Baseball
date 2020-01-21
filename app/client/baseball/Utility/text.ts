@@ -1,182 +1,274 @@
-const text = (phrase, override) => {
-    if (!text.mode) text.mode = 'e';
-    const string = {
-        n: {
-            empty: '-',
-            ' 1st': '1番',
-            ' 2nd': '2番',
-            ' 3rd': '3番',
-            ' 4th': '4番',
-            ' 5th': '5番',
-            ' 6th': '6番',
-            ' 7th': '7番',
-            ' 8th': '8番',
-            ' 9th': '9番',
-            'Now batting': '次のバッター',
-            'way outside': '相当外角',
-            outside: '外角',
-            inside: '内角',
-            'way inside': '相当内角',
-            'way low': '相当低め',
-            low: '低め',
-            high: '高め',
-            'way high': '相当高め',
-            'down the middle': '真ん中',
-            'first baseman': 'ファースト',
-            'second baseman': 'セカンド',
-            'third baseman': 'サード',
-            shortstop: 'ショート',
-            pitcher: 'ピッチャー',
-            catcher: 'キャッチャー',
-            'left fielder': 'レフト',
-            'center fielder': 'センター',
-            'right fielder': 'ライト',
-            'Strike.': 'ストライク。',
-            'Ball.': 'ボール。',
-            'Fouled off.': 'ファウル。',
-            'In play.': 'インプレー。',
-            'Swinging strike.': '空振り。',
-            ' outs': 'アウト',
-            ' out': 'アウト',
-            '4-seam': 'ストレート',
-            '2-seam': 'シュート',
-            slider: 'スライダー',
-            fork: 'フォーク',
-            cutter: 'カット',
-            sinker: 'シンカー',
-            curve: 'カーブ',
-            change: 'チェンジ',
-            ' struck out looking.': '、見逃し三振。',
-            ' walked.': '、フォアボール。',
-            ' struck out swinging.': '、空振り三振。',
-            'Previous: ': '前：',
-            'looks like: ': '予想',
-            'breaking ball': '変化球',
-            fastball: 'ストレート',
-            'Batting, ': '打球',
-            'Catching, pitch selection': '捕球選択',
-            Season: '記録',
-            Game: '今試合',
-            Pitch: '球',
-            Control: '制球',
-            Velocity: '速度',
-            Break: '変化',
-            'At Bat': 'バッター',
-            'On Deck': '次バッター',
-            Eye: '目',
-            Power: '力',
-            Speed: '速',
-            'Up to Bat': '打席',
-            Fielding: '守備',
-            Pitching: '投球',
-            BA: '打率',
-            OBP: '出塁',
-            SLG: '長打',
-            PA: '打席',
-            'H 2B 3B HR': '安 二 三 本',
-            H: '安',
-            '2B': '二',
-            '3B': '三',
-            HR: '本塁打',
-            RBI: '打点',
-            R: '得点',
-            BB: '四球',
-            SO: '三振',
+import { Player } from '../Model/Player';
+import { Game } from '../Model/Game';
+import { out_by_t } from '../Api/outBy';
+import { fielder_short_name_t } from '../Api/fielderShortName';
 
-            ERA: '防御率',
-            W: '勝',
-            K: '三振',
+const translations = {
+    n: {
+        empty: '-',
+        ' 1st': '1番',
+        ' 2nd': '2番',
+        ' 3rd': '3番',
+        ' 4th': '4番',
+        ' 5th': '5番',
+        ' 6th': '6番',
+        ' 7th': '7番',
+        ' 8th': '8番',
+        ' 9th': '9番',
+        'Now batting': '次のバッター',
+        'way outside': '相当外角',
+        outside: '外角',
+        inside: '内角',
+        'way inside': '相当内角',
+        'way low': '相当低め',
+        low: '低め',
+        high: '高め',
+        'way high': '相当高め',
+        'down the middle': '真ん中',
+        'first baseman': 'ファースト',
+        'second baseman': 'セカンド',
+        'third baseman': 'サード',
+        shortstop: 'ショート',
+        pitcher: 'ピッチャー',
+        catcher: 'キャッチャー',
+        'left fielder': 'レフト',
+        'center fielder': 'センター',
+        'right fielder': 'ライト',
+        'Strike.': 'ストライク。',
+        'Ball.': 'ボール。',
+        'Fouled off.': 'ファウル。',
+        'In play.': 'インプレー。',
+        'Swinging strike.': '空振り。',
+        ' outs': 'アウト',
+        ' out': 'アウト',
+        '4-seam': 'ストレート',
+        '2-seam': 'シュート',
+        slider: 'スライダー',
+        fork: 'フォーク',
+        cutter: 'カット',
+        sinker: 'シンカー',
+        curve: 'カーブ',
+        change: 'チェンジ',
+        ' struck out looking.': '、見逃し三振。',
+        ' walked.': '、フォアボール。',
+        ' struck out swinging.': '、空振り三振。',
+        'Previous: ': '前：',
+        'looks like: ': '予想',
+        'breaking ball': '変化球',
+        fastball: 'ストレート',
+        'Batting, ': '打球',
+        'Catching, pitch selection': '捕球選択',
+        Season: '記録',
+        Game: '今試合',
+        Pitch: '球',
+        Control: '制球',
+        Velocity: '速度',
+        Break: '変化',
+        'At Bat': 'バッター',
+        'On Deck': '次バッター',
+        Eye: '目',
+        Power: '力',
+        Speed: '速',
+        'Up to Bat': '打席',
+        Fielding: '守備',
+        Pitching: '投球',
+        BA: '打率',
+        OBP: '出塁',
+        SLG: '長打',
+        PA: '打席',
+        'H 2B 3B HR': '安 二 三 本',
+        H: '安',
+        '2B': '二',
+        '3B': '三',
+        HR: '本塁打',
+        RBI: '打点',
+        R: '得点',
+        BB: '四球',
+        SO: '三振',
 
-            first: 'ファースト',
-            second: 'セカンド',
-            third: 'サード',
-            'Runner on': 'ランナー',
-            'Runners on': 'ランナー',
-            'Bases empty': 'ランナーなし',
-            base: '塁',
+        ERA: '防御率',
+        W: '勝',
+        K: '三振',
 
-            'stolen base': '盗塁成功',
-            'caught stealing': '盗塁失敗',
+        first: 'ファースト',
+        second: 'セカンド',
+        third: 'サード',
+        'Runner on': 'ランナー',
+        'Runners on': 'ランナー',
+        'Bases empty': 'ランナーなし',
+        base: '塁',
 
-            Steal: '盗塁',
-            Opportunistic: '自由',
-            Hold: '止まれ',
+        'stolen base': '盗塁成功',
+        'caught stealing': '盗塁失敗',
 
-            'Select Language:': '言語',
-            'Run Fast Simulation': 'シミュレーションを試合終了まで行う',
-            'Play Ball!': 'プレーボール',
-            'Spectate the CPU': 'CPU観戦',
-            'Play from the 7th': '７回からプレーする',
+        Steal: '盗塁',
+        Opportunistic: '自由',
+        Hold: '止まれ',
 
-            'Throws/Bats': ' ',
-            LHP: '左投',
-            RHP: '右投',
-            LHB: '左打',
-            RHB: '右打',
-            L: '左投',
-            'R ': '右投',
-            ' L ': '左打',
-            ' R ': '右打',
-            '#': '背番号',
+        'Select Language:': '言語',
+        'Run Fast Simulation': 'シミュレーションを試合終了まで行う',
+        'Play Ball!': 'プレーボール',
+        'Spectate the CPU': 'CPU観戦',
+        'Play from the 7th': '７回からプレーする',
 
-            'Opponent connected': '相手選手見参',
-            'Click Here': 'ここにクリック',
+        'Throws/Bats': ' ',
+        LHP: '左投',
+        RHP: '右投',
+        LHB: '左打',
+        RHB: '右打',
+        L: '左投',
+        'R ': '右投',
+        ' L ': '左打',
+        ' R ': '右打',
+        '#': '背番号',
 
-            'Amateur Baseball Club': '野球愛好会',
-            'Amateur Baseball Team': '愛好球団',
-            'College Team': '大学球団',
-            'Industrial League Team': '社会人球団',
-            'Training Squad': '練習軍',
-            'Team Japan': '日本代表',
+        'Opponent connected': '相手選手見参',
+        'Click Here': 'ここにクリック',
 
-            Substituted: '交代',
-            Bench: 'ベンチ',
+        'Amateur Baseball Club': '野球愛好会',
+        'Amateur Baseball Team': '愛好球団',
+        'College Team': '大学球団',
+        'Industrial League Team': '社会人球団',
+        'Training Squad': '練習軍',
+        'Team Japan': '日本代表',
 
-            'Batter Ready': '打撃準備',
+        Substituted: '交代',
+        Bench: 'ベンチ',
 
-            // descriptors pitching
-            Ace: 'エース',
-            'Control pitcher': '技巧派',
-            Flamethrower: '速球派',
-            'Breaking ball': '変化球',
-            // descriptors batting
-            'Genius batter': '天才',
-            Contact: 'バットコントロール',
-            'Power hitter': '主砲',
-            Speedster: '足速い',
-            Inept: '不器用',
-            'Weak swing': '弱い',
-            'Strikes out': '三振がち',
-            'Leisurely runner': '悠長',
-            //'' : '',
-            //'' : '',
-            // descriptors fielding
-            'Defensive wizard': '守備万能',
-            Glove: '好守',
-            Range: 'レンジ',
-            'Strong throw': '肩強い',
-            //'' : '',
-            //'' : '',
-            'Very late': 'とても遅め',
-            Late: '遅め',
-            '': '',
-            Early: '早め',
-            'Very Early': 'とても早め',
+        'Batter Ready': '打撃準備',
 
-            'Sim At Bat': '自動打撃'
-        },
-        e: {
-            empty: '-',
-            Season: 'Season',
-            Fielding: 'F%',
-            Pitching: 'P',
-            Eye: 'Eye',
-            Power: 'Pow',
-            Speed: 'Spd'
-        }
-    }[override ? override : text.mode][phrase];
-    return string ? string : phrase;
+        // descriptors pitching
+        Ace: 'エース',
+        'Control pitcher': '技巧派',
+        Flamethrower: '速球派',
+        'Breaking ball': '変化球',
+        // descriptors batting
+        'Genius batter': '天才',
+        Contact: 'バットコントロール',
+        'Power hitter': '主砲',
+        Speedster: '足速い',
+        Inept: '不器用',
+        'Weak swing': '弱い',
+        'Strikes out': '三振がち',
+        'Leisurely runner': '悠長',
+        //'' : '',
+        //'' : '',
+        // descriptors fielding
+        'Defensive wizard': '守備万能',
+        Glove: '好守',
+        Range: 'レンジ',
+        'Strong throw': '肩強い',
+        //'' : '',
+        //'' : '',
+        'Very late': 'とても遅め',
+        Late: '遅め',
+        '': '',
+        Early: '早め',
+        'Very Early': 'とても早め',
+
+        'Sim At Bat': '自動打撃'
+    },
+    e: {
+        empty: '-',
+        Season: 'Season',
+        Fielding: 'F%',
+        Pitching: 'P',
+        Eye: 'Eye',
+        Power: 'Pow',
+        Speed: 'Spd'
+    }
 };
+
+export type mode_t = 'e' | 'n'; // English or Japanese;
+
+const text: {
+    /**
+     * The global i18n translation function.
+     * @param phrase - key to translate.
+     * @param override - language override.
+     */
+    (phrase: string, override?: mode_t): string;
+    /**
+     * Denotes which language the app UI is running in.
+     */
+    mode: mode_t;
+    /**
+     * Describe a bench substitution that has occurred.
+     * @param sub - new player.
+     * @param player - outgoing player.
+     * @param mode - lang override.
+     */
+    substitution: (sub: Player, player: Player, mode?: mode_t) => string;
+    /**
+     * Locale description of how a batter sees an incoming pitch.
+     * @param game - will use pitchInFlight, probably.
+     */
+    getBattersEye: (game: Game) => Record<mode_t, string>;
+    /**
+     * @param base
+     * @returns locale description of which base a ball was batted to, or outfield area.
+     */
+    baseShortName: (base: keyof typeof baseShort) => string;
+    /**
+     * Locale fielder short name.
+     * @param fielder - key.
+     * @param override - language overrride.
+     * @returns e.g. 'short' or 'ショート'.
+     */
+    fielderShortName: (fielder: fielder_short_name_t | string, override?: mode_t) => string;
+    /**
+     * Locale slash / spacer.
+     */
+    slash: () => '/' | '・';
+    /**
+     * @param fielder - short name key.
+     * @param override - language override.
+     * @returns long name of fielder.
+     * @example 'short' -> shortstop, 'center' -> center fielder.
+     */
+    fielderLongName: (fielder: fielder_short_name_t, override?: mode_t) => string;
+    /**
+     * Locale comma.
+     */
+    comma: () => string;
+    /**
+     * A space in English, otherwise an empty string.
+     */
+    space: () => string;
+    /**
+     * A period.
+     */
+    stop: () => string;
+    /**
+     * @param pitch - thrown.
+     * @returns name of the pitch for UI.
+     */
+    namePitch: (pitch: { name: string }) => string;
+    /**
+     * Narrative for a contact result (ball in play).
+     * @param batter - batter for the play.
+     * @param fielder - fielder for the play.
+     * @param bases - bases gained.
+     * @param outBy - method of out.
+     * @param sacrificeAdvances - any sacrifice advances.
+     * @param out - any runners that were out.
+     */
+    contactResult: (
+        batter: Player,
+        fielder: string | fielder_short_name_t,
+        bases: 0 | 1 | 2 | 3 | 4,
+        outBy: out_by_t,
+        sacrificeAdvances: string[],
+        out: string[] & { doublePlay: boolean }
+    ) => string;
+} = (phrase, override) => {
+    if (!text.mode) text.mode = 'e';
+    const dictionary = translations[override ? override : text.mode];
+    const translatedText = dictionary[phrase as keyof typeof dictionary];
+    return translatedText ? translatedText : phrase;
+};
+
+text.mode = 'e';
 
 text.substitution = (sub, player, mode) => {
     const originalMode = text.mode;
@@ -191,7 +283,7 @@ text.substitution = (sub, player, mode) => {
         6: text(' 7th', mode),
         7: text(' 8th', mode),
         8: text(' 9th', mode)
-    }[player.order];
+    }[player.order as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8];
     const position = text.fielderShortName(player.position, mode);
 
     if (mode === 'n') {
@@ -208,7 +300,10 @@ text.substitution = (sub, player, mode) => {
 };
 
 text.getBattersEye = (game) => {
-    const eye = {},
+    const eye: Record<mode_t, string> = {
+            e: '',
+            n: ''
+        },
         breaking =
             Math.abs(game.pitchInFlight.breakDirection[0]) +
                 Math.abs(game.pitchInFlight.breakDirection[1]) >
@@ -220,37 +315,41 @@ text.getBattersEye = (game) => {
     return eye;
 };
 
-text.baseShortName = (base) => {
-    if (text.mode == 'n') {
-        return {
-            '1st': '一',
-            '2nd': '二',
-            '3rd': '三',
-            home: '本',
-            Home: '本',
+const baseShort = {
+    '1st': '一',
+    '2nd': '二',
+    '3rd': '三',
+    home: '本',
+    Home: '本',
 
-            left: '左',
-            center: '中',
-            right: '右'
-        }[base];
+    left: '左',
+    center: '中',
+    right: '右'
+};
+
+text.baseShortName = (base: keyof typeof baseShort) => {
+    if (text.mode == 'n') {
+        return baseShort[base];
     }
     return base;
+};
+
+const fielderShort = {
+    first: '一',
+    second: '二',
+    third: '三',
+    short: '遊',
+    pitcher: '投',
+    catcher: '捕',
+    left: '左',
+    center: '中',
+    right: '右'
 };
 
 text.fielderShortName = (fielder, override) => {
     const mode = override || text.mode;
     if (mode === 'n') {
-        return {
-            first: '一',
-            second: '二',
-            third: '三',
-            short: '遊',
-            pitcher: '投',
-            catcher: '捕',
-            left: '左',
-            center: '中',
-            right: '右'
-        }[fielder];
+        return fielderShort[fielder as fielder_short_name_t];
     }
     return fielder;
 };
@@ -297,9 +396,7 @@ text.namePitch = (pitch) => {
     if (text.mode == 'e') {
         return pitch.name.charAt(0).toUpperCase() + pitch.name.slice(1);
     }
-    if (text.mode == 'n') {
-        return text(pitch.name);
-    }
+    return text(pitch.name);
 };
 
 text.contactResult = (batter, fielder, bases, outBy, sacrificeAdvances, out) => {
@@ -402,7 +499,7 @@ text.contactResult = (batter, fielder, bases, outBy, sacrificeAdvances, out) => 
         const stop = text.stop();
         statement += `${batter}は`;
         if (outBy) {
-            const fielderLong = text.fielderLongName(fielder);
+            const fielderLong = text.fielderLongName(fielder as fielder_short_name_t);
             fielder = text.fielderShortName(fielder);
             switch (outBy) {
                 case 'fieldersChoice':
@@ -472,19 +569,27 @@ text.contactResult = (batter, fielder, bases, outBy, sacrificeAdvances, out) => 
 
 export { text };
 
-export const abbreviatePosition = function(position) {
+const positionAbbreviation = {
+    pitcher: 'P',
+    catcher: 'C',
+    first: '1B',
+    second: '2B',
+    short: 'SS',
+    third: '3B',
+    left: 'LF',
+    center: 'CF',
+    right: 'RF'
+};
+
+/**
+ * @param position - short name.
+ * @returns 1 or 2 letter abbreviation
+ *
+ * @example pitcher -> P, center -> CF
+ */
+export const abbreviatePosition = function(position: keyof typeof positionAbbreviation) {
     if (text.mode === 'e') {
-        return {
-            pitcher: 'P',
-            catcher: 'C',
-            first: '1B',
-            second: '2B',
-            short: 'SS',
-            third: '3B',
-            left: 'LF',
-            center: 'CF',
-            right: 'RF'
-        }[position];
+        return positionAbbreviation[position];
     }
     return text.fielderShortName(position);
 };

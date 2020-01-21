@@ -36,12 +36,32 @@
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -59,473 +79,479 @@
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
 /******/
+/******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = "./baseball.js");
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
+/******/ ({
+
+/***/ "./baseball.js":
+/*!**********************************!*\
+  !*** ./baseball.js + 39 modules ***!
+  \**********************************/
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+__webpack_require__.r(__webpack_exports__);
 
-// CONCATENATED MODULE: ./Utility/text.js
-const text_text = (phrase, override) => {
-    if (!text_text.mode) text_text.mode = 'e';
-    const string = {
-        n : {
-            empty: '-',
-            ' 1st' : '1番',
-            ' 2nd' : '2番',
-            ' 3rd' : '3番',
-            ' 4th' : '4番',
-            ' 5th' : '5番',
-            ' 6th' : '6番',
-            ' 7th' : '7番',
-            ' 8th' : '8番',
-            ' 9th' : '9番',
-            'Now batting' : '次のバッター',
-            'way outside' : '相当外角',
-            'outside' : '外角',
-            'inside' : '内角',
-            'way inside' : '相当内角',
-            'way low' : '相当低め',
-            'low' : '低め',
-            'high' : '高め',
-            'way high' : '相当高め',
-            'down the middle' : '真ん中',
-            'first baseman': 'ファースト',
-            'second baseman': 'セカンド',
-            'third baseman': 'サード',
-            'shortstop': 'ショート',
-            'pitcher': 'ピッチャー',
-            'catcher': 'キャッチャー',
-            'left fielder': 'レフト',
-            'center fielder': 'センター',
-            'right fielder': 'ライト',
-            'Strike.' : 'ストライク。',
-            'Ball.' : 'ボール。',
-            'Fouled off.': 'ファウル。',
-            'In play.': 'インプレー。',
-            'Swinging strike.': '空振り。',
-            ' outs': 'アウト',
-            ' out': 'アウト',
-            '4-seam': 'ストレート',
-            '2-seam': 'シュート',
-            'slider': 'スライダー',
-            'fork': 'フォーク',
-            'cutter': 'カット',
-            'sinker': 'シンカー',
-            'curve': 'カーブ',
-            'change': 'チェンジ',
-            ' struck out looking.': '、見逃し三振。',
-            ' walked.': '、フォアボール。',
-            ' struck out swinging.': '、空振り三振。',
-            'Previous: ': '前：',
-            'looks like: ': '予想',
-            'breaking ball': '変化球',
-            'fastball': 'ストレート',
-            'Batting, ': '打球',
-            'Catching, pitch selection': '捕球選択',
-            'Season': '記録',
-            'Game': '今試合',
-            'Pitch': '球',
-            'Control': '制球',
-            'Velocity': '速度',
-            'Break': '変化',
-            'At Bat': 'バッター',
-            'On Deck': '次バッター',
-            'Eye': '目',
-            'Power': '力',
-            'Speed': '速',
-            'Up to Bat': '打席',
-            'Fielding': '守備',
-            'Pitching': '投球',
-            'BA' : '打率',
-            'OBP' : '出塁',
-            'SLG' : '長打',
-            'PA' : '打席',
-            'H 2B 3B HR' : '安 二 三 本',
-            'H' : '安',
-            '2B' : '二',
-            '3B' : '三',
-            'HR' : '本塁打',
-            'RBI' : '打点',
-            'R' : '得点',
-            'BB' : '四球',
-            'SO' : '三振',
-
-            'ERA': '防御率',
-            'W': '勝',
-            'K' : '三振',
-
-            'first' : 'ファースト',
-            'second' : 'セカンド',
-            'third' : 'サード',
-            'Runner on' : 'ランナー',
-            'Runners on' : 'ランナー',
-            'Bases empty': 'ランナーなし',
-            'base' : '塁',
-
-            'stolen base' : '盗塁成功',
-            'caught stealing' : '盗塁失敗',
-
-            'Steal' : '盗塁',
-            'Opportunistic' : '自由',
-            'Hold' : '止まれ',
-
-            'Select Language:' : '言語',
-            'Run Fast Simulation' : 'シミュレーションを試合終了まで行う',
-            'Play Ball!' : 'プレーボール',
-            'Spectate the CPU': 'CPU観戦',
-            'Play from the 7th': '７回からプレーする',
-
-            'Throws/Bats' : ' ',
-            'LHP' : '左投',
-            'RHP' : '右投',
-            'LHB' : '左打',
-            'RHB' : '右打',
-            'L' : '左投',
-            'R ' : '右投',
-            ' L ' : '左打',
-            ' R ' : '右打',
-            '#' : '背番号',
-
-            'Opponent connected' : '相手選手見参',
-            'Click Here' : 'ここにクリック',
-
-            'Amateur Baseball Club' : '野球愛好会',
-            'Amateur Baseball Team' : '愛好球団',
-            'College Team' : '大学球団',
-            'Industrial League Team' : '社会人球団',
-            'Training Squad' : '練習軍',
-            'Team Japan': '日本代表',
-
-            'Substituted' : '交代',
-            'Bench': 'ベンチ',
-
-            'Batter Ready' : '打撃準備',
-
-            // descriptors pitching
-            'Ace' : 'エース',
-            'Control pitcher' : '技巧派',
-            'Flamethrower' : '速球派',
-            'Breaking ball' : '変化球',
-            // descriptors batting
-            'Genius batter' : '天才',
-            'Contact' : 'バットコントロール',
-            'Power hitter' : '主砲',
-            'Speedster' : '足速い',
-            'Inept': '不器用',
-            'Weak swing': '弱い',
-            'Strikes out': '三振がち',
-            'Leisurely runner': '悠長',
-            //'' : '',
-            //'' : '',
-            // descriptors fielding
-            'Defensive wizard' : '守備万能',
-            'Glove' : '好守',
-            'Range' : 'レンジ',
-            'Strong throw' : '肩強い',
-            //'' : '',
-            //'' : '',
-            'Very late': 'とても遅め',
-            'Late': '遅め',
-            '': '',
-            'Early': '早め',
-            'Very Early': 'とても早め',
-
-            'Sim At Bat': '自動打撃'
-        },
-        e : {
-            empty: '-',
-            'Season': 'Season',
-            Fielding: 'F%',
-            Pitching: 'P',
-            Eye: 'Eye',
-            Power: 'Pow',
-            Speed: 'Spd'
-        }
-    }[override ? override : text_text.mode][phrase];
-    return string ? string : phrase;
+// CONCATENATED MODULE: ./Utility/text.ts
+var translations = {
+    n: {
+        empty: '-',
+        ' 1st': '1番',
+        ' 2nd': '2番',
+        ' 3rd': '3番',
+        ' 4th': '4番',
+        ' 5th': '5番',
+        ' 6th': '6番',
+        ' 7th': '7番',
+        ' 8th': '8番',
+        ' 9th': '9番',
+        'Now batting': '次のバッター',
+        'way outside': '相当外角',
+        outside: '外角',
+        inside: '内角',
+        'way inside': '相当内角',
+        'way low': '相当低め',
+        low: '低め',
+        high: '高め',
+        'way high': '相当高め',
+        'down the middle': '真ん中',
+        'first baseman': 'ファースト',
+        'second baseman': 'セカンド',
+        'third baseman': 'サード',
+        shortstop: 'ショート',
+        pitcher: 'ピッチャー',
+        catcher: 'キャッチャー',
+        'left fielder': 'レフト',
+        'center fielder': 'センター',
+        'right fielder': 'ライト',
+        'Strike.': 'ストライク。',
+        'Ball.': 'ボール。',
+        'Fouled off.': 'ファウル。',
+        'In play.': 'インプレー。',
+        'Swinging strike.': '空振り。',
+        ' outs': 'アウト',
+        ' out': 'アウト',
+        '4-seam': 'ストレート',
+        '2-seam': 'シュート',
+        slider: 'スライダー',
+        fork: 'フォーク',
+        cutter: 'カット',
+        sinker: 'シンカー',
+        curve: 'カーブ',
+        change: 'チェンジ',
+        ' struck out looking.': '、見逃し三振。',
+        ' walked.': '、フォアボール。',
+        ' struck out swinging.': '、空振り三振。',
+        'Previous: ': '前：',
+        'looks like: ': '予想',
+        'breaking ball': '変化球',
+        fastball: 'ストレート',
+        'Batting, ': '打球',
+        'Catching, pitch selection': '捕球選択',
+        Season: '記録',
+        Game: '今試合',
+        Pitch: '球',
+        Control: '制球',
+        Velocity: '速度',
+        Break: '変化',
+        'At Bat': 'バッター',
+        'On Deck': '次バッター',
+        Eye: '目',
+        Power: '力',
+        Speed: '速',
+        'Up to Bat': '打席',
+        Fielding: '守備',
+        Pitching: '投球',
+        BA: '打率',
+        OBP: '出塁',
+        SLG: '長打',
+        PA: '打席',
+        'H 2B 3B HR': '安 二 三 本',
+        H: '安',
+        '2B': '二',
+        '3B': '三',
+        HR: '本塁打',
+        RBI: '打点',
+        R: '得点',
+        BB: '四球',
+        SO: '三振',
+        ERA: '防御率',
+        W: '勝',
+        K: '三振',
+        first: 'ファースト',
+        second: 'セカンド',
+        third: 'サード',
+        'Runner on': 'ランナー',
+        'Runners on': 'ランナー',
+        'Bases empty': 'ランナーなし',
+        base: '塁',
+        'stolen base': '盗塁成功',
+        'caught stealing': '盗塁失敗',
+        Steal: '盗塁',
+        Opportunistic: '自由',
+        Hold: '止まれ',
+        'Select Language:': '言語',
+        'Run Fast Simulation': 'シミュレーションを試合終了まで行う',
+        'Play Ball!': 'プレーボール',
+        'Spectate the CPU': 'CPU観戦',
+        'Play from the 7th': '７回からプレーする',
+        'Throws/Bats': ' ',
+        LHP: '左投',
+        RHP: '右投',
+        LHB: '左打',
+        RHB: '右打',
+        L: '左投',
+        'R ': '右投',
+        ' L ': '左打',
+        ' R ': '右打',
+        '#': '背番号',
+        'Opponent connected': '相手選手見参',
+        'Click Here': 'ここにクリック',
+        'Amateur Baseball Club': '野球愛好会',
+        'Amateur Baseball Team': '愛好球団',
+        'College Team': '大学球団',
+        'Industrial League Team': '社会人球団',
+        'Training Squad': '練習軍',
+        'Team Japan': '日本代表',
+        Substituted: '交代',
+        Bench: 'ベンチ',
+        'Batter Ready': '打撃準備',
+        // descriptors pitching
+        Ace: 'エース',
+        'Control pitcher': '技巧派',
+        Flamethrower: '速球派',
+        'Breaking ball': '変化球',
+        // descriptors batting
+        'Genius batter': '天才',
+        Contact: 'バットコントロール',
+        'Power hitter': '主砲',
+        Speedster: '足速い',
+        Inept: '不器用',
+        'Weak swing': '弱い',
+        'Strikes out': '三振がち',
+        'Leisurely runner': '悠長',
+        //'' : '',
+        //'' : '',
+        // descriptors fielding
+        'Defensive wizard': '守備万能',
+        Glove: '好守',
+        Range: 'レンジ',
+        'Strong throw': '肩強い',
+        //'' : '',
+        //'' : '',
+        'Very late': 'とても遅め',
+        Late: '遅め',
+        '': '',
+        Early: '早め',
+        'Very Early': 'とても早め',
+        'Sim At Bat': '自動打撃'
+    },
+    e: {
+        empty: '-',
+        Season: 'Season',
+        Fielding: 'F%',
+        Pitching: 'P',
+        Eye: 'Eye',
+        Power: 'Pow',
+        Speed: 'Spd'
+    }
 };
-
-text_text.substitution = (sub, player, mode) => {
-    const originalMode = text_text.mode;
+var text_text = function (phrase, override) {
+    if (!text_text.mode)
+        text_text.mode = 'e';
+    var dictionary = translations[override ? override : text_text.mode];
+    var translatedText = dictionary[phrase];
+    return translatedText ? translatedText : phrase;
+};
+text_text.mode = 'e';
+text_text.substitution = function (sub, player, mode) {
+    var originalMode = text_text.mode;
     mode = mode || text_text.mode;
-    const order = {
-        0 : text_text(' 1st', mode),
-        1 : text_text(' 2nd', mode),
-        2 : text_text(' 3rd', mode),
-        3 : text_text(' 4th', mode),
-        4 : text_text(' 5th', mode),
-        5 : text_text(' 6th', mode),
-        6 : text_text(' 7th', mode),
-        7 : text_text(' 8th', mode),
-        8 : text_text(' 9th', mode)
+    var order = {
+        0: text_text(' 1st', mode),
+        1: text_text(' 2nd', mode),
+        2: text_text(' 3rd', mode),
+        3: text_text(' 4th', mode),
+        4: text_text(' 5th', mode),
+        5: text_text(' 6th', mode),
+        6: text_text(' 7th', mode),
+        7: text_text(' 8th', mode),
+        8: text_text(' 9th', mode)
     }[player.order];
-    const position = text_text.fielderShortName(player.position, mode);
-
+    var position = text_text.fielderShortName(player.position, mode);
     if (mode === 'n') {
         text_text.mode = 'n';
-        var output = `${sub.getName() + text_text.comma() + player.getName()}の交代${text_text.comma()}${order}(${position})`;
-    } else {
+        var output = sub.getName() +
+            text_text.comma() +
+            player.getName() + "\u306E\u4EA4\u4EE3" + text_text.comma() + order + "(" + position + ")";
+    }
+    else {
         text_text.mode = 'e';
-        output = `${sub.getName()} replaces ${player.getName()} at ${position}, batting${order}`;
+        output = sub.getName() + " replaces " + player.getName() + " at " + position + ", batting" + order;
     }
     text_text.mode = originalMode;
     return output;
 };
-
-text_text.getBattersEye = game => {
-    const eye = {}, breaking = Math.abs(game.pitchInFlight.breakDirection[0]) + Math.abs(game.pitchInFlight.breakDirection[1]) > 40;
+text_text.getBattersEye = function (game) {
+    var eye = {
+        e: '',
+        n: ''
+    }, breaking = Math.abs(game.pitchInFlight.breakDirection[0]) +
+        Math.abs(game.pitchInFlight.breakDirection[1]) >
+        40;
     eye.e =
-        text_text('looks like: ', 'e')+
-        breaking ? text_text('breaking ball', 'e') : text_text('fastball', 'e');
+        text_text('looks like: ', 'e') + breaking ? text_text('breaking ball', 'e') : text_text('fastball', 'e');
     eye.n =
-        text_text('looks like: ', 'n')+
-        breaking ? text_text('breaking ball', 'n') : text_text('fastball', 'n');
+        text_text('looks like: ', 'n') + breaking ? text_text('breaking ball', 'n') : text_text('fastball', 'n');
     return eye;
 };
-
-text_text.baseShortName = base => {
+var baseShort = {
+    '1st': '一',
+    '2nd': '二',
+    '3rd': '三',
+    home: '本',
+    Home: '本',
+    left: '左',
+    center: '中',
+    right: '右'
+};
+text_text.baseShortName = function (base) {
     if (text_text.mode == 'n') {
-        return {
-            '1st': '一',
-            '2nd': '二',
-            '3rd': '三',
-            'home' : '本',
-            'Home' : '本',
-
-            'left': '左',
-            'center': '中',
-            'right': '右'
-        }[base];
+        return baseShort[base];
     }
     return base;
 };
-
-text_text.fielderShortName = (fielder, override) => {
-    const mode = override || text_text.mode;
+var fielderShort = {
+    first: '一',
+    second: '二',
+    third: '三',
+    short: '遊',
+    pitcher: '投',
+    catcher: '捕',
+    left: '左',
+    center: '中',
+    right: '右'
+};
+text_text.fielderShortName = function (fielder, override) {
+    var mode = override || text_text.mode;
     if (mode === 'n') {
-        return {
-            'first': '一',
-            'second': '二',
-            'third': '三',
-            'short': '遊',
-            'pitcher': '投',
-            'catcher': '捕',
-            'left': '左',
-            'center': '中',
-            'right': '右'
-        }[fielder];
+        return fielderShort[fielder];
     }
     return fielder;
 };
-
-text_text.slash = () => {
+text_text.slash = function () {
     if (text_text.mode == 'n') {
         return '・';
     }
     return '/';
 };
-
-text_text.fielderLongName = fielder => {
+text_text.fielderLongName = function (fielder) {
     if (text_text.mode == 'n') {
         return {
-            'first': 'ファースト',
-            'second': 'セカンド',
-            'third': 'サード',
-            'short': 'ショート',
-            'pitcher': 'ピッチャー',
-            'catcher': 'キャッチャー',
-            'left': 'レフト',
-            'center': 'センター',
-            'right': 'ライト'
-        }[fielder]
+            first: 'ファースト',
+            second: 'セカンド',
+            third: 'サード',
+            short: 'ショート',
+            pitcher: 'ピッチャー',
+            catcher: 'キャッチャー',
+            left: 'レフト',
+            center: 'センター',
+            right: 'ライト'
+        }[fielder];
     }
     return {
-        first : text_text('first baseman'),
-        second : text_text('second baseman'),
-        third : text_text('third baseman'),
-        short : text_text('shortstop'),
-        pitcher : text_text('pitcher'),
-        catcher : text_text('catcher'),
-        left : text_text('left fielder'),
-        center : text_text('center fielder'),
-        right : text_text('right fielder')
+        first: text_text('first baseman'),
+        second: text_text('second baseman'),
+        third: text_text('third baseman'),
+        short: text_text('shortstop'),
+        pitcher: text_text('pitcher'),
+        catcher: text_text('catcher'),
+        left: text_text('left fielder'),
+        center: text_text('center fielder'),
+        right: text_text('right fielder')
     }[fielder];
 };
-
-text_text.comma = () => ({n: '、', e: ', '})[text_text.mode];
-text_text.space = () => ({n: '', e: ' '})[text_text.mode];
-text_text.stop = () => ({n: '。', e: '. '})[text_text.mode];
-
-text_text.namePitch = pitch => {
+text_text.comma = function () { return ({ n: '、', e: ', ' }[text_text.mode]); };
+text_text.space = function () { return ({ n: '', e: ' ' }[text_text.mode]); };
+text_text.stop = function () { return ({ n: '。', e: '. ' }[text_text.mode]); };
+text_text.namePitch = function (pitch) {
     if (text_text.mode == 'e') {
-        return pitch.name.charAt(0).toUpperCase() + pitch.name.slice(1)
+        return pitch.name.charAt(0).toUpperCase() + pitch.name.slice(1);
     }
-    if (text_text.mode == 'n') {
-        return text_text(pitch.name)
-    }
+    return text_text(pitch.name);
 };
-
-text_text.contactResult = (batter, fielder, bases, outBy, sacrificeAdvances, out) => {
-    let statement = '';
-    const infield = ['left', 'center', 'right'].indexOf(fielder) < 0;
-    const doublePlay = out.doublePlay;
+text_text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances, out) {
+    var statement = '';
+    var infield = ['left', 'center', 'right'].indexOf(fielder) < 0;
+    var doublePlay = out.doublePlay;
     if (text_text.mode == 'e') {
         statement += batter;
         if (outBy) {
             switch (outBy) {
                 case 'fieldersChoice':
                     play = out.length === 2 ? 'double play ' : '';
-                    statement += ` reached on a <span class="txt-red">fielder's choice</span> ${play}by ${text_text.fielderShortName(fielder)}`;
+                    statement += " reached on a <span class=\"txt-red\">fielder's choice</span> " + play + "by " + text_text.fielderShortName(fielder);
                     break;
                 case 'line':
-                    statement += ` <span class="txt-red">lined out</span> to ${text_text.fielderShortName(fielder)}`;
+                    statement += " <span class=\"txt-red\">lined out</span> to " + text_text.fielderShortName(fielder);
                     break;
                 case 'fly':
-                    statement += ` <span class="txt-red">flew out</span> to ${text_text.fielderShortName(fielder)}`;
+                    statement += " <span class=\"txt-red\">flew out</span> to " + text_text.fielderShortName(fielder);
                     break;
                 case 'error':
-                    statement += ` <span class="txt-blue">reached on error</span> by ${text_text.fielderShortName(fielder)}`;
+                    statement += " <span class=\"txt-blue\">reached on error</span> by " + text_text.fielderShortName(fielder);
                     break;
                 case 'pop':
-                    statement += ` <span class="txt-red">popped out</span> to ${text_text.fielderShortName(fielder)}`;
+                    statement += " <span class=\"txt-red\">popped out</span> to " + text_text.fielderShortName(fielder);
                     break;
                 case 'ground':
                     var play = doublePlay ? 'into a double play by' : 'out to';
-                    statement += ` <span class="txt-red">grounded ${play}</span> ${text_text.fielderShortName(fielder)}`;
+                    statement += " <span class=\"txt-red\">grounded " + play + "</span> " + text_text.fielderShortName(fielder);
                     break;
                 case 'thrown':
                     play = doublePlay ? ' on a double play' : '';
-                    statement += ` was <span class="txt-red">thrown out</span> by ${text_text.fielderShortName(fielder)}${play}`;
+                    statement += " was <span class=\"txt-red\">thrown out</span> by " + text_text.fielderShortName(fielder) + play;
                     break;
             }
             if (out.length) {
-                const plural = out.length > 1;
-                const runner = plural ? 'Runners' : 'Runner';
-                const is = plural ? 'are' : 'is';
-                statement += `. ${runner} from ${text_text(out.join(text_text.comma()))} ${is} <span class="txt-red">out</span>`;
+                var plural = out.length > 1;
+                var runner = plural ? 'Runners' : 'Runner';
+                var is = plural ? 'are' : 'is';
+                statement += ". " + runner + " from " + text_text(out.join(text_text.comma())) + " " + is + " <span class=\"txt-red\">out</span>";
             }
-        } else {
+        }
+        else {
             switch (bases) {
                 case 1:
                     if (infield) {
-                        statement += ` reached on an <span class="txt-blue">infield hit</span> to ${text_text.fielderShortName(fielder)}`;
-                    } else {
-                        statement += ` reached on a <span class="txt-blue">single</span> to ${text_text.fielderShortName(fielder)}`;
+                        statement += " reached on an <span class=\"txt-blue\">infield hit</span> to " + text_text.fielderShortName(fielder);
+                    }
+                    else {
+                        statement += " reached on a <span class=\"txt-blue\">single</span> to " + text_text.fielderShortName(fielder);
                     }
                     break;
                 case 2:
-                    statement += ` <span class="txt-blue">doubled</span> past ${text_text.fielderShortName(fielder)}`;
+                    statement += " <span class=\"txt-blue\">doubled</span> past " + text_text.fielderShortName(fielder);
                     break;
                 case 3:
-                    statement += ` <span class="txt-blue">tripled</span> past ${text_text.fielderShortName(fielder)}`;
+                    statement += " <span class=\"txt-blue\">tripled</span> past " + text_text.fielderShortName(fielder);
                     break;
                 case 4:
-                    statement += ` <span class="txt-blue">homered</span> to ${text_text.fielderShortName(fielder)}`;
+                    statement += " <span class=\"txt-blue\">homered</span> to " + text_text.fielderShortName(fielder);
                     break;
             }
         }
         if (sacrificeAdvances) {
-            sacrificeAdvances.map(base => {
+            sacrificeAdvances.map(function (base) {
                 if (base == 'third') {
-                    statement += `${text_text.stop()}Runner on third <span class="txt-blue">scores</span>`;
-                } else {
-                    statement += `${text_text.stop()}Runner on ${base} <span class="txt-green">advances</span>`;
+                    statement += text_text.stop() + "Runner on third <span class=\"txt-blue\">scores</span>";
+                }
+                else {
+                    statement += text_text.stop() + "Runner on " + base + " <span class=\"txt-green\">advances</span>";
                 }
             });
         }
         statement += text_text.stop();
     }
     if (text_text.mode == 'n') {
-        const stop = text_text.stop();
-        statement += `${batter}は`;
+        var stop_1 = text_text.stop();
+        statement += batter + "\u306F";
         if (outBy) {
-            const fielderLong = text_text.fielderLongName(fielder);
+            var fielderLong = text_text.fielderLongName(fielder);
             fielder = text_text.fielderShortName(fielder);
             switch (outBy) {
                 case 'fieldersChoice':
-                    statement += `野選(${fielder})で<span class="txt-red">出塁</span>`;
+                    statement += "\u91CE\u9078(" + fielder + ")\u3067<span class=\"txt-red\">\u51FA\u5841</span>";
                     break;
                 case 'line':
-                    statement += `<span class="txt-red">${fielder}直</span>`;
+                    statement += "<span class=\"txt-red\">" + fielder + "\u76F4</span>";
                     break;
                 case 'fly':
-                    statement += `<span class="txt-red">${fielder}飛</span>`;
+                    statement += "<span class=\"txt-red\">" + fielder + "\u98DB</span>";
                     break;
                 case 'error':
-                    statement += `<span class="txt-blue">エラー(${fielder})で出塁</span>`;
+                    statement += "<span class=\"txt-blue\">\u30A8\u30E9\u30FC(" + fielder + ")\u3067\u51FA\u5841</span>";
                     break;
                 case 'pop':
-                    statement += `<span class="txt-red">ポップフライで${fielder}飛</span>`;
+                    statement += "<span class=\"txt-red\">\u30DD\u30C3\u30D7\u30D5\u30E9\u30A4\u3067" + fielder + "\u98DB</span>";
                     break;
                 case 'ground':
-                    statement += `<span class="txt-red">${fielderLong}ゴロに封殺</span>`;
+                    statement += "<span class=\"txt-red\">" + fielderLong + "\u30B4\u30ED\u306B\u5C01\u6BBA</span>";
                     break;
                 case 'thrown':
-                    statement += `<span class="txt-red">${fielder}ゴロ</span>`;
+                    statement += "<span class=\"txt-red\">" + fielder + "\u30B4\u30ED</span>";
                     break;
             }
             if (out.length) {
-                statement += `。${out.map(runner => text_text(runner)).join(text_text.comma())}ランナーは<span class="txt-red">アウト</span>`;
+                statement += "\u3002" + out
+                    .map(function (runner) { return text_text(runner); })
+                    .join(text_text.comma()) + "\u30E9\u30F3\u30CA\u30FC\u306F<span class=\"txt-red\">\u30A2\u30A6\u30C8</span>";
             }
             if (doublePlay) {
                 statement += '。<span class="txt-red">ゲッツー</span>';
             }
-        } else {
+        }
+        else {
             fielder = text_text.fielderShortName(fielder);
             switch (bases) {
                 case 1:
                     if (infield) {
-                        statement += `<span class="txt-blue">内野安打</span>(${fielder})で出塁`;
-                    } else {
-                        statement += `<span class="txt-blue">安打</span>(${fielder})で出塁`;
+                        statement += "<span class=\"txt-blue\">\u5185\u91CE\u5B89\u6253</span>(" + fielder + ")\u3067\u51FA\u5841";
+                    }
+                    else {
+                        statement += "<span class=\"txt-blue\">\u5B89\u6253</span>(" + fielder + ")\u3067\u51FA\u5841";
                     }
                     break;
                 case 2:
-                    statement += `<span class="txt-blue">二塁打</span>（${fielder}）で出塁`;
+                    statement += "<span class=\"txt-blue\">\u4E8C\u5841\u6253</span>\uFF08" + fielder + "\uFF09\u3067\u51FA\u5841";
                     break;
                 case 3:
-                    statement += `<span class="txt-blue">三塁打</span>（${fielder}）で出塁`;
+                    statement += "<span class=\"txt-blue\">\u4E09\u5841\u6253</span>\uFF08" + fielder + "\uFF09\u3067\u51FA\u5841";
                     break;
                 case 4:
-                    statement += `<span class="txt-blue">本塁打</span>（${fielder}）`;
+                    statement += "<span class=\"txt-blue\">\u672C\u5841\u6253</span>\uFF08" + fielder + "\uFF09";
                     break;
             }
         }
         if (sacrificeAdvances) {
-            sacrificeAdvances.map(base => {
+            sacrificeAdvances.map(function (base) {
                 if (base === 'third') {
-                    statement += `${stop}サードランナー<span class="txt-blue">ホームイン</span>`;
-                } else {
-                    statement += `${stop + text_text(base)}ランナー<span class="txt-green">進塁</span>`;
+                    statement += stop_1 + "\u30B5\u30FC\u30C9\u30E9\u30F3\u30CA\u30FC<span class=\"txt-blue\">\u30DB\u30FC\u30E0\u30A4\u30F3</span>";
+                }
+                else {
+                    statement += stop_1 + text_text(base) + "\u30E9\u30F3\u30CA\u30FC<span class=\"txt-green\">\u9032\u5841</span>";
                 }
             });
         }
-        statement += stop;
+        statement += stop_1;
     }
     return statement;
 };
 
-
-
-const abbreviatePosition = function (position) {
+var positionAbbreviation = {
+    pitcher: 'P',
+    catcher: 'C',
+    first: '1B',
+    second: '2B',
+    short: 'SS',
+    third: '3B',
+    left: 'LF',
+    center: 'CF',
+    right: 'RF'
+};
+/**
+ * @param position - short name.
+ * @returns 1 or 2 letter abbreviation
+ *
+ * @example pitcher -> P, center -> CF
+ */
+var abbreviatePosition = function (position) {
     if (text_text.mode === 'e') {
-        return {
-            pitcher : 'P',
-            catcher : 'C',
-            first : '1B',
-            second : '2B',
-            short : 'SS',
-            third : '3B',
-            left : 'LF',
-            center : 'CF',
-            right : 'RF'
-        }[position];
+        return positionAbbreviation[position];
     }
     return text_text.fielderShortName(position);
 };
@@ -538,16 +564,16 @@ const Log = function() {
 };
 
 Log.prototype = {
-    game : 'instance of Game',
+    game: 'instance of Game',
     init() {
         this.lastSwing = '';
         this.lastSwingJ = '';
         this.stabilized = {
-            pitchRecord : {
+            pitchRecord: {
                 e: ['', '', '', '', '', ''],
                 n: ['', '', '', '', '', '']
             },
-            shortRecord : {
+            shortRecord: {
                 e: ['', '', '', '', '', ''],
                 n: ['', '', '', '', '', '']
             }
@@ -565,23 +591,23 @@ Log.prototype = {
             n: []
         };
     },
-    SINGLE : 'H',
-    DOUBLE : '2B',
-    TRIPLE : '3B',
-    HOMERUN : 'HR',
-    WALK : 'BB',
-    GROUNDOUT : 'GO',
-    FLYOUT : 'FO',
-    LINEOUT : 'LO',
-    RUN : 'R',
-    STRIKEOUT : 'SO',
-    SACRIFICE : 'SAC',
-    REACHED_ON_ERROR : 'ROE',
-    FIELDERS_CHOICE : 'FC',
-    GIDP : '(IDP)',
-    GITP : '(ITP)',
-    STOLEN_BASE : 'SB',
-    CAUGHT_STEALING : 'CS',
+    SINGLE: 'H',
+    DOUBLE: '2B',
+    TRIPLE: '3B',
+    HOMERUN: 'HR',
+    WALK: 'BB',
+    GROUNDOUT: 'GO',
+    FLYOUT: 'FO',
+    LINEOUT: 'LO',
+    RUN: 'R',
+    STRIKEOUT: 'SO',
+    SACRIFICE: 'SAC',
+    REACHED_ON_ERROR: 'ROE',
+    FIELDERS_CHOICE: 'FC',
+    GIDP: '(IDP)',
+    GITP: '(ITP)',
+    STOLEN_BASE: 'SB',
+    CAUGHT_STEALING: 'CS',
     stabilizeShortRecord() {
         const rec = this.record.e.slice(0, 6);
         this.shortRecord.e = rec;
@@ -619,20 +645,27 @@ Log.prototype = {
     getBatter(batter) {
         let order = batter.team.nowBatting;
         order = {
-            0 : text_text(' 1st'),
-            1 : text_text(' 2nd'),
-            2 : text_text(' 3rd'),
-            3 : text_text(' 4th'),
-            4 : text_text(' 5th'),
-            5 : text_text(' 6th'),
-            6 : text_text(' 7th'),
-            7 : text_text(' 8th'),
-            8 : text_text(' 9th')
+            0: text_text(' 1st'),
+            1: text_text(' 2nd'),
+            2: text_text(' 3rd'),
+            3: text_text(' 4th'),
+            4: text_text(' 5th'),
+            5: text_text(' 6th'),
+            6: text_text(' 7th'),
+            7: text_text(' 8th'),
+            8: text_text(' 9th')
         }[order];
         const positions = this.longFormFielder();
-        return text_text('Now batting')+order+text_text.comma()+positions[batter.position]+text_text.comma()+
-            batter.getUniformNumber()+text_text.comma()+
-            batter.getName();
+        return (
+            text_text('Now batting') +
+            order +
+            text_text.comma() +
+            positions[batter.position] +
+            text_text.comma() +
+            batter.getUniformNumber() +
+            text_text.comma() +
+            batter.getName()
+        );
     },
     noteBatter(batter) {
         const m = text_text.mode;
@@ -649,7 +682,8 @@ Log.prototype = {
         let x = pitchInFlight.x;
         const y = pitchInFlight.y;
         let say = '';
-        let noComma = false, noComma2 = false;
+        let noComma = false,
+            noComma2 = false;
         let ball = false;
         if (!batterIsLefty) x = 200 - x;
         if (x < 50) {
@@ -725,18 +759,20 @@ Log.prototype = {
         return `${this.game.getInning()}: ${count.strikes}-${count.balls}, ${outs}${text_text.stop()}`;
     },
     broadcastScore() {
-        return `${this.game.teams.away.getName()} ${this.game.tally.away.R}, ${this.game.teams.home.getName()} ${this.game.tally.home.R}${text_text.stop()}`;
+        return `${this.game.teams.away.getName()} ${
+            this.game.tally.away.R
+        }, ${this.game.teams.home.getName()} ${this.game.tally.home.R}${text_text.stop()}`;
     },
     broadcastRunners() {
         const field = this.game.field;
         const runners = [
-            field.first && text_text('first') || '',
-            field.second && text_text('second') || '',
-            field.third && text_text('third') || ''
-        ].filter(x => x);
+            (field.first && text_text('first')) || '',
+            (field.second && text_text('second')) || '',
+            (field.third && text_text('third')) || ''
+        ].filter((x) => x);
 
         let runnerCount = 0;
-        runners.map(runner => {
+        runners.map((runner) => {
             if (runner) {
                 runnerCount++;
             }
@@ -760,17 +796,11 @@ Log.prototype = {
                 result += `<span class="txt-green">${text_text('Ball.')}</span>`;
             }
         } else {
-            const timing = [
-                'Very late',
-                'Late',
-                '',
-                'Early',
-                'Very Early'
-            ][Math.max(0, Math.min(4,
-                ((swingResult.timing|0) + 175)/70 | 0
-            ))];
+            const timing = ['Very late', 'Late', '', 'Early', 'Very Early'][
+                Math.max(0, Math.min(4, (((swingResult.timing | 0) + 175) / 70) | 0))
+            ];
             if (timing) {
-                result += '('+text_text(timing)+')' + text_text.space();
+                result += '(' + text_text(timing) + ')' + text_text.space();
             }
 
             if (swingResult.contact) {
@@ -828,21 +858,22 @@ Log.prototype = {
         this.lastSwing = record;
         this.lastSwingJ = recordJ;
 
-        record.indexOf('Previous') !== 0 && this.async(() => {
-            if (record.indexOf('In play') > -1 && record.indexOf('struck out') > -1) {
-                if (text_text.mode === 'n') {
-                    console.log(recordJ);
+        record.indexOf('Previous') !== 0 &&
+            this.async(() => {
+                if (record.indexOf('In play') > -1 && record.indexOf('struck out') > -1) {
+                    if (text_text.mode === 'n') {
+                        console.log(recordJ);
+                    } else {
+                        console.log(record);
+                    }
                 } else {
-                    console.log(record);
+                    if (text_text.mode === 'n') {
+                        console.log(giraffe.broadcastCount(), recordJ);
+                    } else {
+                        console.log(giraffe.broadcastCount(), record);
+                    }
                 }
-            } else {
-                if (text_text.mode === 'n') {
-                    console.log(giraffe.broadcastCount(), recordJ);
-                } else {
-                    console.log(giraffe.broadcastCount(), record);
-                }
-            }
-        });
+            });
     },
     async(fn) {
         if (!this.game.console) {
@@ -850,8 +881,11 @@ Log.prototype = {
         }
     },
     noteStealAttempt(thief, success, base) {
-        return `${text_text.space() + thief.getName() + text_text.comma()
-    + (success ? text_text('stolen base') : text_text('caught stealing')) + text_text.space()}(${text_text.baseShortName(base)})${text_text.stop()}`;
+        return `${text_text.space() +
+            thief.getName() +
+            text_text.comma() +
+            (success ? text_text('stolen base') : text_text('caught stealing')) +
+            text_text.space()}(${text_text.baseShortName(base)})${text_text.stop()}`;
     },
     noteSubstitution(sub, player) {
         return this.note(text_text.substitution(sub, player, 'e'), text_text.substitution(sub, player, 'n'));
@@ -863,9 +897,9 @@ Log.prototype = {
         let out = [];
         if (r.looking) {
             if (r.strike) {
-                record = (batter + `<span class="txt-red">${text_text(' struck out looking.')}</span>`);
+                record = batter + `<span class="txt-red">${text_text(' struck out looking.')}</span>`;
             } else {
-                record = (batter + `<span class="txt-blue">${text_text(' walked.')}</span>`);
+                record = batter + `<span class="txt-blue">${text_text(' walked.')}</span>`;
             }
             let steal = '';
             const lineup = this.game.batter.team.lineup;
@@ -880,7 +914,9 @@ Log.prototype = {
             record += steal;
         } else {
             if (r.contact) {
-                let fielder = r.fielder, bases = r.bases, outBy;
+                let fielder = r.fielder,
+                    bases = r.bases,
+                    outBy;
                 if (r.caught) {
                     if (r.flyAngle < 15) {
                         outBy = 'line';
@@ -925,7 +961,9 @@ Log.prototype = {
                                 }
                             }
                             if (r.firstOut) {
-                                out = out.concat(r.additionalOuts.filter(runner => runner !== 'batter'));
+                                out = out.concat(
+                                    r.additionalOuts.filter((runner) => runner !== 'batter')
+                                );
                                 out.doublePlay = r.doublePlay;
                             }
                             if (r.fieldersChoice) {
@@ -939,15 +977,24 @@ Log.prototype = {
                         }
                     }
                 }
-                record = text_text.contactResult(batter, fielder, bases, outBy, r.outs === 3 ? [] : r.sacrificeAdvances, out);
+                record = text_text.contactResult(
+                    batter,
+                    fielder,
+                    bases,
+                    outBy,
+                    r.outs === 3 ? [] : r.sacrificeAdvances,
+                    out
+                );
             } else {
-                record = (batter + `<span class="txt-red">${text_text(' struck out swinging.')}</span>`);
+                record = batter + `<span class="txt-red">${text_text(' struck out swinging.')}</span>`;
             }
         }
         return record;
     },
     notePlateAppearanceResult(game) {
-        const m = text_text.mode, prevJ = text_text('Previous: ', 'n'), prev = text_text('Previous: ', 'e');
+        const m = text_text.mode,
+            prevJ = text_text('Previous: ', 'n'),
+            prev = text_text('Previous: ', 'e');
 
         let statement;
         const record = this.record;
@@ -972,74 +1019,87 @@ Log.prototype = {
         const giraffe = this;
         this.async(() => {
             if (text_text.mode === 'n') {
-                console.log([`%c${resultJ}`, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners()].join(' '),
-                    'color: darkgreen;');
+                console.log(
+                    [
+                        `%c${resultJ}`,
+                        giraffe.broadcastCount(true),
+                        giraffe.broadcastScore(),
+                        giraffe.broadcastRunners()
+                    ].join(' '),
+                    'color: darkgreen;'
+                );
             } else {
-                console.log([`%c${result}`, giraffe.broadcastCount(true), giraffe.broadcastScore(), giraffe.broadcastRunners()].join(' '),
-                    'color: darkgreen;');
+                console.log(
+                    [
+                        `%c${result}`,
+                        giraffe.broadcastCount(true),
+                        giraffe.broadcastScore(),
+                        giraffe.broadcastRunners()
+                    ].join(' '),
+                    'color: darkgreen;'
+                );
             }
         });
     },
-    pointer : 0,
+    pointer: 0,
     stabilized: {
-        pitchRecord : {
+        pitchRecord: {
             e: ['', '', '', '', '', ''],
             n: ['', '', '', '', '', '']
         },
-        shortRecord : {
+        shortRecord: {
             e: ['', '', '', '', '', ''],
             n: ['', '', '', '', '', '']
         }
     },
-    pitchRecord : {
+    pitchRecord: {
         e: [],
         n: []
     },
-    shortRecord : {
+    shortRecord: {
         e: [],
         n: []
     },
-    record : {
+    record: {
         e: [],
         n: []
     },
     longFormFielder() {
         return {
-            first : text_text('first baseman'),
-            second : text_text('second baseman'),
-            third : text_text('third baseman'),
-            short : text_text('shortstop'),
-            pitcher : text_text('pitcher'),
-            catcher : text_text('catcher'),
-            left : text_text('left fielder'),
-            center : text_text('center fielder'),
-            right : text_text('right fielder')
-        }
+            first: text_text('first baseman'),
+            second: text_text('second baseman'),
+            third: text_text('third baseman'),
+            short: text_text('shortstop'),
+            pitcher: text_text('pitcher'),
+            catcher: text_text('catcher'),
+            left: text_text('left fielder'),
+            center: text_text('center fielder'),
+            right: text_text('right fielder')
+        };
     }
 };
 
 
 
-// CONCATENATED MODULE: ./Model/AtBat.js
-
+// CONCATENATED MODULE: ./Model/AtBat.ts
 
 /**
  *
  * e.g. "HR++" (HR and 2 extra runs), "SO" strikeout, "FO" flyout
+ * string formatting encapsulation for an at-bat.
  *
  */
-class AtBat_AtBat {
-    constructor(text) {
-        this.infield = text.includes(AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR)
-            ? AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR
+var AtBat_AtBat = /** @class */ (function () {
+    function AtBat(text) {
+        this.beneficial = false;
+        this.infield = text.includes(AtBat.INFIELD_HIT_INDICATOR)
+            ? AtBat.INFIELD_HIT_INDICATOR
             : '';
-        text = text.replace(AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR, '');
-        this.text = text.split(AtBat_AtBat.prototype.RBI_INDICATOR)[0];
-        this.rbi = `${text.split(this.text)[1]}`;
-
-        const log = new Log();
-
-        const beneficial = [
+        text = text.replace(AtBat.INFIELD_HIT_INDICATOR, '');
+        this.text = text.split(AtBat.RBI_INDICATOR)[0];
+        this.rbi = "" + text.split(this.text)[1];
+        var log = new Log();
+        var beneficial = [
             log.WALK,
             log.SINGLE,
             log.HOMERUN,
@@ -1050,25 +1110,22 @@ class AtBat_AtBat {
             log.STOLEN_BASE,
             log.RUN
         ];
-        if (beneficial.includes(this.text)) {
+        if (~beneficial.indexOf(this.text)) {
             this.beneficial = true;
         }
     }
-    toString() {
-        return `${this.infield}${this.text}${this.rbi}`;
-    }
-}
-
-AtBat_AtBat.prototype.constructor = AtBat_AtBat;
-AtBat_AtBat.prototype.identifier = 'AtBat';
-AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR = '';
-AtBat_AtBat.prototype.RBI_INDICATOR = '+';
-
+    AtBat.prototype.toString = function () {
+        return "" + this.infield + this.text + this.rbi;
+    };
+    AtBat.INFIELD_HIT_INDICATOR = '';
+    AtBat.RBI_INDICATOR = '+';
+    return AtBat;
+}());
 
 
 // CONCATENATED MODULE: ./Utility/data.js
 const data_data = {
-    surnames : [
+    surnames: [
         'Sato',
         'Suzuki',
         'Takahashi',
@@ -1123,7 +1180,7 @@ const data_data = {
         'Harada',
         'Nakano'
     ],
-    surnamesJ : [
+    surnamesJ: [
         '佐藤',
         '鈴木',
         '高橋',
@@ -1290,7 +1347,7 @@ const data_data = {
         '博之',
         '巌'
     ],
-    names : [
+    names: [
         'Takumi',
         'Hikaru',
         'Yuuki',
@@ -1401,7 +1458,7 @@ const data_data = {
         'Hiroyuki',
         'Iwao'
     ],
-    teamNamesJ : [
+    teamNamesJ: [
         '横浜',
         '大阪',
         '名古屋',
@@ -1502,7 +1559,7 @@ const data_data = {
         '松江',
         '日立'
     ],
-    teamNames : [
+    teamNames: [
         'Yokohama',
         'Osaka',
         'Nagoya',
@@ -1606,6 +1663,7 @@ const data_data = {
 };
 
 
+
 // CONCATENATED MODULE: ./Utility/helper.js
 const helper = {
     /**
@@ -1614,32 +1672,32 @@ const helper = {
      *
      * x movement, y movement, speed ratio, rotation angle, RPM from RHP perspective where left is smaller X
      */
-    pitchDefinitions : {
+    pitchDefinitions: {
         // fastball, kinda
-        '4-seam' :      [  0,    0, 1   ,   180, 1000],
-        '2-seam' :      [ 20,  -20, 0.90,   -45, 1200],
-        'cutter' :      [-25,  -20, 0.95,    75, 1200],
-        'sinker' :      [ 15,  -30, 0.95,   -45, 1500],
+        '4-seam': [0, 0, 1, 180, 1000],
+        '2-seam': [20, -20, 0.9, -45, 1200],
+        cutter: [-25, -20, 0.95, 75, 1200],
+        sinker: [15, -30, 0.95, -45, 1500],
 
         // breaking ball
-        'slider' :      [-50,  -35, 0.88 ,    80, 2000],
-        'fork'   :      [  0,  -70, 0.87,    20,  500],
-        'curve'  :      [  0, -110, 0.82,    10, 2500],
+        slider: [-50, -35, 0.88, 80, 2000],
+        fork: [0, -70, 0.87, 20, 500],
+        curve: [0, -110, 0.82, 10, 2500],
 
         // change-up
-        'change' :      [  0,  -10, 0.86,   -15, 1000]
+        change: [0, -10, 0.86, -15, 1000]
     },
     selectRandomPitch() {
-        return [
-            '4-seam', '2-seam', 'cutter', 'sinker',
-            'slider', 'fork', 'curve',
-            'change'
-        ][Math.floor(Math.random()*8)]
+        return ['4-seam', '2-seam', 'cutter', 'sinker', 'slider', 'fork', 'curve', 'change'][
+            Math.floor(Math.random() * 8)
+        ];
     }
 };
 
 
+
 // CONCATENATED MODULE: ./Utility/_utils.js
+
 
 
 
@@ -1701,10 +1759,12 @@ const Distribution = Object.assign(DistributionCtor, {
          * @type {number}
          */
         const launchAngleScalar =
-            (1 - abs(flyAngle - 30) / 60) * (1 - ((10 - Math.max(Math.min(10, flyAngle), -10)) / 20) * 0.83);
+            (1 - abs(flyAngle - 30) / 60) *
+            (1 - ((10 - Math.max(Math.min(10, flyAngle), -10)) / 20) * 0.83);
 
         return (
-            (10 + scalar * 320 + staticPowerContribution + randomPowerContribution * 150) * launchAngleScalar
+            (10 + scalar * 320 + staticPowerContribution + randomPowerContribution * 150) *
+            launchAngleScalar
         );
     },
     /**
@@ -1833,7 +1893,9 @@ const Distribution = Object.assign(DistributionCtor, {
                 // the planning (guess) component is removed from the swing decision.
 
                 finalSwingLikelihood =
-                    (positionalLikelihood * 20 + eyeEvaluatedSwingLikelihood * 70 + abs(certainty) * 10) /
+                    (positionalLikelihood * 20 +
+                        eyeEvaluatedSwingLikelihood * 70 +
+                        abs(certainty) * 10) /
                     100;
             }
         }
@@ -1861,12 +1923,15 @@ const Distribution = Object.assign(DistributionCtor, {
     breakEffect(pitch, pitcher, x, y) {
         const effect = {};
         effect.x = floor(
-            x + pitch.breakDirection[0] * (0.5 + 0.5 * random() + pitcher.pitching[pitch.name].break / 200)
+            x +
+                pitch.breakDirection[0] *
+                    (0.5 + 0.5 * random() + pitcher.pitching[pitch.name].break / 200)
         );
         effect.y = floor(
             y +
                 pitch.breakDirection[1] *
-                    ((0.5 + 0.5 * random() + pitcher.pitching[pitch.name].break / 200) / (0.5 + y / 200))
+                    ((0.5 + 0.5 * random() + pitcher.pitching[pitch.name].break / 200) /
+                        (0.5 + y / 200))
         );
         return effect;
     },
@@ -1935,7 +2000,11 @@ const Distribution = Object.assign(DistributionCtor, {
      */
     willSteal(pitch, catcher, thief, base) {
         if (base == 4) return false;
-        return random() < 0.15 && this.stealSuccess(pitch, catcher, thief, base, false) && random() < 0.5;
+        return (
+            random() < 0.15 &&
+            this.stealSuccess(pitch, catcher, thief, base, false) &&
+            random() < 0.5
+        );
     }
 });
 
@@ -1951,19 +2020,19 @@ Distribution.main = () => {
             console.log('S', ump.count.strikes, 'B', ump.count.balls);
             console.log(
                 'middle',
-                [15, 35, 55, 75, 95].map(x => {
+                [15, 35, 55, 75, 95].map((x) => {
                     return Distribution.swingLikelihood(x, 100, 100, ump) | 0;
                 })
             );
             console.log(
                 'corner',
-                [15, 35, 55, 75, 95].map(x => {
+                [15, 35, 55, 75, 95].map((x) => {
                     return Distribution.swingLikelihood(x, 50, 50, ump) | 0;
                 })
             );
             console.log(
                 'ball',
-                [15, 35, 55, 75, 95].map(x => {
+                [15, 35, 55, 75, 95].map((x) => {
                     return Distribution.swingLikelihood(x, 15, 15, ump) | 0;
                 })
             );
@@ -1987,7 +2056,7 @@ const Mathinator = function() {};
  * @param n
  * @returns {number}
  */
-Mathinator.square = n => n * n;
+Mathinator.square = (n) => n * n;
 
 Mathinator.prototype = {
     identifier: 'Mathinator',
@@ -2046,7 +2115,14 @@ Mathinator.prototype = {
      * @param [givenSplayAngle] where 0 is up the middle and 90 is right foul
      * @returns {{bottom: number, left: number, padding: number, borderWidth: number, delay: number, ease: (r.easeOut|*)}}
      */
-    transitionalTrajectory(percent, quarter, step, givenApexHeight, givenDistance, givenSplayAngle) {
+    transitionalTrajectory(
+        percent,
+        quarter,
+        step,
+        givenApexHeight,
+        givenDistance,
+        givenSplayAngle
+    ) {
         if (givenApexHeight) Mathinator.prototype.memory.apexHeight = givenApexHeight;
         if (givenDistance) Mathinator.prototype.memory.distance = givenDistance;
         if (givenSplayAngle) Mathinator.prototype.memory.splay = givenSplayAngle;
@@ -2064,7 +2140,8 @@ Mathinator.prototype = {
 
         bottom = (((Math.cos(splay * radian) * percent) / 100) * distance * 95) / 300;
         left =
-            (((Math.sin(splay * radian) * percent) / 100) * distance * 95) / 300 + this.SPLAY_INDICATOR_LEFT;
+            (((Math.sin(splay * radian) * percent) / 100) * distance * 95) / 300 +
+            this.SPLAY_INDICATOR_LEFT;
 
         const apexRatio = Math.sqrt((50 - Math.abs(percent - 50)) / 100) * (1 / 0.7071);
         if (bounding) {
@@ -2130,7 +2207,11 @@ Mathinator.prototype = {
 
         const projection = Math.pow((500 - currentDistance) / 500, 2); // reduction of dimensions due to distance
 
-        top = 200 - origin.y - height * 20 * projection + (percent / 100) * (origin.y - 85) * projection;
+        top =
+            200 -
+            origin.y -
+            height * 20 * projection +
+            (percent / 100) * (origin.y - 85) * projection;
         left = origin.x + Math.sin(splay * radian) * (currentDistance * 8) * projection;
         padding = 12 * projection * projection;
         borderWidth = Math.max(Math.min(padding / 3, 4), 0);
@@ -2158,9 +2239,11 @@ Mathinator.prototype = {
         // CF HR bottom: 95px, centerline: left: 190px;
         let bottom, left;
 
-        bottom = (Math.cos((swingResult.splay / 180) * Math.PI) * swingResult.travelDistance * 95) / 300;
+        bottom =
+            (Math.cos((swingResult.splay / 180) * Math.PI) * swingResult.travelDistance * 95) / 300;
         left =
-            (Math.sin((swingResult.splay / 180) * Math.PI) * swingResult.travelDistance * 95) / 300 +
+            (Math.sin((swingResult.splay / 180) * Math.PI) * swingResult.travelDistance * 95) /
+                300 +
             this.SPLAY_INDICATOR_LEFT;
 
         bottom = Math.max(Math.min(bottom, 400), -20);
@@ -2214,22 +2297,23 @@ Mathinator.prototype = {
         };
     },
     /**
-     * @param distance {number} feet
-     * @param throwing {number} 0-1
-     * @param fielding {number} 0-1
-     * @param intercept {number} approx. -140 to 140
+     * @param {number} distance - travel distance for the fielder (not the batted ball).
+     * @param {number} throwing - skill rating 0-1
+     * @param {number} fielding - skill rating 0-1
+     * @param {number} intercept - approx. -140 to 140
      * @returns {number} seconds
      */
     fielderReturnDelay(distance, throwing, fielding, intercept) {
+        const distanceContribution = distance / 60;
         return (
-            distance / 90 + // bip distance (up to 3s+)
-            (5 *
+            distanceContribution + // bip distance (up to 3s+)
+            (6 *
             (distance / 310) * // worst case time to reach the ball,
                 Math.min(intercept - 120, 0)) /
                 -240 + // a good intercept rating will cut the base down to 0
             1 -
-            (0.2 + fielding * 0.8) + // gather time (up to 0.8s)
-            distance / 90 / (0.5 + throwing / 2)
+            (1.8 + fielding * 0.8) + // gather time (up to 1.8s)
+            distanceContribution / (0.5 + throwing / 2)
         ); // throwing distance (up to 2s)
     },
     /**
@@ -2324,7 +2408,7 @@ for (const fn in Iterator.prototype) {
 
 
 
-// CONCATENATED MODULE: ./Model/TeamConstants.js
+// CONCATENATED MODULE: ./Model/TeamConstants.ts
 /* harmony default export */ var TeamConstants = ({
     RUNNERS_DISCRETION: 'runnersDiscretion',
     RUNNER_GO: 'go',
@@ -2393,7 +2477,8 @@ Player.prototype = {
      */
     spaceName(jSurname, jGivenName) {
         if (jSurname.length === 1 && jGivenName.length <= 2) jSurname += '・';
-        if (jGivenName.length === 1 && !jSurname.includes('・') && jSurname.length <= 2) jSurname += '・';
+        if (jGivenName.length === 1 && !jSurname.includes('・') && jSurname.length <= 2)
+            jSurname += '・';
         this.nameJ = jSurname + jGivenName;
         this.surnameJ = jSurname;
     },
@@ -2570,7 +2655,9 @@ Player.prototype = {
                 },
                 ba: null,
                 getOBP() {
-                    return (this.h + this.bb + this.hbp) / (this.ab + this.bb + this.hbp + this.sac);
+                    return (
+                        (this.h + this.bb + this.hbp) / (this.ab + this.bb + this.hbp + this.sac)
+                    );
                 },
                 obp: null,
                 getSLG() {
@@ -2589,7 +2676,7 @@ Player.prototype = {
                     this.slash =
                         this.slash ||
                         [this.getBA() || '.---', this.getOBP(), this.getSLG()]
-                            .map(x => {
+                            .map((x) => {
                                 if (isNaN(x)) return '.---';
                                 if (x < 1) return `${x}0000`.slice(1, 5);
                                 return `${x}0000`.slice(0, 5);
@@ -2646,7 +2733,7 @@ Player.prototype = {
     atBatObjects: [],
     getAtBats() {
         if (this.atBats.length > this.atBatObjects.length) {
-            this.atBatObjects = this.atBats.map(item => new AtBat_AtBat(item));
+            this.atBatObjects = this.atBats.map((item) => new AtBat_AtBat(item));
         }
         return this.atBatObjects;
     },
@@ -2716,7 +2803,7 @@ Player.prototype = {
     randomizeSkills(hero, allPitches) {
         this.hero = hero;
         const giraffe = this;
-        const randValue = isPitching => {
+        const randValue = (isPitching) => {
             let value = Math.floor(Math.pow(Math.random(), 0.75) * 80 + Math.random() * 20);
             if (hero) {
                 value += Math.floor((100 - value) * Math.max(Math.random(), isPitching ? 0 : 0.65));
@@ -2822,7 +2909,9 @@ Player.prototype = {
      * @returns {String}
      */
     getOrder() {
-        return text_text([' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]);
+        return text_text(
+            [' 1st', ' 2nd', ' 3rd', ' 4th', ' 5th', ' 6th', '7th', ' 8th', ' 9th'][this.order]
+        );
     },
     /**
      * Where positive is an early swing and negative is a late swing.
@@ -2852,7 +2941,10 @@ Player.prototype = {
      */
     getDefiningPitchingCharacteristic() {
         if (!this.definingPitchingCharacteristic[text_text.mode]) {
-            this.definingPitchingCharacteristic[text_text.mode] = this.getDefiningCharacteristic(false, true);
+            this.definingPitchingCharacteristic[text_text.mode] = this.getDefiningCharacteristic(
+                false,
+                true
+            );
         }
         return this.definingPitchingCharacteristic[text_text.mode];
     },
@@ -2883,17 +2975,17 @@ Player.prototype = {
         const offense = [o.eye, o.power, o.speed];
         const defense = [d.fielding, d.speed, d.throwing];
 
-        const sum = x => x.reduce((a, b) => a + b);
+        const sum = (x) => x.reduce((a, b) => a + b);
 
         let pitching = [0, 0, 0]; // control, speed, break
         const pitchingKeys = Object.keys(p);
-        pitchingKeys.map(x => {
+        pitchingKeys.map((x) => {
             pitching[0] += p[x].control;
             pitching[1] += p[x].velocity;
             pitching[2] += p[x].break;
         });
         const pitches = pitchingKeys.length;
-        pitching = pitching.map(x => (x / pitches) | 0);
+        pitching = pitching.map((x) => (x / pitches) | 0);
 
         if (pitchingOnly || (pitcherRating > 90 && !battingOnly)) {
             if (pitcherRating > 94) {
@@ -2949,7 +3041,7 @@ Player.prototype = {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/AbstractMesh.js
+// CONCATENATED MODULE: ./Render/Mesh/AbstractMesh.js
 /**
  * Each class should adhere to this pattern.
  * When a scene object has been positioned correctly and its trajectory set,
@@ -3000,10 +3092,10 @@ AbstractMesh.WORLD_BASE_Y = -4;
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Indicator.js
+// CONCATENATED MODULE: ./Render/Mesh/Indicator.js
 
 
-class Indicator extends AbstractMesh {
+class Indicator_Indicator extends AbstractMesh {
     constructor(loop) {
         super();
         let n = 60;
@@ -3044,7 +3136,7 @@ class Indicator extends AbstractMesh {
 const VERTICAL_CORRECTION = -0.2;
 const INITIAL_CAMERA_DISTANCE = 8;
 
-// CONCATENATED MODULE: ./Render/mesh/Ball.js
+// CONCATENATED MODULE: ./Render/Mesh/Ball.js
 
 
 
@@ -3171,7 +3263,7 @@ class Ball_Ball extends AbstractMesh {
             return;
         }
         this.hasIndicator = true;
-        const indicator = new Indicator();
+        const indicator = new Indicator_Indicator();
         indicator.mesh.position.x = this.mesh.position.x;
         indicator.mesh.position.y = this.mesh.position.y;
         indicator.mesh.position.z = this.mesh.position.z;
@@ -3260,9 +3352,15 @@ class Ball_Ball extends AbstractMesh {
                 scalarSum = momentumScalar + breakingScalar;
             // adjustment toward breaking ball position
             const breakingPosition = {
-                x: (position.x * momentumScalar + breakingInfluencePosition.x * breakingScalar) / scalarSum,
-                y: (position.y * momentumScalar + breakingInfluencePosition.y * breakingScalar) / scalarSum,
-                z: (position.z * momentumScalar + breakingInfluencePosition.z * breakingScalar) / scalarSum
+                x:
+                    (position.x * momentumScalar + breakingInfluencePosition.x * breakingScalar) /
+                    scalarSum,
+                y:
+                    (position.y * momentumScalar + breakingInfluencePosition.y * breakingScalar) /
+                    scalarSum,
+                z:
+                    (position.z * momentumScalar + breakingInfluencePosition.z * breakingScalar) /
+                    scalarSum
             };
             const increment = {
                 x: position.x - lastPosition.x,
@@ -3417,7 +3515,8 @@ class Ball_Ball extends AbstractMesh {
                 // the multiplication of bounce rate means that as distance approaches the
                 // final distance, the sine wave will have been traversed that many times, giving that
                 // many bounces.
-                const waveProgress = (averageBounceRate * Math.pow(currentDistance, 1.1)) / distance;
+                const waveProgress =
+                    (averageBounceRate * Math.pow(currentDistance, 1.1)) / distance;
                 const waveComponent = Math.sin((waveProgress * Math.PI) / 2);
                 const waveHeight = Math.abs(waveComponent);
 
@@ -3469,7 +3568,7 @@ Ball_Ball.prototype.rotation = {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Mound.js
+// CONCATENATED MODULE: ./Render/Mesh/Mound.js
 
 
 class Mound_Mound extends AbstractMesh {
@@ -3503,7 +3602,7 @@ class Mound_Mound extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Base.js
+// CONCATENATED MODULE: ./Render/Mesh/Base.js
 
 
 class Base_Base extends AbstractMesh {
@@ -3556,7 +3655,7 @@ class Base_Base extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/FoulLine.js
+// CONCATENATED MODULE: ./Render/Mesh/FoulLine.js
 
 
 class FoulLine_FoulLine extends AbstractMesh {
@@ -3599,7 +3698,7 @@ class FoulLine_FoulLine extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/FoulPole.js
+// CONCATENATED MODULE: ./Render/Mesh/FoulPole.js
 
 
 class FoulPole_FoulPole extends AbstractMesh {
@@ -3637,7 +3736,7 @@ class FoulPole_FoulPole extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Field.js
+// CONCATENATED MODULE: ./Render/Mesh/Field.js
 
 
 class Field_Field extends AbstractMesh {
@@ -3671,7 +3770,7 @@ class Field_Field extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Grass.js
+// CONCATENATED MODULE: ./Render/Mesh/Grass.js
 
 
 class Grass_Grass extends AbstractMesh {
@@ -3719,7 +3818,7 @@ class Grass_Grass extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/BaseDirt.js
+// CONCATENATED MODULE: ./Render/Mesh/BaseDirt.js
 
 
 class BaseDirt_BaseDirt extends AbstractMesh {
@@ -3757,7 +3856,7 @@ class BaseDirt_BaseDirt extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/BattersEye.js
+// CONCATENATED MODULE: ./Render/Mesh/BattersEye.js
 
 
 class BattersEye_BattersEye extends AbstractMesh {
@@ -3786,7 +3885,7 @@ class BattersEye_BattersEye extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Wall.js
+// CONCATENATED MODULE: ./Render/Mesh/Wall.js
 
 
 class Wall_Wall extends AbstractMesh {
@@ -4073,7 +4172,7 @@ const loadSkyShader = () => {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Sky.js
+// CONCATENATED MODULE: ./Render/Mesh/Sky.js
 
 
 
@@ -4127,10 +4226,10 @@ class Sky_Sky extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Sun.js
+// CONCATENATED MODULE: ./Render/Mesh/Sun.js
 
 
-class Sun extends AbstractMesh {
+class Sun_Sun extends AbstractMesh {
     constructor(loop) {
         super();
         this.getMesh();
@@ -4252,7 +4351,11 @@ const INITIAL_POSITION = () => {
         return initialPosition;
     }
     if (typeof THREE !== 'undefined') {
-        return (initialPosition = new THREE.Vector3(0, VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE));
+        return (initialPosition = new THREE.Vector3(
+            0,
+            VERTICAL_CORRECTION,
+            INITIAL_CAMERA_DISTANCE
+        ));
     }
 };
 
@@ -4314,7 +4417,7 @@ class Loop_Loop {
         this.moveSpeed = 0.05;
         this.panSpeed = 0.3;
 
-        this.objects.forEach(object => object.animate());
+        this.objects.forEach((object) => object.animate());
         //this.breathe();
         this.renderer.render(this.scene, this.camera);
     }
@@ -4424,7 +4527,8 @@ class Loop_Loop {
         sun.time.h = hours;
         sun.time.m = minutes;
         sun.derivePosition(sky);
-        const luminosity = (-0.5 + Math.max(Math.abs(1.25 - azimuth), Math.abs(0.25 - azimuth))) * 2;
+        const luminosity =
+            (-0.5 + Math.max(Math.abs(1.25 - azimuth), Math.abs(0.25 - azimuth))) * 2;
         if (this.Animator) {
             this.Animator.setLuminosity(0.1 + luminosity / 1.4);
         }
@@ -4439,7 +4543,7 @@ class Loop_Loop {
         new Grass_Grass().join(this);
         new Grass_Grass(this, true);
         new BattersEye_BattersEye().join(this);
-        const sun = new Sun(),
+        const sun = new Sun_Sun(),
             sky = new Sky_Sky();
         sun.derivePosition(sky);
         sky.join(this);
@@ -4547,15 +4651,18 @@ class Loop_Loop {
      */
     panToward(vector) {
         const maxIncrement = this.panSpeed;
-        this.forAllLoops(loop => {
+        this.forAllLoops((loop) => {
             const target = loop._target;
             if (target) {
                 target.x =
-                    target.x + Math.max(Math.min((vector.x - target.x) / 100, maxIncrement), -maxIncrement);
+                    target.x +
+                    Math.max(Math.min((vector.x - target.x) / 100, maxIncrement), -maxIncrement);
                 target.y =
-                    target.y + Math.max(Math.min((vector.y - target.y) / 100, maxIncrement), -maxIncrement);
+                    target.y +
+                    Math.max(Math.min((vector.y - target.y) / 100, maxIncrement), -maxIncrement);
                 target.z =
-                    target.z + Math.max(Math.min((vector.z - target.z) / 100, maxIncrement), -maxIncrement);
+                    target.z +
+                    Math.max(Math.min((vector.z - target.z) / 100, maxIncrement), -maxIncrement);
                 loop.camera.lookAt(target);
             }
         });
@@ -4567,12 +4674,21 @@ class Loop_Loop {
      */
     moveToward(vector) {
         const maxIncrement = this.moveSpeed;
-        this.forAllLoops(loop => {
+        this.forAllLoops((loop) => {
             const position = loop.camera && loop.camera.position;
             if (position) {
-                position.x += Math.max(Math.min(vector.x - position.x, maxIncrement), -maxIncrement);
-                position.y += Math.max(Math.min(vector.y - position.y, maxIncrement), -maxIncrement);
-                position.z += Math.max(Math.min(vector.z - position.z, maxIncrement), -maxIncrement);
+                position.x += Math.max(
+                    Math.min(vector.x - position.x, maxIncrement),
+                    -maxIncrement
+                );
+                position.y += Math.max(
+                    Math.min(vector.y - position.y, maxIncrement),
+                    -maxIncrement
+                );
+                position.z += Math.max(
+                    Math.min(vector.z - position.z, maxIncrement),
+                    -maxIncrement
+                );
             }
         });
     }
@@ -4583,7 +4699,7 @@ class Loop_Loop {
      * @param panSpeed
      */
     setLookTarget(vector, panSpeed) {
-        this.forAllLoops(loop => {
+        this.forAllLoops((loop) => {
             loop.panSpeed = panSpeed;
             loop.panning = vector !== AHEAD();
             loop.target = vector;
@@ -4596,14 +4712,14 @@ class Loop_Loop {
      * @param moveSpeed
      */
     setMoveTarget(vector, moveSpeed) {
-        this.forAllLoops(loop => {
+        this.forAllLoops((loop) => {
             loop.moveSpeed = moveSpeed;
             loop.moveTarget = vector;
             loop.overwatchMoveTarget = null;
         });
     }
     setOverwatchMoveTarget(vector, moveSpeed) {
-        this.forAllLoops(loop => {
+        this.forAllLoops((loop) => {
             loop.moveSpeed = moveSpeed;
             loop.overwatchMoveTarget = vector;
             loop.moveTarget = null;
@@ -4621,7 +4737,7 @@ class Loop_Loop {
         if (typeof x === 'object') {
             return this.moveCamera(x.x, x.y, x.z);
         }
-        this.forAllLoops(loop => {
+        this.forAllLoops((loop) => {
             loop.camera.position.x = x;
             loop.camera.position.y = y;
             loop.camera.position.z = z;
@@ -4793,8 +4909,24 @@ Animator_Animator.prototype = {
             henka = (this.pitchBreak = $('.main-area .target .baseball.break')),
             quarter = flightSpeed / 4;
 
-        const pitchTransition = Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 12, 4),
-            targetTransition = Mathinator.pitchTransition(top, left, originTop, originLeft, quarter, 10, 3);
+        const pitchTransition = Mathinator.pitchTransition(
+                top,
+                left,
+                originTop,
+                originLeft,
+                quarter,
+                12,
+                4
+            ),
+            targetTransition = Mathinator.pitchTransition(
+                top,
+                left,
+                originTop,
+                originLeft,
+                quarter,
+                10,
+                3
+            );
 
         const transitions = [
             pitchTransition(0, 0),
@@ -4931,13 +5063,21 @@ Animator_Animator.prototype = {
         const apexHeight =
             ((velocityVerticalComponent * velocityVerticalComponent) / (2 * 9.81)) *
             linearApproximateDragScalar.apexHeight;
-        const airTime = 1.5 * Math.sqrt((2 * apexHeight) / 9.81) * linearApproximateDragScalar.airTime; // 2x freefall equation
+        const airTime =
+            1.5 * Math.sqrt((2 * apexHeight) / 9.81) * linearApproximateDragScalar.airTime; // 2x freefall equation
 
         //log('angle', angle, 'vel', velocity, 'apex', apexHeight, 'air', airTime, 'dist', result.travelDistance);
         const quarter = airTime / 4;
         const mathinator = new Mathinator();
         let transitions = [
-            mathinator.transitionalTrajectory(0, quarter, 0, apexHeight, scalar * distance, result.splay),
+            mathinator.transitionalTrajectory(
+                0,
+                quarter,
+                0,
+                apexHeight,
+                scalar * distance,
+                result.splay
+            ),
             mathinator.transitionalTrajectory(25, quarter, 0),
             mathinator.transitionalTrajectory(50, quarter, 1),
             mathinator.transitionalTrajectory(75, quarter, 2),
@@ -5009,7 +5149,10 @@ Animator_Animator.prototype = {
         ball.join(this.loop);
 
         if (result.thrownOut || result.caught || result.bases) {
-            if ((Math.random() < 0.15 && ball.airTime > 1.5) || (Math.random() < 0.5 && ball.airTime > 2.5)) {
+            if (
+                (Math.random() < 0.15 && ball.airTime > 1.5) ||
+                (Math.random() < 0.5 && ball.airTime > 2.5)
+            ) {
                 var scale = 1;
                 if (result.splay > 0) {
                     scale = -1;
@@ -5064,7 +5207,11 @@ Model_Field_Field.prototype = {
      * @returns {boolean}
      */
     hasRunnersOn() {
-        return this.first instanceof Player || this.second instanceof Player || this.third instanceof Player;
+        return (
+            this.first instanceof Player ||
+            this.second instanceof Player ||
+            this.third instanceof Player
+        );
     },
     /**
      * @param swing
@@ -5133,8 +5280,19 @@ Model_Field_Field.prototype = {
                 landingDistance
             ]);
             const speedComponent = ((1 + Math.sqrt(fielder.skill.defense.speed / 100)) / 2) * 100;
-            const interceptRating = speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.55 - 15;
-            if (interceptRating > 0 && flyAngle > 4) {
+
+            /**
+             * This is an important calculation, since it decides
+             * whether a ball was caught in the air, or
+             * how quickly a fielder reaches a landed ball.
+             *
+             * Higher is better for the defense.
+             * @type {number}
+             */
+            const interceptRating =
+                speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.35 - 25;
+
+            if (interceptRating > 0 && flyAngle > 10) {
                 //caught cleanly?
                 if (Distribution.error(fielder)) {
                     //error
@@ -5153,13 +5311,22 @@ Model_Field_Field.prototype = {
                             100
                         );
                         // todo ran into outfield assist
-                        if (this.first && sacrificeThrowInTime > this.first.getBaseRunningTime() + 4.5) {
+                        if (
+                            this.first &&
+                            sacrificeThrowInTime > this.first.getBaseRunningTime() + 4.5
+                        ) {
                             swing.sacrificeAdvances.push('first');
                         }
-                        if (this.second && sacrificeThrowInTime > this.second.getBaseRunningTime()) {
+                        if (
+                            this.second &&
+                            sacrificeThrowInTime > this.second.getBaseRunningTime()
+                        ) {
                             swing.sacrificeAdvances.push('second');
                         }
-                        if (this.third && sacrificeThrowInTime > this.third.getBaseRunningTime() - 0.5) {
+                        if (
+                            this.third &&
+                            sacrificeThrowInTime > this.third.getBaseRunningTime() - 0.5
+                        ) {
                             swing.sacrificeAdvances.push('third');
                         }
                     }
@@ -5188,7 +5355,8 @@ Model_Field_Field.prototype = {
                     fieldingReturnDelay -= baseRunningTime;
 
                     while (
-                        ((fieldingReturnDelay > baseRunningTime && Math.random() < 0.25 + speed / 200) ||
+                        ((fieldingReturnDelay > baseRunningTime &&
+                            Math.random() < 0.25 + speed / 200) ||
                             Math.random() < 0.04 + speed / 650) &&
                         swing.bases < 3
                     ) {
@@ -5201,7 +5369,7 @@ Model_Field_Field.prototype = {
                         second = this.second,
                         third = this.third;
                     swing.fieldersChoice = null;
-                    swing.bases = fieldingReturnDelay >= baseRunningTime + 1 ? 1 : 0;
+                    swing.bases = fieldingReturnDelay >= baseRunningTime ? 1 : 0;
                     if (first && fieldingReturnDelay < first.getBaseRunningTime())
                         swing.fieldersChoice = 'first';
                     if (first && second && fieldingReturnDelay < second.getBaseRunningTime() + 0.6)
@@ -5281,7 +5449,7 @@ Model_Field_Field.prototype = {
                         delete swing.fieldersChoice;
                     }
                 }
-                swing.thrownOut = swing.bases == 0;
+                swing.thrownOut = swing.bases === 0;
                 if (swing.thrownOut) {
                     fielder.stats.fielding.PO++; // todo A to PO
                     swing.thrownOut = true;
@@ -5306,7 +5474,11 @@ Model_Field_Field.prototype = {
         const first = this.first,
             second = this.second,
             third = this.third;
-        return (first && second && third && 'third') || (first && second && 'second') || (first && 'first');
+        return (
+            (first && second && third && 'third') ||
+            (first && second && 'second') ||
+            (first && 'first')
+        );
     },
     /**
      * @returns {Player}
@@ -5344,7 +5516,8 @@ Model_Field_Field.prototype = {
         let infield = landingDistance < 145 - (Math.abs(angle) / 90) * 50;
         if (flyAngle < 7) {
             // 7 degrees straight would fly over the infielder, but add some for arc
-            let horizontalVelocity = Math.cos((flyAngle / 180) * Math.PI) * (85 + (power / 100) * 10); // mph toward infielder
+            let horizontalVelocity =
+                Math.cos((flyAngle / 180) * Math.PI) * (85 + (power / 100) * 10); // mph toward infielder
             if (flyAngle < 0) horizontalVelocity *= 0.5; // velocity loss on bounce
             const fielderLateralReachDegrees = 1 + (22.5 * (100 - horizontalVelocity)) / 100; // up to 90/4 = 22.5
             if (angle < -20) {
@@ -5427,7 +5600,11 @@ Manager.prototype = {
         if (!this.team.positions.pitcher.number) {
             this.team.positions.pitcher.number = jerseyNumber++;
         }
-        this.team.positions.catcher = this.selectForSkill(this.team.bench, ['defense', 'catching'], 'right');
+        this.team.positions.catcher = this.selectForSkill(
+            this.team.bench,
+            ['defense', 'catching'],
+            'right'
+        );
         this.team.positions.catcher.position = 'catcher';
         if (!this.team.positions.catcher.number) {
             this.team.positions.catcher.number = jerseyNumber++;
@@ -5438,11 +5615,23 @@ Manager.prototype = {
                 player.number = jerseyNumber;
             }
         });
-        this.team.positions.short = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
+        this.team.positions.short = this.selectForSkill(
+            this.team.bench,
+            ['defense', 'fielding'],
+            'right'
+        );
         this.team.positions.short.position = 'short';
-        this.team.positions.second = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
+        this.team.positions.second = this.selectForSkill(
+            this.team.bench,
+            ['defense', 'fielding'],
+            'right'
+        );
         this.team.positions.second.position = 'second';
-        this.team.positions.third = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'right');
+        this.team.positions.third = this.selectForSkill(
+            this.team.bench,
+            ['defense', 'fielding'],
+            'right'
+        );
         this.team.positions.third.position = 'third';
         this.team.positions.center = this.selectForSkill(this.team.bench, ['defense', 'speed']);
         this.team.positions.center.position = 'center';
@@ -5450,7 +5639,11 @@ Manager.prototype = {
         this.team.positions.left.position = 'left';
         this.team.positions.right = this.selectForSkill(this.team.bench, ['defense', 'speed']);
         this.team.positions.right.position = 'right';
-        this.team.positions.first = this.selectForSkill(this.team.bench, ['defense', 'fielding'], 'left');
+        this.team.positions.first = this.selectForSkill(
+            this.team.bench,
+            ['defense', 'fielding'],
+            'left'
+        );
         this.team.positions.first.position = 'first';
 
         this.team.lineup[3] = this.selectForSkill(this.team.positions, ['offense', 'power']);
@@ -5497,7 +5690,9 @@ Manager.prototype = {
             });
             if (pool === this.team.bench) {
                 delete this.team.bench[index];
-                this.team.bench = this.team.bench.filter(player => player instanceof selection.constructor);
+                this.team.bench = this.team.bench.filter(
+                    (player) => player instanceof selection.constructor
+                );
             }
             return selection;
         }
@@ -5530,25 +5725,32 @@ Manager.prototype = {
 
 
 
-// CONCATENATED MODULE: ./Model/Team.js
+// CONCATENATED MODULE: ./Model/Team.ts
 
 
 
 
-
-
-
-const Team = function(game, heroRate) {
-    this.init(game, heroRate);
-};
-
-TeamConstants.RUNNERS_DISCRETION = 'runnersDiscretion';
-TeamConstants.RUNNER_GO = 'go';
-TeamConstants.RUNNER_HOLD = 'hold';
-
-Team.prototype = {
-    constructor: Team,
-    init(game, heroRate) {
+var Team_Team = /** @class */ (function () {
+    function Team(game, heroRate) {
+        this.stealAttempt = TeamConstants.RUNNERS_DISCRETION;
+        this.lineup = [];
+        this.game = null;
+        this.manager = null;
+        this.bench = [];
+        this.bullpen = [];
+        this.nowBatting = 0;
+        this.substituted = [];
+        this.expanded = null;
+        this.name = '';
+        this.nameJ = '';
+        this.noSubstituteSelected = {
+            toString: function () {
+                return '';
+            },
+            toValue: function () {
+                return false;
+            }
+        };
         this.sub = this.noSubstituteSelected;
         heroRate = heroRate || 0.1;
         this.substituted = [];
@@ -5570,40 +5772,24 @@ Team.prototype = {
         this.manager = new Manager(this);
         if (game !== 'no init') {
             this.game = game;
-            for (let j = 0; j < 20; j++) {
+            for (var j = 0; j < 20; j++) {
                 this.bench.push(new Player(this, Math.random() < heroRate));
             }
             if (this.bench.length === 20) {
                 this.manager.makeLineup();
             }
         }
-    },
-    pickName() {
-        const teamNameIndex = Math.floor(Math.random() * data_data.teamNames.length);
+    }
+    Team.prototype.pickName = function () {
+        var teamNameIndex = Math.floor(Math.random() * data_data.teamNames.length);
         this.name = data_data.teamNames[teamNameIndex];
         this.nameJ = data_data.teamNamesJ[teamNameIndex];
-    },
-    getName() {
+    };
+    Team.prototype.getName = function () {
         return text_text.mode === 'n' ? this.nameJ : this.name;
-    },
-    stealAttempt: TeamConstants.RUNNERS_DISCRETION,
-    lineup: [],
-    positions: {},
-    manager: null,
-    bench: [],
-    bullpen: [],
-    nowBatting: 0,
-    expanded: 'Player&',
-    noSubstituteSelected: {
-        toString() {
-            return '';
-        },
-        toValue() {
-            return false;
-        }
-    }
-};
-
+    };
+    return Team;
+}());
 
 
 // CONCATENATED MODULE: ./Model/Umpire.js
@@ -5657,7 +5843,8 @@ Umpire.prototype = {
         const field = game.field;
 
         if (game.swingResult.fielder) {
-            var fielder = game.teams[game.half === 'top' ? 'home' : 'away'].positions[result.fielder];
+            var fielder =
+                game.teams[game.half === 'top' ? 'home' : 'away'].positions[result.fielder];
         } else {
             fielder = null;
         }
@@ -5685,7 +5872,8 @@ Umpire.prototype = {
             thief.stats.batting.sb++;
         }
         if (!isNaN(result.caughtStealing)) {
-            game.teams[game.half === 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding.PO++;
+            game.teams[game.half === 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding
+                .PO++;
             this.count.outs++;
             thief = game.batter.team.lineup[result.caughtStealing];
             thief.stats.batting.cs++;
@@ -5759,7 +5947,7 @@ Umpire.prototype = {
                         batter.stats.batting.ab++;
                         if (result.firstOut) {
                             game.field[result.firstOut] = null;
-                            result.additionalOuts.map(runner => {
+                            result.additionalOuts.map((runner) => {
                                 if (runner !== 'batter') {
                                     game.field[runner] = null;
                                 }
@@ -5798,7 +5986,9 @@ Umpire.prototype = {
                         }
                         if (result.bases) {
                             if (!result.error) {
-                                game.tally[game.half === 'top' ? 'away' : 'home'][Log.prototype.SINGLE]++;
+                                game.tally[game.half === 'top' ? 'away' : 'home'][
+                                    Log.prototype.SINGLE
+                                ]++;
                                 pitcher.stats.pitching.H++;
                             } else {
                                 if (result.bases > 0) {
@@ -5971,9 +6161,9 @@ Umpire.prototype = {
                 second = game.field.second;
                 third = game.field.third;
             }
-            let canAdvance = position => true;
+            let canAdvance = (position) => true;
             if (sacrificeAdvances) {
-                canAdvance = position => {
+                canAdvance = (position) => {
                     switch (position) {
                         case 'first':
                             return sacrificeAdvances.includes('first') && !game.field.second;
@@ -6258,8 +6448,8 @@ Game.prototype = {
         if (m) text_text.mode = m;
         this.gamesIntoSeason = 72 + Math.floor(Math.random() * 72);
         this.field = new Model_Field_Field(this);
-        this.teams.away = new Team(this);
-        this.teams.home = new Team(this);
+        this.teams.away = new Team_Team(this);
+        this.teams.home = new Team_Team(this);
         this.log = new Log();
         this.log.game = this;
         this.debug = [];
@@ -6384,11 +6574,13 @@ Game.prototype = {
                 if (typeof giraffe.pitchTarget != 'object') {
                     giraffe.pitchTarget = { x: 100, y: 100 };
                 }
-                giraffe.autoSwing(giraffe.pitchTarget.x, giraffe.pitchTarget.y, callback => {
+                giraffe.autoSwing(giraffe.pitchTarget.x, giraffe.pitchTarget.y, (callback) => {
                     callback();
                 });
             },
-            giraffe.field.hasRunnersOn() ? Animator_Animator.TIME_FROM_SET + 2500 : Animator_Animator.TIME_FROM_WINDUP + 2500
+            giraffe.field.hasRunnersOn()
+                ? Animator_Animator.TIME_FROM_SET + 2500
+                : Animator_Animator.TIME_FROM_WINDUP + 2500
         );
     },
     /**
@@ -6486,7 +6678,9 @@ Game.prototype = {
         const giraffe = this;
         const bonus = this.batter.eye.bonus || 0;
         const eye =
-            this.batter.skill.offense.eye + 6 * (this.umpire.count.balls + this.umpire.count.strikes) + bonus;
+            this.batter.skill.offense.eye +
+            6 * (this.umpire.count.balls + this.umpire.count.strikes) +
+            bonus;
         let convergence;
         let convergenceSum;
 
@@ -6729,7 +6923,8 @@ Game.prototype = {
             const field = this.field;
             const team = this.batter.team;
             if (
-                (team.stealAttempt === Team.RUNNER_GO || team.stealAttempt === Team.RUNNERS_DISCRETION) &&
+                (team.stealAttempt === Team_Team.RUNNER_GO ||
+                    team.stealAttempt === Team_Team.RUNNERS_DISCRETION) &&
                 !this.opponentConnected
             ) {
                 const thief = field.getLeadRunner();
@@ -6748,7 +6943,8 @@ Game.prototype = {
                     let validToSteal = true;
                     if (result.looking) {
                         const count = this.umpire.count;
-                        if (count.strikes >= 2 && result.strike && count.outs >= 2) validToSteal = false;
+                        if (count.strikes >= 2 && result.strike && count.outs >= 2)
+                            validToSteal = false;
                         if (count.balls >= 3 && !result.strike && field.first) validToSteal = false;
                     }
                     if (result.foul || result.caught) {
@@ -6756,11 +6952,16 @@ Game.prototype = {
                     }
                     const discretion =
                         team.stealAttempt === 'go' ||
-                        Distribution.willSteal(pitch, this.pitcher.team.positions.catcher, thief, base);
+                        Distribution.willSteal(
+                            pitch,
+                            this.pitcher.team.positions.catcher,
+                            thief,
+                            base
+                        );
                     if (discretion && validToSteal) {
                         thief.attemptSteal(this, base);
                     }
-                    team.stealAttempt = Team.RUNNERS_DISCRETION;
+                    team.stealAttempt = Team_Team.RUNNERS_DISCRETION;
                 }
             }
 
@@ -6812,26 +7013,26 @@ Game.prototype = {
     debugOut() {
         log(
             'slugging',
-            this.debug.filter(a => a.bases == 1).length,
-            this.debug.filter(a => a.bases == 2).length,
-            this.debug.filter(a => a.bases == 3).length,
-            this.debug.filter(a => a.bases == 4).length
+            this.debug.filter((a) => a.bases == 1).length,
+            this.debug.filter((a) => a.bases == 2).length,
+            this.debug.filter((a) => a.bases == 3).length,
+            this.debug.filter((a) => a.bases == 4).length
         );
         log(
             'grounders',
-            this.debug.filter(a => !a.caught && !a.foul && a.flyAngle < 0).length,
+            this.debug.filter((a) => !a.caught && !a.foul && a.flyAngle < 0).length,
             'thrown out',
-            this.debug.filter(a => !a.caught && !a.foul && a.flyAngle < 0 && a.thrownOut).length
+            this.debug.filter((a) => !a.caught && !a.foul && a.flyAngle < 0 && a.thrownOut).length
         );
         log(
             'flies/liners',
-            this.debug.filter(a => !a.foul && a.flyAngle > 0).length,
+            this.debug.filter((a) => !a.foul && a.flyAngle > 0).length,
             'caught',
-            this.debug.filter(a => a.caught && a.flyAngle > 0).length
+            this.debug.filter((a) => a.caught && a.flyAngle > 0).length
         );
 
         const PO = {};
-        this.debug.map(a => {
+        this.debug.map((a) => {
             if (!a.fielder) return;
             if (!PO[a.fielder]) {
                 PO[a.fielder] = 0;
@@ -6844,20 +7045,20 @@ Game.prototype = {
 
         const hitters = this.teams.away.lineup.concat(this.teams.home.lineup);
         let atBats = [];
-        hitters.map(a => {
-            atBats = atBats.concat(a.getAtBats().map(ab => ab.text));
+        hitters.map((a) => {
+            atBats = atBats.concat(a.getAtBats().map((ab) => ab.text));
         });
 
-        const LO = atBats.filter(ab => ab === 'LO').length;
-        const FO = atBats.filter(ab => ab === 'FO').length;
-        const GO = atBats.filter(ab => ab === 'GO').length;
-        const GIDP = atBats.filter(ab => ab === '(IDP)').length;
-        const SO = atBats.filter(ab => ab === 'SO').length;
-        const BB = atBats.filter(ab => ab === 'BB').length;
-        const SAC = atBats.filter(ab => ab === 'SAC').length;
-        const FC = atBats.filter(ab => ab === 'FC').length;
-        const CS = atBats.filter(ab => ab === 'CS').length;
-        const SB = atBats.filter(ab => ab === 'SB').length;
+        const LO = atBats.filter((ab) => ab === 'LO').length;
+        const FO = atBats.filter((ab) => ab === 'FO').length;
+        const GO = atBats.filter((ab) => ab === 'GO').length;
+        const GIDP = atBats.filter((ab) => ab === '(IDP)').length;
+        const SO = atBats.filter((ab) => ab === 'SO').length;
+        const BB = atBats.filter((ab) => ab === 'BB').length;
+        const SAC = atBats.filter((ab) => ab === 'SAC').length;
+        const FC = atBats.filter((ab) => ab === 'FC').length;
+        const CS = atBats.filter((ab) => ab === 'CS').length;
+        const SB = atBats.filter((ab) => ab === 'SB').length;
 
         log(
             'line outs',
@@ -6881,11 +7082,11 @@ Game.prototype = {
         );
 
         log('BB', BB, 'SB', SB);
-        log('fouls', this.debug.filter(a => a.foul).length);
+        log('fouls', this.debug.filter((a) => a.foul).length);
         log('fatigue, home vs away');
         const teams = this.teams;
         const fatigue = { home: {}, away: {} };
-        Iterator.each(this.teams.home.positions, key => {
+        Iterator.each(this.teams.home.positions, (key) => {
             const position = key;
             fatigue.home[position] = teams.home.positions[position].fatigue;
             fatigue.away[position] = teams.away.positions[position].fatigue;
@@ -7212,15 +7413,22 @@ Game.prototype = {
 
 
 class Trainer_Trainer {
-    makePlayer(player, name, surname, surnameJ, nameJ, pitching, offense, defense, bats, throws, number) {
+    makePlayer(
+        player,
+        name,
+        surname,
+        surnameJ,
+        nameJ,
+        pitching,
+        offense,
+        defense,
+        bats,
+        throws,
+        number
+    ) {
         player.hero = true;
 
-        if (false) {
-            surnameJ = '代表';
-            nameJ =  '選手';
-            name = 'TEAM';
-            surname = 'JPN';
-        }
+        if (false) {}
 
         player.name = `${surname} ${name}`;
         player.nameJ = surnameJ + nameJ;
@@ -7236,13 +7444,14 @@ class Trainer_Trainer {
         player.throws = throws;
         player.number = number;
         Iterator.each(player.pitching, (key, value) => {
-            player.pitching[key].velocity += pitching/5 | 0;
-            player.pitching[key].break += pitching/5 | 0;
-            player.pitching[key].control += pitching/5 | 0;
+            player.pitching[key].velocity += (pitching / 5) | 0;
+            player.pitching[key].break += (pitching / 5) | 0;
+            player.pitching[key].control += (pitching / 5) | 0;
         });
         player.resetStats(0);
     }
 }
+
 
 
 // CONCATENATED MODULE: ./Teams/TeamJapan.js
@@ -7251,7 +7460,7 @@ class Trainer_Trainer {
 
 
 
-const samurai = new Team('no init');
+const samurai = new Team_Team('no init');
 samurai.name = 'Japan';
 samurai.nameJ = '日本';
 
@@ -7471,7 +7680,7 @@ const namespace_Baseball = {};
 namespace_Baseball.model = {};
 namespace_Baseball.model.Game = namespace_Baseball.Game = Game;
 namespace_Baseball.model.Player = namespace_Baseball.Player = Player;
-namespace_Baseball.model.Team = namespace_Baseball.Team = Team;
+namespace_Baseball.model.Team = namespace_Baseball.Team = Team_Team;
 
 namespace_Baseball.service = {};
 namespace_Baseball.service.Animator = Animator_Animator;
@@ -7507,4 +7716,6 @@ if (typeof window === 'object') {
 
 
 /***/ })
-/******/ ])));
+
+/******/ })));
+//# sourceMappingURL=baseball.bundle.js.map

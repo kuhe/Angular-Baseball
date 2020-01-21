@@ -36,12 +36,32 @@
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -59,202 +79,199 @@
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
 /******/
+/******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = "./baseball.js");
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
+/******/ ({
+
+/***/ "./baseball.js":
+/*!**********************************!*\
+  !*** ./baseball.js + 39 modules ***!
+  \**********************************/
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+__webpack_require__.r(__webpack_exports__);
 
-// CONCATENATED MODULE: ./Utility/text.js
-const text_text = (phrase, override) => {
-    if (!text_text.mode) text_text.mode = 'e';
-    const string = {
-        n: {
-            empty: '-',
-            ' 1st': '1番',
-            ' 2nd': '2番',
-            ' 3rd': '3番',
-            ' 4th': '4番',
-            ' 5th': '5番',
-            ' 6th': '6番',
-            ' 7th': '7番',
-            ' 8th': '8番',
-            ' 9th': '9番',
-            'Now batting': '次のバッター',
-            'way outside': '相当外角',
-            outside: '外角',
-            inside: '内角',
-            'way inside': '相当内角',
-            'way low': '相当低め',
-            low: '低め',
-            high: '高め',
-            'way high': '相当高め',
-            'down the middle': '真ん中',
-            'first baseman': 'ファースト',
-            'second baseman': 'セカンド',
-            'third baseman': 'サード',
-            shortstop: 'ショート',
-            pitcher: 'ピッチャー',
-            catcher: 'キャッチャー',
-            'left fielder': 'レフト',
-            'center fielder': 'センター',
-            'right fielder': 'ライト',
-            'Strike.': 'ストライク。',
-            'Ball.': 'ボール。',
-            'Fouled off.': 'ファウル。',
-            'In play.': 'インプレー。',
-            'Swinging strike.': '空振り。',
-            ' outs': 'アウト',
-            ' out': 'アウト',
-            '4-seam': 'ストレート',
-            '2-seam': 'シュート',
-            slider: 'スライダー',
-            fork: 'フォーク',
-            cutter: 'カット',
-            sinker: 'シンカー',
-            curve: 'カーブ',
-            change: 'チェンジ',
-            ' struck out looking.': '、見逃し三振。',
-            ' walked.': '、フォアボール。',
-            ' struck out swinging.': '、空振り三振。',
-            'Previous: ': '前：',
-            'looks like: ': '予想',
-            'breaking ball': '変化球',
-            fastball: 'ストレート',
-            'Batting, ': '打球',
-            'Catching, pitch selection': '捕球選択',
-            Season: '記録',
-            Game: '今試合',
-            Pitch: '球',
-            Control: '制球',
-            Velocity: '速度',
-            Break: '変化',
-            'At Bat': 'バッター',
-            'On Deck': '次バッター',
-            Eye: '目',
-            Power: '力',
-            Speed: '速',
-            'Up to Bat': '打席',
-            Fielding: '守備',
-            Pitching: '投球',
-            BA: '打率',
-            OBP: '出塁',
-            SLG: '長打',
-            PA: '打席',
-            'H 2B 3B HR': '安 二 三 本',
-            H: '安',
-            '2B': '二',
-            '3B': '三',
-            HR: '本塁打',
-            RBI: '打点',
-            R: '得点',
-            BB: '四球',
-            SO: '三振',
-
-            ERA: '防御率',
-            W: '勝',
-            K: '三振',
-
-            first: 'ファースト',
-            second: 'セカンド',
-            third: 'サード',
-            'Runner on': 'ランナー',
-            'Runners on': 'ランナー',
-            'Bases empty': 'ランナーなし',
-            base: '塁',
-
-            'stolen base': '盗塁成功',
-            'caught stealing': '盗塁失敗',
-
-            Steal: '盗塁',
-            Opportunistic: '自由',
-            Hold: '止まれ',
-
-            'Select Language:': '言語',
-            'Run Fast Simulation': 'シミュレーションを試合終了まで行う',
-            'Play Ball!': 'プレーボール',
-            'Spectate the CPU': 'CPU観戦',
-            'Play from the 7th': '７回からプレーする',
-
-            'Throws/Bats': ' ',
-            LHP: '左投',
-            RHP: '右投',
-            LHB: '左打',
-            RHB: '右打',
-            L: '左投',
-            'R ': '右投',
-            ' L ': '左打',
-            ' R ': '右打',
-            '#': '背番号',
-
-            'Opponent connected': '相手選手見参',
-            'Click Here': 'ここにクリック',
-
-            'Amateur Baseball Club': '野球愛好会',
-            'Amateur Baseball Team': '愛好球団',
-            'College Team': '大学球団',
-            'Industrial League Team': '社会人球団',
-            'Training Squad': '練習軍',
-            'Team Japan': '日本代表',
-
-            Substituted: '交代',
-            Bench: 'ベンチ',
-
-            'Batter Ready': '打撃準備',
-
-            // descriptors pitching
-            Ace: 'エース',
-            'Control pitcher': '技巧派',
-            Flamethrower: '速球派',
-            'Breaking ball': '変化球',
-            // descriptors batting
-            'Genius batter': '天才',
-            Contact: 'バットコントロール',
-            'Power hitter': '主砲',
-            Speedster: '足速い',
-            Inept: '不器用',
-            'Weak swing': '弱い',
-            'Strikes out': '三振がち',
-            'Leisurely runner': '悠長',
-            //'' : '',
-            //'' : '',
-            // descriptors fielding
-            'Defensive wizard': '守備万能',
-            Glove: '好守',
-            Range: 'レンジ',
-            'Strong throw': '肩強い',
-            //'' : '',
-            //'' : '',
-            'Very late': 'とても遅め',
-            Late: '遅め',
-            '': '',
-            Early: '早め',
-            'Very Early': 'とても早め',
-
-            'Sim At Bat': '自動打撃'
-        },
-        e: {
-            empty: '-',
-            Season: 'Season',
-            Fielding: 'F%',
-            Pitching: 'P',
-            Eye: 'Eye',
-            Power: 'Pow',
-            Speed: 'Spd'
-        }
-    }[override ? override : text_text.mode][phrase];
-    return string ? string : phrase;
+// CONCATENATED MODULE: ./Utility/text.ts
+var translations = {
+    n: {
+        empty: '-',
+        ' 1st': '1番',
+        ' 2nd': '2番',
+        ' 3rd': '3番',
+        ' 4th': '4番',
+        ' 5th': '5番',
+        ' 6th': '6番',
+        ' 7th': '7番',
+        ' 8th': '8番',
+        ' 9th': '9番',
+        'Now batting': '次のバッター',
+        'way outside': '相当外角',
+        outside: '外角',
+        inside: '内角',
+        'way inside': '相当内角',
+        'way low': '相当低め',
+        low: '低め',
+        high: '高め',
+        'way high': '相当高め',
+        'down the middle': '真ん中',
+        'first baseman': 'ファースト',
+        'second baseman': 'セカンド',
+        'third baseman': 'サード',
+        shortstop: 'ショート',
+        pitcher: 'ピッチャー',
+        catcher: 'キャッチャー',
+        'left fielder': 'レフト',
+        'center fielder': 'センター',
+        'right fielder': 'ライト',
+        'Strike.': 'ストライク。',
+        'Ball.': 'ボール。',
+        'Fouled off.': 'ファウル。',
+        'In play.': 'インプレー。',
+        'Swinging strike.': '空振り。',
+        ' outs': 'アウト',
+        ' out': 'アウト',
+        '4-seam': 'ストレート',
+        '2-seam': 'シュート',
+        slider: 'スライダー',
+        fork: 'フォーク',
+        cutter: 'カット',
+        sinker: 'シンカー',
+        curve: 'カーブ',
+        change: 'チェンジ',
+        ' struck out looking.': '、見逃し三振。',
+        ' walked.': '、フォアボール。',
+        ' struck out swinging.': '、空振り三振。',
+        'Previous: ': '前：',
+        'looks like: ': '予想',
+        'breaking ball': '変化球',
+        fastball: 'ストレート',
+        'Batting, ': '打球',
+        'Catching, pitch selection': '捕球選択',
+        Season: '記録',
+        Game: '今試合',
+        Pitch: '球',
+        Control: '制球',
+        Velocity: '速度',
+        Break: '変化',
+        'At Bat': 'バッター',
+        'On Deck': '次バッター',
+        Eye: '目',
+        Power: '力',
+        Speed: '速',
+        'Up to Bat': '打席',
+        Fielding: '守備',
+        Pitching: '投球',
+        BA: '打率',
+        OBP: '出塁',
+        SLG: '長打',
+        PA: '打席',
+        'H 2B 3B HR': '安 二 三 本',
+        H: '安',
+        '2B': '二',
+        '3B': '三',
+        HR: '本塁打',
+        RBI: '打点',
+        R: '得点',
+        BB: '四球',
+        SO: '三振',
+        ERA: '防御率',
+        W: '勝',
+        K: '三振',
+        first: 'ファースト',
+        second: 'セカンド',
+        third: 'サード',
+        'Runner on': 'ランナー',
+        'Runners on': 'ランナー',
+        'Bases empty': 'ランナーなし',
+        base: '塁',
+        'stolen base': '盗塁成功',
+        'caught stealing': '盗塁失敗',
+        Steal: '盗塁',
+        Opportunistic: '自由',
+        Hold: '止まれ',
+        'Select Language:': '言語',
+        'Run Fast Simulation': 'シミュレーションを試合終了まで行う',
+        'Play Ball!': 'プレーボール',
+        'Spectate the CPU': 'CPU観戦',
+        'Play from the 7th': '７回からプレーする',
+        'Throws/Bats': ' ',
+        LHP: '左投',
+        RHP: '右投',
+        LHB: '左打',
+        RHB: '右打',
+        L: '左投',
+        'R ': '右投',
+        ' L ': '左打',
+        ' R ': '右打',
+        '#': '背番号',
+        'Opponent connected': '相手選手見参',
+        'Click Here': 'ここにクリック',
+        'Amateur Baseball Club': '野球愛好会',
+        'Amateur Baseball Team': '愛好球団',
+        'College Team': '大学球団',
+        'Industrial League Team': '社会人球団',
+        'Training Squad': '練習軍',
+        'Team Japan': '日本代表',
+        Substituted: '交代',
+        Bench: 'ベンチ',
+        'Batter Ready': '打撃準備',
+        // descriptors pitching
+        Ace: 'エース',
+        'Control pitcher': '技巧派',
+        Flamethrower: '速球派',
+        'Breaking ball': '変化球',
+        // descriptors batting
+        'Genius batter': '天才',
+        Contact: 'バットコントロール',
+        'Power hitter': '主砲',
+        Speedster: '足速い',
+        Inept: '不器用',
+        'Weak swing': '弱い',
+        'Strikes out': '三振がち',
+        'Leisurely runner': '悠長',
+        //'' : '',
+        //'' : '',
+        // descriptors fielding
+        'Defensive wizard': '守備万能',
+        Glove: '好守',
+        Range: 'レンジ',
+        'Strong throw': '肩強い',
+        //'' : '',
+        //'' : '',
+        'Very late': 'とても遅め',
+        Late: '遅め',
+        '': '',
+        Early: '早め',
+        'Very Early': 'とても早め',
+        'Sim At Bat': '自動打撃'
+    },
+    e: {
+        empty: '-',
+        Season: 'Season',
+        Fielding: 'F%',
+        Pitching: 'P',
+        Eye: 'Eye',
+        Power: 'Pow',
+        Speed: 'Spd'
+    }
 };
-
-text_text.substitution = (sub, player, mode) => {
-    const originalMode = text_text.mode;
+var text_text = function (phrase, override) {
+    if (!text_text.mode)
+        text_text.mode = 'e';
+    var dictionary = translations[override ? override : text_text.mode];
+    var translatedText = dictionary[phrase];
+    return translatedText ? translatedText : phrase;
+};
+text_text.mode = 'e';
+text_text.substitution = function (sub, player, mode) {
+    var originalMode = text_text.mode;
     mode = mode || text_text.mode;
-    const order = {
+    var order = {
         0: text_text(' 1st', mode),
         1: text_text(' 2nd', mode),
         2: text_text(' 3rd', mode),
@@ -265,77 +282,74 @@ text_text.substitution = (sub, player, mode) => {
         7: text_text(' 8th', mode),
         8: text_text(' 9th', mode)
     }[player.order];
-    const position = text_text.fielderShortName(player.position, mode);
-
+    var position = text_text.fielderShortName(player.position, mode);
     if (mode === 'n') {
         text_text.mode = 'n';
-        var output = `${sub.getName() +
+        var output = sub.getName() +
             text_text.comma() +
-            player.getName()}の交代${text_text.comma()}${order}(${position})`;
-    } else {
+            player.getName() + "\u306E\u4EA4\u4EE3" + text_text.comma() + order + "(" + position + ")";
+    }
+    else {
         text_text.mode = 'e';
-        output = `${sub.getName()} replaces ${player.getName()} at ${position}, batting${order}`;
+        output = sub.getName() + " replaces " + player.getName() + " at " + position + ", batting" + order;
     }
     text_text.mode = originalMode;
     return output;
 };
-
-text_text.getBattersEye = (game) => {
-    const eye = {},
-        breaking =
-            Math.abs(game.pitchInFlight.breakDirection[0]) +
-                Math.abs(game.pitchInFlight.breakDirection[1]) >
-            40;
+text_text.getBattersEye = function (game) {
+    var eye = {
+        e: '',
+        n: ''
+    }, breaking = Math.abs(game.pitchInFlight.breakDirection[0]) +
+        Math.abs(game.pitchInFlight.breakDirection[1]) >
+        40;
     eye.e =
         text_text('looks like: ', 'e') + breaking ? text_text('breaking ball', 'e') : text_text('fastball', 'e');
     eye.n =
         text_text('looks like: ', 'n') + breaking ? text_text('breaking ball', 'n') : text_text('fastball', 'n');
     return eye;
 };
-
-text_text.baseShortName = (base) => {
+var baseShort = {
+    '1st': '一',
+    '2nd': '二',
+    '3rd': '三',
+    home: '本',
+    Home: '本',
+    left: '左',
+    center: '中',
+    right: '右'
+};
+text_text.baseShortName = function (base) {
     if (text_text.mode == 'n') {
-        return {
-            '1st': '一',
-            '2nd': '二',
-            '3rd': '三',
-            home: '本',
-            Home: '本',
-
-            left: '左',
-            center: '中',
-            right: '右'
-        }[base];
+        return baseShort[base];
     }
     return base;
 };
-
-text_text.fielderShortName = (fielder, override) => {
-    const mode = override || text_text.mode;
+var fielderShort = {
+    first: '一',
+    second: '二',
+    third: '三',
+    short: '遊',
+    pitcher: '投',
+    catcher: '捕',
+    left: '左',
+    center: '中',
+    right: '右'
+};
+text_text.fielderShortName = function (fielder, override) {
+    var mode = override || text_text.mode;
     if (mode === 'n') {
-        return {
-            first: '一',
-            second: '二',
-            third: '三',
-            short: '遊',
-            pitcher: '投',
-            catcher: '捕',
-            left: '左',
-            center: '中',
-            right: '右'
-        }[fielder];
+        return fielderShort[fielder];
     }
     return fielder;
 };
-
-text_text.slash = () => {
+text_text.slash = function () {
     if (text_text.mode == 'n') {
         return '・';
     }
     return '/';
 };
-
-text_text.fielderLongName = (fielder) => {
+text_text.fielderLongName = function (fielder) {
     if (text_text.mode == 'n') {
         return {
             first: 'ファースト',
@@ -361,203 +375,183 @@ text_text.fielderLongName = (fielder) => {
         right: text_text('right fielder')
     }[fielder];
 };
-
-text_text.comma = () => ({ n: '、', e: ', ' }[text_text.mode]);
-text_text.space = () => ({ n: '', e: ' ' }[text_text.mode]);
-text_text.stop = () => ({ n: '。', e: '. ' }[text_text.mode]);
-
-text_text.namePitch = (pitch) => {
+text_text.comma = function () { return ({ n: '、', e: ', ' }[text_text.mode]); };
+text_text.space = function () { return ({ n: '', e: ' ' }[text_text.mode]); };
+text_text.stop = function () { return ({ n: '。', e: '. ' }[text_text.mode]); };
+text_text.namePitch = function (pitch) {
     if (text_text.mode == 'e') {
         return pitch.name.charAt(0).toUpperCase() + pitch.name.slice(1);
     }
-    if (text_text.mode == 'n') {
-        return text_text(pitch.name);
-    }
+    return text_text(pitch.name);
 };
-
-text_text.contactResult = (batter, fielder, bases, outBy, sacrificeAdvances, out) => {
-    let statement = '';
-    const infield = ['left', 'center', 'right'].indexOf(fielder) < 0;
-    const doublePlay = out.doublePlay;
+text_text.contactResult = function (batter, fielder, bases, outBy, sacrificeAdvances, out) {
+    var statement = '';
+    var infield = ['left', 'center', 'right'].indexOf(fielder) < 0;
+    var doublePlay = out.doublePlay;
     if (text_text.mode == 'e') {
         statement += batter;
         if (outBy) {
             switch (outBy) {
                 case 'fieldersChoice':
                     play = out.length === 2 ? 'double play ' : '';
-                    statement += ` reached on a <span class="txt-red">fielder's choice</span> ${play}by ${text_text.fielderShortName(
-                        fielder
-                    )}`;
+                    statement += " reached on a <span class=\"txt-red\">fielder's choice</span> " + play + "by " + text_text.fielderShortName(fielder);
                     break;
                 case 'line':
-                    statement += ` <span class="txt-red">lined out</span> to ${text_text.fielderShortName(
-                        fielder
-                    )}`;
+                    statement += " <span class=\"txt-red\">lined out</span> to " + text_text.fielderShortName(fielder);
                     break;
                 case 'fly':
-                    statement += ` <span class="txt-red">flew out</span> to ${text_text.fielderShortName(
-                        fielder
-                    )}`;
+                    statement += " <span class=\"txt-red\">flew out</span> to " + text_text.fielderShortName(fielder);
                     break;
                 case 'error':
-                    statement += ` <span class="txt-blue">reached on error</span> by ${text_text.fielderShortName(
-                        fielder
-                    )}`;
+                    statement += " <span class=\"txt-blue\">reached on error</span> by " + text_text.fielderShortName(fielder);
                     break;
                 case 'pop':
-                    statement += ` <span class="txt-red">popped out</span> to ${text_text.fielderShortName(
-                        fielder
-                    )}`;
+                    statement += " <span class=\"txt-red\">popped out</span> to " + text_text.fielderShortName(fielder);
                     break;
                 case 'ground':
                     var play = doublePlay ? 'into a double play by' : 'out to';
-                    statement += ` <span class="txt-red">grounded ${play}</span> ${text_text.fielderShortName(
-                        fielder
-                    )}`;
+                    statement += " <span class=\"txt-red\">grounded " + play + "</span> " + text_text.fielderShortName(fielder);
                     break;
                 case 'thrown':
                     play = doublePlay ? ' on a double play' : '';
-                    statement += ` was <span class="txt-red">thrown out</span> by ${text_text.fielderShortName(
-                        fielder
-                    )}${play}`;
+                    statement += " was <span class=\"txt-red\">thrown out</span> by " + text_text.fielderShortName(fielder) + play;
                     break;
             }
             if (out.length) {
-                const plural = out.length > 1;
-                const runner = plural ? 'Runners' : 'Runner';
-                const is = plural ? 'are' : 'is';
-                statement += `. ${runner} from ${text_text(
-                    out.join(text_text.comma())
-                )} ${is} <span class="txt-red">out</span>`;
+                var plural = out.length > 1;
+                var runner = plural ? 'Runners' : 'Runner';
+                var is = plural ? 'are' : 'is';
+                statement += ". " + runner + " from " + text_text(out.join(text_text.comma())) + " " + is + " <span class=\"txt-red\">out</span>";
             }
-        } else {
+        }
+        else {
             switch (bases) {
                 case 1:
                     if (infield) {
-                        statement += ` reached on an <span class="txt-blue">infield hit</span> to ${text_text.fielderShortName(
-                            fielder
-                        )}`;
-                    } else {
-                        statement += ` reached on a <span class="txt-blue">single</span> to ${text_text.fielderShortName(
-                            fielder
-                        )}`;
+                        statement += " reached on an <span class=\"txt-blue\">infield hit</span> to " + text_text.fielderShortName(fielder);
+                    }
+                    else {
+                        statement += " reached on a <span class=\"txt-blue\">single</span> to " + text_text.fielderShortName(fielder);
                     }
                     break;
                 case 2:
-                    statement += ` <span class="txt-blue">doubled</span> past ${text_text.fielderShortName(
-                        fielder
-                    )}`;
+                    statement += " <span class=\"txt-blue\">doubled</span> past " + text_text.fielderShortName(fielder);
                     break;
                 case 3:
-                    statement += ` <span class="txt-blue">tripled</span> past ${text_text.fielderShortName(
-                        fielder
-                    )}`;
+                    statement += " <span class=\"txt-blue\">tripled</span> past " + text_text.fielderShortName(fielder);
                     break;
                 case 4:
-                    statement += ` <span class="txt-blue">homered</span> to ${text_text.fielderShortName(
-                        fielder
-                    )}`;
+                    statement += " <span class=\"txt-blue\">homered</span> to " + text_text.fielderShortName(fielder);
                     break;
             }
         }
         if (sacrificeAdvances) {
-            sacrificeAdvances.map((base) => {
+            sacrificeAdvances.map(function (base) {
                 if (base == 'third') {
-                    statement += `${text_text.stop()}Runner on third <span class="txt-blue">scores</span>`;
-                } else {
-                    statement += `${text_text.stop()}Runner on ${base} <span class="txt-green">advances</span>`;
+                    statement += text_text.stop() + "Runner on third <span class=\"txt-blue\">scores</span>";
+                }
+                else {
+                    statement += text_text.stop() + "Runner on " + base + " <span class=\"txt-green\">advances</span>";
                 }
             });
         }
         statement += text_text.stop();
     }
     if (text_text.mode == 'n') {
-        const stop = text_text.stop();
-        statement += `${batter}は`;
+        var stop_1 = text_text.stop();
+        statement += batter + "\u306F";
         if (outBy) {
-            const fielderLong = text_text.fielderLongName(fielder);
+            var fielderLong = text_text.fielderLongName(fielder);
             fielder = text_text.fielderShortName(fielder);
             switch (outBy) {
                 case 'fieldersChoice':
-                    statement += `野選(${fielder})で<span class="txt-red">出塁</span>`;
+                    statement += "\u91CE\u9078(" + fielder + ")\u3067<span class=\"txt-red\">\u51FA\u5841</span>";
                     break;
                 case 'line':
-                    statement += `<span class="txt-red">${fielder}直</span>`;
+                    statement += "<span class=\"txt-red\">" + fielder + "\u76F4</span>";
                     break;
                 case 'fly':
-                    statement += `<span class="txt-red">${fielder}飛</span>`;
+                    statement += "<span class=\"txt-red\">" + fielder + "\u98DB</span>";
                     break;
                 case 'error':
-                    statement += `<span class="txt-blue">エラー(${fielder})で出塁</span>`;
+                    statement += "<span class=\"txt-blue\">\u30A8\u30E9\u30FC(" + fielder + ")\u3067\u51FA\u5841</span>";
                     break;
                 case 'pop':
-                    statement += `<span class="txt-red">ポップフライで${fielder}飛</span>`;
+                    statement += "<span class=\"txt-red\">\u30DD\u30C3\u30D7\u30D5\u30E9\u30A4\u3067" + fielder + "\u98DB</span>";
                     break;
                 case 'ground':
-                    statement += `<span class="txt-red">${fielderLong}ゴロに封殺</span>`;
+                    statement += "<span class=\"txt-red\">" + fielderLong + "\u30B4\u30ED\u306B\u5C01\u6BBA</span>";
                     break;
                 case 'thrown':
-                    statement += `<span class="txt-red">${fielder}ゴロ</span>`;
+                    statement += "<span class=\"txt-red\">" + fielder + "\u30B4\u30ED</span>";
                     break;
             }
             if (out.length) {
-                statement += `。${out
-                    .map((runner) => text_text(runner))
-                    .join(text_text.comma())}ランナーは<span class="txt-red">アウト</span>`;
+                statement += "\u3002" + out
+                    .map(function (runner) { return text_text(runner); })
+                    .join(text_text.comma()) + "\u30E9\u30F3\u30CA\u30FC\u306F<span class=\"txt-red\">\u30A2\u30A6\u30C8</span>";
             }
             if (doublePlay) {
                 statement += '。<span class="txt-red">ゲッツー</span>';
             }
-        } else {
+        }
+        else {
             fielder = text_text.fielderShortName(fielder);
             switch (bases) {
                 case 1:
                     if (infield) {
-                        statement += `<span class="txt-blue">内野安打</span>(${fielder})で出塁`;
-                    } else {
-                        statement += `<span class="txt-blue">安打</span>(${fielder})で出塁`;
+                        statement += "<span class=\"txt-blue\">\u5185\u91CE\u5B89\u6253</span>(" + fielder + ")\u3067\u51FA\u5841";
+                    }
+                    else {
+                        statement += "<span class=\"txt-blue\">\u5B89\u6253</span>(" + fielder + ")\u3067\u51FA\u5841";
                     }
                     break;
                 case 2:
-                    statement += `<span class="txt-blue">二塁打</span>（${fielder}）で出塁`;
+                    statement += "<span class=\"txt-blue\">\u4E8C\u5841\u6253</span>\uFF08" + fielder + "\uFF09\u3067\u51FA\u5841";
                     break;
                 case 3:
-                    statement += `<span class="txt-blue">三塁打</span>（${fielder}）で出塁`;
+                    statement += "<span class=\"txt-blue\">\u4E09\u5841\u6253</span>\uFF08" + fielder + "\uFF09\u3067\u51FA\u5841";
                     break;
                 case 4:
-                    statement += `<span class="txt-blue">本塁打</span>（${fielder}）`;
+                    statement += "<span class=\"txt-blue\">\u672C\u5841\u6253</span>\uFF08" + fielder + "\uFF09";
                     break;
             }
         }
         if (sacrificeAdvances) {
-            sacrificeAdvances.map((base) => {
+            sacrificeAdvances.map(function (base) {
                 if (base === 'third') {
-                    statement += `${stop}サードランナー<span class="txt-blue">ホームイン</span>`;
-                } else {
-                    statement += `${stop + text_text(base)}ランナー<span class="txt-green">進塁</span>`;
+                    statement += stop_1 + "\u30B5\u30FC\u30C9\u30E9\u30F3\u30CA\u30FC<span class=\"txt-blue\">\u30DB\u30FC\u30E0\u30A4\u30F3</span>";
+                }
+                else {
+                    statement += stop_1 + text_text(base) + "\u30E9\u30F3\u30CA\u30FC<span class=\"txt-green\">\u9032\u5841</span>";
                 }
             });
         }
-        statement += stop;
+        statement += stop_1;
     }
     return statement;
 };
 
-
-
-const abbreviatePosition = function(position) {
+var positionAbbreviation = {
+    pitcher: 'P',
+    catcher: 'C',
+    first: '1B',
+    second: '2B',
+    short: 'SS',
+    third: '3B',
+    left: 'LF',
+    center: 'CF',
+    right: 'RF'
+};
+/**
+ * @param position - short name.
+ * @returns 1 or 2 letter abbreviation
+ *
+ * @example pitcher -> P, center -> CF
+ */
+var abbreviatePosition = function (position) {
     if (text_text.mode === 'e') {
-        return {
-            pitcher: 'P',
-            catcher: 'C',
-            first: '1B',
-            second: '2B',
-            short: 'SS',
-            third: '3B',
-            left: 'LF',
-            center: 'CF',
-            right: 'RF'
-        }[position];
+        return positionAbbreviation[position];
     }
     return text_text.fielderShortName(position);
 };
@@ -1087,26 +1081,25 @@ Log.prototype = {
 
 
 
-// CONCATENATED MODULE: ./Model/AtBat.js
-
+// CONCATENATED MODULE: ./Model/AtBat.ts
 
 /**
  *
  * e.g. "HR++" (HR and 2 extra runs), "SO" strikeout, "FO" flyout
+ * string formatting encapsulation for an at-bat.
  *
  */
-class AtBat_AtBat {
-    constructor(text) {
-        this.infield = text.includes(AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR)
-            ? AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR
+var AtBat_AtBat = /** @class */ (function () {
+    function AtBat(text) {
+        this.beneficial = false;
+        this.infield = text.includes(AtBat.INFIELD_HIT_INDICATOR)
+            ? AtBat.INFIELD_HIT_INDICATOR
             : '';
-        text = text.replace(AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR, '');
-        this.text = text.split(AtBat_AtBat.prototype.RBI_INDICATOR)[0];
-        this.rbi = `${text.split(this.text)[1]}`;
-
-        const log = new Log();
-
-        const beneficial = [
+        text = text.replace(AtBat.INFIELD_HIT_INDICATOR, '');
+        this.text = text.split(AtBat.RBI_INDICATOR)[0];
+        this.rbi = "" + text.split(this.text)[1];
+        var log = new Log();
+        var beneficial = [
             log.WALK,
             log.SINGLE,
             log.HOMERUN,
@@ -1117,20 +1110,17 @@ class AtBat_AtBat {
             log.STOLEN_BASE,
             log.RUN
         ];
-        if (beneficial.includes(this.text)) {
+        if (~beneficial.indexOf(this.text)) {
             this.beneficial = true;
         }
     }
-    toString() {
-        return `${this.infield}${this.text}${this.rbi}`;
-    }
-}
-
-AtBat_AtBat.prototype.constructor = AtBat_AtBat;
-AtBat_AtBat.prototype.identifier = 'AtBat';
-AtBat_AtBat.prototype.INFIELD_HIT_INDICATOR = '';
-AtBat_AtBat.prototype.RBI_INDICATOR = '+';
-
+    AtBat.prototype.toString = function () {
+        return "" + this.infield + this.text + this.rbi;
+    };
+    AtBat.INFIELD_HIT_INDICATOR = '';
+    AtBat.RBI_INDICATOR = '+';
+    return AtBat;
+}());
 
 
 // CONCATENATED MODULE: ./Utility/data.js
@@ -2307,22 +2297,23 @@ Mathinator.prototype = {
         };
     },
     /**
-     * @param distance {number} feet
-     * @param throwing {number} 0-1
-     * @param fielding {number} 0-1
-     * @param intercept {number} approx. -140 to 140
+     * @param {number} distance - travel distance for the fielder (not the batted ball).
+     * @param {number} throwing - skill rating 0-1
+     * @param {number} fielding - skill rating 0-1
+     * @param {number} intercept - approx. -140 to 140
      * @returns {number} seconds
      */
     fielderReturnDelay(distance, throwing, fielding, intercept) {
+        const distanceContribution = distance / 60;
         return (
-            distance / 90 + // bip distance (up to 3s+)
-            (5 *
+            distanceContribution + // bip distance (up to 3s+)
+            (6 *
             (distance / 310) * // worst case time to reach the ball,
                 Math.min(intercept - 120, 0)) /
                 -240 + // a good intercept rating will cut the base down to 0
             1 -
-            (0.2 + fielding * 0.8) + // gather time (up to 0.8s)
-            distance / 90 / (0.5 + throwing / 2)
+            (1.8 + fielding * 0.8) + // gather time (up to 1.8s)
+            distanceContribution / (0.5 + throwing / 2)
         ); // throwing distance (up to 2s)
     },
     /**
@@ -2417,7 +2408,7 @@ for (const fn in Iterator.prototype) {
 
 
 
-// CONCATENATED MODULE: ./Model/TeamConstants.js
+// CONCATENATED MODULE: ./Model/TeamConstants.ts
 /* harmony default export */ var TeamConstants = ({
     RUNNERS_DISCRETION: 'runnersDiscretion',
     RUNNER_GO: 'go',
@@ -3050,7 +3041,7 @@ Player.prototype = {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/AbstractMesh.js
+// CONCATENATED MODULE: ./Render/Mesh/AbstractMesh.js
 /**
  * Each class should adhere to this pattern.
  * When a scene object has been positioned correctly and its trajectory set,
@@ -3101,10 +3092,10 @@ AbstractMesh.WORLD_BASE_Y = -4;
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Indicator.js
+// CONCATENATED MODULE: ./Render/Mesh/Indicator.js
 
 
-class Indicator extends AbstractMesh {
+class Indicator_Indicator extends AbstractMesh {
     constructor(loop) {
         super();
         let n = 60;
@@ -3145,7 +3136,7 @@ class Indicator extends AbstractMesh {
 const VERTICAL_CORRECTION = -0.2;
 const INITIAL_CAMERA_DISTANCE = 8;
 
-// CONCATENATED MODULE: ./Render/mesh/Ball.js
+// CONCATENATED MODULE: ./Render/Mesh/Ball.js
 
 
 
@@ -3272,7 +3263,7 @@ class Ball_Ball extends AbstractMesh {
             return;
         }
         this.hasIndicator = true;
-        const indicator = new Indicator();
+        const indicator = new Indicator_Indicator();
         indicator.mesh.position.x = this.mesh.position.x;
         indicator.mesh.position.y = this.mesh.position.y;
         indicator.mesh.position.z = this.mesh.position.z;
@@ -3577,7 +3568,7 @@ Ball_Ball.prototype.rotation = {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Mound.js
+// CONCATENATED MODULE: ./Render/Mesh/Mound.js
 
 
 class Mound_Mound extends AbstractMesh {
@@ -3611,7 +3602,7 @@ class Mound_Mound extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Base.js
+// CONCATENATED MODULE: ./Render/Mesh/Base.js
 
 
 class Base_Base extends AbstractMesh {
@@ -3664,7 +3655,7 @@ class Base_Base extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/FoulLine.js
+// CONCATENATED MODULE: ./Render/Mesh/FoulLine.js
 
 
 class FoulLine_FoulLine extends AbstractMesh {
@@ -3707,7 +3698,7 @@ class FoulLine_FoulLine extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/FoulPole.js
+// CONCATENATED MODULE: ./Render/Mesh/FoulPole.js
 
 
 class FoulPole_FoulPole extends AbstractMesh {
@@ -3745,7 +3736,7 @@ class FoulPole_FoulPole extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Field.js
+// CONCATENATED MODULE: ./Render/Mesh/Field.js
 
 
 class Field_Field extends AbstractMesh {
@@ -3779,7 +3770,7 @@ class Field_Field extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Grass.js
+// CONCATENATED MODULE: ./Render/Mesh/Grass.js
 
 
 class Grass_Grass extends AbstractMesh {
@@ -3827,7 +3818,7 @@ class Grass_Grass extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/BaseDirt.js
+// CONCATENATED MODULE: ./Render/Mesh/BaseDirt.js
 
 
 class BaseDirt_BaseDirt extends AbstractMesh {
@@ -3865,7 +3856,7 @@ class BaseDirt_BaseDirt extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/BattersEye.js
+// CONCATENATED MODULE: ./Render/Mesh/BattersEye.js
 
 
 class BattersEye_BattersEye extends AbstractMesh {
@@ -3894,7 +3885,7 @@ class BattersEye_BattersEye extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Wall.js
+// CONCATENATED MODULE: ./Render/Mesh/Wall.js
 
 
 class Wall_Wall extends AbstractMesh {
@@ -4181,7 +4172,7 @@ const loadSkyShader = () => {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Sky.js
+// CONCATENATED MODULE: ./Render/Mesh/Sky.js
 
 
 
@@ -4235,10 +4226,10 @@ class Sky_Sky extends AbstractMesh {
 
 
 
-// CONCATENATED MODULE: ./Render/mesh/Sun.js
+// CONCATENATED MODULE: ./Render/Mesh/Sun.js
 
 
-class Sun extends AbstractMesh {
+class Sun_Sun extends AbstractMesh {
     constructor(loop) {
         super();
         this.getMesh();
@@ -4552,7 +4543,7 @@ class Loop_Loop {
         new Grass_Grass().join(this);
         new Grass_Grass(this, true);
         new BattersEye_BattersEye().join(this);
-        const sun = new Sun(),
+        const sun = new Sun_Sun(),
             sky = new Sky_Sky();
         sun.derivePosition(sky);
         sky.join(this);
@@ -5289,9 +5280,19 @@ Model_Field_Field.prototype = {
                 landingDistance
             ]);
             const speedComponent = ((1 + Math.sqrt(fielder.skill.defense.speed / 100)) / 2) * 100;
+
+            /**
+             * This is an important calculation, since it decides
+             * whether a ball was caught in the air, or
+             * how quickly a fielder reaches a landed ball.
+             *
+             * Higher is better for the defense.
+             * @type {number}
+             */
             const interceptRating =
-                speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.55 - 15;
-            if (interceptRating > 0 && flyAngle > 4) {
+                speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.35 - 25;
+
+            if (interceptRating > 0 && flyAngle > 10) {
                 //caught cleanly?
                 if (Distribution.error(fielder)) {
                     //error
@@ -5368,7 +5369,7 @@ Model_Field_Field.prototype = {
                         second = this.second,
                         third = this.third;
                     swing.fieldersChoice = null;
-                    swing.bases = fieldingReturnDelay >= baseRunningTime + 1 ? 1 : 0;
+                    swing.bases = fieldingReturnDelay >= baseRunningTime ? 1 : 0;
                     if (first && fieldingReturnDelay < first.getBaseRunningTime())
                         swing.fieldersChoice = 'first';
                     if (first && second && fieldingReturnDelay < second.getBaseRunningTime() + 0.6)
@@ -5448,7 +5449,7 @@ Model_Field_Field.prototype = {
                         delete swing.fieldersChoice;
                     }
                 }
-                swing.thrownOut = swing.bases == 0;
+                swing.thrownOut = swing.bases === 0;
                 if (swing.thrownOut) {
                     fielder.stats.fielding.PO++; // todo A to PO
                     swing.thrownOut = true;
@@ -5724,25 +5725,32 @@ Manager.prototype = {
 
 
 
-// CONCATENATED MODULE: ./Model/Team.js
+// CONCATENATED MODULE: ./Model/Team.ts
 
 
 
 
-
-
-
-const Team = function(game, heroRate) {
-    this.init(game, heroRate);
-};
-
-TeamConstants.RUNNERS_DISCRETION = 'runnersDiscretion';
-TeamConstants.RUNNER_GO = 'go';
-TeamConstants.RUNNER_HOLD = 'hold';
-
-Team.prototype = {
-    constructor: Team,
-    init(game, heroRate) {
+var Team_Team = /** @class */ (function () {
+    function Team(game, heroRate) {
+        this.stealAttempt = TeamConstants.RUNNERS_DISCRETION;
+        this.lineup = [];
+        this.game = null;
+        this.manager = null;
+        this.bench = [];
+        this.bullpen = [];
+        this.nowBatting = 0;
+        this.substituted = [];
+        this.expanded = null;
+        this.name = '';
+        this.nameJ = '';
+        this.noSubstituteSelected = {
+            toString: function () {
+                return '';
+            },
+            toValue: function () {
+                return false;
+            }
+        };
         this.sub = this.noSubstituteSelected;
         heroRate = heroRate || 0.1;
         this.substituted = [];
@@ -5764,40 +5772,24 @@ Team.prototype = {
         this.manager = new Manager(this);
         if (game !== 'no init') {
             this.game = game;
-            for (let j = 0; j < 20; j++) {
+            for (var j = 0; j < 20; j++) {
                 this.bench.push(new Player(this, Math.random() < heroRate));
             }
             if (this.bench.length === 20) {
                 this.manager.makeLineup();
             }
         }
-    },
-    pickName() {
-        const teamNameIndex = Math.floor(Math.random() * data_data.teamNames.length);
+    }
+    Team.prototype.pickName = function () {
+        var teamNameIndex = Math.floor(Math.random() * data_data.teamNames.length);
         this.name = data_data.teamNames[teamNameIndex];
         this.nameJ = data_data.teamNamesJ[teamNameIndex];
-    },
-    getName() {
+    };
+    Team.prototype.getName = function () {
         return text_text.mode === 'n' ? this.nameJ : this.name;
-    },
-    stealAttempt: TeamConstants.RUNNERS_DISCRETION,
-    lineup: [],
-    positions: {},
-    manager: null,
-    bench: [],
-    bullpen: [],
-    nowBatting: 0,
-    expanded: 'Player&',
-    noSubstituteSelected: {
-        toString() {
-            return '';
-        },
-        toValue() {
-            return false;
-        }
-    }
-};
-
+    };
+    return Team;
+}());
 
 
 // CONCATENATED MODULE: ./Model/Umpire.js
@@ -6456,8 +6448,8 @@ Game.prototype = {
         if (m) text_text.mode = m;
         this.gamesIntoSeason = 72 + Math.floor(Math.random() * 72);
         this.field = new Model_Field_Field(this);
-        this.teams.away = new Team(this);
-        this.teams.home = new Team(this);
+        this.teams.away = new Team_Team(this);
+        this.teams.home = new Team_Team(this);
         this.log = new Log();
         this.log.game = this;
         this.debug = [];
@@ -6931,8 +6923,8 @@ Game.prototype = {
             const field = this.field;
             const team = this.batter.team;
             if (
-                (team.stealAttempt === Team.RUNNER_GO ||
-                    team.stealAttempt === Team.RUNNERS_DISCRETION) &&
+                (team.stealAttempt === Team_Team.RUNNER_GO ||
+                    team.stealAttempt === Team_Team.RUNNERS_DISCRETION) &&
                 !this.opponentConnected
             ) {
                 const thief = field.getLeadRunner();
@@ -6969,7 +6961,7 @@ Game.prototype = {
                     if (discretion && validToSteal) {
                         thief.attemptSteal(this, base);
                     }
-                    team.stealAttempt = Team.RUNNERS_DISCRETION;
+                    team.stealAttempt = Team_Team.RUNNERS_DISCRETION;
                 }
             }
 
@@ -7436,12 +7428,7 @@ class Trainer_Trainer {
     ) {
         player.hero = true;
 
-        if (false) {
-            surnameJ = '代表';
-            nameJ = '選手';
-            name = 'TEAM';
-            surname = 'JPN';
-        }
+        if (false) {}
 
         player.name = `${surname} ${name}`;
         player.nameJ = surnameJ + nameJ;
@@ -7473,7 +7460,7 @@ class Trainer_Trainer {
 
 
 
-const samurai = new Team('no init');
+const samurai = new Team_Team('no init');
 samurai.name = 'Japan';
 samurai.nameJ = '日本';
 
@@ -7693,7 +7680,7 @@ const namespace_Baseball = {};
 namespace_Baseball.model = {};
 namespace_Baseball.model.Game = namespace_Baseball.Game = Game;
 namespace_Baseball.model.Player = namespace_Baseball.Player = Player;
-namespace_Baseball.model.Team = namespace_Baseball.Team = Team;
+namespace_Baseball.model.Team = namespace_Baseball.Team = Team_Team;
 
 namespace_Baseball.service = {};
 namespace_Baseball.service.Animator = Animator_Animator;
@@ -7729,4 +7716,6 @@ if (typeof window === 'object') {
 
 
 /***/ })
-/******/ ])));
+
+/******/ })));
+//# sourceMappingURL=baseball.bundle.js.map

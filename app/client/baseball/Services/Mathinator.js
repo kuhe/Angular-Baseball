@@ -249,22 +249,23 @@ Mathinator.prototype = {
         };
     },
     /**
-     * @param distance {number} feet
-     * @param throwing {number} 0-1
-     * @param fielding {number} 0-1
-     * @param intercept {number} approx. -140 to 140
+     * @param {number} distance - travel distance for the fielder (not the batted ball).
+     * @param {number} throwing - skill rating 0-1
+     * @param {number} fielding - skill rating 0-1
+     * @param {number} intercept - approx. -140 to 140
      * @returns {number} seconds
      */
     fielderReturnDelay(distance, throwing, fielding, intercept) {
+        const distanceContribution = distance / 60;
         return (
-            distance / 90 + // bip distance (up to 3s+)
-            (5 *
+            distanceContribution + // bip distance (up to 3s+)
+            (6 *
             (distance / 310) * // worst case time to reach the ball,
                 Math.min(intercept - 120, 0)) /
                 -240 + // a good intercept rating will cut the base down to 0
             1 -
-            (0.2 + fielding * 0.8) + // gather time (up to 0.8s)
-            distance / 90 / (0.5 + throwing / 2)
+            (1.8 + fielding * 0.8) + // gather time (up to 1.8s)
+            distanceContribution / (0.5 + throwing / 2)
         ); // throwing distance (up to 2s)
     },
     /**

@@ -52,10 +52,10 @@ const TERRIBAD = 5,
     GOOD = 65,
     ELITE = 88;
 
-const offense = { eye: ELITE, power: AWFUL, speed: ELITE };
+const offense = { eye: ELITE, power: GOOD, speed: ELITE };
 // const offense = player.skill.offense;
-// const defense = { fielding: ELITE, throwing: GOOD, catching: ELITE, speed: GOOD };
-const defense = player.skill.defense;
+const defense = { fielding: ELITE, throwing: ELITE, catching: ELITE, speed: ELITE };
+// const defense = player.skill.defense;
 
 offense.eye += 10;
 offense.power += 10;
