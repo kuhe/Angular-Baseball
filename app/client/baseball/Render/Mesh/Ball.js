@@ -260,15 +260,11 @@ class Ball extends AbstractMesh {
                     first: 1, second: 1, short: 1, third: 1
                 }:
                     // If we're using the ground ball animation trajectory,
-                    // have the rendered travel distance be at least 90 if the fielder
+                    // have the rendered travel distance be at least to the
+                    // infield arc if the fielder
                     // is a non-battery infielder.
-                    distance = Math.max(90, distance);
-                    break;
-                case result.fielder in { pitcher: 1, catcher: 1 }:
-                    distance = Math.min(45, distance);
-                    break;
-                default:
                     distance = Math.max(110, distance);
+                    break;
             }
         }
 
@@ -315,7 +311,7 @@ class Ball extends AbstractMesh {
         };
 
         const frames = [];
-        const frameCount = airTime * 60 + groundTime * 20 | 0;
+        let frameCount = airTime * 60 + groundTime * 20 | 0;
         let counter = frameCount;
         let frame = 0;
 
@@ -325,7 +321,6 @@ class Ball extends AbstractMesh {
         // travel rate reduction from hitting the ground.
         // decreases each bounce.
         let slow = 1;
-
         let bounces = 0;
 
         while (counter-- > 0) {
@@ -336,7 +331,7 @@ class Ball extends AbstractMesh {
             let percent;
 
             progress = Math.pow(
-                (++frame)/frameCount, 0.9 // ease out / trend toward 1.0 to simulate higher initial speed.
+                (++frame)/frameCount, 0.87 // ease out / trend toward 1.0 to simulate higher initial speed.
             );
             percent = progress * 100;
 
@@ -344,7 +339,10 @@ class Ball extends AbstractMesh {
             if (flightScalar < 0) {
                 const currentDistance = progress * distance;
 
-                const tapering = (100 - percent) / 100;
+                const tapering = Math.max(
+                    0,
+                    (100 - bounces * 20) / 100
+                );
                 const startingHeight = origin.y * scale;
                 const finalHeight = AbstractMesh.WORLD_BASE_Y;
 
@@ -364,7 +362,10 @@ class Ball extends AbstractMesh {
                 if (waveComponent * lastWaveDirection < 0) {
                     bounces += 1;
                     slow *= 0.75;
-                    console.log('bounced');
+                    frameCount /= slow;
+                    frameCount |= 0;
+                    frame /= slow;
+                    frame |= 0;
                 }
                 lastWaveDirection = waveComponent;
 

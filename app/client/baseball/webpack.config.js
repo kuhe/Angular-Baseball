@@ -10,7 +10,7 @@ module.exports = {
         new webpack.optimize.ModuleConcatenationPlugin()
     ],
     output: {
-        path: rootPublic,
+        path: appPublic,
         filename: 'baseball.bundle.js',
         libraryTarget: 'commonjs'
     }

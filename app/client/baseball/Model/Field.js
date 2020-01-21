@@ -61,11 +61,10 @@ Field.prototype = {
 
         if (Math.abs(splayAngle) > 50) swing.foul = true;
         swing.fielder = this.findFielder(splayAngle, landingDistance, power, flyAngle);
-        if (['first', 'second', 'short', 'third'].includes(swing.fielder)) {
-            landingDistance = Math.min(landingDistance, 110); // stopped by infielder
-        } else {
-            landingDistance = Math.max(landingDistance, 150); // rolled past infielder
-        }
+
+        // previous code was here to bracket the distance based on fielder, but
+        // that should have been taken into account by #findFielder()
+
         swing.travelDistance = landingDistance;
         swing.flyAngle = flyAngle;
         /**
@@ -239,7 +238,7 @@ Field.prototype = {
     //    return [this.first ? this.first.getName() : '', this.second ? this.second.getName() : '', this.third ? this.third.getname() : ''];
     //},
     /**
-     * @param splayAngle {Number} 0 to 180, apparently
+     * @param splayAngle {Number} -45 to 45.
      * @param landingDistance {Number} in feet, up to 310 or so
      * @param power {Number} 0-100
      * @param flyAngle {Number} roughly -15 to 90
@@ -253,7 +252,7 @@ Field.prototype = {
         if (Math.abs(angle) > 50) return false; // foul
         if (landingDistance < 10 && landingDistance > -20) {
             return 'catcher';
-        } else if (landingDistance >= 10 && landingDistance < 45 && Math.abs(angle) < 5) {
+        } else if (landingDistance >= 10 && landingDistance < 45 && angle < 5) {
             return 'pitcher';
         }
 
@@ -273,11 +272,10 @@ Field.prototype = {
             }
             const fielderArcPosition = this.positions[fielder][0] - 90;
             // a good infielder can field a hard hit grounder even with a high terminal distance
-            infield = Math.abs(angle - (fielderArcPosition)) < fielderLateralReachDegrees;
+            infield = infield || (Math.abs(angle - (fielderArcPosition)) < fielderLateralReachDegrees);
         }
 
-        // ball in the air to infielder
-        if (infield && landingDistance > 15) {
+        if (infield) {
             if (angle < -20) {
                 fielder = 'third';
             } else if (angle < 5) {

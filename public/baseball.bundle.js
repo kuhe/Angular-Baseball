@@ -1679,11 +1679,22 @@ const Distribution = Object.assign(DistributionCtor, {
         const goodContactBonus = 8 - sqrt(x*x + y*y);
 
         const scalar = pow(random(), 1 - goodContactBonus * 0.125);
+        const staticPowerContribution = power/300;
+        const randomPowerContribution = random() * power/75;
 
-        return (10 + scalar * 320 + power/300
-            + (random() * power/75) * 150)
+        /**
+         * The launch angle scalar should ideally be around these values based on flyAngle.
+         * 0 -> liner that goes no farther than infield.
+         * 10 -> max 120 or so
+         * 30 to 45 -> any distance
+         * over 50 -> risk of pop fly
+         * @type {number}
+         */
+        const launchAngleScalar = (1 - abs(flyAngle - 30)/60) *
+            (1 - (10 - Math.max(Math.min(10, flyAngle), -10))/20 * 0.83);
 
-            * (1 - abs(flyAngle - 30)/60);
+        return (10 + scalar * 320 + staticPowerContribution + randomPowerContribution * 150)
+            * launchAngleScalar;
     },
     /**
      * @param count {{strikes: number, balls: number}}
@@ -3212,15 +3223,11 @@ class Ball_Ball extends AbstractMesh {
                     first: 1, second: 1, short: 1, third: 1
                 }:
                     // If we're using the ground ball animation trajectory,
-                    // have the rendered travel distance be at least 90 if the fielder
+                    // have the rendered travel distance be at least to the
+                    // infield arc if the fielder
                     // is a non-battery infielder.
-                    distance = Math.max(90, distance);
-                    break;
-                case result.fielder in { pitcher: 1, catcher: 1 }:
-                    distance = Math.min(45, distance);
-                    break;
-                default:
                     distance = Math.max(110, distance);
+                    break;
             }
         }
 
@@ -3267,7 +3274,7 @@ class Ball_Ball extends AbstractMesh {
         };
 
         const frames = [];
-        const frameCount = airTime * 60 + groundTime * 20 | 0;
+        let frameCount = airTime * 60 + groundTime * 20 | 0;
         let counter = frameCount;
         let frame = 0;
 
@@ -3277,7 +3284,6 @@ class Ball_Ball extends AbstractMesh {
         // travel rate reduction from hitting the ground.
         // decreases each bounce.
         let slow = 1;
-
         let bounces = 0;
 
         while (counter-- > 0) {
@@ -3288,7 +3294,7 @@ class Ball_Ball extends AbstractMesh {
             let percent;
 
             progress = Math.pow(
-                (++frame)/frameCount, 0.9 // ease out / trend toward 1.0 to simulate higher initial speed.
+                (++frame)/frameCount, 0.87 // ease out / trend toward 1.0 to simulate higher initial speed.
             );
             percent = progress * 100;
 
@@ -3296,7 +3302,10 @@ class Ball_Ball extends AbstractMesh {
             if (flightScalar < 0) {
                 const currentDistance = progress * distance;
 
-                const tapering = (100 - percent) / 100;
+                const tapering = Math.max(
+                    0,
+                    (100 - bounces * 20) / 100
+                );
                 const startingHeight = origin.y * scale;
                 const finalHeight = AbstractMesh.WORLD_BASE_Y;
 
@@ -3316,7 +3325,10 @@ class Ball_Ball extends AbstractMesh {
                 if (waveComponent * lastWaveDirection < 0) {
                     bounces += 1;
                     slow *= 0.75;
-                    console.log('bounced');
+                    frameCount /= slow;
+                    frameCount |= 0;
+                    frame /= slow;
+                    frame |= 0;
                 }
                 lastWaveDirection = waveComponent;
 
@@ -5028,11 +5040,10 @@ Model_Field_Field.prototype = {
 
         if (Math.abs(splayAngle) > 50) swing.foul = true;
         swing.fielder = this.findFielder(splayAngle, landingDistance, power, flyAngle);
-        if (['first', 'second', 'short', 'third'].includes(swing.fielder)) {
-            landingDistance = Math.min(landingDistance, 110); // stopped by infielder
-        } else {
-            landingDistance = Math.max(landingDistance, 150); // rolled past infielder
-        }
+
+        // previous code was here to bracket the distance based on fielder, but
+        // that should have been taken into account by #findFielder()
+
         swing.travelDistance = landingDistance;
         swing.flyAngle = flyAngle;
         /**
@@ -5206,7 +5217,7 @@ Model_Field_Field.prototype = {
     //    return [this.first ? this.first.getName() : '', this.second ? this.second.getName() : '', this.third ? this.third.getname() : ''];
     //},
     /**
-     * @param splayAngle {Number} 0 to 180, apparently
+     * @param splayAngle {Number} -45 to 45.
      * @param landingDistance {Number} in feet, up to 310 or so
      * @param power {Number} 0-100
      * @param flyAngle {Number} roughly -15 to 90
@@ -5220,7 +5231,7 @@ Model_Field_Field.prototype = {
         if (Math.abs(angle) > 50) return false; // foul
         if (landingDistance < 10 && landingDistance > -20) {
             return 'catcher';
-        } else if (landingDistance >= 10 && landingDistance < 45 && Math.abs(angle) < 5) {
+        } else if (landingDistance >= 10 && landingDistance < 45 && angle < 5) {
             return 'pitcher';
         }
 
@@ -5240,11 +5251,10 @@ Model_Field_Field.prototype = {
             }
             const fielderArcPosition = this.positions[fielder][0] - 90;
             // a good infielder can field a hard hit grounder even with a high terminal distance
-            infield = Math.abs(angle - (fielderArcPosition)) < fielderLateralReachDegrees;
+            infield = infield || (Math.abs(angle - (fielderArcPosition)) < fielderLateralReachDegrees);
         }
 
-        // ball in the air to infielder
-        if (infield && landingDistance > 15) {
+        if (infield) {
             if (angle < -20) {
                 fielder = 'third';
             } else if (angle < 5) {

@@ -40,11 +40,22 @@ const Distribution = Object.assign(DistributionCtor, {
         const goodContactBonus = 8 - sqrt(x*x + y*y);
 
         const scalar = pow(random(), 1 - goodContactBonus * 0.125);
+        const staticPowerContribution = power/300;
+        const randomPowerContribution = random() * power/75;
 
-        return (10 + scalar * 320 + power/300
-            + (random() * power/75) * 150)
+        /**
+         * The launch angle scalar should ideally be around these values based on flyAngle.
+         * 0 -> liner that goes no farther than infield.
+         * 10 -> max 120 or so
+         * 30 to 45 -> any distance
+         * over 50 -> risk of pop fly
+         * @type {number}
+         */
+        const launchAngleScalar = (1 - abs(flyAngle - 30)/60) *
+            (1 - (10 - Math.max(Math.min(10, flyAngle), -10))/20 * 0.83);
 
-            * (1 - abs(flyAngle - 30)/60);
+        return (10 + scalar * 320 + staticPowerContribution + randomPowerContribution * 150)
+            * launchAngleScalar;
     },
     /**
      * @param count {{strikes: number, balls: number}}
