@@ -54,12 +54,22 @@ Or simply run the file in Node.
 
 ## Project history
 
-Circa 2014 I began writing this as a baseball game/simulator using Angular 1.x, hence the name.
-I have since stopped using Angular in my day job, but I upgraded this to use Angular 2 (and then 5)
-regardless, to stay true to its roots. And also because the core baseball simulation did not care what was
-being used to render it.
+Circa 2014 I began writing this as a baseball game/simulator using Angular 1.x, hence the name,
+out of a combination of personal interests, namely baseball and JavaScript.
+
+I have since stopped using Angular in my day job, and stopped playing baseball,
+but I upgraded this to use Angular 2 (and then 5) regardless, to stay true to its roots, and also
+because the core baseball simulation did not care what was being used to render it.
 
 However, as much as I like TypeScript and Angular, it's been kind of a pain to integrate the ESM portion of the
 baseball engine to an `angular-cli` project.
 
-This project was developed unironically on Microsoft Windows.
+This project was developed unironically on Microsoft Windows, and sometimes on Mac too.
+
+##### Project milestones:
+
+    - 2014, started the project while working at my first job.
+    - 2016 or thereabouts, modified the rendering engine to use WebGL instead of just CSS.
+    - Wrote nodejs and Java versions of a live-play matchmaking back end.
+    - 2018 or so, upgraded to Angular 2+ (8)
+    - 2020, planned migration to TypeScript (baseball engine) and/or off Angular (front end).
