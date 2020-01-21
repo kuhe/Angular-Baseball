@@ -21,7 +21,7 @@ class AtBat {
             : '';
         text = text.replace(AtBat.INFIELD_HIT_INDICATOR, '');
         this.text = text.split(AtBat.RBI_INDICATOR)[0];
-        this.rbi = `${text.split(this.text)[1]}`;
+        this.rbi = `${text.split(this.text)[1] || ''}`;
 
         const log = new Log();
 

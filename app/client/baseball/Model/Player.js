@@ -320,10 +320,10 @@ Player.prototype = {
         return this.atBatObjects;
     },
     recordRBI() {
-        this.atBats[this.atBats.length - 1] += AtBat.prototype.RBI_INDICATOR;
+        this.atBats[this.atBats.length - 1] += AtBat.RBI_INDICATOR;
     },
     recordInfieldHit() {
-        this.atBats[this.atBats.length - 1] += AtBat.prototype.INFIELD_HIT_INDICATOR;
+        this.atBats[this.atBats.length - 1] += AtBat.INFIELD_HIT_INDICATOR;
     },
     /**
      * @returns {number}
