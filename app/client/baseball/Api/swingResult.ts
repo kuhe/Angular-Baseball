@@ -144,4 +144,9 @@ export type swing_result_t = strike_zone_coordinate_t & {
      * the ball.
      */
     fieldingDelay: number;
+
+    /**
+     * Hit by pitch, batter takes first.
+     */
+    hitByPitch: boolean;
 };

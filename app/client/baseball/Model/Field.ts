@@ -14,9 +14,9 @@ import { runner_name_t } from '../Api/runnerName';
  * The baseball field tracks the ball's movement, fielders, and what runners are on.
  */
 class Field {
-    public first: Player | null = null;
-    public second: Player | null = null;
-    public third: Player | null = null;
+    public first: Player = null;
+    public second: Player = null;
+    public third: Player = null;
 
     /**
      * approximate fielder positions (polar degrees where 90 is up the middle, distance from origin (home plate))
@@ -32,6 +32,8 @@ class Field {
         center: [90, 280],
         right: [135 - 14, 280]
     };
+
+    public defense: Record<fielder_short_name_t, Player>;
 
     constructor(public game: Game) {
         this.game = game;

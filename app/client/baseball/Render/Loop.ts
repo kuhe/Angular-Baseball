@@ -1,3 +1,4 @@
+import { PerspectiveCamera, Scene, THREE_t, VECTOR3, WebGLRenderer } from '../Api/externalRenderer';
 import { Ball } from './Mesh/Ball';
 import { Mound } from './Mesh/Mound';
 import { Base } from './Mesh/Base';
@@ -11,12 +12,14 @@ import { Wall } from './Mesh/Wall';
 import { Sky } from './Mesh/Sky';
 import { Sun } from './Mesh/Sun';
 import { lighting } from './scene/lighting';
-import { AbstractMesh } from './Mesh/AbstractMesh';
-import { loadSkyShader } from './Shaders/SkyShader';
-
 import { VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE } from './LoopConstants';
+import { AbstractMesh } from './Mesh/AbstractMesh';
+import { Animator } from '../Services/Animator';
+import { swing_result_t } from '../Api/swingResult';
 
-let ahead, initialPosition;
+declare var THREE: THREE_t;
+
+let ahead: VECTOR3, initialPosition: VECTOR3;
 
 const AHEAD = () => {
     if (ahead) {
@@ -43,35 +46,51 @@ const INITIAL_POSITION = () => {
  * manager for the rendering loop
  */
 class Loop {
+    public overwatchMoveTarget: VECTOR3;
+    public lighting: typeof lighting;
+    public element: HTMLElement;
+    public foreground: Loop;
+    public background: Loop;
+    public active: boolean;
+    public timeOfDay = {
+        h: 5,
+        m: 30
+    };
+    public renderer: WebGLRenderer;
+    public target: VECTOR3;
     /**
-     * @param {string} elementClass
-     * @param {boolean} background
-     * @param {Class} Animator
+     * Camera is panning.
      */
-    constructor(elementClass, background, Animator) {
+    public panning: boolean;
+    public _target: VECTOR3;
+    public bob: number;
+    public moveTarget: VECTOR3;
+    public moveSpeed: number;
+    public panSpeed: number;
+    public objects: AbstractMesh[];
+    public scene: Scene;
+    public camera: PerspectiveCamera;
+    public sun: Sun;
+    public sky: Sky;
+
+    public Animator: typeof Animator;
+
+    /**
+     * @param elementClass
+     * @param isBackground - is the background loop, otherwise is the foreground loop.
+     */
+    constructor(public elementClass: string, isBackground: boolean) {
         this.overwatchMoveTarget = null;
         this.lighting = lighting;
-        this.Animator = Animator;
         this.loop = this.loop.bind(this);
         this.onResize = this.onResize.bind(this);
 
-        this.elementClass = elementClass;
-
-        /** @type {HTMLElement} */
-        this.element = null;
-
-        /** @type {Loop} */
-        this.foreground = null;
-
-        /** @type {Loop} */
-        this.background = null;
-
-        window.loop = this;
+        ((window as unknown) as { loop: Loop }).loop = this;
         this.timeOfDay = {
             h: 5,
             m: 30
         };
-        this.main(background);
+        this.main(isBackground);
     }
 
     /**
@@ -80,8 +99,8 @@ class Loop {
      * Individual objects<AbstractMesh> can attach and detach to the manager to be rendered.
      *
      */
-    loop() {
-        this.loop.active = true;
+    public loop(): void {
+        this.active = true;
         requestAnimationFrame(this.loop);
 
         this.panToward(this.target);
@@ -104,13 +123,12 @@ class Loop {
 
     /**
      * initialize lights, camera, action
+     * @param background - is the background loop.
      */
-    main(background) {
+    public main(background?: boolean): void {
         this.objects = [];
 
         if (this.getThree()) {
-            const THREE = this.THREE;
-
             const scene = (this.scene = new THREE.Scene());
             scene.fog = new THREE.FogExp2(0x838888, 0.002);
             if (this.attach()) {
@@ -127,7 +145,7 @@ class Loop {
                 this.moveTarget = camera.position;
 
                 this.resetCamera();
-                if (!this.loop.active) {
+                if (!this.active) {
                     this.loop();
                 }
                 if (background) {
@@ -142,9 +160,9 @@ class Loop {
     }
 
     /**
-     * @param addition
+     * @param addition - number of minutes to add.
      */
-    addMinutes(addition) {
+    public addMinutes(addition: number): void {
         let hours = this.timeOfDay.h,
             minutes = this.timeOfDay.m;
         minutes += addition;
@@ -157,11 +175,11 @@ class Loop {
     }
 
     /**
-     * @param hours
-     * @param minutes
+     * @param hours - 0-24
+     * @param minutes - 0-60
      * gradual transition
      */
-    setTargetTimeOfDay(hours, minutes) {
+    public setTargetTimeOfDay(hours: number, minutes: number): void {
         if (this.background) {
             var sun = this.background.sun;
         } else {
@@ -177,11 +195,11 @@ class Loop {
     }
 
     /**
-     * @param hours {Number} 0-24
-     * @param minutes {Number} 0-60
+     * @param hours - 0-24
+     * @param minutes - 0-60
      * instant transition
      */
-    setTimeOfDay(hours, minutes) {
+    public setTimeOfDay(hours: number, minutes: number): void {
         this.timeOfDay = {
             h: hours,
             m: minutes
@@ -217,7 +235,7 @@ class Loop {
     /**
      * used by the background layer
      */
-    addStaticMeshes() {
+    public addStaticMeshes(): void {
         new Field().join(this);
         new Mound().join(this);
         new Grass().join(this);
@@ -257,7 +275,7 @@ class Loop {
     /**
      * experimental camera bobbing
      */
-    breathe() {
+    public breathe(): void {
         const pos = this.camera.position;
         const x = pos.x,
             y = pos.y,
@@ -272,27 +290,24 @@ class Loop {
         pos.y += rate;
         pos.z += rate;
     }
-    getThree() {
-        if (this.THREE === Loop.prototype.THREE && typeof window === 'object' && window.THREE) {
-            return (this.THREE = window.THREE);
-        }
-        return true;
+
+    public getThree(): THREE_t {
+        return THREE;
     }
 
     /**
      * attach to the DOM
-     * @returns {THREE.WebGLRenderer|Boolean}
+     * @returns renderer or false
      */
-    attach() {
+    public attach(): WebGLRenderer | false {
         window.removeEventListener('resize', this.onResize, false);
         window.addEventListener('resize', this.onResize, false);
 
-        this.element = document.getElementsByClassName(this.elementClass)[0];
+        this.element = document.getElementsByClassName(this.elementClass)[0] as HTMLElement;
 
         const { element } = this;
         if (element) {
             element.innerHTML = '';
-            const THREE = this.THREE;
             const renderer = new THREE.WebGLRenderer({ alpha: true });
             this.setSize(renderer);
             //renderer.setClearColor(0xffffff, 0);
@@ -308,19 +323,23 @@ class Loop {
     /**
      * higher FOV on lower view widths
      */
-    onResize() {
+    public onResize(): void {
         const element = this.element;
         this.camera.aspect = this.getAspect();
         this.camera.fov = Math.max(90 - 30 * (element.offsetWidth / 1200), 55);
         this.camera.updateProjectionMatrix();
         this.setSize(this.renderer);
     }
-    setSize(renderer) {
+    public setSize(renderer: WebGLRenderer): void {
         const element = this.element;
         const width = element.offsetWidth;
         renderer.setSize(width, HEIGHT);
     }
-    getAspect() {
+
+    /**
+     * Aspect ratio.
+     */
+    public getAspect(): number {
         const element = this.element;
         return element.offsetWidth / HEIGHT;
     }
@@ -329,9 +348,9 @@ class Loop {
      * incrementally pan toward the vector given
      * @param vector
      */
-    panToward(vector) {
+    panToward(vector: VECTOR3) {
         const maxIncrement = this.panSpeed;
-        this.forAllLoops((loop) => {
+        this.forAllLoops((loop: Loop) => {
             const target = loop._target;
             if (target) {
                 target.x =
@@ -352,9 +371,9 @@ class Loop {
      * incrementally move the camera to the vector
      * @param vector
      */
-    moveToward(vector) {
+    public moveToward(vector: VECTOR3): void {
         const maxIncrement = this.moveSpeed;
-        this.forAllLoops((loop) => {
+        this.forAllLoops((loop: Loop) => {
             const position = loop.camera && loop.camera.position;
             if (position) {
                 position.x += Math.max(
@@ -378,8 +397,8 @@ class Loop {
      * @param vector
      * @param panSpeed
      */
-    setLookTarget(vector, panSpeed) {
-        this.forAllLoops((loop) => {
+    public setLookTarget(vector: VECTOR3, panSpeed: number) {
+        this.forAllLoops((loop: Loop) => {
             loop.panSpeed = panSpeed;
             loop.panning = vector !== AHEAD();
             loop.target = vector;
@@ -391,21 +410,31 @@ class Loop {
      * @param vector
      * @param moveSpeed
      */
-    setMoveTarget(vector, moveSpeed) {
-        this.forAllLoops((loop) => {
+    public setMoveTarget(vector: VECTOR3, moveSpeed: number): void {
+        this.forAllLoops((loop: Loop) => {
             loop.moveSpeed = moveSpeed;
             loop.moveTarget = vector;
             loop.overwatchMoveTarget = null;
         });
     }
-    setOverwatchMoveTarget(vector, moveSpeed) {
-        this.forAllLoops((loop) => {
+
+    /**
+     * View from above the target.
+     * @param vector
+     * @param moveSpeed
+     */
+    public setOverwatchMoveTarget(vector: VECTOR3, moveSpeed: number): void {
+        this.forAllLoops((loop: Loop) => {
             loop.moveSpeed = moveSpeed;
             loop.overwatchMoveTarget = vector;
             loop.moveTarget = null;
         });
     }
-    resetCamera() {
+
+    /**
+     * Move back to the initial position.
+     */
+    public resetCamera(): void {
         let moveSpeed = 0.5;
         if (this.camera.position.z !== INITIAL_POSITION().z) {
             moveSpeed = 2.5;
@@ -413,11 +442,21 @@ class Loop {
         this.setLookTarget(AHEAD(), moveSpeed);
         this.setMoveTarget(INITIAL_POSITION(), moveSpeed / 10);
     }
-    moveCamera(x, y, z) {
+
+    /**
+     * Move camera to vector.
+     * Contrast {@link #setLookTarget()}, this moves the camera itself, not its
+     * view angle.
+     * @param x
+     */
+    public moveCamera(x: VECTOR3): void;
+    public moveCamera(x: number, y: number, z: number): void;
+    public moveCamera(x: number | VECTOR3, y?: number, z?: number): void {
         if (typeof x === 'object') {
-            return this.moveCamera(x.x, x.y, x.z);
+            const _x: VECTOR3 = x;
+            return this.moveCamera(_x.x, _x.y, _x.z);
         }
-        this.forAllLoops((loop) => {
+        this.forAllLoops((loop: Loop) => {
             loop.camera.position.x = x;
             loop.camera.position.y = y;
             loop.camera.position.z = z;
@@ -428,7 +467,7 @@ class Loop {
      * execute the function on all loops
      * @param fn {Function}
      */
-    forAllLoops(fn) {
+    public forAllLoops(fn: (loop: Loop) => void): void {
         if (this.background) {
             fn(this.background);
         }
@@ -438,10 +477,16 @@ class Loop {
         fn(this);
     }
 
-    test() {
+    /**
+     * @deprecated
+     * Test method.
+     */
+    public test(): void {
         const ball = new Ball();
-        window.Ball = Ball;
-        window.ball = ball;
+        Object.assign(window, {
+            Ball,
+            ball
+        });
         ball.setType('4-seam');
         //with (ball.mesh.rotation) {x=0,y=0,z=0}; ball.rotation = {x:0.00, y:0.00};
         ball.animate = () => {
@@ -451,10 +496,16 @@ class Loop {
         // Baseball.service.Animator.loop.test();
     }
 
-    testTrajectory(data) {
+    /**
+     * @deprecated
+     * @param data
+     */
+    public testTrajectory(data?: swing_result_t): void {
         const ball = new Ball();
-        window.Ball = Ball;
-        window.ball = ball;
+        Object.assign(window, {
+            Ball,
+            ball
+        });
         ball.deriveTrajectory(
             data || {
                 splay: -35,
@@ -472,13 +523,6 @@ class Loop {
     }
 }
 
-var HEIGHT = 700;
-
-Loop.prototype.THREE = {};
-Loop.prototype.constructors = {
-    Ball,
-    Mound,
-    Field
-};
+const HEIGHT = 700;
 
 export { Loop };

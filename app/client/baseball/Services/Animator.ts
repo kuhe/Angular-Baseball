@@ -8,6 +8,7 @@ import { Game } from '../Model/Game';
 import { Ball } from '../Render/Mesh/Ball';
 import { pitches_t } from '../Api/pitches';
 import { swing_result_t } from '../Api/swingResult';
+import {strike_zone_coordinate_t} from "../Api/pitchInFlight";
 
 declare var $: any;
 
@@ -28,8 +29,8 @@ class Animator {
     public static readonly TIME_FROM_SET = 2300; //ms
     public static readonly TIME_FROM_WINDUP = 3600; //ms
     public static readonly HOLD_UP_ALLOWANCE = 0.25; // seconds
-    public static readonly pitchTarget = null;
-    public static readonly pitchBreak = null;
+    public static readonly pitchTarget: strike_zone_coordinate_t = null;
+    public static readonly pitchBreak: strike_zone_coordinate_t = null;
     public static _ball: Ball;
 
     /**
@@ -48,8 +49,8 @@ class Animator {
      * @returns main foreground loop.
      */
     public static beginRender() {
-        Animator.background = new Loop('webgl-bg-container', true, Animator);
-        Animator.loop = new Loop('webgl-container', false, Animator);
+        Animator.background = new Loop('webgl-bg-container', true);
+        Animator.loop = new Loop('webgl-container', false);
 
         Animator.loop.background = Animator.background;
         Animator.background.foreground = Animator.loop;
@@ -113,7 +114,7 @@ class Animator {
         if (!Animator.loop) {
             Animator.beginRender();
         }
-        const ball = new Animator.loop.constructors.Ball();
+        const ball = new Ball();
         Animator._ball = ball;
         ball.derivePitchingTrajectory(game);
         ball.trajectory = ball.breakingTrajectory;

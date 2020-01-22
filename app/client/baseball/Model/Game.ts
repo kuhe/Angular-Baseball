@@ -40,10 +40,12 @@ class Game {
     public showMessage = false;
     public debug: any[] = [];
 
-    public pitcher: Player = (null as unknown) as Player;
-    public batter: Player = (null as unknown) as Player;
-    public deck: Player = (null as unknown) as Player;
-    public hole: Player = (null as unknown) as Player;
+    public pitcher: Player = null;
+    public batter: Player = null;
+    public batterRunner: Player = null;
+    public lastBatter: Player = null;
+    public deck: Player = null;
+    public hole: Player = null;
 
     public stage: 'pitch' | 'swing' | 'end' = 'pitch';
     /**
@@ -86,7 +88,7 @@ class Game {
         fielder: ''
     };
     public half = 'top';
-    public inning = 1;
+    public inning: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 = 1;
     public scoreboard = {
         away: {
             1: 0,
@@ -1046,7 +1048,7 @@ class Game {
     public clickLineup(player: Player): void | boolean {
         if (player.team.sub !== player.team.noSubstituteSelected) {
             const sub = player.team.sub as Player;
-            player.team.sub = (null as unknown) as Player;
+            player.team.sub = null;
             if (sub) {
                 return sub.substitute(player);
             }

@@ -2,6 +2,9 @@ import { Log } from '../Utility/Log';
 import { Distribution } from '../Services/Distribution';
 import { Game } from './Game';
 import { count_t } from '../Api/count';
+import { fielder_short_name_t } from '../Api/fielderShortName';
+import { on_base_runner_name_t, runner_name_t } from '../Api/runnerName';
+import { swing_result_t } from '../Api/swingResult';
 
 class Umpire {
     /**
@@ -25,7 +28,7 @@ class Umpire {
     /**
      * Starts the game by announcing it and signalling the first batter up
      */
-    playBall() {
+    public playBall(): void {
         const game = this.game;
         game.half = 'top';
         game.inning = 1;
@@ -45,7 +48,7 @@ class Umpire {
      * Makes the call based on the last pitch and swing (or no swing)
      * @todo add margin of error to Umpire to simulate real umpiring, haha.
      */
-    makeCall() {
+    public makeCall(): void {
         this.says = '';
         const game = this.game;
         const result = game.swingResult;
@@ -55,15 +58,17 @@ class Umpire {
 
         if (game.swingResult.fielder) {
             var fielder =
-                game.teams[game.half === 'top' ? 'home' : 'away'].positions[result.fielder];
+                game.teams[game.half === 'top' ? 'home' : 'away'].positions[
+                    result.fielder as fielder_short_name_t
+                ];
         } else {
             fielder = null;
         }
 
         game.batterRunner = game.batter;
 
-        if (!isNaN(result.stoleABase)) {
-            var thief = game.batter.team.lineup[result.stoleABase];
+        if (!isNaN(result.stoleABase as number)) {
+            var thief = game.batter.team.lineup[result.stoleABase as number];
             thief.atBats.push(Log.STOLEN_BASE);
             switch (thief) {
                 case field.first:
@@ -82,11 +87,11 @@ class Umpire {
             }
             thief.stats.batting.sb++;
         }
-        if (!isNaN(result.caughtStealing)) {
+        if (!isNaN(result.caughtStealing as number)) {
             game.teams[game.half === 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding
                 .PO++;
             this.count.outs++;
-            thief = game.batter.team.lineup[result.caughtStealing];
+            thief = game.batter.team.lineup[result.caughtStealing as number];
             thief.stats.batting.cs++;
             thief.atBats.push(Log.CAUGHT_STEALING);
             switch (thief) {
@@ -157,7 +162,7 @@ class Umpire {
                         batter.stats.batting.pa++;
                         batter.stats.batting.ab++;
                         if (result.firstOut) {
-                            game.field[result.firstOut] = null;
+                            game.field[result.firstOut as 'first' | 'second' | 'third'] = null;
                             result.additionalOuts.map((runner) => {
                                 if (runner !== 'batter') {
                                     game.field[runner] = null;
@@ -174,7 +179,7 @@ class Umpire {
                             this.advanceRunners(false, result.fieldersChoice);
                             result.doublePlay && game.batter.atBats.push(Log.GIDP);
                             this.reachBase();
-                            result.outs = this.count.outs;
+                            result.outs = this.count.outs as 0 | 1 | 2 | 3;
                             this.newBatter();
                         } else if (result.fieldersChoice) {
                             result.bases = 0;
@@ -189,7 +194,7 @@ class Umpire {
                             if (this.count.outs < 3) {
                                 this.advanceRunners(false);
                             }
-                            result.outs = this.count.outs;
+                            result.outs = this.count.outs as 0 | 1 | 2 | 3;
                             this.newBatter();
                         }
                         if (result.hitByPitch) {
@@ -207,9 +212,6 @@ class Umpire {
                             }
                             let bases = result.bases;
                             switch (bases) {
-                                case 0:
-                                    game.batter.atBats.push(Log.GROUNDOUT);
-                                    break;
                                 case 1:
                                     if (result.error) {
                                         game.batter.atBats.push(Log.REACHED_ON_ERROR);
@@ -248,7 +250,11 @@ class Umpire {
                                     break;
                             }
                             if (bases > 0 && bases < 4 && !result.error) {
-                                if (['left', 'right', 'center'].includes(result.fielder)) {
+                                if (
+                                    !!~['left', 'right', 'center'].indexOf(
+                                        result.fielder as fielder_short_name_t
+                                    )
+                                ) {
                                     batter.recordInfieldHit();
                                 }
                             }
@@ -309,7 +315,7 @@ class Umpire {
     /**
      * awards first base to the batter
      */
-    reachBase() {
+    public reachBase(): Umpire {
         const game = this.game;
         game.field.first = game.batter;
         game.field.first.fatigue += 2;
@@ -323,7 +329,11 @@ class Umpire {
      * @param fieldersChoice \results in an out to someone other than the batter
      * @param sacrificeAdvances \advances on a sacrifice
      */
-    advanceRunners(isWalk, fieldersChoice, sacrificeAdvances) {
+    public advanceRunners(
+        isWalk?: boolean,
+        fieldersChoice?: runner_name_t,
+        sacrificeAdvances?: runner_name_t[]
+    ): Umpire {
         isWalk = Boolean(isWalk);
         const game = this.game;
         let first = game.field.first;
@@ -367,28 +377,28 @@ class Umpire {
             }
         } else {
             if (fieldersChoice) {
-                game.field[fieldersChoice] = null;
+                game.field[fieldersChoice as on_base_runner_name_t] = null;
                 first = game.field.first;
                 second = game.field.second;
                 third = game.field.third;
             }
-            let canAdvance = (position) => true;
+            let canAdvance = (position: unknown) => true;
             if (sacrificeAdvances) {
                 canAdvance = (position) => {
                     switch (position) {
                         case 'first':
-                            return sacrificeAdvances.includes('first') && !game.field.second;
+                            return !!~sacrificeAdvances.indexOf('first') && !game.field.second;
                         case 'second':
-                            return sacrificeAdvances.includes('second') && !game.field.third;
+                            return !!~sacrificeAdvances.indexOf('second') && !game.field.third;
                         case 'third':
-                            return sacrificeAdvances.includes('third');
+                            return !!~sacrificeAdvances.indexOf('third');
                     }
                 };
             }
             let arm = 0;
             if (swing.fielder) {
                 const fielder = game.pitcher.team.positions[swing.fielder];
-                if (['left', 'center', 'right'].includes(fielder.position)) {
+                if (!!~['left', 'center', 'right'].indexOf(fielder.position)) {
                     arm = fielder.skill.defense.throwing;
                 } else {
                     arm = fielder.skill.defense.throwing + 120; // very rare extra bases on infield BIP
@@ -442,7 +452,7 @@ class Umpire {
     /**
      * "run scores!"
      */
-    runScores() {
+    public runScores(): void {
         const game = this.game;
         game.scoreboard[game.half === 'top' ? 'away' : 'home'][game.inning]++;
         game.tally[game.half === 'top' ? 'away' : 'home'].R++;
@@ -451,7 +461,7 @@ class Umpire {
     /**
      * lets the on deck batter into the batter's box.
      */
-    newBatter() {
+    public newBatter(): void {
         const game = this.game;
         game.passMinutes(2);
         game.log.pitchRecord = {
@@ -479,10 +489,10 @@ class Umpire {
     /**
      * 3 outs
      */
-    changeSides() {
+    public changeSides(): void {
         const game = this.game;
         game.passMinutes(5);
-        game.swingResult = {};
+        game.swingResult = {} as swing_result_t;
         game.swingResult.looking = true; // hide bat
         game.pitchInFlight.x = null; // hide ball
         game.pitchInFlight.y = null; // hide ball
@@ -490,7 +500,7 @@ class Umpire {
             e: [],
             n: []
         };
-        let offense, defense;
+        let offense: 'home' | 'away', defense: 'home' | 'away';
         game.field.first = null;
         game.field.second = null;
         game.field.third = null;
@@ -526,7 +536,8 @@ class Umpire {
         this.onSideChange();
     }
 
-    onSideChange(): void {} // will be be bound externally
+    // will be be bound externally
+    public onSideChange(): void {}
 }
 
 export { Umpire };
