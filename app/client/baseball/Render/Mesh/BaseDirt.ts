@@ -1,15 +1,22 @@
 import { AbstractMesh } from './AbstractMesh';
+import { Loop } from '../Loop';
+import { THREE } from '../../Api/externalRenderer';
+import { Mesh } from 'three';
+import { Base } from './Base';
 
+/**
+ * Grassless area around the bases.
+ */
 class BaseDirt extends AbstractMesh {
-    constructor(loop, base) {
+    public constructor(loop: Loop, public base: Base) {
         super();
-        this.base = base;
         this.getMesh();
         if (loop && loop.loop) {
             this.join(loop);
         }
     }
-    getMesh() {
+
+    public getMesh(): Mesh {
         const material = new THREE.MeshLambertMaterial({
             color: 0xdcb096
         });
@@ -30,7 +37,8 @@ class BaseDirt extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {}
+
+    public animate(): void {}
 }
 
 export { BaseDirt };

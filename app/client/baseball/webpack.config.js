@@ -5,7 +5,7 @@ const appPublic = path.resolve(path.join(__dirname, '..', 'baseball-angular', 's
 const rootPublic = path.resolve(path.join(__dirname, '..', '..', '..', 'public'));
 
 module.exports = {
-    entry: path.join(__dirname, 'baseball.js'),
+    entry: path.join(__dirname, 'baseball.ts'),
     plugins: [new webpack.optimize.ModuleConcatenationPlugin()],
     module: {
         rules: [

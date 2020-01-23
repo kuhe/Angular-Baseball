@@ -32,11 +32,14 @@ class Game {
         away: new Team(this),
         home: new Team(this)
     };
-    public log = new Log();
-    public umpire = new Umpire(this);
+    public log = new Log(this);
+
+    /**
+     * later initialization is required, not inline.
+     */
+    public umpire: Umpire;
 
     public gamesIntoSeason = 72;
-    public humanControl: 'home' | 'away' | 'both' | 'none' = 'home';
     public showMessage = false;
     public debug: any[] = [];
 
@@ -72,8 +75,8 @@ class Game {
         control: 50
     };
     public swingResult: swing_result_t = {
-        x: 100, //difference to pitch location
-        y: 100, //difference to pitch location
+        x: 0, //difference to pitch location
+        y: 0, //difference to pitch location
         strike: false,
         foul: false,
         caught: false,
@@ -130,7 +133,7 @@ class Game {
     public helper = helper;
 
     public startTime = {
-        h: (Math.random() * 6 + 11) | 0,
+        h: (Math.random() * 3 + 11) | 0,
         m: (Math.random() * 60) | 0
     };
     public timeOfDay = {
@@ -145,8 +148,17 @@ class Game {
 
     /**
      * @param m - language mode.
+     * @param consoleMode - startup with no UI.
+     * @param humanControl - 'home' : play as home team. 'none' : spectate CPU.
      */
-    public constructor(m: lang_mode_t) {
+    public constructor(
+        m: lang_mode_t,
+        consoleMode = false,
+        public humanControl: 'home' | 'away' | 'both' | 'none' = 'home'
+    ) {
+        if (consoleMode) {
+            this.console = true;
+        }
         this.reset();
         if (m) text.mode = m;
         this.gamesIntoSeason = 72 + Math.floor(Math.random() * 72);
@@ -155,6 +167,7 @@ class Game {
         while (this.teams.away.name === this.teams.home.name) {
             this.teams.away.pickName();
         }
+        this.umpire = new Umpire(this);
         if (this.humanPitching()) {
             this.stage = 'pitch';
         }
@@ -180,7 +193,7 @@ class Game {
         time.m |= 0;
         time.m += minutes | 0;
         while (time.m >= 60) {
-            time.m -= -60;
+            time.m -= 60;
             time.h = ((time.h | 0) + 1) % 24;
         }
         if (!Animator.console) Animator.loop.setTargetTimeOfDay(time.h, time.m);
@@ -417,7 +430,7 @@ class Game {
         let x = Distribution.centralizedNumber(),
             y = Distribution.centralizedNumber();
         /**
-         * @type {number} -100 to 100 negative: fooled on pitch, positive: certain of pitch location.
+         * -100 to 100 negative: fooled on pitch, positive: certain of pitch location.
          */
         let certainty = (Math.random() * -100) / ((100 + eye) / 100);
 

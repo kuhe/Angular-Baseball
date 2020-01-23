@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Scene, THREE_t, VECTOR3, WebGLRenderer } from '../Api/externalRenderer';
+import { THREE, VECTOR3 } from '../Api/externalRenderer';
 import { Ball } from './Mesh/Ball';
 import { Mound } from './Mesh/Mound';
 import { Base } from './Mesh/Base';
@@ -16,8 +16,8 @@ import { VERTICAL_CORRECTION, INITIAL_CAMERA_DISTANCE } from './LoopConstants';
 import { AbstractMesh } from './Mesh/AbstractMesh';
 import { Animator } from '../Services/Animator';
 import { swing_result_t } from '../Api/swingResult';
-
-declare var THREE: THREE_t;
+import { PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
+import { pitch_in_flight_t } from '../Api/pitchInFlight';
 
 let ahead: VECTOR3, initialPosition: VECTOR3;
 
@@ -62,7 +62,7 @@ class Loop {
      * Camera is panning.
      */
     public panning: boolean;
-    public _target: VECTOR3;
+    public _target: Vector3;
     public bob: number;
     public moveTarget: VECTOR3;
     public moveSpeed: number;
@@ -291,7 +291,7 @@ class Loop {
         pos.z += rate;
     }
 
-    public getThree(): THREE_t {
+    public getThree(): typeof THREE {
         return THREE;
     }
 
@@ -507,17 +507,18 @@ class Loop {
             ball
         });
         ball.deriveTrajectory(
-            data || {
-                splay: -35,
-                travelDistance: 135,
-                flyAngle: -15,
-                x: 100,
-                y: 100
-            },
+            data ||
+                ({
+                    splay: -35,
+                    travelDistance: 135,
+                    flyAngle: -15,
+                    x: 100,
+                    y: 100
+                } as swing_result_t),
             {
                 x: 0,
                 y: 0
-            }
+            } as pitch_in_flight_t
         );
         ball.join(this);
     }

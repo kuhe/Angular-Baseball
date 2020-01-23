@@ -1,7 +1,18 @@
 import { AbstractMesh } from './AbstractMesh';
+import { Loop } from '../Loop';
+import { splay_t } from '../../Api/math';
+import { Mesh } from 'three';
+import { THREE } from '../../Api/externalRenderer';
 
+/**
+ * Outfield walls.
+ */
 class Wall extends AbstractMesh {
-    constructor(loop, angle) {
+    /**
+     * @param loop
+     * @param angle - viewed from home plate.
+     */
+    constructor(loop: Loop, public angle: splay_t) {
         super();
         this.angle = angle;
         this.getMesh();
@@ -9,7 +20,8 @@ class Wall extends AbstractMesh {
             this.join(loop);
         }
     }
-    getMesh() {
+
+    public getMesh(): Mesh {
         const material = new THREE.MeshLambertMaterial({
             color: 0x3f4045
         });
@@ -24,13 +36,14 @@ class Wall extends AbstractMesh {
         const offset = Math.sin(radians) * hypotenuse;
 
         mesh.position.x += offset;
-        mesh.position.y = AbstractMesh.WORLD_BASE_Y + 0;
+        mesh.position.y = AbstractMesh.WORLD_BASE_Y;
         mesh.position.z -= distance;
 
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {}
+
+    public animate(): void {}
 }
 
 export { Wall };

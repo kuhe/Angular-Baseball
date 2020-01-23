@@ -31,8 +31,9 @@ class Player {
 
     /**
      * Batting order index (0 - 8).
+     * -1 indicates not in lineup.
      */
-    public order = 0;
+    public order = -1;
 
     public throws: handedness_t = Math.random() > 0.86 ? 'left' : 'right';
     public bats: handedness_t = Math.random() > 0.75 ? 'left' : 'right';
@@ -658,7 +659,6 @@ class Player {
 
     /**
      * language-sensitive, for text representation of batting order
-     * @returns {String}
      */
     public getOrder(): string {
         return text(
@@ -681,7 +681,6 @@ class Player {
 
     /**
      * a localized description of this player's defining batting characteristic e.g. "contact hitter"
-     * @returns {string}
      */
     public getDefiningBattingCharacteristic(): string {
         if (!this.definingBattingCharacteristic[text.mode]) {

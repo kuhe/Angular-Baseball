@@ -10,7 +10,6 @@ import { out_by_t } from '../Api/outBy';
 import { multilingual_log_t } from '../Api/log';
 
 class Log {
-    public game: Game = (null as unknown) as Game;
     public static readonly SINGLE = 'H';
     public static readonly DOUBLE = '2B';
     public static readonly TRIPLE = '3B';
@@ -60,10 +59,12 @@ class Log {
     public lastSwing: string = '';
     public lastSwingJ: string = '';
 
+    constructor(public game: Game) {}
+
     /**
      * Stabilize shortRecord to exactly 6 items, for UI balancing purposes.
      */
-    stabilizeShortRecord(): void {
+    public stabilizeShortRecord(): void {
         const rec = this.record.e.slice(0, 6);
         this.shortRecord.e = rec;
         this.stabilized.shortRecord.e = rec.concat(['', '', '', '', '', '']).slice(0, 6);
@@ -79,26 +80,26 @@ class Log {
      * @param noteJ - Japanese.
      * @param only - only log one language.
      */
-    note(note: string, noteJ: string, only?: lang_mode_t): void {
+    public note(note: string, noteJ: string, only?: lang_mode_t): void {
         //todo fix don't double language when specifying param [only]
         if (only === 'e') {
             this.record.e.unshift(note);
             this.async(() => {
-                console.log(note);
+                this.pushConsole(note);
             });
         } else if (only === 'n') {
             this.record.n.unshift(noteJ);
             this.async(() => {
-                console.log(noteJ);
+                this.pushConsole(noteJ);
             });
         } else {
             this.record.e.unshift(note);
             this.record.n.unshift(noteJ);
             this.async(() => {
                 if (text.mode === 'n') {
-                    console.log(noteJ);
+                    this.pushConsole(noteJ);
                 } else {
-                    console.log(note);
+                    this.pushConsole(note);
                 }
             });
         }
@@ -110,7 +111,7 @@ class Log {
      * @param batter - up to bat.
      * @returns e.g. "now batting 1st, right fielder, #51, Ichiro"
      */
-    getBatter(batter: Player): string {
+    public getBatter(batter: Player): string {
         const orderIndex = batter.team.nowBatting;
         const order = {
             0: text(' 1st'),
@@ -139,7 +140,7 @@ class Log {
      * Announce a new batter at the plate.
      * @param batter - up to bat.
      */
-    noteBatter(batter: Player): void {
+    public noteBatter(batter: Player): void {
         const m = text.mode;
         let record;
         let recordJ;
@@ -160,7 +161,10 @@ class Log {
      * @param batterIsLefty - from Player.
      * @returns e.g. "Curveball, way outside".
      */
-    getPitchLocationDescription(pitchInFlight: pitch_in_flight_t, batterIsLefty?: boolean): string {
+    public getPitchLocationDescription(
+        pitchInFlight: pitch_in_flight_t,
+        batterIsLefty?: boolean
+    ): string {
         let x = pitchInFlight.x;
         const y = pitchInFlight.y;
         let say = '';
@@ -218,7 +222,7 @@ class Log {
      * @param pitchInFlight - from Game.
      * @param batter - a Player.
      */
-    notePitch(pitchInFlight: pitch_in_flight_t, batter: Player): void {
+    public notePitch(pitchInFlight: pitch_in_flight_t, batter: Player): void {
         const m = text.mode;
         let record;
         let recordJ;
@@ -239,7 +243,7 @@ class Log {
      * Broadcast inning (optional), strike/ball count.
      * @param justOuts - only announce number of outs, vs an inning change.
      */
-    broadcastCount(justOuts?: boolean): string {
+    public broadcastCount(justOuts?: boolean): string {
         let outs;
         if (!this.game.umpire) return '';
         const count = this.game.umpire.count;
@@ -259,7 +263,7 @@ class Log {
      * @example
      * "Yankees 2, Red Sox 1"
      */
-    broadcastScore(): string {
+    public broadcastScore(): string {
         return `${this.game.teams.away.getName()} ${
             this.game.tally.away.R
         }, ${this.game.teams.home.getName()} ${this.game.tally.home.R}${text.stop()}`;
@@ -268,7 +272,7 @@ class Log {
     /**
      * @returns e.g. "Runners on first, second".
      */
-    broadcastRunners(): string {
+    public broadcastRunners(): string {
         const field = this.game.field;
         const runners = [
             (field.first && text('first')) || '',
@@ -299,7 +303,7 @@ class Log {
      *
      * @param swingResult - from Game.
      */
-    getSwing(swingResult: swing_result_t) {
+    public getSwing(swingResult: swing_result_t) {
         let result = '';
         if (swingResult.looking) {
             if (swingResult.strike) {
@@ -353,7 +357,7 @@ class Log {
      * @see Log#getSwing()
      * @param swingResult - from Game.
      */
-    noteSwing(swingResult: swing_result_t) {
+    public noteSwing(swingResult: swing_result_t) {
         const m = text.mode;
         let record: string;
         let recordJ: string;
@@ -379,26 +383,32 @@ class Log {
             this.async(() => {
                 if (record.indexOf('In play') > -1 && record.indexOf('struck out') > -1) {
                     if (text.mode === 'n') {
-                        console.log(recordJ);
+                        this.pushConsole(recordJ);
                     } else {
-                        console.log(record);
+                        this.pushConsole(record);
                     }
                 } else {
                     if (text.mode === 'n') {
-                        console.log(giraffe.broadcastCount(), recordJ);
+                        this.pushConsole(giraffe.broadcastCount(), recordJ);
                     } else {
-                        console.log(giraffe.broadcastCount(), record);
+                        this.pushConsole(giraffe.broadcastCount(), record);
                     }
                 }
             });
+    }
+
+    public pushConsole(...args: string[]) {
+        console.log(
+            ...args.map((arg) => arg.replace(/<span (class="?([\w-_]+)?"?)?>(.*?)<\/span>/g, '$3'))
+        );
     }
 
     /**
      * Async logging.
      * @param fn
      */
-    async(fn: () => void) {
-        if (!this.game.console) {
+    public async(fn: () => void) {
+        if (!(this.game && this.game.console)) {
             setTimeout(fn, 100);
         }
     }
@@ -409,7 +419,7 @@ class Log {
      * @param success - whether base was stolen.
      * @param base - which base?
      */
-    noteStealAttempt(thief: Player, success: boolean, base: base_name_t) {
+    public noteStealAttempt(thief: Player, success: boolean, base: base_name_t) {
         return `${text.space() +
             thief.getName() +
             text.comma() +
@@ -422,7 +432,7 @@ class Log {
      * @param sub - new Player.
      * @param player - Player leaving the field.
      */
-    noteSubstitution(sub: Player, player: Player): void {
+    public noteSubstitution(sub: Player, player: Player): void {
         return this.note(text.substitution(sub, player, 'e'), text.substitution(sub, player, 'n'));
     }
 
@@ -430,7 +440,7 @@ class Log {
      * E.g. "Ichiro reached on a single to right".
      * @param game
      */
-    getPlateAppearanceResult(game: Game): string {
+    public getPlateAppearanceResult(game: Game): string {
         const r = game.swingResult;
         let record = '';
         const batter = game.batter.getName();
@@ -538,7 +548,7 @@ class Log {
      * @see #getPlateAppearanceResult()
      * @param game
      */
-    notePlateAppearanceResult(game: Game): void {
+    public notePlateAppearanceResult(game: Game): void {
         const m = text.mode,
             prevJ = text('Previous: ', 'n'),
             prev = text('Previous: ', 'e');
@@ -566,7 +576,7 @@ class Log {
         const giraffe = this;
         this.async(() => {
             if (text.mode === 'n') {
-                console.log(
+                this.pushConsole(
                     [
                         `%c${resultJ}`,
                         giraffe.broadcastCount(true),
@@ -576,7 +586,7 @@ class Log {
                     'color: darkgreen;'
                 );
             } else {
-                console.log(
+                this.pushConsole(
                     [
                         `%c${result}`,
                         giraffe.broadcastCount(true),

@@ -1,15 +1,23 @@
 import { AbstractMesh } from './AbstractMesh';
+import { Mesh } from 'three';
+import { THREE } from '../../Api/externalRenderer';
+import { Loop } from '../Loop';
+import { handedness_t } from '../../Api/handedness';
 
+/**
+ *
+ * Chalk lines to the left and right.
+ *
+ */
 class FoulLine extends AbstractMesh {
-    constructor(loop, side) {
+    constructor(loop: Loop, public side: handedness_t) {
         super();
-        this.side = side;
         this.getMesh();
         if (loop && loop.loop) {
             this.join(loop);
         }
     }
-    getMesh() {
+    public getMesh(): Mesh {
         const material = new THREE.MeshLambertMaterial({
             color: 0xffffff
         });
@@ -35,7 +43,7 @@ class FoulLine extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {}
+    public animate(): void {}
 }
 
 export { FoulLine };

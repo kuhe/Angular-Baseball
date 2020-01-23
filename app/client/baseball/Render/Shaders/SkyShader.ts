@@ -1,3 +1,5 @@
+import { THREE } from '../../Api/externalRenderer';
+
 /**
  * @author zz85 / https://github.com/zz85
  *
@@ -13,16 +15,15 @@
  *
  * Three.js integration by zz85 http://twitter.com/blurspline
  */
-
 const loadSkyShader = () => {
     THREE.ShaderLib['sky'] = {
         uniforms: {
-            luminance: { type: 'f', value: 1 },
-            turbidity: { type: 'f', value: 2 },
-            reileigh: { type: 'f', value: 1 },
-            mieCoefficient: { type: 'f', value: 0.005 },
-            mieDirectionalG: { type: 'f', value: 0.8 },
-            sunPosition: { type: 'v3', value: new THREE.Vector3() }
+            luminance: { value: 1 },
+            turbidity: { value: 2 },
+            reileigh: { value: 1 },
+            mieCoefficient: { value: 0.005 },
+            mieDirectionalG: { value: 0.8 },
+            sunPosition: { value: new THREE.Vector3() }
         },
 
         vertexShader: [
@@ -238,9 +239,10 @@ const loadSkyShader = () => {
         const skyGeo = new THREE.SphereBufferGeometry(450000, 32, 15);
         const skyMesh = new THREE.Mesh(skyGeo, skyMat);
 
-        // Expose variables
-        this.mesh = skyMesh;
-        this.uniforms = skyUniforms;
+        return {
+            skyMesh,
+            skyUniforms
+        };
     };
 };
 

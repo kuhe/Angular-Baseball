@@ -1,15 +1,22 @@
 import { AbstractMesh } from './AbstractMesh';
+import { THREE } from '../../Api/externalRenderer';
+import { key_base_name_t } from '../../Api/baseName';
+import { Loop } from '../Loop';
+import { Mesh } from 'three';
 
+/**
+ * "Base" ball.
+ */
 class Base extends AbstractMesh {
-    constructor(loop, base) {
+    constructor(loop: Loop, public base: key_base_name_t) {
         super();
-        this.base = base;
         this.getMesh();
         if (loop && loop.loop) {
             this.join(loop);
         }
     }
-    getMesh() {
+
+    public getMesh(): Mesh {
         const material = new THREE.MeshLambertMaterial({
             color: 0xffffff
         });
@@ -45,7 +52,8 @@ class Base extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {}
+
+    public animate(): void {}
 }
 
 export { Base };

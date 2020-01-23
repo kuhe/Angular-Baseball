@@ -2,44 +2,81 @@ import { AbstractMesh } from './AbstractMesh';
 import { Mathinator } from '../../Services/Mathinator';
 import { Indicator } from './Indicator';
 import { helper } from '../../Utility/helper';
-import { VERTICAL_CORRECTION } from './../LoopConstants';
+import { VERTICAL_CORRECTION } from '../LoopConstants';
+import { Loop } from '../Loop';
+import { THREE, VECTOR3 } from '../../Api/externalRenderer';
+import { Game } from '../../Model/Game';
+import { swing_result_t } from '../../Api/swingResult';
+import { pitch_in_flight_t } from '../../Api/pitchInFlight';
+import { pitches_t } from '../../Api/pitches';
+import { degrees_t } from '../../Api/math';
+import { Mesh } from 'three';
 
 /**
  * on the DOM the pitch zone is 200x200 pixels
  * here we scale the strike zone to 4.2 units (feet)
  * for display purposes. It is only approximately related to actual pitch zone dimensions.
- * @type {number}
  */
 const SCALE = 2.1 / 100;
 
 const INDICATOR_DEPTH = -5;
 
+/**
+ * Baseball, that is.
+ */
 class Ball extends AbstractMesh {
+    public static readonly DEFAULT_RPM = 1000;
+    public static readonly RPM = 1000;
+    public static readonly RPS = 1000 / 60;
+    public static readonly RP60thOfASecond = 1000 / 60 / 60;
+    public static readonly rotation = {
+        x: (Ball.RP60thOfASecond * 360 * Math.PI) / 180, // in radians per 60th of a second
+        y: (Ball.RP60thOfASecond * 360 * Math.PI) / 180
+    };
+
+    public airTime: number;
+
+    public RPM: number = 0;
+    public RPS: number = 0;
+    public RP60thOfASecond: number = 0;
+    public rotation: {
+        x: number;
+        y: number;
+    } = {
+        x: 0,
+        y: 0
+    };
+    public hasIndicator = false;
+    public breakingTrajectory: VECTOR3[] = [];
+
+    /**
+     * ensures the ball does not go below the ground plane.
+     */
+    public bounce: 1 | -1 = 1;
+
     /**
      *
      * @param loop
-     * @param trajectory {Array<Vector3>} incremental vectors applied each frame
+     * @param trajectory - incremental vectors applied each frame
      * e.g. for 1 second of flight time there should be 60 incremental vectors
      */
-    constructor(loop, trajectory) {
+    constructor(loop?: Loop | VECTOR3[], public trajectory: VECTOR3[] = []) {
         super();
-        if (!(loop && loop.loop) && loop instanceof Array) {
-            trajectory = loop;
+        if (!(loop && (loop as Loop).loop) && loop instanceof Array) {
+            this.trajectory = loop as VECTOR3[];
         }
-        this.hasIndicator = false;
         this.trajectory = trajectory ? trajectory : [];
-        this.breakingTrajectory = [];
         this.getMesh();
-        if (loop && loop.loop) {
-            this.join(loop);
+        if (loop && (loop as Loop).loop) {
+            this.join(loop as Loop);
         }
         this.setType('4-seam', 1);
         this.bounce = 1;
     }
-    getMesh() {
+
+    public getMesh(): Mesh {
         /** @see threex.sportballs */
         const baseURL = 'public/';
-        const THREE = window.THREE;
         const loader = new THREE.TextureLoader();
         const textureColor = loader.load(`${baseURL}images/BaseballColor.jpg`);
         const textureBump = loader.load(`${baseURL}images/BaseballBump.jpg`);
@@ -57,7 +94,7 @@ class Ball extends AbstractMesh {
      * Leave an indicator when crossing the home plate front plane,
      * and rotate while moving (default 1000 RPM)
      */
-    animate() {
+    public animate(): void {
         const frame = this.trajectory.shift(),
             pos = this.mesh.position;
 
@@ -80,18 +117,30 @@ class Ball extends AbstractMesh {
             this.loop.resetCamera();
         }
     }
-    setType(type, handednessScalar) {
+
+    /**
+     * @param type
+     * @param handednessScalar - inverts for left-handedness, I think.
+     */
+    public setType(type: pitches_t, handednessScalar?: 1 | -1): void {
         const rpm = helper.pitchDefinitions[type][4];
         const rotationAngle = helper.pitchDefinitions[type][3];
         this.setRotation(rpm, rotationAngle * (handednessScalar || 1));
     }
-    rotate() {
+
+    public rotate(): void {
         const rotation = this.rotation;
         const meshRotation = this.mesh.rotation;
         meshRotation.x += rotation.x;
         meshRotation.y += rotation.y;
     }
-    setRotation(rpm, rotationAngle) {
+
+    /**
+     * Look for the seams!
+     * @param rpm
+     * @param rotationAngle
+     */
+    public setRotation(rpm: number, rotationAngle: degrees_t): void {
         this.RPM = rpm;
         this.RPS = this.RPM / 60;
         const rotationalIncrement = (this.RP60thOfASecond = this.RPS / 60);
@@ -114,12 +163,18 @@ class Ball extends AbstractMesh {
             y: (yComponent * 360 * Math.PI) / 180
         };
     }
-    exportPositionTo(mesh) {
+
+    public exportPositionTo(mesh: Mesh): void {
         mesh.position.x = this.mesh.position.x;
         mesh.position.y = this.mesh.position.y;
         mesh.position.z = this.mesh.position.z;
     }
-    spawnIndicator() {
+
+    /**
+     * This leaves a shadow as the ball crosses the strike zone serving
+     * as a pitch location indicator.
+     */
+    public spawnIndicator(): void {
         if (this.hasIndicator) {
             return;
         }
@@ -130,7 +185,12 @@ class Ball extends AbstractMesh {
         indicator.mesh.position.z = this.mesh.position.z;
         indicator.join(this.loop.background);
     }
-    derivePitchingTrajectory(game) {
+
+    /**
+     * @param game
+     * @returns the positional increments for animating a pitch.
+     */
+    public derivePitchingTrajectory(game: Game): VECTOR3[] {
         this.setType(game.pitchInFlight.name, game.pitcher.throws === 'right' ? 1 : -1);
         const top = 200 - game.pitchTarget.y,
             left = game.pitchTarget.x,
@@ -174,8 +234,8 @@ class Ball extends AbstractMesh {
                 z: origin.z
             };
 
-        const frames = [];
-        const breakingFrames = [];
+        const frames: VECTOR3[] = [];
+        const breakingFrames: VECTOR3[] = [];
         const frameCount = (flightTime * 60) | 0;
         let counter = (frameCount * 1.08) | 0;
         let frame = 0;
@@ -184,7 +244,7 @@ class Ball extends AbstractMesh {
             yBreak = breakingTerminus.y - terminus.y;
         const breakingDistance = Math.sqrt(Math.pow(xBreak, 2) + Math.pow(yBreak, 2));
         /**
-         * @type {number} 1.0+, an expression of how late the pitch breaks
+         * 1.0+, an expression of how late the pitch breaks
          */
         const breakingLateness = breakingDistance / (2 * ARC_APPROXIMATION_Y_ADDITIVE) / scale,
             breakingLatenessMomentumExponent = 0.2 + Math.pow(0.45, breakingLateness);
@@ -251,7 +311,13 @@ class Ball extends AbstractMesh {
         this.trajectory = frames;
         return frames;
     }
-    deriveTrajectory(result, pitch) {
+
+    /**
+     * @param result
+     * @param pitch
+     * @returns incremental positions for animating a batted ball.
+     */
+    public deriveTrajectory(result: swing_result_t, pitch: pitch_in_flight_t): VECTOR3[] {
         const dragScalarApproximation = {
             distance: 1,
             apexHeight: 0.57,
@@ -348,10 +414,10 @@ class Ball extends AbstractMesh {
 
         while (counter-- > 0) {
             let y;
-            /** @type {number} 0 to 1. */
-            let progress;
-            /** @type {number} 0 to 100. */
-            let percent;
+            /** 0 to 1. */
+            let progress: number;
+            /** 0 to 100. */
+            let percent: number;
 
             progress = Math.pow(
                 ++frame / frameCount,
@@ -393,13 +459,11 @@ class Ball extends AbstractMesh {
 
                 /**
                  * SIN wave with tapering gives a ground ball the bouncing trajectory.
-                 * @type {number}
                  */
                 y = (startingHeight + apexHeight * waveHeight) * tapering + finalHeight * progress;
             } else {
                 /**
                  * Note the pow(n, 2) gives the flyball a parabolic trajectory.
-                 * @type {number}
                  */
                 y = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 2) * apexHeight;
             }
@@ -417,14 +481,5 @@ class Ball extends AbstractMesh {
         return frames;
     }
 }
-
-Ball.prototype.DEFAULT_RPM = 1000;
-Ball.prototype.RPM = 1000;
-Ball.prototype.RPS = 1000 / 60;
-Ball.prototype.RP60thOfASecond = 1000 / 60 / 60;
-Ball.prototype.rotation = {
-    x: (Ball.prototype.RP60thOfASecond * 360 * Math.PI) / 180, // in radians per 60th of a second
-    y: (Ball.prototype.RP60thOfASecond * 360 * Math.PI) / 180
-};
 
 export { Ball };

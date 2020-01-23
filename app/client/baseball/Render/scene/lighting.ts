@@ -1,5 +1,10 @@
+import { THREE } from '../../Api/externalRenderer';
+import { ratio_t } from '../../Api/math';
+
 const lighting = {
-    addTo(scene) {
+    light: null as THREE.HemisphereLight,
+    sun: null as THREE.DirectionalLight,
+    addTo(scene: THREE.Scene) {
         const light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1.0);
         scene.add(light);
         const sun = new THREE.DirectionalLight(0xffffbb, 0.45);
@@ -8,7 +13,7 @@ const lighting = {
         this.sun = sun;
         scene.add(sun);
     },
-    setLuminosity(level) {
+    setLuminosity(level: ratio_t) {
         this.light.intensity = level;
         this.sun.intensity = level / 2;
     }

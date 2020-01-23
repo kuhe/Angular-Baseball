@@ -1,7 +1,7 @@
-import { Game } from '../Model/Game';
 import { Team } from '../Model/Team';
 import { Player } from '../Model/Player';
-import { Trainer } from '../Teams/Trainer';
+import { Trainer } from './Trainer';
+import { fielder_short_name_t } from '../Api/fielderShortName';
 
 const samurai = new Team('no init');
 samurai.name = 'Japan';
@@ -170,7 +170,9 @@ samurai.positions = {
 
 for (const position in samurai.positions) {
     if (samurai.positions.hasOwnProperty(position)) {
-        samurai.positions[position].position = position;
+        samurai.positions[
+            position as fielder_short_name_t
+        ].position = position as fielder_short_name_t;
     }
 }
 

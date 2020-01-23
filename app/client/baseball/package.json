@@ -7,11 +7,15 @@
   "main": "dist/baseball.bundle.js",
   "scripts": {
     "test": "node test/CareerSpec.js",
-    "build": "npx webpack",
+    "build": "npx webpack --mode production",
     "watch": "npx webpack --watch --mode development"
   },
   "author": "George Fu (george.jing.fu@gmail.com)",
   "license": "UNLICENSED",
+  "dependencies": {
+    "gsap": "3.0.4",
+    "three": "0.112.1"
+  },
   "devDependencies": {
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.5",

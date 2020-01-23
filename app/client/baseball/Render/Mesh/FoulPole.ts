@@ -1,15 +1,18 @@
 import { AbstractMesh } from './AbstractMesh';
+import { Loop } from '../Loop';
+import { handedness_t } from '../../Api/handedness';
+import { Mesh } from 'three';
+import { THREE } from '../../Api/externalRenderer';
 
 class FoulPole extends AbstractMesh {
-    constructor(loop, side) {
+    constructor(loop: Loop, public side: handedness_t) {
         super();
-        this.side = side;
         this.getMesh();
         if (loop && loop.loop) {
             this.join(loop);
         }
     }
-    getMesh() {
+    public getMesh(): Mesh {
         const material = new THREE.MeshLambertMaterial({
             color: 0xe3ef6e
         });
@@ -30,7 +33,7 @@ class FoulPole extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {}
+    public animate(): void {}
 }
 
 export { FoulPole };

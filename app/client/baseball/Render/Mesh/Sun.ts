@@ -1,7 +1,29 @@
 import { AbstractMesh } from './AbstractMesh';
+import { Loop } from '../Loop';
+import { Mesh } from 'three';
+import { THREE } from '../../Api/externalRenderer';
+import { Sky } from './Sky';
 
+/**
+ *
+ * Big Sol.
+ *
+ */
 class Sun extends AbstractMesh {
-    constructor(loop) {
+    /**
+     * The time of day that the sun should animate toward.
+     * Affects light levels.
+     */
+    public targetTime: {
+        h: number;
+        m: number;
+    };
+    public time: {
+        h: number;
+        m: number;
+    };
+
+    constructor(loop?: Loop) {
         super();
         this.getMesh();
         if (loop && loop.loop) {
@@ -16,11 +38,13 @@ class Sun extends AbstractMesh {
             m: 0
         };
     }
-    setTargetTime(hours, minutes) {
+
+    public setTargetTime(hours: number, minutes: number): void {
         this.targetTime.h = hours;
         this.targetTime.m = minutes;
     }
-    getMesh() {
+
+    public getMesh(): Mesh {
         const sun = new THREE.Mesh(
             new THREE.SphereGeometry(20000, 16, 8),
             new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
@@ -34,10 +58,7 @@ class Sun extends AbstractMesh {
         return this.mesh;
     }
 
-    /**
-     * @param sky Sky
-     */
-    derivePosition(sky) {
+    public derivePosition(sky: Sky): void {
         const distance = 400000;
         const uniforms = sky.uniforms;
 
@@ -54,7 +75,8 @@ class Sun extends AbstractMesh {
 
         sky.uniforms.sunPosition.value.copy(mesh.position);
     }
-    animate() {
+
+    public animate(): void {
         if (this.time.h !== this.targetTime.h || this.time.m !== this.targetTime.m) {
             this.loop.addMinutes(1);
             this.time.m += 1;

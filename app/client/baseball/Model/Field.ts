@@ -8,7 +8,7 @@ import { polar_coordinate_reversed_t } from '../Api/pitchInFlight';
 import { fielder_short_name_t } from '../Api/fielderShortName';
 import { degrees_t, fly_angle_t } from '../Api/math';
 import { player_skill_t } from '../Api/player';
-import { runner_name_t } from '../Api/runnerName';
+import { on_base_runner_name_t, runner_name_t } from '../Api/runnerName';
 
 /**
  * The baseball field tracks the ball's movement, fielders, and what runners are on.
@@ -40,9 +40,9 @@ class Field {
     }
 
     /**
-     * @returns {boolean}
+     * @returns whether any runner is on base.
      */
-    hasRunnersOn() {
+    public hasRunnersOn(): boolean {
         return (
             this.first instanceof Player ||
             this.second instanceof Player ||
@@ -52,9 +52,8 @@ class Field {
 
     /**
      * @param swing
-     * @returns {object}
      */
-    determineSwingContactResult(swing: swing_result_t) {
+    public determineSwingContactResult(swing: swing_result_t): void {
         if (this.first) this.first.fatigue += 4;
         if (this.second) this.second.fatigue += 4;
         if (this.third) this.third.fatigue += 4;
@@ -96,7 +95,6 @@ class Field {
         swing.flyAngle = flyAngle;
         /**
          * the splay for the result is adjusted to 0 being up the middle and negatives being left field
-         * @type {number}
          */
         swing.splay = splayAngle;
         swing.sacrificeAdvances = [];
@@ -124,7 +122,6 @@ class Field {
              * how quickly a fielder reaches a landed ball.
              *
              * Higher is better for the defense.
-             * @type {number}
              */
             const interceptRating =
                 speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.35 - 25;
@@ -311,22 +308,22 @@ class Field {
         }
     }
 
-    forcePlaySituation() {
+    public forcePlaySituation(): false | on_base_runner_name_t {
         const first = this.first,
             second = this.second,
             third = this.third;
         return (
             (first && second && third && 'third') ||
             (first && second && 'second') ||
-            (first && 'first')
+            (first && 'first') ||
+            false
         );
     }
 
     /**
-     * @returns {Player}
-     * the best steal candidate.
+     * @returns the best steal candidate.
      */
-    getLeadRunner() {
+    public getLeadRunner(): Player {
         const first = this.first,
             second = this.second,
             third = this.third;
@@ -345,7 +342,7 @@ class Field {
      * @param flyAngle - roughly -15 to 90
      * @returns fielder covering the play.
      */
-    findFielder(
+    public findFielder(
         splayAngle: degrees_t,
         landingDistance: number,
         power: player_skill_t,
@@ -410,7 +407,10 @@ class Field {
         return fielder;
     }
 
-    getPolarDistance(a: polar_coordinate_reversed_t, b: polar_coordinate_reversed_t) {
+    public getPolarDistance(
+        a: polar_coordinate_reversed_t,
+        b: polar_coordinate_reversed_t
+    ): number {
         return Mathinator.getPolarDistance(a, b);
     }
 }

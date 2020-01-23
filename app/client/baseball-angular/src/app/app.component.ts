@@ -4,10 +4,8 @@ import SocketService from './../services/SocketService';
 import { ModeComponent } from './mode/mode.component';
 
 declare function require(file: string): any;
-const THREE = require('three');
 const TweenMax = require('gsap/TweenMax');
 
-(<any>window).THREE = THREE;
 (<any>window).TweenMax = TweenMax;
 
 const $: any = (<any>window).$;

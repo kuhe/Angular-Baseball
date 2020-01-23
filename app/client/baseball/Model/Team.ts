@@ -13,14 +13,14 @@ class Team {
     public stealAttempt: string = Team.RUNNERS_DISCRETION;
     public lineup: Player[] = [];
     public positions: Record<fielder_short_name_t, Player>;
-    public game: Game = (null as unknown) as Game;
+    public game: Game = null as Game;
     public manager: Manager = new Manager(this);
     public bench: Player[] = [];
     public bullpen: Player[] = [];
     public nowBatting = 0;
     public substituted: Player[] = [];
     public sub: { toString(): string; toValue?(): boolean };
-    public expanded: Player = (null as unknown) as Player;
+    public expanded: Player = null as Player;
 
     public name: string = '';
     public nameJ: string = '';
@@ -42,15 +42,15 @@ class Team {
         this.bench = [];
         this.bullpen = [];
         this.positions = {
-            pitcher: (null as unknown) as Player,
-            catcher: (null as unknown) as Player,
-            first: (null as unknown) as Player,
-            second: (null as unknown) as Player,
-            short: (null as unknown) as Player,
-            third: (null as unknown) as Player,
-            left: (null as unknown) as Player,
-            center: (null as unknown) as Player,
-            right: (null as unknown) as Player
+            pitcher: null as Player,
+            catcher: null as Player,
+            first: null as Player,
+            second: null as Player,
+            short: null as Player,
+            third: null as Player,
+            left: null as Player,
+            center: null as Player,
+            right: null as Player
         };
         if (game !== 'no init') {
             this.game = game;

@@ -325,7 +325,7 @@ class Umpire {
     /**
      * advance the runners (ball in play or walk)
      *
-     * @param isWalk {boolean}
+     * @param isWalk
      * @param fieldersChoice \results in an out to someone other than the batter
      * @param sacrificeAdvances \advances on a sacrifice
      */

@@ -3,9 +3,9 @@
   "compilerOptions": {
     /* Basic Options */
     // "incremental": true,                   /* Enable incremental compilation */
-    "target": "es5",
-    "module": "es2015",
-    "lib": ["dom", "es2015"],
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
     "allowJs": true,
     // "checkJs": true,                       /* Report errors in .js files. */
     // "jsx": "preserve",                     /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */

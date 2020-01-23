@@ -1,15 +1,24 @@
 import { AbstractMesh } from './AbstractMesh';
+import { Loop } from '../Loop';
+import { Mesh } from 'three';
+import { THREE } from '../../Api/externalRenderer';
 
+/**
+ * Green layer on the field.
+ */
 class Grass extends AbstractMesh {
-    constructor(loop, infield) {
+    /**
+     * @param loop
+     * @param infield - whether the grass is for the infield. False = outfield.
+     */
+    constructor(loop?: Loop, public infield?: boolean) {
         super();
-        this.infield = infield;
         this.getMesh();
         if (loop && loop.loop) {
             this.join(loop);
         }
     }
-    getMesh() {
+    public getMesh(): Mesh {
         const material = new THREE.MeshLambertMaterial({
             color: this.infield ? 0x284c19 : 0x284c19 //0x486D1F
         });
@@ -40,7 +49,7 @@ class Grass extends AbstractMesh {
         this.mesh = mesh;
         return this.mesh;
     }
-    animate() {}
+    public animate(): void {}
 }
 
 export { Grass };

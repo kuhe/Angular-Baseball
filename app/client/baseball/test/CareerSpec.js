@@ -25,13 +25,7 @@ const format = (n, digits) => {
     return n;
 };
 
-Game.prototype.console = true;
-Game.prototype.humanControl = 'none';
-
-const game = new Game();
-
-game.console = true;
-game.humanControl = 'none';
+const game = new Game('e', true, 'none');
 
 game.gamesIntoSeason = 144;
 let player, p;

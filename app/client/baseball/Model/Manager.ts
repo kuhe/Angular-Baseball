@@ -89,7 +89,8 @@ class Manager {
 
     /**
      * Select a player from a pool (bench or positions) based on a skillset.
-     * @param pool
+     * @param pool - when selecting from the bench, the player is removed from the bench upon selection.
+     *               when selecting lineup from positions, the player must not be in the lineup.
      * @param skillset
      * @param requiredThrowingHandedness - e.g. lefty for 1B.
      */
@@ -98,11 +99,20 @@ class Manager {
         skillset: string[],
         requiredThrowingHandedness?: handedness_t
     ): Player {
-        if (this.team.bench.length || pool === this.team.positions) {
+        if (pool === this.team.positions) {
+            pool = Object.keys(this.team.positions).map(
+                (pos) => this.team.positions[pos as fielder_short_name_t]
+            );
+        }
+
+        const _pool: Player[] = pool as Player[];
+
+        if (_pool.length) {
             let selection = this.team.bench[0];
             let rating = 0;
             let index = 0;
-            Iterator.each(pool as Player[], (key: number, player: Player) => {
+            let selectedIndex = 0;
+            for (const player of _pool) {
                 const skills = skillset.slice();
                 let cursor: any = player.skill;
                 let property = skills.shift();
@@ -111,20 +121,19 @@ class Manager {
                     property = skills.shift();
                 }
                 if (
-                    !(player.order + 1) &&
+                    player.order === -1 &&
                     cursor >= rating &&
                     (!requiredThrowingHandedness || player.throws === requiredThrowingHandedness)
                 ) {
                     rating = cursor;
                     selection = player;
-                    index = key;
+                    selectedIndex = index;
                 }
-            });
+                index += 1;
+            }
             if (pool === this.team.bench) {
-                delete this.team.bench[index];
-                this.team.bench = this.team.bench.filter(
-                    (player) => player instanceof selection.constructor
-                );
+                delete this.team.bench[selectedIndex];
+                this.team.bench = this.team.bench.filter((player) => player instanceof Player);
             }
             return selection;
         }
@@ -133,7 +142,7 @@ class Manager {
 
     /**
      * used by the AI to substitute a fatigued pitcher
-     * @param {Number} fatigueAllowed
+     * @param fatigueAllowed
      * only execute if the pitcher's fatigue is greater than this number
      */
     public checkPitcherFatigue(fatigueAllowed = 120): void {

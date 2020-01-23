@@ -3,12 +3,12 @@ import { Loop } from '../Render/Loop';
 import { helper } from '../Utility/helper';
 import { INITIAL_CAMERA_DISTANCE } from '../Render/LoopConstants';
 import { ratio_t } from '../Api/math';
-import { THREE_t, TweenMax_t } from '../Api/externalRenderer';
+import { THREE, TweenMax_t } from '../Api/externalRenderer';
 import { Game } from '../Model/Game';
 import { Ball } from '../Render/Mesh/Ball';
 import { pitches_t } from '../Api/pitches';
 import { swing_result_t } from '../Api/swingResult';
-import {strike_zone_coordinate_t} from "../Api/pitchInFlight";
+import { strike_zone_coordinate_t } from '../Api/pitchInFlight';
 
 declare var $: any;
 
@@ -19,7 +19,7 @@ class Animator {
     public static console: boolean;
 
     public static TweenMax: TweenMax_t | null = null;
-    public static THREE: THREE_t | null = null;
+    public static THREE: typeof THREE | null = null;
 
     public static loop: Loop;
     public static background: Loop & {
@@ -92,7 +92,10 @@ class Animator {
     public static updateFlightPath(callback: () => void) {
         if (Animator.console) return;
 
-        return Animator.renderFlightPath(callback, Animator);
+        /**
+         * Note, {this} is bound externally as $scope (Component).
+         */
+        return Animator.renderFlightPath(callback, this);
     }
 
     /**
@@ -227,7 +230,7 @@ class Animator {
         }
         const result = game.swingResult;
 
-        const ball = Animator._ball || new Animator.loop.constructors.Ball();
+        const ball = Animator._ball || new Ball();
         ball.deriveTrajectory(result, game.pitchInFlight);
         ball.join(Animator.loop);
 
