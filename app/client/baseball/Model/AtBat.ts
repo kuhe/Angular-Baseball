@@ -2,8 +2,8 @@ import { Log } from '../Utility/Log';
 
 /**
  *
- * e.g. "HR++" (HR and 2 extra runs), "SO" strikeout, "FO" flyout
- * string formatting encapsulation for an at-bat.
+ * e.g. "HR++" (HR and 2 extra runs), "SO" strikeout, "FO" flyout.
+ * String formatting encapsulation for an at-bat.
  *
  */
 class AtBat {

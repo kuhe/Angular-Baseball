@@ -6,6 +6,12 @@ import { fielder_short_name_t } from '../Api/fielderShortName';
 import { on_base_runner_name_t, runner_name_t } from '../Api/runnerName';
 import { swing_result_t } from '../Api/swingResult';
 
+/**
+ *
+ * In this version of baseball, the umpire is always right.
+ * @todo make the umpire not always right.
+ *
+ */
 class Umpire {
     /**
      * Three strikes and you're out!

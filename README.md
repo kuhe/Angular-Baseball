@@ -22,14 +22,17 @@ todo :
 
     app (development source code)
         / client
-            / baseball : game engine (ES6/ESM)
-                / test : unit (ES6)
-            / baseball-angular : TypeScript/Angular5 rendering front end
+            / baseball : game engine (TypeScript 3.7+)
+                / Model : Object-oriented Baseball ;)
+                / Services : Where most of the interesting math happens
+                / Render : 3D meshes and stuff
+                / test : unit test of the baseball engine
+            / baseball-angular : Angular rendering front end (contains ported legacy code)
             / baseball-frontend : Possible WIP for a thinner Preact front end
             / styles : less
     matchmaker
-        a Java implementation of the websocket service
-    public (end user runtime)
+        a Java implementation of the websocket head-2-head service
+    public (end user runtime, hosted assets)
         index.html : the home page
 
 
@@ -40,6 +43,13 @@ Install npm somehow.
 Install dependencies in each folder that contains a `package.json` file.
 
     > npm run install
+    
+Run the client application by starting the Angular front end `ng serve`.
+
+To watch for modifications to the baseball engine, run `npm run watch` in `app/client/baseball` as well.
+
+If you opt for a full build, e.g. `make deploy`, you can run `make serve` in the repository
+root to run the productionized version.
 
 ## Test development
 
@@ -72,4 +82,8 @@ This project was developed unironically on Microsoft Windows, and sometimes on M
 - 2016 or thereabouts, modified the rendering engine to use WebGL instead of just CSS.
 - Wrote nodejs and Java versions of a live-play matchmaking back end.
 - 2018 or so, upgraded to Angular 2+ (8)
-- 2020, planned migration to TypeScript (baseball engine) and/or off Angular (front end).
+- 2020, migration to TypeScript (baseball engine)
+
+Future:
+
+- migrate off Angular?

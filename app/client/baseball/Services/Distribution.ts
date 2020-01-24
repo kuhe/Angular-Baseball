@@ -60,6 +60,10 @@ class Distribution {
     }
 
     /**
+     * Selects a pitch location for the AI based on the count.
+     * Higher strikes in the count go for corners,
+     * higher balls in the count go for strikes.
+     *
      * @param count {{strikes: number, balls: number}}
      * @returns strike zone coord.
      */

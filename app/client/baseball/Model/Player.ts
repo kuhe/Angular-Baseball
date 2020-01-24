@@ -642,7 +642,7 @@ class Player {
      * language-sensitive
      * @returns family name.
      */
-    getSurname(): string {
+    public getSurname(): string {
         return text.mode === 'n' ? this.surnameJ : this.surname;
     }
 

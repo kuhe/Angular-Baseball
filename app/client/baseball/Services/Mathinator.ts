@@ -77,7 +77,7 @@ class Mathinator {
      * @param [givenApexHeight] feet
      * @param [givenDistance] in feet
      * @param [givenSplayAngle] where 0 is up the middle and 90 is right foul
-     * @returns
+     * @returns tween values.
      */
     public static transitionalTrajectory(
         percent: number,
@@ -158,8 +158,8 @@ class Mathinator {
     }
 
     /**
-     * @param player
-     * @returns approximately 2 seconds.
+     * @param player - a fielder.
+     * @returns approximately 2 seconds, accounting for skills.
      */
     public static infieldThrowDelay(player: Player): number {
         const fielding = player.skill.defense.fielding,
@@ -215,7 +215,7 @@ class Mathinator {
     /**
      * @param velocityRating - 0-100
      * @param velocityScalar - approx 1
-     * @returns seconds in the air.
+     * @returns seconds in the air for a pitched ball.
      */
     public static getFlightTime(velocityRating: player_skill_t, velocityScalar: number) {
         return (1.3 - (0.6 * (velocityRating + 300)) / 400) / velocityScalar;

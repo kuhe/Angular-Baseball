@@ -6,6 +6,11 @@ import { data, text } from '../Utility/_utils';
 
 import { fielder_short_name_t } from '../Api/fielderShortName';
 
+/**
+ *
+ * A baseball team, tracking the lineup, positions, and bench.
+ *
+ */
 class Team {
     public static readonly RUNNERS_DISCRETION = 'runnersDiscretion';
     public static readonly RUNNER_GO = 'go';
@@ -25,6 +30,10 @@ class Team {
     public name: string = '';
     public nameJ: string = '';
 
+    /**
+     * This object stubs the substitute player selection when
+     * none is selected.
+     */
     public noSubstituteSelected = {
         toString() {
             return '';
@@ -63,12 +72,19 @@ class Team {
         }
     }
 
-    pickName() {
+    /**
+     * Select a team name out of the data list.
+     */
+    public pickName() {
         const teamNameIndex = Math.floor(Math.random() * data.teamNames.length);
         this.name = data.teamNames[teamNameIndex];
         this.nameJ = data.teamNamesJ[teamNameIndex];
     }
-    getName() {
+
+    /**
+     * Language specific name.
+     */
+    public getName(): string {
         return text.mode === 'n' ? this.nameJ : this.name;
     }
 }
