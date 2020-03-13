@@ -353,6 +353,7 @@ class Player {
 
             if (typeof skill === 'number') {
                 total += skill;
+                count += 1;
             } else {
                 skill += '';
                 if (!skill) skill = '';

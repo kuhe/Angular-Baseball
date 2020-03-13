@@ -117,7 +117,7 @@ class Loop {
         this.panSpeed = 0.3;
 
         this.objects.forEach((object) => object.animate());
-        //this.breathe();
+        // this.breathe();
         this.renderer.render(this.scene, this.camera);
     }
 
@@ -180,8 +180,9 @@ class Loop {
      * gradual transition
      */
     public setTargetTimeOfDay(hours: number, minutes: number): void {
+        let sun;
         if (this.background) {
-            var sun = this.background.sun;
+            sun = this.background.sun;
         } else {
             sun = this.sun;
         }
@@ -204,9 +205,11 @@ class Loop {
             h: hours,
             m: minutes
         };
+        let sky, sun;
+
         if (this.background) {
-            var sky = this.background.sky,
-                sun = this.background.sun;
+            sky = this.background.sky;
+            sun = this.background.sun;
         } else {
             sky = this.sky;
             sun = this.sun;
@@ -277,9 +280,7 @@ class Loop {
      */
     public breathe(): void {
         const pos = this.camera.position;
-        const x = pos.x,
-            y = pos.y,
-            z = pos.z;
+        const { x, y, z } = pos;
         const rate = 0.0005 * this.bob || 1;
         if (y > 0.6) {
             this.bob = -1;
