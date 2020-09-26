@@ -1076,3 +1076,13 @@ footer {
 .pitch-selection button {
   background: #5d0e10;
 }
+.source-code-link {
+  margin: 1rem 0 0 0;
+}
+.source-code-link > code {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+}
+.source-code-link > code a {
+  background-color: transparent;
+}

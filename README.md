@@ -20,6 +20,8 @@ todo :
 
 ## Code organization
 
+Baseball logic source code root: [app/client/baseball](https://github.com/kuhe/Angular-Baseball/tree/master/app/client/baseball)
+
     app (development source code)
         / client
             / baseball : game engine (TypeScript 3.7+)
