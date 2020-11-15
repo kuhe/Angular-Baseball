@@ -135,18 +135,18 @@ public class Organizer {
     /**
      * Fields keyed by name.
      */
-    private HashMap<@FieldId String, Field> fields = new HashMap<>();
+    private final HashMap<@FieldId String, Field> fields = new HashMap<>();
 
     /**
      * Fields keyed by teamField token.
      */
-    private HashMap<@TeamToken String, Field> locations = new HashMap<>();
+    private final HashMap<@TeamToken String, Field> locations = new HashMap<>();
 
     /**
      * Teams keyed by session id, and inverse.
      */
-    private HashMap<@TeamToken String, String> teamSession = new HashMap<>();
-    private HashMap<String, @TeamToken String> sessionTeam = new HashMap<>();
+    private final HashMap<@TeamToken String, String> teamSession = new HashMap<>();
+    private final HashMap<String, @TeamToken String> sessionTeam = new HashMap<>();
 
 
 }

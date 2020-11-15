@@ -4,6 +4,7 @@
     "career": "make career",
     "serve": "make serve"
   },
+  "license": "UNLICENSED",
   "devDependencies": {
     "prettier": "1.19.1"
   }

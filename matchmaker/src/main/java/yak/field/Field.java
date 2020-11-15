@@ -120,7 +120,8 @@ public class Field extends Pair<@TeamToken String, @TeamToken String> {
 
     public final @FieldId String name;
 
-    public final String toString() {
+    @Override
+    public String toString() {
 
         return MessageFormat.format("field: {0}, away: {1}, home: {2}", name, first, second);
 

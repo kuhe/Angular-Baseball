@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import Baseball from './baseball-lib';
-import SocketService from './../services/SocketService';
 import { ModeComponent } from './mode/mode.component';
 
 declare function require(file: string): any;

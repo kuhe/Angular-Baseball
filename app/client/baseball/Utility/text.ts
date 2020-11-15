@@ -122,7 +122,7 @@ const translations = {
         ' R ': '右打',
         '#': '背番号',
 
-        'Opponent connected': '相手選手見参',
+        'Opponent connected': '対戦相手現参',
         'Click Here': 'ここにクリック',
 
         'Amateur Baseball Club': '野球愛好会',

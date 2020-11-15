@@ -38,6 +38,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
                 .addEndpoint("/match-socks") // SockJS client initializes against this route (Step 1).
                 .setAllowedOrigins(
                         "http://kuhe.github.io",
+                        "https://kuhe.github.io",
+                        "http://localhost:4200",
                         "http://localhost:63342",
                         "*"
                 )

@@ -12,7 +12,7 @@ public class Pitch extends Message {
     /**
      * Where the pitch was aimed or set up, not necessarily where it goes.
      */
-    public class Target {
+    public static class Target {
         public @Coordinate double x;
         public @Coordinate double y;
     }
@@ -20,7 +20,7 @@ public class Pitch extends Message {
     /**
      * Actual pitch position, vs. Target.
      */
-    public class InFlight {
+    public static class InFlight {
 
         public @Rating int velocity;
 

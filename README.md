@@ -40,13 +40,13 @@ Baseball logic source code root: [app/client/baseball](https://github.com/kuhe/A
 
 ## Development
 
-Install npm somehow.
+You'll need `yarn` or `npm`, and a NodeJS runtime.
 
 Install dependencies in each folder that contains a `package.json` file.
 
-    > npm run install
+    > yarn
     
-Run the client application by starting the Angular front end `ng serve`.
+Run the client application by starting the Angular front end `npx ng serve`.
 
 To watch for modifications to the baseball engine, run `npm run watch` in `app/client/baseball` as well.
 
