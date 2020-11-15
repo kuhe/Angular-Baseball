@@ -74,7 +74,7 @@ const SocketService = (function () {
 
         const connect = !!~location.hostname.indexOf('localhost')
             ? 'http://localhost:8080/match-socks'
-            : 'http://kuhe-baseball.us-east-1.elasticbeanstalk.com/match-socks';
+            : 'http://matchmaker.yakyuu-aikoukai.net/match-socks';
 
         const socket = new (<any>window).SockJS(connect);
 
