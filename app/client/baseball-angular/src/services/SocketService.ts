@@ -74,7 +74,7 @@ const SocketService = (function () {
 
         const connect = !!~location.hostname.indexOf('localhost')
             ? 'http://localhost:8080/match-socks'
-            : 'http://matchmaker.yakyuu-aikoukai.net/match-socks';
+            : 'https://d116k8htq7f4sm.cloudfront.net/match-socks';
 
         const socket = new (<any>window).SockJS(connect);
 
