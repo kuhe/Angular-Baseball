@@ -5,9 +5,10 @@ import { ModeComponent } from './mode/mode.component';
 declare function require(file: string): any;
 const TweenMax = require('gsap/TweenMax');
 
-(<any>window).TweenMax = TweenMax;
+const $win95 = window as any;
 
-const $: any = (<any>window).$;
+$win95.TweenMax = TweenMax;
+const $: any = $win95.$;
 
 /**
  *
@@ -19,7 +20,11 @@ const IndexController = function($scope) {
     const text = Baseball.util.text;
     const Game = Baseball.Game;
 
-    (<any>window).s = $scope;
+    if (!~$win95.location.protocol.indexOf('https')) {
+        $win95.location.protocol = 'https:';
+    }
+
+    $win95.s = $scope;
     $scope.t = text;
     $scope.y = new Game();
 
