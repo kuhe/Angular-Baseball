@@ -20,7 +20,8 @@ const IndexController = function($scope) {
     const text = Baseball.util.text;
     const Game = Baseball.Game;
 
-    if (!~$win95.location.protocol.indexOf('https')) {
+    if (!~$win95.location.toString().indexOf('localhost') &&
+        !~$win95.location.protocol.indexOf('https')) {
         $win95.location.protocol = 'https:';
     }
 
