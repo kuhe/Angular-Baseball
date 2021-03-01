@@ -14,7 +14,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "gsap": "3.0.4",
-    "three": "0.112.1"
+    "three": "0.125.0"
   },
   "devDependencies": {
     "ts-loader": "^6.2.1",
