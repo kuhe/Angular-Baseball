@@ -38,7 +38,7 @@
                         <div class='input-area' (click)='indicate($event)'>
 
                         </div>
-                        <div class="target live {{y.stage}}"
+                        <div class="interactive target live {{y.stage}}"
                              [ngClass]='{
                                             batting: y.humanBatting(),
                                             pitching: y.humanPitching()
@@ -82,7 +82,7 @@
                     <div class='centered'>
                         <div class='batter-stats'
                              [ngClass]='{"lefty": y.batter.bats == "left", "righty": y.batter.bats == "right"}'>
-                            <button class='btn small batter-ready'
+                            <button class='btn interactive small batter-ready'
                                     *ngIf='y.batter.bats==="left" && !y.opponentConnected && y.humanBatting()'
                                     [ngClass]='{disabled: !y.batter.ready}'
                                     (click)='y.batterReady(!y.batter.ready)'>
@@ -103,7 +103,7 @@
                                     <span *ngIf='y.batter.hero' class="glyphicon glyphicon-chevron-up"></span>
                                 </span>
                             </section>
-                            <button class='btn small batter-ready'
+                            <button class='btn interactive small batter-ready'
                                     *ngIf='y.batter.bats==="right" && !y.opponentConnected && y.humanBatting()'
                                     [ngClass]='{disabled: !y.batter.ready}'
                                     (click)='y.batterReady(!y.batter.ready)'>

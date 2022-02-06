@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import Baseball from './baseball-lib';
 import { ModeComponent } from './mode/mode.component';
+import {UserIdleDetector} from "../services/UserIdleDetector";
 
 declare function require(file: string): any;
 const TweenMax = require('gsap/TweenMax');
@@ -47,21 +48,23 @@ const IndexController = function($scope) {
 })
 export class AppComponent extends ModeComponent {
     y: any; // {Baseball.model.Game}
-    t: Function;
+    t: (translationString: string) => string;
 
     constructor() {
         super();
         IndexController(this);
         referenceContainer.instance = this;
+        this.idleDetector.start();
     }
 
-    holdUpTimeouts: any[];
+    idleDetector: UserIdleDetector = new UserIdleDetector();
+    holdUpTimeouts: number[];
     begin: boolean;
     expandScoreboard: boolean;
-    updateFlightPath: Function;
+    updateFlightPath:  (callback: () => void) => void;
     allowInput: boolean;
-    holdUp: Function;
-    indicate: Function;
+    holdUp: () => void;
+    indicate: (event: { pageY: number, pageX: number }) => void;
 
     /**
      * Carryover from angular 1 code.

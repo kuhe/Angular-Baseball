@@ -224,6 +224,7 @@ button.btn.disabled {
   pointer-events: auto;
   cursor: auto;
 }
+
 .explanation {
   font-weight: normal;
   margin: 0 auto 2rem;

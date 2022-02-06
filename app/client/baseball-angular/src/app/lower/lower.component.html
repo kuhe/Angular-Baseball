@@ -1,14 +1,14 @@
 <hr class='under-canvas'/>
-<div class='visible-sm visible-xs centered' [innerHTML]=y.log.pitchRecord[mode()][0]>
+<div [innerHTML]=y.log.pitchRecord[mode()][0] class='visible-sm visible-xs centered'>
 </div>
 <!--<div class="umpire centered">-->
 <!--Umpire: {{y.umpire.says}}-->
 <!--</div>-->
 <hr class='visible-sm visible-xs centered'>
-<ul class='centered list-inline pitch-selection' *ngIf='y.humanPitching()'>
-    <li class='pointer' *ngFor='let pitch of y.pitcher.pitching | toIterable;' (click)="selectPitch(pitch.__key)">
+<ul *ngIf='y.humanPitching()' class='centered list-inline pitch-selection'>
+    <li (click)="selectPitch(pitch.__key)" *ngFor='let pitch of y.pitcher.pitching | toIterable;' class='pointer'>
         <span>
-            <button class='pointer btn small' [ngClass]='{disabled: y.pitchInFlight.name !== pitch.__key}'>
+            <button [ngClass]='{disabled: y.pitchInFlight.name !== pitch.__key}' class='interactive pointer btn small'>
                 {{ t(pitch.__key) }}
             </button>
             <br>
@@ -22,8 +22,8 @@
         {{ t('Control') }} / {{ t('Velocity') }} / {{ t('Break') }}
     </li>
 </ul>
-<ul class='centered list-inline pitch-selection' *ngIf='!y.humanPitching()'>
-    <li class='pointer' *ngFor='let pitch of y.pitcher.pitching | toIterable;'>
+<ul *ngIf='!y.humanPitching()' class='centered list-inline pitch-selection'>
+    <li *ngFor='let pitch of y.pitcher.pitching | toIterable;' class='pointer'>
                 <span class='pointer'>
                     {{ t(pitch.__key) }}
                 </span>
@@ -40,44 +40,44 @@
 <hr/>
 <div class='row'>
     <section class='col-xs-12 centered'>
-        <battery-data [y]='y' [t]='t' class='pitcher-data'></battery-data>
+        <battery-data [t]='t' [y]='y' class='pitcher-data'></battery-data>
     </section>
     <section class='col-xs-12'>
-        <div class='col-sm-6' *ngIf='y.half === "bottom"'></div>
-        <batters-data [y]='y' [t]='t' class='batter-data col-sm-6'></batters-data>
-        <div class='col-sm-6' *ngIf='y.half === "top"'></div>
+        <div *ngIf='y.half === "bottom"' class='col-sm-6'></div>
+        <batters-data [t]='t' [y]='y' class='batter-data col-sm-6'></batters-data>
+        <div *ngIf='y.half === "top"' class='col-sm-6'></div>
     </section>
 </div>
 <hr/>
 <div class='block stabilized col-lg-12 hidden-lg hidden-md'>
     <ul class="list-group pitch-record col-xs-6">
-        <li class='list-group-item' *ngFor="let event of y.log.stabilized.pitchRecord[mode()]" [innerHTML]="event">
+        <li *ngFor="let event of y.log.stabilized.pitchRecord[mode()]" [innerHTML]="event" class='list-group-item'>
         </li>
     </ul>
     <ul class="list-group pitch-record col-xs-6">
-        <li class='list-group-item' *ngFor="let event of y.log.stabilized.shortRecord[mode()]" [innerHTML]="event">
+        <li *ngFor="let event of y.log.stabilized.shortRecord[mode()]" [innerHTML]="event" class='list-group-item'>
         </li>
     </ul>
     <hr/>
 </div>
 <div class='clear'></div>
 <div class='col-lg-12 batting-lines'>
-    <ul class='list-group col-lg-6' *ngFor='let team of [y.teams.away, y.teams.home]'
-        [ngClass]='{ click_to_sub: team.sub !== team.noSubstituteSelected }'>
+    <ul *ngFor='let team of [y.teams.away, y.teams.home]' [ngClass]='{ click_to_sub: team.sub !== team.noSubstituteSelected }'
+        class='list-group col-lg-6'>
         <li class='list-group-item team-name'>
             <flag [team]='team'></flag>
             {{team.getName()}}
         </li>
-        <li class='list-group-item pointer lineup' *ngFor="let player of team.lineup"
+        <li (click)='clickLineup(player)' *ngFor="let player of team.lineup"
             [ngClass]='{
-                        at_bat: player.team.lineup.indexOf(player) === player.team.nowBatting
-                    }'
-            (click)='clickLineup(player)'>
+                         at_bat: player.team.lineup.indexOf(player) === player.team.nowBatting
+                       }'
+            class='list-group-item pointer lineup'>
             {{abbreviatePosition(player.position)}}
             <!--<rating-block [rating]='player.defensiveAverage()'></rating-block>-->
             &raquo;
             <strong>{{player.getName()}}</strong>
-            ({{'#'+player.number}})
+            ({{'#' + player.number}})
             <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>
             <em>{{ player.team.lineup.indexOf(player) === player.team.nowBatting ? ' - ' + t('Up to Bat') : ''}}</em>
 
@@ -85,8 +85,8 @@
                         <span class='defining'>
                             {{ player.getDefiningCharacteristic() }}
                         </span>
-                        <span class='action-line' *ngFor='let atBat of player.getAtBats()'
-                              [ngClass]='{beneficial: atBat.beneficial}'>
+                        <span *ngFor='let atBat of player.getAtBats()' [ngClass]='{beneficial: atBat.beneficial}'
+                              class='action-line'>
                             {{ atBat + '' }}
                         </span>
                     </span>
@@ -125,15 +125,18 @@
                 </ul>
                 <hr>
                 <div class='col-xs-12'>
-                            <span>
-                                {{ t('Eye') }} <rating-block [rating]='player.skill.offense.eye'></rating-block>
-                            </span>
                     <span>
-                                {{ t('Power') }} <rating-block [rating]='player.skill.offense.power'></rating-block>
-                            </span>
+                        {{ t('Eye') }}
+                        <rating-block [rating]='player.skill.offense.eye'></rating-block>
+                    </span>
                     <span>
-                                {{ t('Speed') }} <rating-block [rating]='player.skill.offense.speed'></rating-block>
-                            </span>
+                        {{ t('Power') }}
+                        <rating-block [rating]='player.skill.offense.power'></rating-block>
+                    </span>
+                    <span>
+                        {{ t('Speed') }}
+                        <rating-block [rating]='player.skill.offense.speed'></rating-block>
+                    </span>
                 </div>
                 <div class='row'></div>
             </section>
@@ -142,14 +145,14 @@
             <flag [team]='team'></flag>
             {{ team.getName() + t.space() + t('Bench') }}
         </li>
-        <li class='list-group-item pointer bench' *ngFor='let player of team.bench'
-            (click)='selectSubstitute(player)' [ngClass]='{selected_sub: team.sub?.toString() === player.toString()}'>
+        <li (click)='selectSubstitute(player)' *ngFor='let player of team.bench'
+            [ngClass]='{selected_sub: team.sub?.toString() === player.toString()}' class='list-group-item pointer bench'>
             <strong>{{player.getName()}}</strong>
-            ({{'#'+player.number}})
+            ({{'#' + player.number}})
             <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>
             <span class='pull-right'>
                 <!--<span class='col-md-3'>-->
-                    <!--{{ player.stats.batting.getSlash() }}-->
+                <!--{{ player.stats.batting.getSlash() }}-->
                 <!--</span>-->
                 <span class='defining'>
                     {{ player.getDefiningCharacteristic() }}
@@ -157,16 +160,16 @@
             </span>
             <div class='row'></div>
         </li>
-        <li class='list-group-item pointer substituted' *ngFor='let player of team.substituted'>
+        <li *ngFor='let player of team.substituted' class='list-group-item pointer substituted'>
             <strong>{{player.getName()}}</strong>
-            ({{'#'+player.number}})
+            ({{'#' + player.number}})
             <span *ngIf='player.hero' class='glyphicon glyphicon-chevron-up'></span>
             <span class='pull-right'>
                 <span class='defining'>
                     {{ player.getDefiningCharacteristic() }}
                 </span>
-                <span class='action-line' *ngFor='let atBat of player.getAtBats()'
-                      [ngClass]='{beneficial: atBat.beneficial}'>
+                <span *ngFor='let atBat of player.getAtBats()' [ngClass]='{beneficial: atBat.beneficial}'
+                      class='action-line'>
                     {{ atBat + '' }}
                 </span>
                 {{ t('Substituted') }}
@@ -175,20 +178,20 @@
         </li>
     </ul>
 </div>
-<div class='block col-lg-12' *ngIf='y.stage == "end"'>
+<div *ngIf='y.stage == "end"' class='block col-lg-12'>
     <ul class="list-group pitch-record col-xs-12">
-        <li class='list-group-item' *ngFor="let event of y.log.record[mode()]" [innerHTML]="event">
+        <li *ngFor="let event of y.log.record[mode()]" [innerHTML]="event" class='list-group-item'>
         </li>
     </ul>
 </div>
 <hr>
-<section class='difficulty-select col-xs-12' *ngIf='!y.opponentConnected'>
-    <h4 *ngIf='mode() === "e"' (click)='showDifficultySelection = !showDifficultySelection' class='pointer'>
+<section *ngIf='!y.opponentConnected' class='difficulty-select col-xs-12'>
+    <h4 (click)='showDifficultySelection = !showDifficultySelection' *ngIf='mode() === "e"' class='pointer'>
         <a>
             Opponent Selection &raquo;
         </a>
     </h4>
-    <h4 *ngIf='mode() === "n"' (click)='showDifficultySelection = !showDifficultySelection' class='pointer'>
+    <h4 (click)='showDifficultySelection = !showDifficultySelection' *ngIf='mode() === "n"' class='pointer'>
         <a>
             挑戦 &raquo;
         </a>
@@ -198,10 +201,10 @@
             <button (click)='generateTeam(0.03)' class='btn pull-left pointer'>
                 {{ t('Amateur Baseball Club') }}
             </button>
-            <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
+            <div *ngIf='mode() === "e"' class='pull-left difficulty-indicator'>
                 (Easy)
             </div>
-            <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
+            <div *ngIf='mode() === "n"' class='pull-left difficulty-indicator'>
                 （栗鼠）
             </div>
         </div>
@@ -209,10 +212,10 @@
             <button (click)='generateTeam(0.12)' class='btn pull-left pointer'>
                 {{ t('Amateur Baseball Team') }}
             </button>
-            <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
+            <div *ngIf='mode() === "e"' class='pull-left difficulty-indicator'>
                 (Easy)
             </div>
-            <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
+            <div *ngIf='mode() === "n"' class='pull-left difficulty-indicator'>
                 （猫）
             </div>
         </div>
@@ -220,10 +223,10 @@
             <button (click)='generateTeam(0.24)' class='btn pull-left pointer'>
                 {{ t('College Team') }}
             </button>
-            <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
+            <div *ngIf='mode() === "e"' class='pull-left difficulty-indicator'>
                 (Moderate)
             </div>
-            <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
+            <div *ngIf='mode() === "n"' class='pull-left difficulty-indicator'>
                 （馬）
             </div>
         </div>
@@ -231,10 +234,10 @@
             <button (click)='generateTeam(0.48)' class='btn pull-left pointer'>
                 {{ t('Industrial League Team') }}
             </button>
-            <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
+            <div *ngIf='mode() === "e"' class='pull-left difficulty-indicator'>
                 (Hard)
             </div>
-            <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
+            <div *ngIf='mode() === "n"' class='pull-left difficulty-indicator'>
                 （牛）
             </div>
         </div>
@@ -242,10 +245,10 @@
             <button (click)='generateTeam(0.75)' class='btn pull-left pointer'>
                 {{ t('Training Squad') }}
             </button>
-            <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
+            <div *ngIf='mode() === "e"' class='pull-left difficulty-indicator'>
                 (Hard)
             </div>
-            <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
+            <div *ngIf='mode() === "n"' class='pull-left difficulty-indicator'>
                 （象）
             </div>
         </div>
@@ -253,15 +256,15 @@
             <button (click)='teamJapan()' class='btn pull-left pointer'>
                 {{ t('Team Japan') }}
             </button>
-            <div class='pull-left difficulty-indicator' *ngIf='mode() === "e"'>
+            <div *ngIf='mode() === "e"' class='pull-left difficulty-indicator'>
                 (Merciless)
             </div>
-            <div class='pull-left difficulty-indicator' *ngIf='mode() === "n"'>
+            <div *ngIf='mode() === "n"' class='pull-left difficulty-indicator'>
                 （獅子）
             </div>
         </div>
     </div>
 </section>
-<aside class='mousehover' *ngIf='message'>
+<aside *ngIf='message' class='mousehover'>
     {{ message }}
 </aside>

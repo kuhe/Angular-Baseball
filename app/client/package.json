@@ -16,7 +16,7 @@
     "webpack": "4.41.5"
   },
   "engines": {
-    "node": "13",
+    "node": ">=13",
     "npm": "6"
   },
   "scripts": {
