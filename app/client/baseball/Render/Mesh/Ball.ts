@@ -1,16 +1,16 @@
-import { AbstractMesh } from './AbstractMesh';
-import { Mathinator } from '../../Services/Mathinator';
-import { Indicator } from './Indicator';
-import { helper } from '../../Utility/helper';
-import { VERTICAL_CORRECTION } from '../LoopConstants';
-import { Loop } from '../Loop';
-import { THREE, VECTOR3 } from '../../Api/externalRenderer';
-import { Game } from '../../Model/Game';
-import { swing_result_t } from '../../Api/swingResult';
-import { pitch_in_flight_t } from '../../Api/pitchInFlight';
-import { pitches_t } from '../../Api/pitches';
-import { degrees_t } from '../../Api/math';
-import { Mesh } from 'three';
+import {AbstractMesh} from './AbstractMesh';
+import {Mathinator} from '../../Services/Mathinator';
+import {Indicator} from './Indicator';
+import {helper} from '../../Utility/helper';
+import {VERTICAL_CORRECTION} from '../LoopConstants';
+import {Loop} from '../Loop';
+import {THREE, VECTOR3} from '../../Api/externalRenderer';
+import {Game} from '../../Model/Game';
+import {swing_result_t} from '../../Api/swingResult';
+import {pitch_in_flight_t} from '../../Api/pitchInFlight';
+import {pitches_t} from '../../Api/pitches';
+import {degrees_t, feet_t, fps_t, mph_t, ratio_t, seconds_t, splay_t} from '../../Api/math';
+import {Mesh} from 'three';
 
 /**
  * on the DOM the pitch zone is 200x200 pixels
@@ -265,9 +265,9 @@ class Ball extends AbstractMesh {
                 z: origin.z + (breakingTerminus.z - origin.z) * progress
             };
             if (progress > 1) {
-                momentumScalar = 1 - Math.pow(progress, breakingLateness);
+                var momentumScalar = 1 - Math.pow(progress, breakingLateness);
             } else {
-                var momentumScalar = Math.pow(1 - progress, breakingLatenessMomentumExponent);
+                momentumScalar = Math.pow(1 - progress, breakingLatenessMomentumExponent);
             }
             const breakingScalar = 1 - momentumScalar,
                 scalarSum = momentumScalar + breakingScalar;
@@ -303,8 +303,8 @@ class Ball extends AbstractMesh {
 
         let pause = 60;
         while (pause--) {
-            breakingFrames.push({ x: 0, y: 0, z: 0 });
-            frames.push({ x: 0, y: 0, z: 0 });
+            breakingFrames.push({x: 0, y: 0, z: 0});
+            frames.push({x: 0, y: 0, z: 0});
         }
 
         this.breakingTrajectory = breakingFrames;
@@ -320,37 +320,37 @@ class Ball extends AbstractMesh {
     public deriveTrajectory(result: swing_result_t, pitch: pitch_in_flight_t): VECTOR3[] {
         const dragScalarApproximation = {
             distance: 1,
-            apexHeight: 0.57,
+            apexHeight: 0.85,
             airTime: 0.96
         };
+        const feetInMile = 5280;
+        const secondsInHour = 3600;
 
         // a.k.a. launch angle in Baseball terminology.
-        let flyAngle = result.flyAngle;
+        let flyAngle: degrees_t = result.flyAngle;
 
         // distance the ball travels before hitting the ground the first time.
-        let distance = Math.abs(result.travelDistance);
+        let distance: feet_t = Math.abs(result.travelDistance);
+        const useParabolicTrajectory =
+            result.caught || // line or flyout
+            (result.flyAngle > 15 && result.foul) || // air foul
+            (result.bases === 4) // home run
 
-        const scalar = result.travelDistance < 0 ? -1 : 1;
+        const splay: splay_t = result.splay;
 
-        // Using a different scalar for ground balls.
-        const flightScalar = flyAngle < 7 ? -1 : 1;
-        const splay = result.splay;
-
-        if (flightScalar < 0 && result.travelDistance > 0) {
-            switch (true) {
-                case result.fielder in
-                    {
-                        first: 1,
-                        second: 1,
-                        short: 1,
-                        third: 1
-                    }:
-                    // If we're using the ground ball animation trajectory,
-                    // have the rendered travel distance be at least to the
-                    // infield arc if the fielder
-                    // is a non-battery infielder.
-                    distance = Math.max(110, distance);
-                    break;
+        if (!useParabolicTrajectory && result.travelDistance > 0) {
+            const infield = {
+                first: 1,
+                second: 1,
+                short: 1,
+                third: 1
+            };
+            if (result.fielder in infield) {
+                // If we're using the ground ball animation trajectory,
+                // have the rendered travel distance be at least to the
+                // infield arc if the fielder
+                // is a non-battery infielder.
+                distance = Math.max(110, distance);
             }
         }
 
@@ -358,28 +358,51 @@ class Ball extends AbstractMesh {
         if (flyAngle > 90) flyAngle = 180 - flyAngle;
 
         // exit velocity in mph.
-        const velocity =
+        const velocity: fps_t =
             dragScalarApproximation.distance *
-            Math.sqrt((9.81 * distance) / Math.sin((2 * Math.PI * Math.max(flyAngle, 8)) / 180));
-        const velocityVerticalComponent = Math.sin(Mathinator.RADIAN * flyAngle) * velocity;
+            60 + 35 * (1 - Math.abs(flyAngle - 33) / 40)
+            / secondsInHour * feetInMile;
+        const velocityVerticalComponent: fps_t = flyAngle / 90 * velocity;
+        const velocityHorizontalComponent: fps_t = (90 - flyAngle) / 90 * velocity;
 
-        let groundTime = 0;
-
-        // if the ball was caught, stop animation at the landing point.
-        // otherwise, add fielder travel to the tail of the animation as the ball rolls.
-        if (result.fieldingDelay) {
-            groundTime = result.fieldingDelay;
-        }
+        const gravitationAcceleration = 32.185; // feet per second squared.
 
         // in feet
-        const apexHeight =
-            ((velocityVerticalComponent * velocityVerticalComponent) / (2 * 9.81)) *
+        const apexHeight: feet_t =
+            3 + ((velocityVerticalComponent * velocityVerticalComponent) / (2 * gravitationAcceleration)) *
             dragScalarApproximation.apexHeight;
 
-        // in seconds
-        const airTime = 1.5 * Math.sqrt((2 * apexHeight) / 9.81) * dragScalarApproximation.airTime; // 2x freefall equation
+        // free fall equation: dist = 0.5 * gravity * time**2
+        const airTime: seconds_t =
+            2 // 2x freefall equation
+            * Math.sqrt((2 * apexHeight) / gravitationAcceleration) * dragScalarApproximation.airTime;
 
         this.airTime = airTime;
+
+        let timeToTarget: seconds_t;
+
+        if (useParabolicTrajectory) {
+            timeToTarget = airTime;
+        } else {
+            const mphLostPerSecond = 8;
+            const fpsLostPerSecond = mphLostPerSecond / secondsInHour * feetInMile;
+
+            timeToTarget = 0;
+            let cumulativeDistanceToTarget = 0;
+            let speed = velocityHorizontalComponent;
+            while (cumulativeDistanceToTarget < distance) {
+                timeToTarget += Math.max(1, (distance - cumulativeDistanceToTarget) / speed);
+                cumulativeDistanceToTarget += speed;
+                speed = Math.max(speed - fpsLostPerSecond, speed * 0.8);
+            }
+        }
+
+        // debugging point:
+        // by this point we have determined the trajectory parameters but have not yet animated the path
+        console.log('trajectory debug', {
+            flyAngle, distance, velocity, velocityVerticalComponent, velocityHorizontalComponent,
+            apexHeight, timeToTarget
+        });
 
         const scale = SCALE;
 
@@ -400,17 +423,16 @@ class Ball extends AbstractMesh {
         };
 
         const frames = [];
-        let frameCount = (airTime * 60 + groundTime * 20) | 0;
+        let frameCount = (timeToTarget * 60) | 0;
         let counter = frameCount;
         let frame = 0;
 
         let lastHeight = 0;
         let lastWaveDirection = 0;
 
-        // travel rate reduction from hitting the ground.
-        // decreases each bounce.
-        let slow = 1;
         let bounces = 0;
+        const startingHeight = origin.y * scale + AbstractMesh.WORLD_BASE_Y;
+        const endingHeight = result.caught ? startingHeight : AbstractMesh.WORLD_BASE_Y;
 
         while (counter-- > 0) {
             let y;
@@ -425,53 +447,44 @@ class Ball extends AbstractMesh {
             );
             percent = progress * 100;
 
-            // this equation is approximate
-            if (flightScalar < 0) {
-                const currentDistance = progress * distance;
-
-                const tapering = Math.max(0, (100 - bounces * 20) / 100);
-                const startingHeight = origin.y * scale;
-                const finalHeight = AbstractMesh.WORLD_BASE_Y;
-
-                // lets say 3 bounces per 90 feet.
-                // in practice, this effect will be invisible after a certain distance due to
-                // tapering.
-                const averageBounceRate = 3;
-
-                // a map of distance to sine wave position.
-                // the multiplication of bounce rate means that as distance approaches the
-                // final distance, the sine wave will have been traversed that many times, giving that
-                // many bounces.
-                const waveProgress =
-                    (averageBounceRate * Math.pow(currentDistance, 1.1)) / distance;
-                const waveComponent = Math.sin((waveProgress * Math.PI) / 2);
-                const waveHeight = Math.abs(waveComponent);
-
-                if (waveComponent * lastWaveDirection < 0) {
-                    bounces += 1;
-                    slow *= 0.75;
-                    frameCount /= slow;
-                    frameCount |= 0;
-                    frame /= slow;
-                    frame |= 0;
-                }
-                lastWaveDirection = waveComponent;
-
+            if (useParabolicTrajectory) {
                 /**
-                 * SIN wave with tapering gives a ground ball the bouncing trajectory.
-                 */
-                y = (startingHeight + apexHeight * waveHeight) * tapering + finalHeight * progress;
-            } else {
-                /**
+                 * If caught, the ball will not animate a bounce.
                  * Note the pow(n, 2) gives the flyball a parabolic trajectory.
                  */
                 y = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 2) * apexHeight;
+            } else {
+                /**
+                 * If not caught, the ball will bounce initially,
+                 * then roll and stop, depending on the launch angle.
+                 */
+                const currentDistance: feet_t = progress * distance;
+                const timeElapsed: seconds_t = progress * timeToTarget;
+                const waveStrength: ratio_t = Math.pow(0.6, bounces);
+                const currentPotentialHeight: feet_t = apexHeight * waveStrength;
+
+                // s = (1/2)gt²
+                const waveProgress: ratio_t =
+                    Math.abs(0.5 - timeElapsed) - Math.floor(timeElapsed)
+                    // gravitationAcceleration * Math.pow(timeElapsed, 2) / 2
+                    // / currentPotentialHeight;
+                const waveComponent: ratio_t = Math.sin((waveProgress * Math.PI) / 2);
+                const waveHeightRatio: ratio_t = Math.abs(waveComponent);
+
+                if (waveComponent * lastWaveDirection < 0) {
+                    bounces += 1;
+                }
+                lastWaveDirection = waveComponent;
+
+                y = (1 - progress) * startingHeight +
+                    progress * endingHeight +
+                    apexHeight * waveHeightRatio * waveStrength;
             }
 
             frames.push({
-                x: (extrema.x / frameCount) * slow,
+                x: extrema.x / frameCount,
                 y: y - lastHeight,
-                z: (extrema.z / frameCount) * slow
+                z: extrema.z / frameCount
             });
 
             lastHeight = y;
@@ -482,4 +495,4 @@ class Ball extends AbstractMesh {
     }
 }
 
-export { Ball };
+export {Ball};

@@ -5,7 +5,7 @@ import {
 } from '../Api/pitchInFlight';
 import { player_skill_decimal_t, player_skill_t } from '../Api/player';
 import { Player } from '../Model/Player';
-import { degrees_t, fly_angle_t, splay_t } from '../Api/math';
+import {degrees_t, feet_t, fly_angle_t, splay_t} from '../Api/math';
 
 /**
  *
@@ -139,7 +139,7 @@ class Mathinator {
      * @returns seconds taken by the fielder to get the batted ball thrown to a base.
      */
     public static fielderReturnDelay(
-        distance: number,
+        distance: feet_t,
         throwing: player_skill_decimal_t,
         fielding: player_skill_decimal_t,
         intercept: number
@@ -153,8 +153,8 @@ class Mathinator {
                 -240 + // a good intercept rating will cut the base down to 0
             1 -
             (1.8 + fielding * 0.8) + // gather time (up to 1.8s)
-            distanceContribution / (0.5 + throwing / 2)
-        ); // throwing distance (up to 2s)
+            distanceContribution / (0.5 + throwing / 2) // throwing distance (up to 2s)
+        );
     }
 
     /**
@@ -204,11 +204,20 @@ class Mathinator {
 
         pull /= Math.abs(100 / (100 + angle)); // diluted by angle
 
-        let splay = -1.5 * x - (y * angle) / 20 + pull;
+        const splay = -1.5 * x - (y * angle) / 20 + pull;
+
+        const initialFlyAngle = 5 + (-3.5 * y);
+        const flyVerticalScalar = initialFlyAngle > 0 ? 1 : -1;
+        const fly = 30 +
+            flyVerticalScalar * (
+                Math.pow(
+                    0.01 + Math.abs(initialFlyAngle - 30), 0.75
+                )
+            );
 
         return {
             splay,
-            fly: (-3 * y) / ((Math.abs(angle) + 25) / 35) // more difficult to hit a pop fly on a angled bat
+            fly
         };
     }
 

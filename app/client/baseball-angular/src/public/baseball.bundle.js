@@ -2236,13 +2236,13 @@ class Distribution {
      * @param y - batting offset vertical
      * @returns landing distance. 310 is usually considered the outfield fence distance, beyond which is a home run.
      */
-    static landingDistance(power, flyAngle, x, y) {
+    static travelDistance(power, flyAngle, x, y) {
         x = min(5, abs(x) | 0);
         y = min(5, abs(y) | 0);
         const goodContactBonus = 8 - sqrt(x * x + y * y);
-        const scalar = pow(random(), 1 - goodContactBonus * 0.125);
+        const randomScalar = pow(random(), 1 - goodContactBonus * 0.125);
         const staticPowerContribution = power / 300;
-        const randomPowerContribution = (random() * power) / 75;
+        const randomPowerContribution = (random() * power);
         /**
          * The launch angle scalar should ideally be around these values based on flyAngle.
          * 0 -> liner that goes no farther than infield.
@@ -2250,10 +2250,25 @@ class Distribution {
          * 30 to 45 -> any distance
          * over 50 -> risk of pop fly
          */
-        const launchAngleScalar = (1 - abs(flyAngle - 30) / 60) *
-            (1 - ((10 - Math.max(Math.min(10, flyAngle), -10)) / 20) * 0.83);
-        return ((10 + scalar * 320 + staticPowerContribution + randomPowerContribution * 150) *
-            launchAngleScalar);
+        const launchAngleScalar = Math.pow((1 - abs(flyAngle - 30) / 60), 2.5);
+        const initialDistance = ((10 + randomScalar * 320 + staticPowerContribution + randomPowerContribution)
+            * launchAngleScalar);
+        let distance;
+        // if the distance is below 110, an infielder will advance to meet the ball.
+        if (initialDistance < 110) {
+            distance = (initialDistance * 0.25 + 110 * 0.75);
+        }
+        else {
+            distance = initialDistance;
+        }
+        // console.log('distance debug', {
+        //     scalar: randomScalar, staticPowerContribution,
+        //     randomPowerContribution,
+        //     launchAngleScalar,
+        //     initialDistance,
+        //     distance
+        // })
+        return distance;
     }
     /**
      * Selects a pitch location for the AI based on the count.
@@ -2614,7 +2629,8 @@ class Mathinator {
                 -240 + // a good intercept rating will cut the base down to 0
             1 -
             (1.8 + fielding * 0.8) + // gather time (up to 1.8s)
-            distanceContribution / (0.5 + throwing / 2)); // throwing distance (up to 2s)
+            distanceContribution / (0.5 + throwing / 2) // throwing distance (up to 2s)
+        );
     }
     /**
      * @param player - a fielder.
@@ -2651,10 +2667,14 @@ class Mathinator {
         // With this formula, 140ms early will pull the ball by ~50 degrees
         let pull = pullDirection * ((50 / 140) * timing + Math.random() * 10 * (100 / (50 + eye)));
         pull /= Math.abs(100 / (100 + angle)); // diluted by angle
-        let splay = -1.5 * x - (y * angle) / 20 + pull;
+        const splay = -1.5 * x - (y * angle) / 20 + pull;
+        const initialFlyAngle = 5 + (-3.5 * y);
+        const flyVerticalScalar = initialFlyAngle > 0 ? 1 : -1;
+        const fly = 30 +
+            flyVerticalScalar * (Math.pow(0.01 + Math.abs(initialFlyAngle - 30), 0.75));
         return {
             splay,
-            fly: (-3 * y) / ((Math.abs(angle) + 25) / 35) // more difficult to hit a pop fly on a angled bat
+            fly
         };
     }
     /**
@@ -52985,10 +53005,10 @@ class Ball_Ball extends AbstractMesh {
                 z: origin.z + (breakingTerminus.z - origin.z) * progress
             };
             if (progress > 1) {
-                momentumScalar = 1 - Math.pow(progress, breakingLateness);
+                var momentumScalar = 1 - Math.pow(progress, breakingLateness);
             }
             else {
-                var momentumScalar = Math.pow(1 - progress, breakingLatenessMomentumExponent);
+                momentumScalar = Math.pow(1 - progress, breakingLatenessMomentumExponent);
             }
             const breakingScalar = 1 - momentumScalar, scalarSum = momentumScalar + breakingScalar;
             // adjustment toward breaking ball position
@@ -53032,32 +53052,32 @@ class Ball_Ball extends AbstractMesh {
     deriveTrajectory(result, pitch) {
         const dragScalarApproximation = {
             distance: 1,
-            apexHeight: 0.57,
+            apexHeight: 0.85,
             airTime: 0.96
         };
+        const feetInMile = 5280;
+        const secondsInHour = 3600;
         // a.k.a. launch angle in Baseball terminology.
         let flyAngle = result.flyAngle;
         // distance the ball travels before hitting the ground the first time.
         let distance = Math.abs(result.travelDistance);
-        const scalar = result.travelDistance < 0 ? -1 : 1;
-        // Using a different scalar for ground balls.
-        const flightScalar = flyAngle < 7 ? -1 : 1;
+        const useParabolicTrajectory = result.caught || // line or flyout
+            (result.flyAngle > 15 && result.foul) || // air foul
+            (result.bases === 4); // home run
         const splay = result.splay;
-        if (flightScalar < 0 && result.travelDistance > 0) {
-            switch (true) {
-                case result.fielder in
-                    {
-                        first: 1,
-                        second: 1,
-                        short: 1,
-                        third: 1
-                    }:
-                    // If we're using the ground ball animation trajectory,
-                    // have the rendered travel distance be at least to the
-                    // infield arc if the fielder
-                    // is a non-battery infielder.
-                    distance = Math.max(110, distance);
-                    break;
+        if (!useParabolicTrajectory && result.travelDistance > 0) {
+            const infield = {
+                first: 1,
+                second: 1,
+                short: 1,
+                third: 1
+            };
+            if (result.fielder in infield) {
+                // If we're using the ground ball animation trajectory,
+                // have the rendered travel distance be at least to the
+                // infield arc if the fielder
+                // is a non-battery infielder.
+                distance = Math.max(110, distance);
             }
         }
         flyAngle = 1 + Math.abs(flyAngle); // todo why plus 1?
@@ -53065,20 +53085,40 @@ class Ball_Ball extends AbstractMesh {
             flyAngle = 180 - flyAngle;
         // exit velocity in mph.
         const velocity = dragScalarApproximation.distance *
-            Math.sqrt((9.81 * distance) / Math.sin((2 * Math.PI * Math.max(flyAngle, 8)) / 180));
-        const velocityVerticalComponent = Math.sin(Mathinator.RADIAN * flyAngle) * velocity;
-        let groundTime = 0;
-        // if the ball was caught, stop animation at the landing point.
-        // otherwise, add fielder travel to the tail of the animation as the ball rolls.
-        if (result.fieldingDelay) {
-            groundTime = result.fieldingDelay;
-        }
+            60 + 35 * (1 - Math.abs(flyAngle - 33) / 40)
+            / secondsInHour * feetInMile;
+        const velocityVerticalComponent = flyAngle / 90 * velocity;
+        const velocityHorizontalComponent = (90 - flyAngle) / 90 * velocity;
+        const gravitationAcceleration = 32.185; // feet per second squared.
         // in feet
-        const apexHeight = ((velocityVerticalComponent * velocityVerticalComponent) / (2 * 9.81)) *
+        const apexHeight = 3 + ((velocityVerticalComponent * velocityVerticalComponent) / (2 * gravitationAcceleration)) *
             dragScalarApproximation.apexHeight;
-        // in seconds
-        const airTime = 1.5 * Math.sqrt((2 * apexHeight) / 9.81) * dragScalarApproximation.airTime; // 2x freefall equation
+        // free fall equation: dist = 0.5 * gravity * time**2
+        const airTime = 2 // 2x freefall equation
+            * Math.sqrt((2 * apexHeight) / gravitationAcceleration) * dragScalarApproximation.airTime;
         this.airTime = airTime;
+        let timeToTarget;
+        if (useParabolicTrajectory) {
+            timeToTarget = airTime;
+        }
+        else {
+            const mphLostPerSecond = 8;
+            const fpsLostPerSecond = mphLostPerSecond / secondsInHour * feetInMile;
+            timeToTarget = 0;
+            let cumulativeDistanceToTarget = 0;
+            let speed = velocityHorizontalComponent;
+            while (cumulativeDistanceToTarget < distance) {
+                timeToTarget += Math.max(1, (distance - cumulativeDistanceToTarget) / speed);
+                cumulativeDistanceToTarget += speed;
+                speed = Math.max(speed - fpsLostPerSecond, speed * 0.8);
+            }
+        }
+        // debugging point:
+        // by this point we have determined the trajectory parameters but have not yet animated the path
+        console.log('trajectory debug', {
+            flyAngle, distance, velocity, velocityVerticalComponent, velocityHorizontalComponent,
+            apexHeight, timeToTarget
+        });
         const scale = SCALE;
         const origin = {
             x: pitch.x + result.x - 100,
@@ -53094,15 +53134,14 @@ class Ball_Ball extends AbstractMesh {
             z: -Math.cos((splay / 180) * Math.PI) * distance
         };
         const frames = [];
-        let frameCount = (airTime * 60 + groundTime * 20) | 0;
+        let frameCount = (timeToTarget * 60) | 0;
         let counter = frameCount;
         let frame = 0;
         let lastHeight = 0;
         let lastWaveDirection = 0;
-        // travel rate reduction from hitting the ground.
-        // decreases each bounce.
-        let slow = 1;
         let bounces = 0;
+        const startingHeight = origin.y * scale + AbstractMesh.WORLD_BASE_Y;
+        const endingHeight = result.caught ? startingHeight : AbstractMesh.WORLD_BASE_Y;
         while (counter-- > 0) {
             let y;
             /** 0 to 1. */
@@ -53112,47 +53151,40 @@ class Ball_Ball extends AbstractMesh {
             progress = Math.pow(++frame / frameCount, 0.87 // ease out / trend toward 1.0 to simulate higher initial speed.
             );
             percent = progress * 100;
-            // this equation is approximate
-            if (flightScalar < 0) {
-                const currentDistance = progress * distance;
-                const tapering = Math.max(0, (100 - bounces * 20) / 100);
-                const startingHeight = origin.y * scale;
-                const finalHeight = AbstractMesh.WORLD_BASE_Y;
-                // lets say 3 bounces per 90 feet.
-                // in practice, this effect will be invisible after a certain distance due to
-                // tapering.
-                const averageBounceRate = 3;
-                // a map of distance to sine wave position.
-                // the multiplication of bounce rate means that as distance approaches the
-                // final distance, the sine wave will have been traversed that many times, giving that
-                // many bounces.
-                const waveProgress = (averageBounceRate * Math.pow(currentDistance, 1.1)) / distance;
-                const waveComponent = Math.sin((waveProgress * Math.PI) / 2);
-                const waveHeight = Math.abs(waveComponent);
-                if (waveComponent * lastWaveDirection < 0) {
-                    bounces += 1;
-                    slow *= 0.75;
-                    frameCount /= slow;
-                    frameCount |= 0;
-                    frame /= slow;
-                    frame |= 0;
-                }
-                lastWaveDirection = waveComponent;
+            if (useParabolicTrajectory) {
                 /**
-                 * SIN wave with tapering gives a ground ball the bouncing trajectory.
-                 */
-                y = (startingHeight + apexHeight * waveHeight) * tapering + finalHeight * progress;
-            }
-            else {
-                /**
+                 * If caught, the ball will not animate a bounce.
                  * Note the pow(n, 2) gives the flyball a parabolic trajectory.
                  */
                 y = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 2) * apexHeight;
             }
+            else {
+                /**
+                 * If not caught, the ball will bounce initially,
+                 * then roll and stop, depending on the launch angle.
+                 */
+                const currentDistance = progress * distance;
+                const timeElapsed = progress * timeToTarget;
+                const waveStrength = Math.pow(0.6, bounces);
+                const currentPotentialHeight = apexHeight * waveStrength;
+                // s = (1/2)gt²
+                const waveProgress = Math.abs(0.5 - timeElapsed) - Math.floor(timeElapsed);
+                // gravitationAcceleration * Math.pow(timeElapsed, 2) / 2
+                // / currentPotentialHeight;
+                const waveComponent = Math.sin((waveProgress * Math.PI) / 2);
+                const waveHeightRatio = Math.abs(waveComponent);
+                if (waveComponent * lastWaveDirection < 0) {
+                    bounces += 1;
+                }
+                lastWaveDirection = waveComponent;
+                y = (1 - progress) * startingHeight +
+                    progress * endingHeight +
+                    apexHeight * waveHeightRatio * waveStrength;
+            }
             frames.push({
-                x: (extrema.x / frameCount) * slow,
+                x: extrema.x / frameCount,
                 y: y - lastHeight,
-                z: (extrema.z / frameCount) * slow
+                z: extrema.z / frameCount
             });
             lastHeight = y;
         }
@@ -53888,7 +53920,7 @@ class Loop_Loop {
     constructor(elementClass, isBackground) {
         this.elementClass = elementClass;
         this.timeOfDay = {
-            h: 5,
+            h: 12,
             m: 30
         };
         this.overwatchMoveTarget = null;
@@ -53897,7 +53929,7 @@ class Loop_Loop {
         this.onResize = this.onResize.bind(this);
         window.loop = this;
         this.timeOfDay = {
-            h: 5,
+            h: 12,
             m: 30
         };
         this.main(isBackground);
@@ -54537,16 +54569,16 @@ class Model_Field_Field {
         const splayAngle = angles.splay;
         const flyAngle = angles.fly;
         const power = this.game.batter.skill.offense.power + (this.game.batter.eye.bonus || 0) / 5;
-        let landingDistance = Distribution.landingDistance(power, flyAngle, x, y);
-        if (flyAngle < 0 && landingDistance > 95) {
-            landingDistance = (landingDistance - 95) / 4 + 95;
+        let travelDistance = Distribution.travelDistance(power, flyAngle, x, y);
+        if (flyAngle < 0 && travelDistance > 95) {
+            travelDistance = (travelDistance - 95) / 4 + 95;
         }
         if (Math.abs(splayAngle) > 50)
             swing.foul = true;
-        swing.fielder = this.findFielder(splayAngle, landingDistance, power, flyAngle);
+        swing.fielder = this.findFielder(splayAngle, travelDistance, power, flyAngle);
         // previous code was here to bracket the distance based on fielder, but
         // that should have been taken into account by #findFielder()
-        swing.travelDistance = landingDistance;
+        swing.travelDistance = travelDistance;
         swing.flyAngle = flyAngle;
         /**
          * the splay for the result is adjusted to 0 being up the middle and negatives being left field
@@ -54563,7 +54595,7 @@ class Model_Field_Field {
             let fieldingEase = fielder.skill.defense.fielding / 100;
             const throwingEase = fielder.skill.defense.throwing / 100;
             //reach the batted ball?
-            swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle + 90, landingDistance]);
+            swing.fielderTravel = this.getPolarDistance(this.positions[swing.fielder], [splayAngle + 90, travelDistance]);
             const speedComponent = ((1 + Math.sqrt(fielder.skill.defense.speed / 100)) / 2) * 100;
             /**
              * This is an important calculation, since it decides
@@ -54717,7 +54749,7 @@ class Model_Field_Field {
             }
         }
         else {
-            if (Math.abs(splayAngle) < 45 && landingDistance > 300) {
+            if (Math.abs(splayAngle) < 45 && travelDistance > 300) {
                 swing.bases = 4;
             }
             else {
@@ -54752,23 +54784,23 @@ class Model_Field_Field {
     //}
     /**
      * @param splayAngle - -45 to 45.
-     * @param landingDistance - in feet, up to 310 or so
+     * @param travelDistance - in feet, up to 310 or so
      * @param power - 0-100
      * @param flyAngle - roughly -15 to 90
      * @returns fielder covering the play.
      */
-    findFielder(splayAngle, landingDistance, power, flyAngle) {
+    findFielder(splayAngle, travelDistance, power, flyAngle) {
         const angle = splayAngle; // 0 is up the middle, clockwise increasing
         let fielder;
         if (Math.abs(angle) > 50)
             return false; // foul
-        if (landingDistance < 10 && landingDistance > -20) {
+        if (travelDistance < 10 && travelDistance > -20) {
             return 'catcher';
         }
-        else if (landingDistance >= 10 && landingDistance < 45 && angle < 5) {
+        else if (travelDistance >= 10 && travelDistance < 45 && angle < 5) {
             return 'pitcher';
         }
-        let infield = landingDistance < 145 - (Math.abs(angle) / 90) * 50;
+        let infield = travelDistance < 145 - (Math.abs(angle) / 90) * 50;
         if (flyAngle < 7) {
             // 7 degrees straight would fly over the infielder, but add some for arc
             let horizontalVelocity = Math.cos((flyAngle / 180) * Math.PI) * (85 + (power / 100) * 10); // mph toward infielder
@@ -54807,7 +54839,7 @@ class Model_Field_Field {
                 fielder = 'first';
             }
         }
-        else if (landingDistance < 310) {
+        else if (travelDistance < 310) {
             // past the infield or fly ball to outfielder
             if (angle < -15) {
                 fielder = 'left';
@@ -55565,12 +55597,12 @@ class Game_Game {
         this.expectedSwingTiming = 0;
         this.helper = helper;
         this.startTime = {
-            h: (Math.random() * 3 + 11) | 0,
+            h: (Math.random() * 3 + 13) | 0,
             m: (Math.random() * 60) | 0
         };
         this.timeOfDay = {
-            h: 8,
-            m: 0
+            h: 12,
+            m: 45
         }; // @see {Loop} for time initialization.
         /**
          * Socket service for live head-2-head.

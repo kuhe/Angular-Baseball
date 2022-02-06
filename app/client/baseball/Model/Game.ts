@@ -133,12 +133,12 @@ class Game {
     public helper = helper;
 
     public startTime = {
-        h: (Math.random() * 3 + 11) | 0,
+        h: (Math.random() * 3 + 13) | 0,
         m: (Math.random() * 60) | 0
     };
     public timeOfDay = {
-        h: 8,
-        m: 0
+        h: 12,
+        m: 45
     }; // @see {Loop} for time initialization.
 
     /**

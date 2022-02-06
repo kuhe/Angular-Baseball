@@ -6,7 +6,7 @@ import { Game } from './Game';
 import { swing_result_t } from '../Api/swingResult';
 import { polar_coordinate_reversed_t } from '../Api/pitchInFlight';
 import { fielder_short_name_t } from '../Api/fielderShortName';
-import { degrees_t, fly_angle_t } from '../Api/math';
+import {degrees_t, feet_t, fly_angle_t} from '../Api/math';
 import { player_skill_t } from '../Api/player';
 import { on_base_runner_name_t, runner_name_t } from '../Api/runnerName';
 
@@ -80,18 +80,18 @@ class Field {
 
         const flyAngle = angles.fly;
         const power = this.game.batter.skill.offense.power + (this.game.batter.eye.bonus || 0) / 5;
-        let landingDistance = Distribution.landingDistance(power, flyAngle, x, y);
-        if (flyAngle < 0 && landingDistance > 95) {
-            landingDistance = (landingDistance - 95) / 4 + 95;
+        let travelDistance = Distribution.travelDistance(power, flyAngle, x, y);
+        if (flyAngle < 0 && travelDistance > 95) {
+            travelDistance = (travelDistance - 95) / 4 + 95;
         }
 
         if (Math.abs(splayAngle) > 50) swing.foul = true;
-        swing.fielder = this.findFielder(splayAngle, landingDistance, power, flyAngle);
+        swing.fielder = this.findFielder(splayAngle, travelDistance, power, flyAngle);
 
         // previous code was here to bracket the distance based on fielder, but
         // that should have been taken into account by #findFielder()
 
-        swing.travelDistance = landingDistance;
+        swing.travelDistance = travelDistance;
         swing.flyAngle = flyAngle;
         /**
          * the splay for the result is adjusted to 0 being up the middle and negatives being left field
@@ -112,7 +112,7 @@ class Field {
             //reach the batted ball?
             swing.fielderTravel = this.getPolarDistance(
                 this.positions[swing.fielder] as [number, number],
-                [splayAngle + 90, landingDistance]
+                [splayAngle + 90, travelDistance]
             );
             const speedComponent = ((1 + Math.sqrt(fielder.skill.defense.speed / 100)) / 2) * 100;
 
@@ -294,7 +294,7 @@ class Field {
                 }
             }
         } else {
-            if (Math.abs(splayAngle) < 45 && landingDistance > 300) {
+            if (Math.abs(splayAngle) < 45 && travelDistance > 300) {
                 swing.bases = 4;
             } else {
                 swing.foul = true;
@@ -337,14 +337,14 @@ class Field {
 
     /**
      * @param splayAngle - -45 to 45.
-     * @param landingDistance - in feet, up to 310 or so
+     * @param travelDistance - in feet, up to 310 or so
      * @param power - 0-100
      * @param flyAngle - roughly -15 to 90
      * @returns fielder covering the play.
      */
     public findFielder(
         splayAngle: degrees_t,
-        landingDistance: number,
+        travelDistance: feet_t,
         power: player_skill_t,
         flyAngle: fly_angle_t
     ): fielder_short_name_t | false {
@@ -353,13 +353,13 @@ class Field {
         let fielder: fielder_short_name_t | false;
 
         if (Math.abs(angle) > 50) return false; // foul
-        if (landingDistance < 10 && landingDistance > -20) {
+        if (travelDistance < 10 && travelDistance > -20) {
             return 'catcher';
-        } else if (landingDistance >= 10 && landingDistance < 45 && angle < 5) {
+        } else if (travelDistance >= 10 && travelDistance < 45 && angle < 5) {
             return 'pitcher';
         }
 
-        let infield = landingDistance < 145 - (Math.abs(angle) / 90) * 50;
+        let infield = travelDistance < 145 - (Math.abs(angle) / 90) * 50;
         if (flyAngle < 7) {
             // 7 degrees straight would fly over the infielder, but add some for arc
             let horizontalVelocity =
@@ -392,7 +392,7 @@ class Field {
                 // first has reduced arc to receive the throw
                 fielder = 'first';
             }
-        } else if (landingDistance < 310) {
+        } else if (travelDistance < 310) {
             // past the infield or fly ball to outfielder
             if (angle < -15) {
                 fielder = 'left';

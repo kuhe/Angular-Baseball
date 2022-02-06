@@ -2,6 +2,7 @@ import { base_name_t } from './baseName';
 import { strike_zone_coordinate_t } from './pitchInFlight';
 import { fielder_short_name_t } from './fielderShortName';
 import { runner_name_t } from './runnerName';
+import {degrees_t, feet_t, seconds_t, splay_t} from "./math";
 
 /**
  * Describes the result of a pitch, and is poorly named.
@@ -66,17 +67,17 @@ export type swing_result_t = strike_zone_coordinate_t & {
     /**
      * Angle of the bat, not the launch angle.
      */
-    angle: number;
+    angle: degrees_t;
 
     /**
      * a.k.a. launch angle in baseball parlance.
      */
-    flyAngle: number;
+    flyAngle: degrees_t;
 
     /**
      * How far the ball landed.
      */
-    travelDistance: number;
+    travelDistance: feet_t;
 
     /**
      * Which fielder was responsible for fielding the batted ball.
@@ -87,7 +88,7 @@ export type swing_result_t = strike_zone_coordinate_t & {
      * Direction of the batted ball.
      * -45 to 45 degrees where 0 is a hit up the middle and 45 is the first base foul line.
      */
-    splay: number;
+    splay: splay_t;
 
     /**
      * A fielder allowed ROE.
@@ -117,7 +118,7 @@ export type swing_result_t = strike_zone_coordinate_t & {
     /**
      * Distance needed to be covered by fielder on the play.
      */
-    fielderTravel: number;
+    fielderTravel: feet_t;
 
     /**
      * First (possibly only) out on the play.
@@ -143,7 +144,7 @@ export type swing_result_t = strike_zone_coordinate_t & {
      * Time it took for the fielder to gather and throw
      * the ball.
      */
-    fieldingDelay: number;
+    fieldingDelay: seconds_t;
 
     /**
      * Hit by pitch, batter takes first.

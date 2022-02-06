@@ -1,7 +1,7 @@
 import { helper } from '../Utility/helper';
 import { Player } from '../Model/Player';
 import { player_skill_t } from '../Api/player';
-import { fly_angle_t, probability_t, ratio_t } from '../Api/math';
+import {feet_t, fly_angle_t, probability_t, ratio_t} from '../Api/math';
 import { count_t } from '../Api/count';
 import { axis_t, pitch_in_flight_t, strike_zone_coordinate_t } from '../Api/pitchInFlight';
 import { Umpire } from '../Model/Umpire';
@@ -28,7 +28,7 @@ class Distribution {
      * @param y - batting offset vertical
      * @returns landing distance. 310 is usually considered the outfield fence distance, beyond which is a home run.
      */
-    public static landingDistance(
+    public static travelDistance(
         power: player_skill_t,
         flyAngle: fly_angle_t,
         x: number,
@@ -38,9 +38,9 @@ class Distribution {
         y = min(5, abs(y) | 0);
         const goodContactBonus = 8 - sqrt(x * x + y * y);
 
-        const scalar = pow(random(), 1 - goodContactBonus * 0.125);
+        const randomScalar = pow(random(), 1 - goodContactBonus * 0.125);
         const staticPowerContribution = power / 300;
-        const randomPowerContribution = (random() * power) / 75;
+        const randomPowerContribution = (random() * power);
 
         /**
          * The launch angle scalar should ideally be around these values based on flyAngle.
@@ -50,13 +50,31 @@ class Distribution {
          * over 50 -> risk of pop fly
          */
         const launchAngleScalar =
-            (1 - abs(flyAngle - 30) / 60) *
-            (1 - ((10 - Math.max(Math.min(10, flyAngle), -10)) / 20) * 0.83);
+            Math.pow((1 - abs(flyAngle - 30) / 60), 2.5);
 
-        return (
-            (10 + scalar * 320 + staticPowerContribution + randomPowerContribution * 150) *
-            launchAngleScalar
+        const initialDistance: feet_t = (
+            (10 + randomScalar * 320 + staticPowerContribution + randomPowerContribution)
+            * launchAngleScalar
         );
+
+        let distance: feet_t;
+
+        // if the distance is below 110, an infielder will advance to meet the ball.
+        if (initialDistance < 110) {
+            distance = (initialDistance * 0.25 + 110 * 0.75);
+        } else {
+            distance = initialDistance;
+        }
+
+        // console.log('distance debug', {
+        //     scalar: randomScalar, staticPowerContribution,
+        //     randomPowerContribution,
+        //     launchAngleScalar,
+        //     initialDistance,
+        //     distance
+        // })
+
+        return distance;
     }
 
     /**

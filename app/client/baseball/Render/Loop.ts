@@ -53,7 +53,7 @@ class Loop {
     public background: Loop;
     public active: boolean;
     public timeOfDay = {
-        h: 5,
+        h: 12,
         m: 30
     };
     public renderer: WebGLRenderer;
@@ -87,7 +87,7 @@ class Loop {
 
         ((window as unknown) as { loop: Loop }).loop = this;
         this.timeOfDay = {
-            h: 5,
+            h: 12,
             m: 30
         };
         this.main(isBackground);
