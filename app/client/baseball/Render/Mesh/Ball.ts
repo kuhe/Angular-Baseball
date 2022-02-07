@@ -318,54 +318,33 @@ class Ball extends AbstractMesh {
      * @returns incremental positions for animating a batted ball.
      */
     public deriveTrajectory(result: swing_result_t, pitch: pitch_in_flight_t): VECTOR3[] {
-        const dragScalarApproximation = {
-            distance: 1,
-            apexHeight: 0.85,
-            airTime: 0.96
-        };
         const feetInMile = 5280;
         const secondsInHour = 3600;
+
+        const gravitationAcceleration: fpss_t = 32.185; // feet per second squared.
+        const scale = SCALE;
 
         // a.k.a. launch angle in Baseball terminology.
         let flyAngle: degrees_t = result.flyAngle;
 
         // distance the ball travels before hitting the ground the first time.
         let distance: feet_t = Math.abs(result.travelDistance);
-        const useParabolicTrajectory =
-            result.caught || // line or flyout
-            (result.flyAngle > 15 && result.foul) || // air foul
-            result.bases === 4; // home run
 
         const splay: splay_t = result.splay;
 
-        if (!useParabolicTrajectory && result.travelDistance > 0) {
-            const infield = {
-                first: 1,
-                second: 1,
-                short: 1,
-                third: 1
-            };
-            if (result.fielder in infield) {
-                // If we're using the ground ball animation trajectory,
-                // have the rendered travel distance be at least to the
-                // infield arc if the fielder
-                // is a non-battery infielder.
-                distance = Math.max(110, distance);
-            }
+        const infield = {
+            first: 1,
+            second: 1,
+            short: 1,
+            third: 1
+        };
+        if (result.fielder in infield) {
+            // If we're using the ground ball animation trajectory,
+            // have the rendered travel distance be at least to the
+            // infield arc if the fielder
+            // is a non-battery infielder.
+            distance = Math.max(110, distance);
         }
-
-        // exit velocity in mph.
-        const velocity: fps_t =
-            ((dragScalarApproximation.distance * 50 +
-                28 * (1 - Math.abs(flyAngle - 33) / 40) +
-                28 * (distance / 310)) /
-                secondsInHour) *
-            feetInMile;
-        const velocityVerticalComponent: fps_t = (flyAngle / 90) * velocity;
-        const velocityHorizontalComponent: fps_t = ((90 - flyAngle) / 90) * velocity;
-
-        const gravitationAcceleration: fpss_t = 32.185; // feet per second squared.
-        const scale = SCALE;
 
         const origin = {
             x: pitch.x + result.x - 100,
@@ -387,6 +366,16 @@ class Ball extends AbstractMesh {
         const startingHeight = origin.y * scale + AbstractMesh.WORLD_BASE_Y;
         const currentPosition = { ...this.mesh.position };
 
+        const FRAME_CAP = 600;
+        let hasRisen = false;
+        let isFalling = false;
+
+        const velocity: fps_t = this.getVelocity(flyAngle, distance, gravitationAcceleration);
+        const velocityVerticalComponent: fps_t = velocity * Math.sin((flyAngle * Math.PI) / 180);
+        const velocityHorizontalComponent: fps_t = velocity * Math.cos((flyAngle * Math.PI) / 180);
+
+        result.battedBallSpeed = (velocity * secondsInHour) / feetInMile;
+
         const vector: {
             x: fps_t;
             y: fps_t;
@@ -396,10 +385,6 @@ class Ball extends AbstractMesh {
             y: velocityVerticalComponent,
             z: -velocityHorizontalComponent * Math.cos((splay / 180) * Math.PI)
         };
-
-        const FRAME_CAP = 600;
-        let hasRisen = false;
-        let isFalling = false;
 
         while (this.dist2d(origin, currentPosition) < distance && frames.length < FRAME_CAP) {
             const diff = {
@@ -441,6 +426,29 @@ class Ball extends AbstractMesh {
 
     private dist2d(a: VECTOR3, b: VECTOR3): number {
         return ((a.z - b.z) ** 2 + (a.x - b.x) ** 2) ** 0.5;
+    }
+
+    private getVelocity(
+        angle: degrees_t,
+        distance: feet_t,
+        gravitationAcceleration: fpss_t
+    ): fps_t {
+        // projectile motion range equation
+        // distance = 2 * Vx * Vy / g
+        // V = Vx / Math.cos(flyAngle)
+        // V = Vy / Math.sin(flyAngle)
+
+        const velocity = Math.sqrt(
+            Math.abs(
+                (distance /
+                    2 /
+                    Math.cos((angle / 180) * Math.PI) /
+                    Math.sin((angle / 180) * Math.PI)) *
+                    gravitationAcceleration
+            )
+        );
+
+        return velocity;
     }
 }
 

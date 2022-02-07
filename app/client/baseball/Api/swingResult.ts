@@ -2,7 +2,7 @@ import { base_name_t } from './baseName';
 import { axis_t } from './pitchInFlight';
 import { fielder_short_name_t } from './fielderShortName';
 import { runner_name_t } from './runnerName';
-import { degrees_t, feet_t, seconds_t, splay_t } from './math';
+import { degrees_t, feet_t, mph_t, seconds_t, splay_t } from './math';
 
 /**
  * Describes the result of a pitch, and is poorly named.
@@ -88,6 +88,11 @@ export type swing_result_t = {
      * How far the ball landed.
      */
     travelDistance: feet_t;
+
+    /**
+     * Batted ball initial speed.
+     */
+    battedBallSpeed: mph_t;
 
     /**
      * Which fielder was responsible for fielding the batted ball.

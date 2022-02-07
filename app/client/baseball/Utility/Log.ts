@@ -297,6 +297,16 @@ class Log {
         }
     }
 
+    public displayMph(mph: number): string {
+        if (!mph) {
+            return '';
+        }
+        if (text.mode === 'e') {
+            return `${mph | 0}mph. `;
+        }
+        return `時速${(1.60934 * mph) | 0}キロ。`;
+    }
+
     /**
      * Note the result of a swingResult (misnomer, also includes not swinging):
      * strike, ball, foul, or in play. Does not know what the fielding result is yet.
@@ -324,12 +334,18 @@ class Log {
                     result += `<span class="txt-orange">${text('Fouled off.')}</span>`;
                 } else {
                     if (swingResult.caught) {
-                        result += `<span class="txt-blue">${text('In play.')}</span>`;
+                        result += `<span class="txt-blue">${text('In play.')} ${this.displayMph(
+                            swingResult.battedBallSpeed
+                        )}</span>`;
                     } else {
                         if (swingResult.thrownOut) {
-                            result += `<span class="txt-blue">${text('In play.')}</span>`;
+                            result += `<span class="txt-blue">${text('In play.')} ${this.displayMph(
+                                swingResult.battedBallSpeed
+                            )}</span>`;
                         } else {
-                            result += `<span class="txt-blue">${text('In play.')}</span>`;
+                            result += `<span class="txt-blue">${text('In play.')} ${this.displayMph(
+                                swingResult.battedBallSpeed
+                            )}</span>`;
                         }
                     }
                 }

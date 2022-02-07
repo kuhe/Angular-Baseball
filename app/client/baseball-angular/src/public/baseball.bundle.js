@@ -1277,6 +1277,15 @@ class Log_Log {
                 return `${text_text('Runners on')}: ${runners.join(text_text.comma())}${text_text.stop()}`;
         }
     }
+    displayMph(mph) {
+        if (!mph) {
+            return '';
+        }
+        if (text_text.mode === 'e') {
+            return `${mph | 0}mph. `;
+        }
+        return `時速${(1.60934 * mph) | 0}キロ。`;
+    }
     /**
      * Note the result of a swingResult (misnomer, also includes not swinging):
      * strike, ball, foul, or in play. Does not know what the fielding result is yet.
@@ -1304,14 +1313,14 @@ class Log_Log {
                 }
                 else {
                     if (swingResult.caught) {
-                        result += `<span class="txt-blue">${text_text('In play.')}</span>`;
+                        result += `<span class="txt-blue">${text_text('In play.')} ${this.displayMph(swingResult.battedBallSpeed)}</span>`;
                     }
                     else {
                         if (swingResult.thrownOut) {
-                            result += `<span class="txt-blue">${text_text('In play.')}</span>`;
+                            result += `<span class="txt-blue">${text_text('In play.')} ${this.displayMph(swingResult.battedBallSpeed)}</span>`;
                         }
                         else {
-                            result += `<span class="txt-blue">${text_text('In play.')}</span>`;
+                            result += `<span class="txt-blue">${text_text('In play.')} ${this.displayMph(swingResult.battedBallSpeed)}</span>`;
                         }
                     }
                 }
@@ -53056,46 +53065,28 @@ class Ball_Ball extends AbstractMesh {
      * @returns incremental positions for animating a batted ball.
      */
     deriveTrajectory(result, pitch) {
-        const dragScalarApproximation = {
-            distance: 1,
-            apexHeight: 0.85,
-            airTime: 0.96
-        };
         const feetInMile = 5280;
         const secondsInHour = 3600;
+        const gravitationAcceleration = 32.185; // feet per second squared.
+        const scale = SCALE;
         // a.k.a. launch angle in Baseball terminology.
         let flyAngle = result.flyAngle;
         // distance the ball travels before hitting the ground the first time.
         let distance = Math.abs(result.travelDistance);
-        const useParabolicTrajectory = result.caught || // line or flyout
-            (result.flyAngle > 15 && result.foul) || // air foul
-            result.bases === 4; // home run
         const splay = result.splay;
-        if (!useParabolicTrajectory && result.travelDistance > 0) {
-            const infield = {
-                first: 1,
-                second: 1,
-                short: 1,
-                third: 1
-            };
-            if (result.fielder in infield) {
-                // If we're using the ground ball animation trajectory,
-                // have the rendered travel distance be at least to the
-                // infield arc if the fielder
-                // is a non-battery infielder.
-                distance = Math.max(110, distance);
-            }
+        const infield = {
+            first: 1,
+            second: 1,
+            short: 1,
+            third: 1
+        };
+        if (result.fielder in infield) {
+            // If we're using the ground ball animation trajectory,
+            // have the rendered travel distance be at least to the
+            // infield arc if the fielder
+            // is a non-battery infielder.
+            distance = Math.max(110, distance);
         }
-        // exit velocity in mph.
-        const velocity = ((dragScalarApproximation.distance * 50 +
-            28 * (1 - Math.abs(flyAngle - 33) / 40) +
-            28 * (distance / 310)) /
-            secondsInHour) *
-            feetInMile;
-        const velocityVerticalComponent = (flyAngle / 90) * velocity;
-        const velocityHorizontalComponent = ((90 - flyAngle) / 90) * velocity;
-        const gravitationAcceleration = 32.185; // feet per second squared.
-        const scale = SCALE;
         const origin = {
             x: pitch.x + result.x - 100,
             y: pitch.y + result.y - 100,
@@ -53112,14 +53103,18 @@ class Ball_Ball extends AbstractMesh {
         const frames = [];
         const startingHeight = origin.y * scale + AbstractMesh.WORLD_BASE_Y;
         const currentPosition = { ...this.mesh.position };
+        const FRAME_CAP = 600;
+        let hasRisen = false;
+        let isFalling = false;
+        const velocity = this.getVelocity(flyAngle, distance, gravitationAcceleration);
+        const velocityVerticalComponent = velocity * Math.sin((flyAngle * Math.PI) / 180);
+        const velocityHorizontalComponent = velocity * Math.cos((flyAngle * Math.PI) / 180);
+        result.battedBallSpeed = (velocity * secondsInHour) / feetInMile;
         const vector = {
             x: velocityHorizontalComponent * Math.sin((splay / 180) * Math.PI),
             y: velocityVerticalComponent,
             z: -velocityHorizontalComponent * Math.cos((splay / 180) * Math.PI)
         };
-        const FRAME_CAP = 600;
-        let hasRisen = false;
-        let isFalling = false;
         while (this.dist2d(origin, currentPosition) < distance && frames.length < FRAME_CAP) {
             const diff = {
                 x: vector.x / 60,
@@ -53150,6 +53145,18 @@ class Ball_Ball extends AbstractMesh {
     }
     dist2d(a, b) {
         return ((a.z - b.z) ** 2 + (a.x - b.x) ** 2) ** 0.5;
+    }
+    getVelocity(angle, distance, gravitationAcceleration) {
+        // projectile motion range equation
+        // distance = 2 * Vx * Vy / g
+        // V = Vx / Math.cos(flyAngle)
+        // V = Vy / Math.sin(flyAngle)
+        const velocity = Math.sqrt(Math.abs((distance /
+            2 /
+            Math.cos((angle / 180) * Math.PI) /
+            Math.sin((angle / 180) * Math.PI)) *
+            gravitationAcceleration));
+        return velocity;
     }
 }
 Ball_Ball.DEFAULT_RPM = 1000;
@@ -56062,6 +56069,7 @@ class Game_Game {
                 }
             }
             this.log.noteSwing(result);
+            this.sounds(result);
             this.stage = 'pitch';
             const half = this.half;
             this.umpire.makeCall();
@@ -56476,6 +56484,33 @@ class Game_Game {
         if (this.opponentConnected)
             return false;
         return true;
+    }
+    async sounds(result) {
+        if (window && window.document) {
+            const mitt = [
+                document.getElementById('mitt1-sound'),
+                document.getElementById('mitt2-sound')
+            ][(0.5 + Math.random()) | 0];
+            const bat = [
+                document.getElementById('bat1-sound'),
+                document.getElementById('bat2-sound')
+            ][(0.5 + Math.random()) | 0];
+            async function cut(audio) {
+                return new Promise((r) => {
+                    setTimeout(async () => {
+                        await audio.pause();
+                        audio.currentTime = 0;
+                        r();
+                    }, 1000);
+                });
+            }
+            if (result.flyAngle) {
+                await Promise.all([bat.play(), cut(bat)]);
+            }
+            else {
+                await Promise.all([mitt.play(), cut(mitt)]);
+            }
+        }
     }
 }
 

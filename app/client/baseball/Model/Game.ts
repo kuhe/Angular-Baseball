@@ -733,6 +733,8 @@ class Game {
             }
 
             this.log.noteSwing(result);
+            this.sounds(result);
+
             this.stage = 'pitch';
 
             const half = this.half;
@@ -1201,6 +1203,35 @@ class Game {
     public allowSimAtBat(): boolean {
         if (this.opponentConnected) return false;
         return true;
+    }
+
+    private async sounds(result: swing_result_t) {
+        if (window && window.document) {
+            const mitt = [
+                document.getElementById('mitt1-sound'),
+                document.getElementById('mitt2-sound')
+            ][(0.5 + Math.random()) | 0] as HTMLAudioElement;
+            const bat = [
+                document.getElementById('bat1-sound'),
+                document.getElementById('bat2-sound')
+            ][(0.5 + Math.random()) | 0] as HTMLAudioElement;
+
+            async function cut(audio: HTMLAudioElement) {
+                return new Promise((r) => {
+                    setTimeout(async () => {
+                        await audio.pause();
+                        audio.currentTime = 0;
+                        r();
+                    }, 1000);
+                });
+            }
+
+            if (result.flyAngle) {
+                await Promise.all([bat.play(), cut(bat)]);
+            } else {
+                await Promise.all([mitt.play(), cut(mitt)]);
+            }
+        }
     }
 }
 
