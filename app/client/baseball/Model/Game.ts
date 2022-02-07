@@ -1206,7 +1206,7 @@ class Game {
     }
 
     private async sounds(result: swing_result_t) {
-        if (window && window.document) {
+        if (typeof window !== 'undefined' && window.document) {
             const mitt = [
                 document.getElementById('mitt1-sound'),
                 document.getElementById('mitt2-sound')
