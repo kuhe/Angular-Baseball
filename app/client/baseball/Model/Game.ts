@@ -457,19 +457,24 @@ class Game {
         x = (deceptiveX * convergence + x) / convergenceSum;
         y = (deceptiveY * convergence + y) / convergenceSum;
 
-        this.swingResult.x = Distribution.cpuSwing(x, this.pitchInFlight.x, eye);
+        this.swingResult.x = Distribution.cpuSwing(x, this.pitchInFlight.x, eye, true);
         this.swingResult.y = Distribution.cpuSwing(y, this.pitchInFlight.y, eye * 0.75);
 
         this.batter.lastPitchCertainty = certainty;
 
         const swingProbability = Distribution.swingLikelihood(eye, x, y, this.umpire, certainty);
-        if (swingProbability < 100 * Math.random()) {
-            x = -20;
+        if (100 * Math.random() < swingProbability) {
+            (callback || (() => {}))(() => {
+                giraffe.theSwing(
+                    this.pitchInFlight.x + this.swingResult.x,
+                    this.pitchInFlight.y + this.swingResult.y
+                );
+            });
+        } else {
+            (callback || (() => {}))(() => {
+                giraffe.theSwing(-20, -20);
+            });
         }
-
-        (callback || (() => {}))(() => {
-            giraffe.theSwing(x, y);
-        });
     }
 
     /**
@@ -652,8 +657,6 @@ class Game {
 
                     result.x = recalculation.x * precision;
                     result.y = -5 + recalculation.y * precision;
-
-                    //log(recalculation.y, precision);
 
                     result.looking = false;
 

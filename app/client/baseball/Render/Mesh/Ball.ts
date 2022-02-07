@@ -1,16 +1,16 @@
-import {AbstractMesh} from './AbstractMesh';
-import {Mathinator} from '../../Services/Mathinator';
-import {Indicator} from './Indicator';
-import {helper} from '../../Utility/helper';
-import {VERTICAL_CORRECTION} from '../LoopConstants';
-import {Loop} from '../Loop';
-import {THREE, VECTOR3} from '../../Api/externalRenderer';
-import {Game} from '../../Model/Game';
-import {swing_result_t} from '../../Api/swingResult';
-import {pitch_in_flight_t} from '../../Api/pitchInFlight';
-import {pitches_t} from '../../Api/pitches';
-import {degrees_t, feet_t, fps_t, mph_t, ratio_t, seconds_t, splay_t} from '../../Api/math';
-import {Mesh} from 'three';
+import { AbstractMesh } from './AbstractMesh';
+import { Mathinator } from '../../Services/Mathinator';
+import { Indicator } from './Indicator';
+import { helper } from '../../Utility/helper';
+import { VERTICAL_CORRECTION } from '../LoopConstants';
+import { Loop } from '../Loop';
+import { THREE, VECTOR3 } from '../../Api/externalRenderer';
+import { Game } from '../../Model/Game';
+import { swing_result_t } from '../../Api/swingResult';
+import { pitch_in_flight_t } from '../../Api/pitchInFlight';
+import { pitches_t } from '../../Api/pitches';
+import { degrees_t, feet_t, fps_t, fpss_t, splay_t } from '../../Api/math';
+import { Mesh } from 'three';
 
 /**
  * on the DOM the pitch zone is 200x200 pixels
@@ -303,8 +303,8 @@ class Ball extends AbstractMesh {
 
         let pause = 60;
         while (pause--) {
-            breakingFrames.push({x: 0, y: 0, z: 0});
-            frames.push({x: 0, y: 0, z: 0});
+            breakingFrames.push({ x: 0, y: 0, z: 0 });
+            frames.push({ x: 0, y: 0, z: 0 });
         }
 
         this.breakingTrajectory = breakingFrames;
@@ -334,7 +334,7 @@ class Ball extends AbstractMesh {
         const useParabolicTrajectory =
             result.caught || // line or flyout
             (result.flyAngle > 15 && result.foul) || // air foul
-            (result.bases === 4) // home run
+            result.bases === 4; // home run
 
         const splay: splay_t = result.splay;
 
@@ -354,145 +354,94 @@ class Ball extends AbstractMesh {
             }
         }
 
-        flyAngle = 1 + Math.abs(flyAngle); // todo why plus 1?
-        if (flyAngle > 90) flyAngle = 180 - flyAngle;
-
         // exit velocity in mph.
         const velocity: fps_t =
-            dragScalarApproximation.distance *
-            60 + 35 * (1 - Math.abs(flyAngle - 33) / 40)
-            / secondsInHour * feetInMile;
-        const velocityVerticalComponent: fps_t = flyAngle / 90 * velocity;
-        const velocityHorizontalComponent: fps_t = (90 - flyAngle) / 90 * velocity;
+            ((dragScalarApproximation.distance * 50 +
+                28 * (1 - Math.abs(flyAngle - 33) / 40) +
+                28 * (distance / 310)) /
+                secondsInHour) *
+            feetInMile;
+        const velocityVerticalComponent: fps_t = (flyAngle / 90) * velocity;
+        const velocityHorizontalComponent: fps_t = ((90 - flyAngle) / 90) * velocity;
 
-        const gravitationAcceleration = 32.185; // feet per second squared.
-
-        // in feet
-        const apexHeight: feet_t =
-            3 + ((velocityVerticalComponent * velocityVerticalComponent) / (2 * gravitationAcceleration)) *
-            dragScalarApproximation.apexHeight;
-
-        // free fall equation: dist = 0.5 * gravity * time**2
-        const airTime: seconds_t =
-            2 // 2x freefall equation
-            * Math.sqrt((2 * apexHeight) / gravitationAcceleration) * dragScalarApproximation.airTime;
-
-        this.airTime = airTime;
-
-        let timeToTarget: seconds_t;
-
-        if (useParabolicTrajectory) {
-            timeToTarget = airTime;
-        } else {
-            const mphLostPerSecond = 8;
-            const fpsLostPerSecond = mphLostPerSecond / secondsInHour * feetInMile;
-
-            timeToTarget = 0;
-            let cumulativeDistanceToTarget = 0;
-            let speed = velocityHorizontalComponent;
-            while (cumulativeDistanceToTarget < distance) {
-                timeToTarget += Math.max(1, (distance - cumulativeDistanceToTarget) / speed);
-                cumulativeDistanceToTarget += speed;
-                speed = Math.max(speed - fpsLostPerSecond, speed * 0.8);
-            }
-        }
-
-        // debugging point:
-        // by this point we have determined the trajectory parameters but have not yet animated the path
-        console.log('trajectory debug', {
-            flyAngle, distance, velocity, velocityVerticalComponent, velocityHorizontalComponent,
-            apexHeight, timeToTarget
-        });
-
+        const gravitationAcceleration: fpss_t = 32.185; // feet per second squared.
         const scale = SCALE;
 
         const origin = {
             x: pitch.x + result.x - 100,
             y: pitch.y + result.y - 100,
-            z: 0
+            z: -0
+        };
+        const terminal = {
+            x: Math.sin((splay / 180) * Math.PI) * distance,
+            y: AbstractMesh.WORLD_BASE_Y,
+            z: -Math.cos((splay / 180) * Math.PI) * distance
         };
 
         this.mesh.position.x = origin.x * scale;
         this.mesh.position.y = origin.y * scale;
         this.mesh.position.z = origin.z;
 
-        const extrema = {
-            x: Math.sin((splay / 180) * Math.PI) * distance,
-            y: apexHeight,
-            z: -Math.cos((splay / 180) * Math.PI) * distance
+        const frames = [];
+
+        const startingHeight = origin.y * scale + AbstractMesh.WORLD_BASE_Y;
+        const currentPosition = { ...this.mesh.position };
+
+        const vector: {
+            x: fps_t;
+            y: fps_t;
+            z: fps_t;
+        } = {
+            x: velocityHorizontalComponent * Math.sin((splay / 180) * Math.PI),
+            y: velocityVerticalComponent,
+            z: -velocityHorizontalComponent * Math.cos((splay / 180) * Math.PI)
         };
 
-        const frames = [];
-        let frameCount = (timeToTarget * 60) | 0;
-        let counter = frameCount;
-        let frame = 0;
+        const FRAME_CAP = 600;
+        let hasRisen = false;
+        let isFalling = false;
 
-        let lastHeight = 0;
-        let lastWaveDirection = 0;
+        while (this.dist2d(origin, currentPosition) < distance && frames.length < FRAME_CAP) {
+            const diff = {
+                x: vector.x / 60,
+                y: vector.y / 60,
+                z: vector.z / 60
+            };
 
-        let bounces = 0;
-        const startingHeight = origin.y * scale + AbstractMesh.WORLD_BASE_Y;
-        const endingHeight = result.caught ? startingHeight : AbstractMesh.WORLD_BASE_Y;
+            currentPosition.x += diff.x;
+            currentPosition.y += diff.y;
+            currentPosition.z += diff.z;
 
-        while (counter-- > 0) {
-            let y;
-            /** 0 to 1. */
-            let progress: number;
-            /** 0 to 100. */
-            let percent: number;
-
-            progress = Math.pow(
-                ++frame / frameCount,
-                0.87 // ease out / trend toward 1.0 to simulate higher initial speed.
+            vector.x *= 0.999;
+            vector.y = Math.max(
+                vector.y - gravitationAcceleration / 60,
+                isFalling ? -140 : -velocity // terminal falling velocity of a baseball
             );
-            percent = progress * 100;
+            vector.z *= 0.999;
 
-            if (useParabolicTrajectory) {
-                /**
-                 * If caught, the ball will not animate a bounce.
-                 * Note the pow(n, 2) gives the flyball a parabolic trajectory.
-                 */
-                y = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 2) * apexHeight;
-            } else {
-                /**
-                 * If not caught, the ball will bounce initially,
-                 * then roll and stop, depending on the launch angle.
-                 */
-                const currentDistance: feet_t = progress * distance;
-                const timeElapsed: seconds_t = progress * timeToTarget;
-                const waveStrength: ratio_t = Math.pow(0.6, bounces);
-                const currentPotentialHeight: feet_t = apexHeight * waveStrength;
-
-                // s = (1/2)gt²
-                const waveProgress: ratio_t =
-                    Math.abs(0.5 - timeElapsed) - Math.floor(timeElapsed)
-                    // gravitationAcceleration * Math.pow(timeElapsed, 2) / 2
-                    // / currentPotentialHeight;
-                const waveComponent: ratio_t = Math.sin((waveProgress * Math.PI) / 2);
-                const waveHeightRatio: ratio_t = Math.abs(waveComponent);
-
-                if (waveComponent * lastWaveDirection < 0) {
-                    bounces += 1;
-                }
-                lastWaveDirection = waveComponent;
-
-                y = (1 - progress) * startingHeight +
-                    progress * endingHeight +
-                    apexHeight * waveHeightRatio * waveStrength;
+            if (vector.y > 0) {
+                hasRisen = true;
             }
 
-            frames.push({
-                x: extrema.x / frameCount,
-                y: y - lastHeight,
-                z: extrema.z / frameCount
-            });
+            if (hasRisen && vector.y < 0) {
+                isFalling = true;
+            }
 
-            lastHeight = y;
+            if (currentPosition.y <= AbstractMesh.WORLD_BASE_Y) {
+                // velocity lost on bounce redirect.
+                vector.y = -vector.y * 0.66;
+            }
+
+            frames.push(diff);
         }
 
         this.trajectory = frames;
         return frames;
     }
+
+    private dist2d(a: VECTOR3, b: VECTOR3): number {
+        return ((a.z - b.z) ** 2 + (a.x - b.x) ** 2) ** 0.5;
+    }
 }
 
-export {Ball};
+export { Ball };

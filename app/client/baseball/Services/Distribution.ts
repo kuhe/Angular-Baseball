@@ -1,7 +1,7 @@
 import { helper } from '../Utility/helper';
 import { Player } from '../Model/Player';
 import { player_skill_t } from '../Api/player';
-import {feet_t, fly_angle_t, probability_t, ratio_t} from '../Api/math';
+import { feet_t, fly_angle_t, probability_t, ratio_t } from '../Api/math';
 import { count_t } from '../Api/count';
 import { axis_t, pitch_in_flight_t, strike_zone_coordinate_t } from '../Api/pitchInFlight';
 import { Umpire } from '../Model/Umpire';
@@ -40,7 +40,7 @@ class Distribution {
 
         const randomScalar = pow(random(), 1 - goodContactBonus * 0.125);
         const staticPowerContribution = power / 300;
-        const randomPowerContribution = (random() * power);
+        const randomPowerContribution = random() * power;
 
         /**
          * The launch angle scalar should ideally be around these values based on flyAngle.
@@ -50,18 +50,19 @@ class Distribution {
          * over 50 -> risk of pop fly
          */
         const launchAngleScalar =
-            Math.pow((1 - abs(flyAngle - 30) / 60), 2.5);
+            flyAngle > 0
+                ? Math.pow(1 - abs(flyAngle - 30) / 60, 2)
+                : 0.5 * Math.pow(1 - abs(flyAngle) / 90, 2);
 
-        const initialDistance: feet_t = (
-            (10 + randomScalar * 320 + staticPowerContribution + randomPowerContribution)
-            * launchAngleScalar
-        );
+        const initialDistance: feet_t =
+            (10 + randomScalar * 320 + staticPowerContribution + randomPowerContribution) *
+            launchAngleScalar;
 
         let distance: feet_t;
 
         // if the distance is below 110, an infielder will advance to meet the ball.
         if (initialDistance < 110) {
-            distance = (initialDistance * 0.25 + 110 * 0.75);
+            distance = initialDistance * 0.25 + 110 * 0.75;
         } else {
             distance = initialDistance;
         }
@@ -214,9 +215,9 @@ class Distribution {
                 // the planning (guess) component is removed from the swing decision.
 
                 finalSwingLikelihood =
-                    (positionalLikelihood * 20 +
-                        eyeEvaluatedSwingLikelihood * 70 +
-                        abs(certainty) * 10) /
+                    (positionalLikelihood * 0 +
+                        eyeEvaluatedSwingLikelihood * 99 +
+                        abs(certainty) * 0) /
                     100;
             }
         }
@@ -272,11 +273,22 @@ class Distribution {
      * @param target - 0-200
      * @param actual - 0-200
      * @param eye - 0-100
+     * @param timing - whether timing affects the distribution.
      * @returns - 0-200
      */
-    public static cpuSwing(target: axis_t, actual: axis_t, eye: player_skill_t): axis_t {
+    public static cpuSwing(
+        target: axis_t,
+        actual: axis_t,
+        eye: player_skill_t,
+        timing?: boolean
+    ): axis_t {
         eye = min(eye, 100); // higher eye would overcompensate here
-        return 100 + (target - 100) * (0.5 + (random() * eye) / 200) - actual;
+        const targetEyeFactor = (target * random() * eye) / 100;
+        const randomnessFactor = 100 * (random() - 0.5);
+        const timingFactor = timing ? (50 * (400 * (random() - 0.5))) / (100 + eye) : 0;
+        const scalarFactor = 0.85;
+
+        return (targetEyeFactor + randomnessFactor + timingFactor - actual) * scalarFactor;
     }
 
     /**
@@ -294,7 +306,7 @@ class Distribution {
      * @returns a ratio type that decreases swing location disparity for better eye skill.
      */
     public static swing(eye: player_skill_t): ratio_t {
-        return 100 / (eye + 25 + random() * 50);
+        return 1.0 - (eye / 1000 + random());
     }
 
     /**

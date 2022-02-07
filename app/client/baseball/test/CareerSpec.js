@@ -46,10 +46,10 @@ const TERRIBAD = 5,
     GOOD = 65,
     ELITE = 88;
 
-const offense = { eye: ELITE, power: GOOD, speed: ELITE };
-// const offense = player.skill.offense;
-const defense = { fielding: ELITE, throwing: ELITE, catching: ELITE, speed: ELITE };
-// const defense = player.skill.defense;
+// const offense = { eye: ELITE, power: GOOD, speed: ELITE };
+const offense = player.skill.offense;
+// const defense = { fielding: ELITE, throwing: ELITE, catching: ELITE, speed: ELITE };
+const defense = player.skill.defense;
 
 offense.eye += 10;
 offense.power += 10;
@@ -161,7 +161,7 @@ const runSeason = (n) => {
         });
         if (game.stage === 'end') {
             Iterator.each(game.teams.away.positions, (key, player) => {
-                if (key != 'pitcher' && Math.random() > 0.5) {
+                if (key !== 'pitcher' && Math.random() > 0.5) {
                     game.teams.away.positions[key] = p;
                     game.teams.home.positions[key] = p;
                 }

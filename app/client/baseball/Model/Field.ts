@@ -6,7 +6,7 @@ import { Game } from './Game';
 import { swing_result_t } from '../Api/swingResult';
 import { polar_coordinate_reversed_t } from '../Api/pitchInFlight';
 import { fielder_short_name_t } from '../Api/fielderShortName';
-import {degrees_t, feet_t, fly_angle_t} from '../Api/math';
+import { degrees_t, feet_t, fly_angle_t } from '../Api/math';
 import { player_skill_t } from '../Api/player';
 import { on_base_runner_name_t, runner_name_t } from '../Api/runnerName';
 
@@ -124,7 +124,7 @@ class Field {
              * Higher is better for the defense.
              */
             const interceptRating =
-                speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.35 - 25;
+                speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 3.35 - 25;
 
             if (interceptRating > 0 && flyAngle > 10) {
                 //caught cleanly?

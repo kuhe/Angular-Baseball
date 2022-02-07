@@ -1,15 +1,25 @@
 import { base_name_t } from './baseName';
-import { strike_zone_coordinate_t } from './pitchInFlight';
+import { axis_t } from './pitchInFlight';
 import { fielder_short_name_t } from './fielderShortName';
 import { runner_name_t } from './runnerName';
-import {degrees_t, feet_t, seconds_t, splay_t} from "./math";
+import { degrees_t, feet_t, seconds_t, splay_t } from './math';
 
 /**
  * Describes the result of a pitch, and is poorly named.
  * It does not imply that a swing was made by the batter, only that a pitch and reaction
  * occurred.
  */
-export type swing_result_t = strike_zone_coordinate_t & {
+export type swing_result_t = {
+    /**
+     * Swing's x offset. Negative means pulled ball for lefty.
+     */
+    x: axis_t;
+
+    /**
+     * Swing's y offset. Negative means pop fly.
+     */
+    y: axis_t;
+
     /**
      * no swing.
      */

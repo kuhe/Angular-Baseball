@@ -9,6 +9,8 @@ export type mph_t = number;
 
 // feet per second
 export type fps_t = number;
+// feet per second per second
+export type fpss_t = number;
 
 /**
  * -45 to 45, batting splay angle, 0 is up the middle and 45 is first base foul line.

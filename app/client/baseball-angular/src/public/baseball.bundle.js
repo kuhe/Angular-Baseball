@@ -2242,7 +2242,7 @@ class Distribution {
         const goodContactBonus = 8 - sqrt(x * x + y * y);
         const randomScalar = pow(random(), 1 - goodContactBonus * 0.125);
         const staticPowerContribution = power / 300;
-        const randomPowerContribution = (random() * power);
+        const randomPowerContribution = random() * power;
         /**
          * The launch angle scalar should ideally be around these values based on flyAngle.
          * 0 -> liner that goes no farther than infield.
@@ -2250,13 +2250,15 @@ class Distribution {
          * 30 to 45 -> any distance
          * over 50 -> risk of pop fly
          */
-        const launchAngleScalar = Math.pow((1 - abs(flyAngle - 30) / 60), 2.5);
-        const initialDistance = ((10 + randomScalar * 320 + staticPowerContribution + randomPowerContribution)
-            * launchAngleScalar);
+        const launchAngleScalar = flyAngle > 0
+            ? Math.pow(1 - abs(flyAngle - 30) / 60, 2)
+            : 0.5 * Math.pow(1 - abs(flyAngle) / 90, 2);
+        const initialDistance = (10 + randomScalar * 320 + staticPowerContribution + randomPowerContribution) *
+            launchAngleScalar;
         let distance;
         // if the distance is below 110, an infielder will advance to meet the ball.
         if (initialDistance < 110) {
-            distance = (initialDistance * 0.25 + 110 * 0.75);
+            distance = initialDistance * 0.25 + 110 * 0.75;
         }
         else {
             distance = initialDistance;
@@ -2386,9 +2388,9 @@ class Distribution {
                 (eyeEvaluatedSwingLikelihood < planToSwing && !inStrikezone)) {
                 // the planning (guess) component is removed from the swing decision.
                 finalSwingLikelihood =
-                    (positionalLikelihood * 20 +
-                        eyeEvaluatedSwingLikelihood * 70 +
-                        abs(certainty) * 10) /
+                    (positionalLikelihood * 0 +
+                        eyeEvaluatedSwingLikelihood * 99 +
+                        abs(certainty) * 0) /
                         100;
             }
         }
@@ -2431,11 +2433,16 @@ class Distribution {
      * @param target - 0-200
      * @param actual - 0-200
      * @param eye - 0-100
+     * @param timing - whether timing affects the distribution.
      * @returns - 0-200
      */
-    static cpuSwing(target, actual, eye) {
+    static cpuSwing(target, actual, eye, timing) {
         eye = min(eye, 100); // higher eye would overcompensate here
-        return 100 + (target - 100) * (0.5 + (random() * eye) / 200) - actual;
+        const targetEyeFactor = (target * random() * eye) / 100;
+        const randomnessFactor = 100 * (random() - 0.5);
+        const timingFactor = timing ? (50 * (400 * (random() - 0.5))) / (100 + eye) : 0;
+        const scalarFactor = 0.85;
+        return (targetEyeFactor + randomnessFactor + timingFactor - actual) * scalarFactor;
     }
     /**
      * @param x - 0-200.
@@ -2451,7 +2458,7 @@ class Distribution {
      * @returns a ratio type that decreases swing location disparity for better eye skill.
      */
     static swing(eye) {
-        return 100 / (eye + 25 + random() * 50);
+        return 1.0 - (eye / 1000 + random());
     }
     /**
      * @param pitch - from Game pitchInFlight.
@@ -2623,13 +2630,13 @@ class Mathinator {
     static fielderReturnDelay(distance, throwing, fielding, intercept) {
         const distanceContribution = distance / 60;
         return (distanceContribution + // bip distance (up to 3s+)
-            (6 *
-                (distance / 310) * // worst case time to reach the ball,
+            (8 *
+                ((120 + distance) / 310) * // worst case time to reach the ball,
                 Math.min(intercept - 120, 0)) /
                 -240 + // a good intercept rating will cut the base down to 0
             1 -
-            (1.8 + fielding * 0.8) + // gather time (up to 1.8s)
-            distanceContribution / (0.5 + throwing / 2) // throwing distance (up to 2s)
+            (1.8 + (1 / fielding) * 1.8) + // gather time (~3s)
+            distanceContribution / (0.5 + throwing / 2) // throwing distance (~3s)
         );
     }
     /**
@@ -2638,7 +2645,7 @@ class Mathinator {
      */
     static infieldThrowDelay(player) {
         const fielding = player.skill.defense.fielding, throwing = player.skill.defense.throwing;
-        return 3.5 - (fielding + throwing) / 200;
+        return 4.5 - (fielding + throwing) / 200;
     }
     /**
      * @param speed - 0-100
@@ -2665,13 +2672,12 @@ class Mathinator {
         // Let's say that you have a 100ms window in which to hit the ball fair, with an additional 40ms for
         // playing this game interface.
         // With this formula, 140ms early will pull the ball by ~50 degrees
-        let pull = pullDirection * ((50 / 140) * timing + Math.random() * 10 * (100 / (50 + eye)));
+        let pull = pullDirection * ((50 / 140) * timing + 5 * (100 / (50 + eye)));
         pull /= Math.abs(100 / (100 + angle)); // diluted by angle
-        const splay = -1.5 * x - (y * angle) / 20 + pull;
-        const initialFlyAngle = 5 + (-3.5 * y);
+        const splay = -1.75 * x - (y * angle) / 20 + pull;
+        const initialFlyAngle = 5 + -6.5 * y;
         const flyVerticalScalar = initialFlyAngle > 0 ? 1 : -1;
-        const fly = 30 +
-            flyVerticalScalar * (Math.pow(0.01 + Math.abs(initialFlyAngle - 30), 0.75));
+        const fly = 5 + flyVerticalScalar * Math.pow(0.01 + Math.abs(initialFlyAngle - 30), 0.75);
         return {
             splay,
             fly
@@ -53063,7 +53069,7 @@ class Ball_Ball extends AbstractMesh {
         let distance = Math.abs(result.travelDistance);
         const useParabolicTrajectory = result.caught || // line or flyout
             (result.flyAngle > 15 && result.foul) || // air foul
-            (result.bases === 4); // home run
+            result.bases === 4; // home run
         const splay = result.splay;
         if (!useParabolicTrajectory && result.travelDistance > 0) {
             const infield = {
@@ -53080,116 +53086,70 @@ class Ball_Ball extends AbstractMesh {
                 distance = Math.max(110, distance);
             }
         }
-        flyAngle = 1 + Math.abs(flyAngle); // todo why plus 1?
-        if (flyAngle > 90)
-            flyAngle = 180 - flyAngle;
         // exit velocity in mph.
-        const velocity = dragScalarApproximation.distance *
-            60 + 35 * (1 - Math.abs(flyAngle - 33) / 40)
-            / secondsInHour * feetInMile;
-        const velocityVerticalComponent = flyAngle / 90 * velocity;
-        const velocityHorizontalComponent = (90 - flyAngle) / 90 * velocity;
+        const velocity = ((dragScalarApproximation.distance * 50 +
+            28 * (1 - Math.abs(flyAngle - 33) / 40) +
+            28 * (distance / 310)) /
+            secondsInHour) *
+            feetInMile;
+        const velocityVerticalComponent = (flyAngle / 90) * velocity;
+        const velocityHorizontalComponent = ((90 - flyAngle) / 90) * velocity;
         const gravitationAcceleration = 32.185; // feet per second squared.
-        // in feet
-        const apexHeight = 3 + ((velocityVerticalComponent * velocityVerticalComponent) / (2 * gravitationAcceleration)) *
-            dragScalarApproximation.apexHeight;
-        // free fall equation: dist = 0.5 * gravity * time**2
-        const airTime = 2 // 2x freefall equation
-            * Math.sqrt((2 * apexHeight) / gravitationAcceleration) * dragScalarApproximation.airTime;
-        this.airTime = airTime;
-        let timeToTarget;
-        if (useParabolicTrajectory) {
-            timeToTarget = airTime;
-        }
-        else {
-            const mphLostPerSecond = 8;
-            const fpsLostPerSecond = mphLostPerSecond / secondsInHour * feetInMile;
-            timeToTarget = 0;
-            let cumulativeDistanceToTarget = 0;
-            let speed = velocityHorizontalComponent;
-            while (cumulativeDistanceToTarget < distance) {
-                timeToTarget += Math.max(1, (distance - cumulativeDistanceToTarget) / speed);
-                cumulativeDistanceToTarget += speed;
-                speed = Math.max(speed - fpsLostPerSecond, speed * 0.8);
-            }
-        }
-        // debugging point:
-        // by this point we have determined the trajectory parameters but have not yet animated the path
-        console.log('trajectory debug', {
-            flyAngle, distance, velocity, velocityVerticalComponent, velocityHorizontalComponent,
-            apexHeight, timeToTarget
-        });
         const scale = SCALE;
         const origin = {
             x: pitch.x + result.x - 100,
             y: pitch.y + result.y - 100,
-            z: 0
+            z: -0
+        };
+        const terminal = {
+            x: Math.sin((splay / 180) * Math.PI) * distance,
+            y: AbstractMesh.WORLD_BASE_Y,
+            z: -Math.cos((splay / 180) * Math.PI) * distance
         };
         this.mesh.position.x = origin.x * scale;
         this.mesh.position.y = origin.y * scale;
         this.mesh.position.z = origin.z;
-        const extrema = {
-            x: Math.sin((splay / 180) * Math.PI) * distance,
-            y: apexHeight,
-            z: -Math.cos((splay / 180) * Math.PI) * distance
-        };
         const frames = [];
-        let frameCount = (timeToTarget * 60) | 0;
-        let counter = frameCount;
-        let frame = 0;
-        let lastHeight = 0;
-        let lastWaveDirection = 0;
-        let bounces = 0;
         const startingHeight = origin.y * scale + AbstractMesh.WORLD_BASE_Y;
-        const endingHeight = result.caught ? startingHeight : AbstractMesh.WORLD_BASE_Y;
-        while (counter-- > 0) {
-            let y;
-            /** 0 to 1. */
-            let progress;
-            /** 0 to 100. */
-            let percent;
-            progress = Math.pow(++frame / frameCount, 0.87 // ease out / trend toward 1.0 to simulate higher initial speed.
+        const currentPosition = { ...this.mesh.position };
+        const vector = {
+            x: velocityHorizontalComponent * Math.sin((splay / 180) * Math.PI),
+            y: velocityVerticalComponent,
+            z: -velocityHorizontalComponent * Math.cos((splay / 180) * Math.PI)
+        };
+        const FRAME_CAP = 600;
+        let hasRisen = false;
+        let isFalling = false;
+        while (this.dist2d(origin, currentPosition) < distance && frames.length < FRAME_CAP) {
+            const diff = {
+                x: vector.x / 60,
+                y: vector.y / 60,
+                z: vector.z / 60
+            };
+            currentPosition.x += diff.x;
+            currentPosition.y += diff.y;
+            currentPosition.z += diff.z;
+            vector.x *= 0.999;
+            vector.y = Math.max(vector.y - gravitationAcceleration / 60, isFalling ? -140 : -velocity // terminal falling velocity of a baseball
             );
-            percent = progress * 100;
-            if (useParabolicTrajectory) {
-                /**
-                 * If caught, the ball will not animate a bounce.
-                 * Note the pow(n, 2) gives the flyball a parabolic trajectory.
-                 */
-                y = apexHeight - Math.pow(Math.abs(50 - percent) / 50, 2) * apexHeight;
+            vector.z *= 0.999;
+            if (vector.y > 0) {
+                hasRisen = true;
             }
-            else {
-                /**
-                 * If not caught, the ball will bounce initially,
-                 * then roll and stop, depending on the launch angle.
-                 */
-                const currentDistance = progress * distance;
-                const timeElapsed = progress * timeToTarget;
-                const waveStrength = Math.pow(0.6, bounces);
-                const currentPotentialHeight = apexHeight * waveStrength;
-                // s = (1/2)gt²
-                const waveProgress = Math.abs(0.5 - timeElapsed) - Math.floor(timeElapsed);
-                // gravitationAcceleration * Math.pow(timeElapsed, 2) / 2
-                // / currentPotentialHeight;
-                const waveComponent = Math.sin((waveProgress * Math.PI) / 2);
-                const waveHeightRatio = Math.abs(waveComponent);
-                if (waveComponent * lastWaveDirection < 0) {
-                    bounces += 1;
-                }
-                lastWaveDirection = waveComponent;
-                y = (1 - progress) * startingHeight +
-                    progress * endingHeight +
-                    apexHeight * waveHeightRatio * waveStrength;
+            if (hasRisen && vector.y < 0) {
+                isFalling = true;
             }
-            frames.push({
-                x: extrema.x / frameCount,
-                y: y - lastHeight,
-                z: extrema.z / frameCount
-            });
-            lastHeight = y;
+            if (currentPosition.y <= AbstractMesh.WORLD_BASE_Y) {
+                // velocity lost on bounce redirect.
+                vector.y = -vector.y * 0.66;
+            }
+            frames.push(diff);
         }
         this.trajectory = frames;
         return frames;
+    }
+    dist2d(a, b) {
+        return ((a.z - b.z) ** 2 + (a.x - b.x) ** 2) ** 0.5;
     }
 }
 Ball_Ball.DEFAULT_RPM = 1000;
@@ -54604,7 +54564,7 @@ class Model_Field_Field {
              *
              * Higher is better for the defense.
              */
-            const interceptRating = speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 1.35 - 25;
+            const interceptRating = speedComponent * 1.8 + flyAngle * 2.4 - swing.fielderTravel * 3.35 - 25;
             if (interceptRating > 0 && flyAngle > 10) {
                 //caught cleanly?
                 if (Distribution.error(fielder)) {
@@ -55878,16 +55838,20 @@ class Game_Game {
         }
         x = (deceptiveX * convergence + x) / convergenceSum;
         y = (deceptiveY * convergence + y) / convergenceSum;
-        this.swingResult.x = Distribution.cpuSwing(x, this.pitchInFlight.x, eye);
+        this.swingResult.x = Distribution.cpuSwing(x, this.pitchInFlight.x, eye, true);
         this.swingResult.y = Distribution.cpuSwing(y, this.pitchInFlight.y, eye * 0.75);
         this.batter.lastPitchCertainty = certainty;
         const swingProbability = Distribution.swingLikelihood(eye, x, y, this.umpire, certainty);
-        if (swingProbability < 100 * Math.random()) {
-            x = -20;
+        if (100 * Math.random() < swingProbability) {
+            (callback || (() => { }))(() => {
+                giraffe.theSwing(this.pitchInFlight.x + this.swingResult.x, this.pitchInFlight.y + this.swingResult.y);
+            });
         }
-        (callback || (() => { }))(() => {
-            giraffe.theSwing(x, y);
-        });
+        else {
+            (callback || (() => { }))(() => {
+                giraffe.theSwing(-20, -20);
+            });
+        }
     }
     /**
      * variable function for what to do when the batter becomes ready for a pitch (overwritten many times)
@@ -56036,7 +56000,6 @@ class Game_Game {
                     const precision = Distribution.swing(eye);
                     result.x = recalculation.x * precision;
                     result.y = -5 + recalculation.y * precision;
-                    //log(recalculation.y, precision);
                     result.looking = false;
                     if (Math.abs(result.x) < 60 && Math.abs(result.y) < 35 && inTime) {
                         result.contact = true;

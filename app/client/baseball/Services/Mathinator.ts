@@ -5,7 +5,7 @@ import {
 } from '../Api/pitchInFlight';
 import { player_skill_decimal_t, player_skill_t } from '../Api/player';
 import { Player } from '../Model/Player';
-import {degrees_t, feet_t, fly_angle_t, splay_t} from '../Api/math';
+import { degrees_t, feet_t, fly_angle_t, splay_t } from '../Api/math';
 
 /**
  *
@@ -147,13 +147,13 @@ class Mathinator {
         const distanceContribution = distance / 60;
         return (
             distanceContribution + // bip distance (up to 3s+)
-            (6 *
-            (distance / 310) * // worst case time to reach the ball,
+            (8 *
+            ((120 + distance) / 310) * // worst case time to reach the ball,
                 Math.min(intercept - 120, 0)) /
                 -240 + // a good intercept rating will cut the base down to 0
             1 -
-            (1.8 + fielding * 0.8) + // gather time (up to 1.8s)
-            distanceContribution / (0.5 + throwing / 2) // throwing distance (up to 2s)
+            (1.8 + (1 / fielding) * 1.8) + // gather time (~3s)
+            distanceContribution / (0.5 + throwing / 2) // throwing distance (~3s)
         );
     }
 
@@ -164,7 +164,7 @@ class Mathinator {
     public static infieldThrowDelay(player: Player): number {
         const fielding = player.skill.defense.fielding,
             throwing = player.skill.defense.throwing;
-        return 3.5 - (fielding + throwing) / 200;
+        return 4.5 - (fielding + throwing) / 200;
     }
 
     /**
@@ -200,20 +200,15 @@ class Mathinator {
         // Let's say that you have a 100ms window in which to hit the ball fair, with an additional 40ms for
         // playing this game interface.
         // With this formula, 140ms early will pull the ball by ~50 degrees
-        let pull = pullDirection * ((50 / 140) * timing + Math.random() * 10 * (100 / (50 + eye)));
+        let pull = pullDirection * ((50 / 140) * timing + 5 * (100 / (50 + eye)));
 
         pull /= Math.abs(100 / (100 + angle)); // diluted by angle
 
-        const splay = -1.5 * x - (y * angle) / 20 + pull;
+        const splay = -1.75 * x - (y * angle) / 20 + pull;
 
-        const initialFlyAngle = 5 + (-3.5 * y);
+        const initialFlyAngle = 5 + -6.5 * y;
         const flyVerticalScalar = initialFlyAngle > 0 ? 1 : -1;
-        const fly = 30 +
-            flyVerticalScalar * (
-                Math.pow(
-                    0.01 + Math.abs(initialFlyAngle - 30), 0.75
-                )
-            );
+        const fly = 5 + flyVerticalScalar * Math.pow(0.01 + Math.abs(initialFlyAngle - 30), 0.75);
 
         return {
             splay,
