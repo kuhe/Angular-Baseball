@@ -235,7 +235,9 @@ class Player {
             swings: 0,
             getSwing() {
                 return this.swings / this.ps;
-            }
+            },
+            go: 0,
+            fo: 0
         },
         fielding: {
             E: 0,
@@ -422,6 +424,8 @@ class Player {
         const zSwings = randBetween(gamesIntoSeason, gamesIntoSeason * 6, 'eye');
         const ps = randBetween(2 * pa, 4.2 * pa, 'eye'); // pitches seen.
         const swings = oSwings + zSwings;
+        const go = randBetween((pa * 0.9) / 2, (pa * 0.7) / 2, 'eye');
+        const fo = randBetween((pa * 0.9) / 2, (pa * 0.7) / 2, 'eye');
 
         Object.assign(this.stats.pitching, {
             pitches: 0, // in game
@@ -460,7 +464,9 @@ class Player {
             ps,
             oSwings,
             zSwings,
-            swings
+            swings,
+            go,
+            fo
         });
 
         Object.assign(this.stats.fielding, {

@@ -105,6 +105,8 @@ const getStats = (player) => {
         'z%': format(player.stats.batting.getZSwing()),
         'o%': format(player.stats.batting.getOSwing()),
         ppa: format(player.stats.batting.getPPA()),
+        go: format(player.stats.batting.go),
+        fo: format(player.stats.batting.fo),
 
         W: format(player.stats.pitching.W),
         L: format(player.stats.pitching.L),
@@ -257,19 +259,21 @@ times.push(Date.now());
                 ' | F%   ',
                 ' | Z%   ',
                 ' | O%   ',
-                ' | PPA  '
+                ' | P/PA ',
+                ' | GO   ',
+                ' | FO   '
             );
         }
     };
     const logYear = function(stats) {
         let highest = (stat) => {
-            return stats[stat] == Math.max.apply(this, statLines[stat])
+            return Number(stats[stat]) === Math.max(...statLines[stat])
                 ? stats[stat].toString().green
                 : stats[stat];
         };
         let filter = (stat) => {
             const s = highest(stat);
-            return s == Math.min.apply(this, statLines[stat]) ? s.toString().yellow : s;
+            return Number(s) === Math.min(...statLines[stat]) ? s.toString().yellow : s;
         };
         if (asPitcher) {
             log(
@@ -306,14 +310,16 @@ times.push(Date.now());
                 ` | ${filter('fp')}`,
                 ` | ${filter('z%')}`,
                 ` | ${filter('o%')}`,
-                ` | ${filter('ppa')}`
+                ` | ${filter('ppa')}`,
+                ` | ${filter('go')}`,
+                ` | ${filter('fo')}`
             );
         }
     };
     logHeaders();
     logYear(career.Rkie);
     for (year in career) {
-        if (year != 'Rkie') {
+        if (year !== 'Rkie') {
             const stats = career[year];
             logYear(stats);
         }
@@ -337,6 +343,8 @@ times.push(Date.now());
     totals['z%'] = format(totals['z%'] / seasons);
     totals['o%'] = format(totals['o%'] / seasons);
     totals.ppa = format(totals.ppa / seasons);
+    totals.go = format(totals.go);
+    totals.fo = format(totals.fo);
     log('------');
     logYear(totals);
 })();

@@ -50,11 +50,6 @@ class Ball extends AbstractMesh {
     public breakingTrajectory: VECTOR3[] = [];
 
     /**
-     * ensures the ball does not go below the ground plane.
-     */
-    public bounce: 1 | -1 = 1;
-
-    /**
      *
      * @param loop
      * @param trajectory - incremental vectors applied each frame
@@ -71,7 +66,6 @@ class Ball extends AbstractMesh {
             this.join(loop as Loop);
         }
         this.setType('4-seam', 1);
-        this.bounce = 1;
     }
 
     public getMesh(): Mesh {
@@ -100,11 +94,8 @@ class Ball extends AbstractMesh {
 
         if (frame) {
             pos.x += frame.x;
-            pos.y += frame.y * this.bounce;
+            pos.y += frame.y;
             pos.z += frame.z;
-            if (pos.y < AbstractMesh.WORLD_BASE_Y) {
-                this.bounce *= -1;
-            }
             if (frame.x + frame.y + frame.z !== 0) {
                 this.rotate();
             }
@@ -367,8 +358,6 @@ class Ball extends AbstractMesh {
         const currentPosition = { ...this.mesh.position };
 
         const FRAME_CAP = 600;
-        let hasRisen = false;
-        let isFalling = false;
 
         const velocity: fps_t = this.getVelocity(flyAngle, distance, gravitationAcceleration);
         const velocityVerticalComponent: fps_t = velocity * Math.sin((flyAngle * Math.PI) / 180);
@@ -398,23 +387,14 @@ class Ball extends AbstractMesh {
             currentPosition.z += diff.z;
 
             vector.x *= 0.999;
-            vector.y = Math.max(
-                vector.y - gravitationAcceleration / 60,
-                isFalling ? -140 : -velocity // terminal falling velocity of a baseball
-            );
+            vector.y = Math.max(vector.y - gravitationAcceleration / 60, -140);
             vector.z *= 0.999;
-
-            if (vector.y > 0) {
-                hasRisen = true;
-            }
-
-            if (hasRisen && vector.y < 0) {
-                isFalling = true;
-            }
 
             if (currentPosition.y <= AbstractMesh.WORLD_BASE_Y) {
                 // velocity lost on bounce redirect.
-                vector.y = -vector.y * 0.66;
+                if (vector.y < 0) {
+                    vector.y = Math.abs(vector.y) * 0.66;
+                }
             }
 
             frames.push(diff);

@@ -85,7 +85,17 @@ This project was developed unironically on Microsoft Windows, and sometimes on M
 - Wrote nodejs and Java versions of a live-play matchmaking back end.
 - 2018 or so, upgraded to Angular 2+ (8)
 - 2020, migration to TypeScript (baseball engine)
+- 2022, revamped batted ball trajectory animation, added sounds
 
 Future:
 
 - migrate off Angular?
+
+## Developer's Notes
+
+#### Feb 6, 2022
+Good news, I've reworked the batted ball animation frames. 
+- Old system used on-rails animations according to either a parabola (fly ball) or a tapering sine-wave (ground ball bounces). This was often unrealistic looking at certain parts of the input envelope.
+- New system (!) uses physics based trajectory for both fly and ground balls, initial vectoring with acceleration modeled. Ground balls still need some work, but overall looks much better.
+
+Also added sounds for the mitt catching the ball and bat contact, heh. 

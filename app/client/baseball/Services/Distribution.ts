@@ -215,9 +215,9 @@ class Distribution {
                 // the planning (guess) component is removed from the swing decision.
 
                 finalSwingLikelihood =
-                    (positionalLikelihood * 0 +
-                        eyeEvaluatedSwingLikelihood * 99 +
-                        abs(certainty) * 0) /
+                    (positionalLikelihood * 10 +
+                        eyeEvaluatedSwingLikelihood * 80 +
+                        abs(certainty) * 10) /
                     100;
             }
         }
@@ -283,12 +283,15 @@ class Distribution {
         timing?: boolean
     ): axis_t {
         eye = min(eye, 100); // higher eye would overcompensate here
-        const targetEyeFactor = (target * random() * eye) / 100;
-        const randomnessFactor = 100 * (random() - 0.5);
-        const timingFactor = timing ? (50 * (400 * (random() - 0.5))) / (100 + eye) : 0;
+        const targetEyeFactor = ((target - 100) * (100 + random() * eye)) / 200; // -100 to 100 scaled by eye (0-1)
+        const randomnessFactor = 30 * (random() - 0.5); // +- 15
+        const timingFactor = timing ? (45 * (800 * (random() - 0.5))) / (300 + eye) : 0; // +- 50 * eye
         const scalarFactor = 0.85;
 
-        return (targetEyeFactor + randomnessFactor + timingFactor - actual) * scalarFactor;
+        return (
+            (100 + targetEyeFactor + randomnessFactor + timingFactor - (actual - 100)) *
+            scalarFactor
+        );
     }
 
     /**

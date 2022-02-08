@@ -75,23 +75,25 @@ class Umpire {
 
         if (!isNaN(result.stoleABase as number)) {
             var thief = game.batter.team.lineup[result.stoleABase as number];
-            thief.atBats.push(Log.STOLEN_BASE);
-            switch (thief) {
-                case field.first:
-                    field.second = thief;
-                    field.first = null;
-                    break;
-                case field.second:
-                    field.third = thief;
-                    field.second = null;
-                    break;
-                case field.third:
-                    field.third = null;
-                    thief.stats.batting.r++;
-                    thief.atBats.push(Log.RUN);
-                    this.runScores();
+            if (thief) {
+                thief.atBats.push(Log.STOLEN_BASE);
+                switch (thief) {
+                    case field.first:
+                        field.second = thief;
+                        field.first = null;
+                        break;
+                    case field.second:
+                        field.third = thief;
+                        field.second = null;
+                        break;
+                    case field.third:
+                        field.third = null;
+                        thief.stats.batting.r++;
+                        thief.atBats.push(Log.RUN);
+                        this.runScores();
+                }
+                thief.stats.batting.sb++;
             }
-            thief.stats.batting.sb++;
         }
         if (!isNaN(result.caughtStealing as number)) {
             game.teams[game.half === 'top' ? 'home' : 'away'].positions['catcher'].stats.fielding
@@ -153,8 +155,10 @@ class Umpire {
                         batter.stats.batting.ab++;
                         if (result.flyAngle < 15) {
                             game.batter.atBats.push(Log.LINEOUT);
+                            game.batter.stats.batting.fo += 1;
                         } else {
                             game.batter.atBats.push(Log.FLYOUT);
+                            game.batter.stats.batting.fo += 1;
                         }
                     }
                     this.count.outs++;
@@ -182,6 +186,7 @@ class Umpire {
                             fielder.stats.fielding.PO++;
                             pitcher.stats.pitching.IP[1]++;
                             game.batter.atBats.push(Log.FIELDERS_CHOICE);
+                            game.batter.stats.batting.go += 1;
                             this.advanceRunners(false, result.fieldersChoice);
                             result.doublePlay && game.batter.atBats.push(Log.GIDP);
                             this.reachBase();
@@ -196,6 +201,7 @@ class Umpire {
                             fielder.stats.fielding.PO++;
                             pitcher.stats.pitching.IP[1]++;
                             game.batter.atBats.push(Log.GROUNDOUT);
+                            game.batter.stats.batting.go += 1;
                             result.doublePlay && game.batter.atBats.push(Log.GIDP);
                             if (this.count.outs < 3) {
                                 this.advanceRunners(false);

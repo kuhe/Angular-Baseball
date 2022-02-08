@@ -357,11 +357,15 @@ class Log {
         const lineup = this.game.batter.team.lineup;
         if (!isNaN(swingResult.stoleABase)) {
             const thief = lineup[swingResult.stoleABase];
-            steal = this.noteStealAttempt(thief, true, swingResult.attemptedBase);
+            if (thief) {
+                steal = this.noteStealAttempt(thief, true, swingResult.attemptedBase);
+            }
         }
         if (!isNaN(swingResult.caughtStealing)) {
             const thief = lineup[swingResult.caughtStealing];
-            steal = this.noteStealAttempt(thief, false, swingResult.attemptedBase);
+            if (thief) {
+                steal = this.noteStealAttempt(thief, true, swingResult.attemptedBase);
+            }
         }
         if (steal) {
             this.note(steal, steal, text.mode);
